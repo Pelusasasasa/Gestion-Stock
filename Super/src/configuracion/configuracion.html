@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuracion</title>
+    <link rel="stylesheet" href="../assets/global.css">
+</head>
+<body>
+    <h1>Configuracion</h1>
+
+    <section class="input">
+        <main>
+            <label for="caja">Caja</label>
+            <input type="text" name="caja" id="caja">
+        </main>
+
+        <main>
+            <p>Multiples Usuarios?</p>
+            <label for="si">Si</label>
+            <input type="radio" name="multiplesUsuarios" id="si" value="true">
+            <label for="no">No</label>
+            <input type="radio" value="false" name="multiplesUsuarios" id="no">
+        </main>
+
+        <main>
+            <p>Alerta Stock Negativo</p>
+            <label for="si">Si</label>
+            <input type="radio" name="stockNegativo" id="siStockNegativo" value="true">
+            <label for="no">No</label>
+            <input type="radio" value="false" name="stockNegativo" id="noStockNegativo">
+        </main>
+    </section>
+    <section class="botones">
+        <button class="modificar">Modificar</button>
+    </section>
+</body>
+    <script src="./configuracion.js"></script>
+</html>

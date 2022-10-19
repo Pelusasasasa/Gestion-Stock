@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="../css/pdf.css"> -->
+    <title>Document</title>
+    <style>
+        body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+        Arial, sans-serif;
+        }
+
+        html {
+        box-sizing: border-box;
+        font-size: 62.5%;
+        }
+
+        *,
+        *:before,
+        *:after {
+        box-sizing: inherit;
+        }
+
+        body {
+        font-size: 1.6rem;
+        padding: 0 2rem;
+        }
+
+        .morel{
+            display: -webkit-box;
+            -webkit-box-pack: justify;
+            /* display: flex; */
+            /* justify-content: space-between; */
+        }
+
+        .morel{
+            margin-top: 2rem;
+            font-weight: bold;
+            border: .3rem solid black;
+        }
+
+        .morel span{
+            font-weight: 400;
+        }
+
+        .tipoFactura div{
+            border: .5rem solid black;
+            text-align: center;
+            padding: .55rem;
+            margin-top: 2rem;
+        }
+
+        .tipoFactura p{
+            margin: 0;
+        }
+
+        .letra{
+            font-size: 5rem;
+            font-weight: bold;
+        }
+
+        .cliente{
+            border: .3rem solid black;
+            padding: 0 2rem;
+        }
+
+        .cliente main{
+            display: -webkit-box;
+            -webkit-box-pack: justify;
+        }
+        .cliente p,.final p{
+            font-weight: bold;
+        }
+
+        .cliente span,.final span{
+            font-weight: 400;
+        }
+
+        .d-flex{
+            display: -webkit-box;
+            -webkit-box-pack: justify;
+        }
+        .productos{
+            height: auto;
+            min-height: 60rem;
+        }
+        table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead th{
+            border: .1rem solid black;
+        }
+
+        table td{
+            text-align: end;
+        }
+        img{
+            width: 15rem;
+        }
+        .final{
+            margin: 1rem;
+            border: .1rem solid black;
+        }
+
+
+    </style>
+</head>
+<body>
+    <section class="morel">
+        <main>
+            <h3>MOREL TOMAS</h3>
+            <p>Razon Social:<span> MOREL TOMAS</span></p>
+            <p>Domicilio Comercial:<span> 3 De Febrero 3390 - Chajari, Entre Rios</span></p>
+            <p>Codicion frente al IVA:<span> Responsable Monotributo</span></p>
+        </main>
+        <main  class="tipoFactura">
+            <div>
+                <p class="letra">{{letra}}</p>
+            <p class="codigo">{{codigo}}</p>
+            </div>
+        </main>
+        <main>
+            <p class="factura"><span></span></p>
+            <main class="d-flex">
+                <p>Punto de Venta:<span class="puntoVenta">{{puntoVenta}}</span></p>
+                <p>comp. Nro:<span class="numero">{{numero}}</span></p>
+            </main>
+            <p>Fecha de Emision:<span>{{day}}/{{month}}/{{year}}</span></p>
+            <p>CUIT: <span> 20416104655</span></p>
+            <p>Ingresos Brutos: <span> 20-41610465-5</span></p>
+            <p>Fecha de inicio de actividades: <span> 12/03/2021</span></p>
+        </main>
+    </section>
+    <section class="cliente">
+        <main class="nombre">
+            <p>Apellido y Nombre / Razon Social: <span>{{cliente}}</span></p>
+            <p>{{cuit}}: <span>{{dni}}</span></p>
+        </main>
+        <main class="domicilio">
+            <p>Condicion frente al IVA: <span>{{clienteIva}}</span></p>
+            <p>Domicilio: <span>{{domicilio}}</span></p>
+        </main>
+        <main class="condicionVenta">
+            <p>Condicion de Venta: <span>{{condicionVenta}}</span></p>
+        </main>
+    </section>
+    <section class="productos">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cod. Barra</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Unidad</th>
+                    <th>Precio</th>
+                    <th>% Bonif.</th>
+                    <th>Imp. Bonif</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{tr}}
+            </tbody>
+        </table>
+    </section>
+    <section class="final d-flex">
+        <main class="qr">
+            <img src={{qr}} alt="">
+        </main>
+        <main class="cae">
+            <p>CAE N°: <span>{{cae}}</span></p>
+            <p>Fecha de Vto. de CAE: <span>{{fechaCae}}</span></p>
+        </main>
+        <main class="total">
+            <p>Subtotal: $<span>{{subTotal}}</span></p>
+            <p>Importe Otros Atributos: $<span>0.00</span></p>
+            <p>Importe Total: $<span>{{total}}</span></p>
+        </main>
+    </section>
+</body>
+</html>
