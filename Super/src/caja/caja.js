@@ -9,24 +9,34 @@ let seleccion;
 
 const tarjeta = document.querySelector('.tarjeta');
 const contado = document.querySelector('.contado');
+
 const botonDia = document.querySelector('.botonDia');
 const botonMes = document.querySelector('.botonMes');
 const botonAnio = document.querySelector('.botonAnio');
+
 const dia = document.querySelector('.dia');
 const mes = document.querySelector('.mes');
 const anio = document.querySelector('.anio');
+
 let seleccionado = document.querySelector('.seleccionado');
+
 const fecha = document.querySelector('#fecha');
 const selectMes = document.querySelector('#mes');
 const inputAnio = document.querySelector('#anio');
-const tbody = document.querySelector('tbody');
+
+const tbody = document.querySelector('.tbodyListado');
+const tbodyGastos = document.querySelector('.tbodyGastos');
 const volver = document.querySelector('.volver');
 const borrar = document.querySelector('.borrar');
 const total = document.querySelector('#total');
 
+const pestaña = document.querySelector('.pestaña')
+
 let ventas = [];
 let recibos = [];
+let gastos
 let tipoVenta = "CD";
+let filtro = "Ingresos";
 const fechaHoy = new Date();
 let d = fechaHoy.getDate();
 let m = fechaHoy.getMonth() + 1;
@@ -37,6 +47,31 @@ d = d<10 ? `0${d}`: d;
 
 selectMes.value = m;
 inputAnio.value = a;
+
+pestaña.addEventListener('click',e=>{
+    if (e.target.parentNode.nodeName === "MAIN") {
+
+        document.querySelector('.pestañaSeleccionada') && document.querySelector('.pestañaSeleccionada').classList.remove('pestañaSeleccionada');
+        e.target.parentNode.classList.add('pestañaSeleccionada');
+        filtro = e.target.innerHTML;
+
+        if (filtro === "Gastos") {
+            document.querySelector('.gastos').classList.remove('none');
+            document.querySelector('.listado').classList.add('none');
+            //Esconder botones
+            tarjeta.classList.add('none');
+            contado.classList.add('none');
+            listarGastos(gastos);
+        }else{
+            document.querySelector('.listado').classList.remove('none');
+            document.querySelector('.gastos').classList.add('none');
+            //Mostrar botones
+            tarjeta.classList.remove('none');
+            contado.classList.remove('none');
+            listarVentas(ventas)
+        }
+    }
+});
 
 //Cuando se hace click en el boton tarjeta, lo que hacemos es mostrar las ventas con tarjetas
 tarjeta.addEventListener('click',e=>{
@@ -57,20 +92,29 @@ contado.addEventListener('click',e=>{
         listarVentas(ventas)
     };
 });
-//muestra las ventas del mes
+
+//muestra las ventas del mes cuando tocamos en el boton
 botonMes.addEventListener('click',async e=>{
     seleccionado.classList.remove('seleccionado');
     seleccionado = botonMes;
+    seleccionado.classList.add('seleccionado');
     mes.classList.remove('none');
     dia.classList.add('none');
     anio.classList.add('none');
-    seleccionado.classList.add('seleccionado');
-    ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
-    recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
-    listarVentas([...ventas,...recibos]);
+
+
+    //vemos que tipo de filtro es y ahi vemos si traemos los ingresos o gastos
+    if (filtro === "Ingresos") {
+        ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
+        recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
+        listarVentas([...ventas,...recibos]);
+    }else{
+        gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
+        listarGastos(gastos);
+    }
 });
 
-//muestra las ventas del dia
+//muestra las ventas del dia cuando tocamos en el boton
 botonDia.addEventListener('click',async e=>{
     seleccionado.classList.remove('seleccionado');
     seleccionado = botonDia;
@@ -78,12 +122,17 @@ botonDia.addEventListener('click',async e=>{
     mes.classList.add('none');
     anio.classList.add('none');
     seleccionado.classList.add('seleccionado');
-    ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
-    recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-    listarVentas([...ventas,...recibos]);
+    if (filtro === "Ingresos") {
+        ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
+        recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
+        listarVentas([...ventas,...recibos]);
+    }else{
+        gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
+        listarGastos(gastos);
+    }
 });
 
-//muestra las ventas del año
+//muestra las ventas del año cuando tocamos en el boton
 botonAnio.addEventListener('click',async e=>{
     seleccionado.classList.remove('seleccionado');
     seleccionado = botonAnio;
@@ -101,10 +150,74 @@ window.addEventListener('load',async e=>{
     fecha.value = `${a}-${m}-${d}`;
     ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
     recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-    ventas = [...ventas,...recibos]
+    ventas = [...ventas,...recibos];
+    gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
     listarVentas(ventas)
 });
 
+fecha.addEventListener('keypress',async e=>{
+    if ((e.key === "Enter")) {
+        if (filtro === "Ingresos") {
+            ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
+            recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
+            listarVentas([...ventas,...recibos]);
+        }else{
+            gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
+            listarGastos(gastos);
+        }
+    }
+});
+
+selectMes.addEventListener('click',async e=>{
+    if (filtro === "Ingresos") {
+        ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
+        recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
+        listarVentas([...ventas,...recibos]);
+    }else{
+        gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
+        listarGastos(gastos)
+    }
+});
+
+inputAnio.addEventListener('keypress',async e=>{
+    if (e.key === "Enter") {
+        ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
+        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
+        listarVentas([...ventas,...recibos]);
+    }
+});
+
+tbody.addEventListener('click',async e=>{
+    const id = e.target.nodeName === "TD" ? e.target.parentNode.id : e.target.id;
+    
+    seleccion && seleccion.classList.remove('seleccionado');
+    seleccion = document.getElementById(id);
+    seleccion.classList.add('seleccionado');
+    const trs = document.querySelectorAll("tbody .venta" + id)
+    console.log(trs)
+    for await(let tr of trs){
+        console.log("a")
+        tr.classList.toggle('none');
+    }
+});
+
+borrar.addEventListener('click',async e=>{
+    console.log(seleccion.id)
+    await sweet.fire({
+        title:"Borrar Venta?",
+        confirmButtonText:"Aceptar",
+        showCancelButton:true
+    }).then(async({isConfirmed})=>{
+        if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
+            await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
+            location.reload();
+        }else if(isConfirmed && seleccion.children[4].innerHTML === "Recibo"){
+            await sweet.fire({
+                title:"No se puede borrar un recibo"
+            })
+        }
+    });
+});
 
 listarVentas = async (ventas)=>{
     tbody.innerHTML = ``;
@@ -212,65 +325,24 @@ listarVentas = async (ventas)=>{
     total.value = totalVenta.toFixed(2);
 }
 
+const listarGastos = (gastos)=>{
+    tbodyGastos.innerHTML = "";
+    for(let gasto of gastos){
+        const fecha = gasto.fecha.slice(0,10).split('-',3);
+        const a = `
+        <tr>
+            <td>${fecha[2]}/${fecha[1]}/${fecha[0]}</td>
+            <td>${gasto.descripcion}</td>
+            <td>${redondear(gasto.importe * -1,2)}</td>
+        </tr>
+    `
+    tbodyGastos.innerHTML += a;
+    }
+};
 
 volver.addEventListener('click',e=>{
     location.href = "../menu.html";
 })
-
-selectMes.addEventListener('click',async e=>{
-    ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
-    recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
-    listarVentas([...ventas,...recibos]);
-});
-
-inputAnio.addEventListener('keypress',async e=>{
-    if (e.key === "Enter") {
-        ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
-        listarVentas([...ventas,...recibos]);
-    }
-});
-
-fecha.addEventListener('keypress',async e=>{
-    if ((e.key === "Enter")) {
-        ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
-        recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-        listarVentas([...ventas,...recibos]);
-    }
-});
-
-tbody.addEventListener('click',async e=>{
-    const id = e.target.nodeName === "TD" ? e.target.parentNode.id : e.target.id;
-    
-    seleccion && seleccion.classList.remove('seleccionado');
-    seleccion = document.getElementById(id);
-    seleccion.classList.add('seleccionado');
-    const trs = document.querySelectorAll("tbody .venta" + id)
-    console.log(trs)
-    for await(let tr of trs){
-        console.log("a")
-        tr.classList.toggle('none');
-    }
-});
-
-
-borrar.addEventListener('click',async e=>{
-    console.log(seleccion.id)
-    await sweet.fire({
-        title:"Borrar Venta?",
-        confirmButtonText:"Aceptar",
-        showCancelButton:true
-    }).then(async({isConfirmed})=>{
-        if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
-            await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
-            location.reload();
-        }else if(isConfirmed && seleccion.children[4].innerHTML === "Recibo"){
-            await sweet.fire({
-                title:"No se puede borrar un recibo"
-            })
-        }
-    });
-});
 
 document.addEventListener('keyup',e=>{
     if (e.key === "Escape") {

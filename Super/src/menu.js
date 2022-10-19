@@ -6,6 +6,7 @@ require("dotenv").config();
 const URL = process.env.URL;
 
 const archivo = require('./configuracion.json');
+console.log(archivo)
 
 ipcRenderer.send('poner-cierre')
 
@@ -16,6 +17,7 @@ window.addEventListener('load',e=>{
 });
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',e=>{
+    console.log(e.keyCode)
     if (e.keyCode === 112) {
         location.href = "./venta/index.html"
     }else if(e.keyCode === 113){
@@ -31,6 +33,13 @@ document.addEventListener('keyup',e=>{
             ancho:500,
             altura:500
         };
+        ipcRenderer.send('abrir-ventana',opciones);
+    }else if(e.keyCode === 116){
+        const opciones = {
+            path:"gastos/gastos.html",
+            ancho:500,
+            altura:400
+        }
         ipcRenderer.send('abrir-ventana',opciones);
     }
 })

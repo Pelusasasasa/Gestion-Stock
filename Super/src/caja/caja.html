@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="./caja.css">
 </head>
 <body>
+    <section class="pestaña">
+        <main class="pestañaSeleccionada"> 
+            <p>Ingresos</p>
+        </main>
+        <main>
+            <p>Gastos</p>
+        </main>
+    </section>
     <section class="filtro">
         <main class="">
             <button class="buttonSeleccionado contado">Contado</button>
@@ -62,7 +70,19 @@
                     <th>Precio Total</th> 
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody class="tbodyListado"></tbody>
+        </table>
+    </section>
+    <section class="gastos none">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Descripcion</th>
+                    <th>Importe</th>
+                </tr>
+            </thead>
+            <tbody class="tbodyGastos"></tbody>
         </table>
     </section>
     <section class="botones">

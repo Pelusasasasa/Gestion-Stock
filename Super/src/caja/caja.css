@@ -1,3 +1,39 @@
+body{
+  margin-top: 0;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+}
+
+.pestaña{
+  display: flex;
+  justify-content: space-around;
+  background-color: lightgray;
+}
+
+.pestaña main{
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  border: .1rem solid black;
+  border-right: .1rem solid black;
+  border-left: .1rem solid black;
+}
+
+.pestaña main:hover{
+  cursor: pointer;
+}
+
+.pestaña .pestañaSeleccionada{
+  background-color: gray;
+  color: white;
+  border-color: #ffeb78;
+}
+
+.pestaña p{
+  padding: 0;
+  margin: 0;
+}
 
 .filtro{
   display: flex;
@@ -29,7 +65,7 @@
   font-size: 2rem;
 }
 
-.listado{
+.listado,.gastos{
   background-color: white;
   height: 75vh;
   overflow: scroll;
