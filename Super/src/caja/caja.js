@@ -34,7 +34,7 @@ const pestaña = document.querySelector('.pestaña')
 
 let ventas = [];
 let recibos = [];
-let gastos
+let gastos = [];
 let tipoVenta = "CD";
 let filtro = "Ingresos";
 const fechaHoy = new Date();
@@ -45,12 +45,8 @@ let a = fechaHoy.getFullYear();
 m = m<10 ? `0${m}`: m;
 d = d<10 ? `0${d}`: d;
 
-selectMes.value = m;
-inputAnio.value = a;
-
-pestaña.addEventListener('click',e=>{
+pestaña.addEventListener('click',async e=>{
     if (e.target.parentNode.nodeName === "MAIN") {
-
         document.querySelector('.pestañaSeleccionada') && document.querySelector('.pestañaSeleccionada').classList.remove('pestañaSeleccionada');
         e.target.parentNode.classList.add('pestañaSeleccionada');
         filtro = e.target.innerHTML;
@@ -61,17 +57,48 @@ pestaña.addEventListener('click',e=>{
             //Esconder botones
             tarjeta.classList.add('none');
             contado.classList.add('none');
-            listarGastos(gastos);
+            let retornar = await verQueTraer();
+        
+            listarGastos(retornar);
         }else{
             document.querySelector('.listado').classList.remove('none');
             document.querySelector('.gastos').classList.add('none');
             //Mostrar botones
             tarjeta.classList.remove('none');
             contado.classList.remove('none');
-            listarVentas(ventas)
+            let retornar = await verQueTraer();
+            listarVentas(retornar)
         }
     }
 });
+
+const verQueTraer = async()=>{
+    if (seleccionado.classList.contains("botonDia")) {
+        if (filtro === "Ingresos") {
+            ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
+            recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
+            return([...ventas,...recibos])
+        }else{
+            return ((await axios.get(`${URL}gastos/dia/${fecha.value}`)).data);
+        }
+    }else if(seleccionado.classList.contains("mes")){
+        if (filtro === "Ingresos") {
+            ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
+            recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
+            return([...ventas,...recibos])
+        }else{
+            return ((await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data);
+        }
+    }else{
+        if (filtro === "Ingresos") {
+            ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
+            recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
+            return([...ventas,...recibos])
+        }else{
+            return ((await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data)
+        }
+    }
+};
 
 //Cuando se hace click en el boton tarjeta, lo que hacemos es mostrar las ventas con tarjetas
 tarjeta.addEventListener('click',e=>{
@@ -98,6 +125,7 @@ botonMes.addEventListener('click',async e=>{
     seleccionado.classList.remove('seleccionado');
     seleccionado = botonMes;
     seleccionado.classList.add('seleccionado');
+
     mes.classList.remove('none');
     dia.classList.add('none');
     anio.classList.add('none');
@@ -140,19 +168,25 @@ botonAnio.addEventListener('click',async e=>{
     dia.classList.add('none');
     mes.classList.add('none');
     seleccionado.classList.add('seleccionado');
-    ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-    recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data
-    listarVentas([...ventas,...recibos]);
+    if (filtro === "Ingresos") {
+        ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
+        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data
+        listarVentas([...ventas,...recibos]);
+    }else{
+        gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
+        listarGastos(gastos);
+    }
 });
-
 
 window.addEventListener('load',async e=>{
     fecha.value = `${a}-${m}-${d}`;
+    selectMes.value = m;
+    inputAnio.value = a;
     ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
     recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
     ventas = [...ventas,...recibos];
     gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
-    listarVentas(ventas)
+    listarVentas(ventas);
 });
 
 fecha.addEventListener('keypress',async e=>{
@@ -181,9 +215,14 @@ selectMes.addEventListener('click',async e=>{
 
 inputAnio.addEventListener('keypress',async e=>{
     if (e.key === "Enter") {
-        ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
-        listarVentas([...ventas,...recibos]);
+        if (filtro === "Ingresos") {
+            ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
+            recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
+            listarVentas([...ventas,...recibos]);
+        }else{
+            gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
+            listarGastos(gastos)
+        }
     }
 });
 
@@ -194,15 +233,13 @@ tbody.addEventListener('click',async e=>{
     seleccion = document.getElementById(id);
     seleccion.classList.add('seleccionado');
     const trs = document.querySelectorAll("tbody .venta" + id)
-    console.log(trs)
+
     for await(let tr of trs){
-        console.log("a")
         tr.classList.toggle('none');
     }
 });
 
 borrar.addEventListener('click',async e=>{
-    console.log(seleccion.id)
     await sweet.fire({
         title:"Borrar Venta?",
         confirmButtonText:"Aceptar",
@@ -327,22 +364,25 @@ listarVentas = async (ventas)=>{
 
 const listarGastos = (gastos)=>{
     tbodyGastos.innerHTML = "";
+    let totalVenta = 0;
     for(let gasto of gastos){
         const fecha = gasto.fecha.slice(0,10).split('-',3);
-        const a = `
+        const tr = `
         <tr>
             <td>${fecha[2]}/${fecha[1]}/${fecha[0]}</td>
             <td>${gasto.descripcion}</td>
             <td>${redondear(gasto.importe * -1,2)}</td>
         </tr>
     `
-    tbodyGastos.innerHTML += a;
+    tbodyGastos.innerHTML += tr;
+    totalVenta -= gasto.importe;
     }
+    total.value = redondear(totalVenta,2);
 };
 
 volver.addEventListener('click',e=>{
     location.href = "../menu.html";
-})
+});
 
 document.addEventListener('keyup',e=>{
     if (e.key === "Escape") {

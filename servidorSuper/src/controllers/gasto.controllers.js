@@ -12,7 +12,6 @@ gastoCTRL.post = async(req,res)=>{
 gastoCTRL.forDay = async(req,res)=>{
     const {fecha} = req.params;
     const gastos = await Gasto.find({fecha:fecha});
-    console.log(gastos);
     res.send(gastos)
 }
 
@@ -28,11 +27,21 @@ gastoCTRL.forMonth = async(req,res)=>{
             {fecha:{$gte:fechaConMes}},
             {fecha:{$lte:fechaConMesSig}}
         ]
-    })
-
-    console.log(gastos);
-    console.log(fechaConMesSig);
+    });
     res.send(gastos);
+}
+
+gastoCTRL.forYear = async(req,res)=>{
+    const {anio} = req.params;
+    const esteAnio = new Date(anio,0,1,0,0,0);
+    const sigAnio = new Date(parseInt(anio)+1,0,1,0,0,0);
+    const gastos = await Gasto.find({
+        $and:[
+            {fecha:{$gte:esteAnio}},
+            {fecha:{$lte:sigAnio}}
+        ]
+    });
+    res.send(gastos)
 }
 
 gastoCTRL.getBetweenDates = async(req,res)=>{
