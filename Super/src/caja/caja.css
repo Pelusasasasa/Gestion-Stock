@@ -100,3 +100,7 @@ table tbody .total{
   font-weight: bold;
   font-size: 2rem;
 }
+
+tbody tr{
+  cursor: pointer;
+}

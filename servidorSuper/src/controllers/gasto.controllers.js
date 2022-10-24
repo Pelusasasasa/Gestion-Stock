@@ -56,4 +56,12 @@ gastoCTRL.getBetweenDates = async(req,res)=>{
     res.send(gastos);
 }
 
+gastoCTRL.deleteForId = async(req,res)=>{
+    const {id} = req.params;
+    console.log(id)
+    await Gasto.findOneAndRemove({_id:id});
+    console.log(`Venta con el id ${id} fue eliminada`);
+    res.send(`Venta con el id ${id} fue eliminada`);
+};
+
 module.exports = gastoCTRL;

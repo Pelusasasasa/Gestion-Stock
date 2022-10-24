@@ -6,6 +6,7 @@ const { cerrarVentana, redondear } = require("../helpers");
 const sweet = require('sweetalert2');
 
 let seleccion;
+let subSeleccionado;
 
 const tarjeta = document.querySelector('.tarjeta');
 const contado = document.querySelector('.contado');
@@ -240,14 +241,29 @@ tbody.addEventListener('click',async e=>{
 });
 
 borrar.addEventListener('click',async e=>{
+    let title = filtro === "Ingresos" ? "Venta" : "Gasto";
+    
+
     await sweet.fire({
-        title:"Borrar Venta?",
+        title:`Borrar ${title}?`,
         confirmButtonText:"Aceptar",
         showCancelButton:true
     }).then(async({isConfirmed})=>{
-        if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
-            await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
-            location.reload();
+        if (!seleccion.children[4]) {
+            try {
+                await axios.delete(`${URL}gastos/id/${seleccion.id}`);
+                location.reload();
+            } catch (error) {
+                
+            }
+        }else if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
+           try {
+                await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
+                location.reload();
+           } catch (error) {
+            console.log(error)
+            sweet.fire({title:"No se puedo eliminar " + title})
+           }
         }else if(isConfirmed && seleccion.children[4].innerHTML === "Recibo"){
             await sweet.fire({
                 title:"No se puede borrar un recibo"
@@ -256,7 +272,13 @@ borrar.addEventListener('click',async e=>{
     });
 });
 
-listarVentas = async (ventas)=>{
+tbodyGastos.addEventListener('click',e=>{
+    seleccion && seleccion.classList.remove('seleccionado')
+    seleccion = e.target.nodeName === "TD" ? e.target.parentNode : e.target
+    seleccion.classList.add('seleccionado')
+});
+
+const listarVentas = async (ventas)=>{
     tbody.innerHTML = ``;
     let lista = [];
     //organizamos las ventas por fecha
@@ -368,7 +390,7 @@ const listarGastos = (gastos)=>{
     for(let gasto of gastos){
         const fecha = gasto.fecha.slice(0,10).split('-',3);
         const tr = `
-        <tr>
+        <tr id=${gasto._id}>
             <td>${fecha[2]}/${fecha[1]}/${fecha[0]}</td>
             <td>${gasto.descripcion}</td>
             <td>${redondear(gasto.importe * -1,2)}</td>
@@ -385,7 +407,7 @@ volver.addEventListener('click',e=>{
 });
 
 document.addEventListener('keyup',e=>{
-    if (e.key === "Escape") {
+    if (e.key === "Escape" && !document.activeElement.classList.contains('swal2-confirm')) {
         location.href = '../menu.html';
     }
 });
