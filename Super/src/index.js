@@ -71,7 +71,6 @@ ipcMain.on('enviar-ventana-principal',(e,args)=>{
 });
 
 ipcMain.on('imprimir',(e,args)=>{
-
   abrirVentana("ticket/ticket.html",800,500);
   nuevaVentana.webContents.on('did-finish-load',function() {
     nuevaVentana.webContents.send('imprimir',JSON.stringify(args));
@@ -89,7 +88,6 @@ ipcMain.on('imprimir-ventana',(e,args)=>{
     };
   });
 });
-
 
 let nuevaVentana;
 const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{

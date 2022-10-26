@@ -36,6 +36,7 @@ const pestaña = document.querySelector('.pestaña')
 let ventas = [];
 let recibos = [];
 let gastos = [];
+let cuentasCorrientes = [];
 let tipoVenta = "CD";
 let filtro = "Ingresos";
 const fechaHoy = new Date();
@@ -59,18 +60,38 @@ pestaña.addEventListener('click',async e=>{
             tarjeta.classList.add('none');
             contado.classList.add('none');
             let retornar = await verQueTraer();
-        
             listarGastos(retornar);
-        }else{
+        }else if(filtro === "Ingresos"){
             document.querySelector('.listado').classList.remove('none');
             document.querySelector('.gastos').classList.add('none');
             //Mostrar botones
             tarjeta.classList.remove('none');
             contado.classList.remove('none');
             let retornar = await verQueTraer();
+            tipoVenta = "CD";
             listarVentas(retornar)
+        }else{
+            document.querySelector('.listado').classList.remove('none');
+            document.querySelector('.gastos').classList.add('none');
+            //Esconder botones
+            tarjeta.classList.add('none');
+            contado.classList.add('none');
+            tipoVenta = "CC";
+            listarVentas(cuentasCorrientes);
         }
     }
+});
+
+window.addEventListener('load',async e=>{
+    fecha.value = `${a}-${m}-${d}`;
+    selectMes.value = m;
+    inputAnio.value = a;
+    ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
+    recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
+    ventas = [...ventas,...recibos];
+    gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
+    cuentasCorrientes = ((await axios.get(`${URL}ventas/dia/${fecha.value}`)).data).filter(venta => venta.tipo_venta === "CC");
+    listarVentas(ventas);
 });
 
 const verQueTraer = async()=>{
@@ -133,10 +154,16 @@ botonMes.addEventListener('click',async e=>{
 
 
     //vemos que tipo de filtro es y ahi vemos si traemos los ingresos o gastos
-    if (filtro === "Ingresos") {
+    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
-        listarVentas([...ventas,...recibos]);
+        cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+        if (filtro === "Ingresos") {
+            listarVentas([...ventas,...recibos]);    
+        }else{
+            listarVentas(cuentasCorrientes);
+        }
+        
     }else{
         gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
         listarGastos(gastos);
@@ -151,10 +178,15 @@ botonDia.addEventListener('click',async e=>{
     mes.classList.add('none');
     anio.classList.add('none');
     seleccionado.classList.add('seleccionado');
-    if (filtro === "Ingresos") {
+    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-        listarVentas([...ventas,...recibos]);
+        cuentasCorrientes = ventas.fil(venta=>venta.tipo_venta === "CC");
+        if (filtro === "Ingresos") {
+            listarVentas([...ventas,...recibos]);
+        }else{
+            listarVentas(cuentasCorrientes);
+        }
     }else{
         gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
         listarGastos(gastos);
@@ -169,33 +201,32 @@ botonAnio.addEventListener('click',async e=>{
     dia.classList.add('none');
     mes.classList.add('none');
     seleccionado.classList.add('seleccionado');
-    if (filtro === "Ingresos") {
+    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data
-        listarVentas([...ventas,...recibos]);
+        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
+        cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+        if (filtro === "Ingresos") {
+            listarVentas([...ventas,...recibos]);
+        }else{
+            listarVentas(cuentasCorrientes);
+        }
     }else{
         gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
         listarGastos(gastos);
     }
 });
 
-window.addEventListener('load',async e=>{
-    fecha.value = `${a}-${m}-${d}`;
-    selectMes.value = m;
-    inputAnio.value = a;
-    ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
-    recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-    ventas = [...ventas,...recibos];
-    gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
-    listarVentas(ventas);
-});
-
 fecha.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
-        if (filtro === "Ingresos") {
+        if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
             ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
             recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-            listarVentas([...ventas,...recibos]);
+            cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+            if (filtro === "Ingresos") {
+                listarVentas([...ventas,...recibos]);
+            }else{
+                listarVentas(cuentasCorrientes);
+            }
         }else{
             gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
             listarGastos(gastos);
@@ -204,13 +235,19 @@ fecha.addEventListener('keypress',async e=>{
 });
 
 selectMes.addEventListener('click',async e=>{
-    if (filtro === "Ingresos") {
+    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
-        listarVentas([...ventas,...recibos]);
+        cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+
+        if (filtro === "Ingresos") {
+            listarVentas([...ventas,...recibos]);
+        }else{
+            listarVentas(cuentasCorrientes)
+        }
     }else{
         gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
-        listarGastos(gastos)
+        listarGastos(gastos);
     }
 });
 
@@ -219,7 +256,12 @@ inputAnio.addEventListener('keypress',async e=>{
         if (filtro === "Ingresos") {
             ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
             recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
-            listarVentas([...ventas,...recibos]);
+            cuentasCorrientes = ventas.filter(venta => venta.tipo_venta === "CC");
+            if (condition) {
+                listarVentas([...ventas,...recibos]);
+            }else{
+                listarVentas(cuentasCorrientes);
+            }
         }else{
             gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
             listarGastos(gastos)
@@ -294,12 +336,12 @@ const listarVentas = async (ventas)=>{
     //filtramos las ventas si son contadas o tarjeta
     if (tipoVenta === "CD") {
         lista = ventas.filter(venta=>(venta.tipo_venta === "CD"));
+    }else if(tipoVenta === "CC"){
+        lista = ventas;
     }else{
         lista = ventas.filter(venta=>venta.tipo_venta === "T");
     }
-
     let totalVenta = 0;
-
 
     for await(let venta of lista){
         const fecha = new Date(venta.fecha);
@@ -411,3 +453,5 @@ document.addEventListener('keyup',e=>{
         location.href = '../menu.html';
     }
 });
+
+

@@ -43,7 +43,6 @@ const facturar = document.querySelector('.facturar');
 const borrar = document.querySelector(".borrar");
 const impresion = document.querySelector("#impresion");
 
-
 //alerta
 const alerta = document.querySelector('.alerta');
 
@@ -107,9 +106,15 @@ document.addEventListener('keydown',e=>{
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 115){
         impresion.checked = !impresion.checked;
+    }else if(e.keyCode === 116){
+        const opciones = {
+            path:"gastos/gastos.html",
+            ancho:500,
+            altura:400
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
     }
 });
-
 
 //Buscamos un cliente, si sabemos el codigo directamente apretamos enter
 codigo.addEventListener('keypress',async e=>{
@@ -124,28 +129,27 @@ codigo.addEventListener('keypress',async e=>{
             listarCliente(codigo.value)
         }
     }
-})
+});
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,telefono);
-})
+});
 
 telefono.addEventListener('keypress',e=>{
     apretarEnter(e,localidad);
-})
+});
 
 localidad.addEventListener('keypress',e=>{
     apretarEnter(e,direccion);
-})
+});
 
 direccion.addEventListener('keypress',e=>{
     apretarEnter(e,codBarra);
-})
-
+});
 
 cantidad.addEventListener('keypress',async e=>{
     apretarEnter(e,codBarra)
-})
+});
 
 cantidad.addEventListener('keydown',e=>{
     if(e.keyCode === 39){
@@ -430,7 +434,6 @@ const descontarStock = async({cantidad,producto})=>{
     descuentoStock.push(producto)
 }
 
-
 //Lo que hacemos es listar el producto traido
 const listarProducto =async(id)=>{
         let producto = (await axios.get(`${URL}productos/${id}`)).data;
@@ -652,7 +655,6 @@ const hacerHistoricaRecibo = async(numero,haber,tipo)=>{
     (await axios.post(`${URL}historica`,cuenta)).data;
 };
 
-
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
 const cambiarSituacion = (situacion) =>{
     situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
@@ -670,7 +672,6 @@ const verCodigoDocumento = async(cuit)=>{
 
     return 99
 };
-
 
 const listarRubros = async()=>{
     const rubros = (await axios.get(`${URL}rubro`)).data;
