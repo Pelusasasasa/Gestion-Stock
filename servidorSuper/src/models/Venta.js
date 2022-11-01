@@ -53,6 +53,10 @@ const Venta = new mongoose.Schema({
     condicionIva:{
         type:String,
         default:"Consumidor Final"
+    },
+    afip:{
+        type:Object,
+        default:{}
     }
 });
 

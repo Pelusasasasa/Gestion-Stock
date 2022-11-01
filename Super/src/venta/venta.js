@@ -14,7 +14,6 @@ const { ipcRenderer } = require('electron');
 const {apretarEnter,redondear,cargarFactura} = require('../helpers');
 const archivo = require('../configuracion.json');
 
-
 //Parte Cliente
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');
@@ -24,6 +23,7 @@ const direccion = document.querySelector('#direccion');
 const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
 
+//Parte Producto
 const cantidad = document.querySelector('#cantidad');
 const codBarra = document.querySelector('#cod-barra')
 const precioU = document.querySelector('#precio-U');
@@ -40,6 +40,7 @@ const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
 
 //botones
 const facturar = document.querySelector('.facturar');
+const volver = document.querySelector('.volver');
 const borrar = document.querySelector(".borrar");
 const impresion = document.querySelector("#impresion");
 
@@ -229,7 +230,6 @@ const crearProducto = ()=>{
     codBarra.focus();
 };
 
-const volver = document.querySelector('.volver');
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
 })
@@ -306,7 +306,7 @@ facturar.addEventListener('click',async e=>{
     
     venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
     venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
-    console.log(venta);
+
     if (venta.tipo_venta === "CC") {
         await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
     }else{
@@ -346,7 +346,6 @@ facturar.addEventListener('click',async e=>{
             await axios.post(`${URL}ventas`,venta);
 
             if (impresion.checked) {
-                console.log("a")
                 ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
             }
 
@@ -506,6 +505,7 @@ tbody.addEventListener('click',e=>{
 
 //falta hacer con el total
 
+
 // tbody.addEventListener('dblclick',e=>{
 //     if (e.target.nodeName === "TD") {
 //         console.log(seleccionado)
@@ -535,6 +535,7 @@ tbody.addEventListener('click',e=>{
 // });
 
 ///Guardamos el saldo del cliente
+
 const sumarSaldo = async(id,nuevoSaldo,venta)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
     cliente.listaVentas.push(venta);
@@ -566,7 +567,6 @@ const sacarIva = (lista) => {
     }
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),cantIva]
 }
-
 
 borrar.addEventListener('click',e=>{
     total.value = redondear(totalGlobal -  parseFloat(seleccionado.children[5].innerHTML),2);

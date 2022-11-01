@@ -58,7 +58,7 @@ agregar.addEventListener('click',e=>{
 
 //abrimos una ventana para moficiar el cliente
 modificar.addEventListener('click',e=>{
-    seleccionado ? ipcRenderer.send('abrir-ventana',{path:"clientes/modificarCliente.html",informacion:seleccionado.id}) : sweet.fire({title:"Cliente no seleccionado"});
+    seleccionado ? ipcRenderer.send('abrir-ventana',{path:"clientes/modificarCliente.html",altura:500,informacion:seleccionado.id}) : sweet.fire({title:"Cliente no seleccionado"});
 });
 
 //Eliminamos un cliente
@@ -147,7 +147,6 @@ document.addEventListener('keydown',e=>{
         location.href ='../menu.html';
     }
 });
-
 
 document.addEventListener('keydown',e=>{
         if(e.keyCode === 13 && seleccionado && ventanaSecundaria){
