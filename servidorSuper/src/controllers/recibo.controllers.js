@@ -53,4 +53,11 @@ reciboCTRL.recibosAnio = async(req,res)=>{
     res.send(recibos);
 }
 
+reciboCTRL.getForNumber = async(req,res)=>{
+    const {number} = req.params;
+    console.log(number)
+    const recibo = await Recibo.findOne({numero:number});
+    res.send(recibo)
+}
+
 module.exports = reciboCTRL;

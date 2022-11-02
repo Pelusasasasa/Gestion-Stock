@@ -34,3 +34,14 @@
     display: flex;
     justify-content: space-between;
 }
+
+#imprimirVenta main{
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#imprimirVenta input,#imprimirVenta select{
+    font-size: 1.8rem;
+
+}
