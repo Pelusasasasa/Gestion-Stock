@@ -12,7 +12,7 @@ ipcRenderer.send('poner-cierre')
 const cajaTexto = document.querySelector('.cajaTexto');
 
 window.addEventListener('load',e=>{
-    cajaTexto.innerHTML = archivo.caja;  
+    cajaTexto.innerHTML = archivo.caja;
 });
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',e=>{

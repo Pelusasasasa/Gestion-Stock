@@ -50,6 +50,10 @@ const alerta = document.querySelector('.alerta');
 //body
 const body = document.querySelector('body');
 
+
+//audio
+const audio = document.getElementById('audio');
+
 let tipoFactura = getParameterByName("tipoFactura");
 let facturaAnterior;
 
@@ -162,7 +166,6 @@ let listaProductos = [];
 
 codBarra.addEventListener('keypress',async e=>{
     if(e.key === "Enter" && codBarra.value !== ""){
-        console.log("a")
         listarProducto(codBarra.value);
     }else if(e.key === "Enter" && codBarra.value === ""){
         //Esto abre una ventana donde lista todos los productos
@@ -171,6 +174,7 @@ codBarra.addEventListener('keypress',async e=>{
         //     botones: false
         // }
         // ipcRenderer.send('abrir-ventana',opciones);
+        audio.play();
         precioU.focus();
     }
     if(e.keyCode === 37){
@@ -486,6 +490,7 @@ const listarProducto =async(id)=>{
         precioU.value = "";
         codBarra.focus();  
     }else{
+        audio.play();
         precioU.focus();
     }
         
