@@ -21,24 +21,7 @@ window.addEventListener('load',async e=>{
     codigo.value = id;
 });
 
-agregar.addEventListener('click',async e=>{
-    const cliente = {};
-    cliente._id = codigo.value;
-    cliente.nombre = nombre.value;
-    cliente.localidad = localidad.value;
-    cliente.telefono = telefono.value;
-    cliente.direccion = direccion.value;
-    cliente.cuit = cuit.value;
-    cliente.condicionIva = condicionIva.value;
-    cliente.condicionFacturacion = condicionFacturacion.value;
-    const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
-    await sweet.fire({
-        title:mensaje
-    });
-    if (estado) {
-        window.close();
-    }
-});
+
 
 
 nombre.addEventListener('keypress',e=>{
@@ -73,6 +56,25 @@ condicion.addEventListener('keypress',e=>{
 
 document.addEventListener('keydown',e=>{
     cerrarVentana(e)
+});
+
+agregar.addEventListener('click',async e=>{
+    const cliente = {};
+    cliente._id = codigo.value;
+    cliente.nombre = nombre.value;
+    cliente.localidad = localidad.value;
+    cliente.telefono = telefono.value;
+    cliente.direccion = direccion.value;
+    cliente.cuit = cuit.value;
+    cliente.condicionIva = condicionIva.value;
+    cliente.condicionFacturacion = condicionFacturacion.value;
+    const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
+    await sweet.fire({
+        title:mensaje
+    });
+    if (estado) {
+        window.close();
+    }
 });
 
 salir.addEventListener('click',e=>{

@@ -66,6 +66,7 @@ const listar = async(venta,clienteTraido,lista)=>{
         notaCredito.innerHTML = `SALDO ACTUAL: ${clienteTraido.saldo}`;
     }
     for await(const elem of lista){
+
         if (venta.tipo_comp !== "Recibo") {
             listado.innerHTML += `
                 <main>

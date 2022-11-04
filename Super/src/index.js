@@ -78,13 +78,13 @@ ipcMain.on('imprimir',(e,args)=>{
 });
 
 ipcMain.on('imprimir-ventana',(e,args)=>{
-  nuevaVentana.webContents.print({silent:true,deviceName:"POS-80C"},(success,errorType)=>{
+  nuevaVentana.webContents.print({silent:true},(success,errorType)=>{
     if (success) {
        ventanaPrincipal.focus();
-       nuevaVentana.close();
+      // k nuevaVentana.close();
     }else{
        ventanaPrincipal.focus();
-       nuevaVentana && nuevaVentana.close();
+      //  nuevaVentana && nuevaVentana.close();
     };
   });
 });
@@ -96,7 +96,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
     width: ancho,
     modal:true,
     parent:ventanaPrincipal,
-    show:false,
+    show:true,
     webPreferences:{
       nodeIntegration: true,
       contextIsolation:false

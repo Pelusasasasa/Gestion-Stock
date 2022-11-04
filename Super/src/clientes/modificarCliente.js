@@ -21,7 +21,6 @@ const condicionFacturacion = document.querySelector('#condicionFacturacion');
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
-
 const ponerInputs = async(id)=>{
     codigo.value = id;
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -37,6 +36,7 @@ const ponerInputs = async(id)=>{
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,condicionFacturacion);
 });
+
 condicionFacturacion.addEventListener('keypress',e=>{
     e.preventDefault();
     apretarEnter(e,localidad);
@@ -53,9 +53,11 @@ telefono.addEventListener('keypress',e=>{
 direccion.addEventListener('keypress',e=>{
     apretarEnter(e,cuit);
 });
+
 cuit.addEventListener('keypress',e=>{
     apretarEnter(e,condicionIva);
 });
+
 condicionIva.addEventListener('keypress',e=>{
     e.preventDefault();
     apretarEnter(e,modificar);
@@ -84,7 +86,7 @@ modificar.addEventListener('click',async e=>{
     cliente.nombre = nombre.value;
     cliente.localidad = localidad.value;
     cliente.telefono = telefono.value;
-    cliente.direccion = direccion.value;
+    cliente.direccion = direccion.value.to;
     cliente.condicionFacturacion = condicionFacturacion.value;
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;

@@ -19,9 +19,15 @@ let id;
 
 window.addEventListener('load',async e=>{
     const numeros =(await axios.get(`${URL}numero`)).data;
-    let facturas = await ultimaC();
-    facturaC.value = facturas.facturaC;
-    notaC.value = facturas.notaC;
+
+    try {
+        let facturas = await ultimaC();
+        facturaC.value = facturas.facturaC;
+        notaC.value = facturas.notaC;
+    } catch (error) {
+        console.log(error)
+    }
+
     (numeros.Contado === 0 || numeros["Cuenta Corriente"] === 0 || numeros.Recibo === 0 || numeros !== "") && cargar.classList.add('none');
     if (numeros !== "") {
         id = numeros._id;

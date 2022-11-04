@@ -11,7 +11,7 @@ const URL = process.env.URL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -667,7 +667,7 @@ const cambiarSituacion = (situacion) =>{
 
 //Ver Codigo Documento
 const verCodigoDocumento = async(cuit)=>{
-    if (cuit !== 00000000 && cuit !== "") {
+    if (cuit !== "00000000" && cuit !== "") {
         if (cuit.length === 8) {
             return 96
         }else{
@@ -687,3 +687,8 @@ const listarRubros = async()=>{
         select.appendChild(option);
     }
 }
+
+//ponemos un numero para la venta y luego mandamos a imprimirla
+ipcRenderer.on('poner-numero',async (e,args)=>{
+    ponerNumero();
+})

@@ -7,7 +7,9 @@ const URL = process.env.URL;
 
 const archivo = require('./configuracion.json');
 
-ipcRenderer.send('poner-cierre')
+ipcRenderer.send('poner-cierre');
+
+const {abrirVentana, ponerNumero} = require('./helpers');
 
 const cajaTexto = document.querySelector('.cajaTexto');
 
@@ -88,33 +90,5 @@ notaCredito.addEventListener('click',e=>{
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
-    await sweet.fire({
-        html:`
-            <section id=imprimirVenta>
-                <main>
-                    <label htmlFor="tipo">Tipo</label>
-                    <select name="tipo" id="tipo">
-                        <option value="CD">Contado - ${(await axios.get(`${URL}numero`)).data.Contado}</option>
-                        <option value="CC">Cuenta Corriente - ${(await axios.get(`${URL}numero`)).data["Cuenta Corriente"]}</option>
-                    </select>
-                </main>
-                <main>
-                    <label htmlFor="numero">Numero de Venta</label>
-                    <input type="text" name="numero" id="numero" />
-                </main>
-
-            </section>
-        `,
-        showCancelButton:true,
-        confirmButtonText:"Aceptar"
-    }).then(async ({isConfirmed})=>{
-        const tipo = document.getElementById('tipo');
-        const numero = document.getElementById('numero');
-        if (isConfirmed) {
-            const venta = (await axios.get(`${URL}ventas/id/${numero.value}/${tipo.value}`)).data;
-            const cliente = (await axios.get(`${URL}clientes/id/${venta.idCliente}`)).data;
-            const movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;
-            ipcRenderer.send('imprimir',[venta,cliente,movimientos])
-        }
-    })
+    ponerNumero();
 })

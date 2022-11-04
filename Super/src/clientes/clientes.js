@@ -39,7 +39,6 @@ const filtrar = async()=>{
 
 nombre.addEventListener('keyup',filtrar);
 
-
 //Esto sirve para ver si estamos en una ventana secundaria o en la principal
 //la cual va a mostrar o no la parte de botones
 //Y luego podemos mandarle el cliente a la ventana principal si esta es ventana secundaria
@@ -103,7 +102,7 @@ const listarClientes = async(clientes)=>{
         tdDireccion.innerHTML = direccion;
         tdTelefono.innerHTML = telefono;
         tdCuit.innerHTML = cuit ? cuit : ""
-        tdCondicionIva.innerHTML = cuit ? cuit : ""
+        tdCondicionIva.innerHTML = condicionIva ? condicionIva : ""
         tdSaldo.innerHTML = saldo.toFixed(2);
 
         tr.appendChild(tdId);
@@ -172,7 +171,8 @@ ipcRenderer.on('recibir-ventana-secundaria',(e,args)=>{
     tr.children[1].innerHTML = clienteModificado.nombre;
     tr.children[2].innerHTML = clienteModificado.direccion;
     tr.children[3].innerHTML = clienteModificado.telefono;
-    tr.children[4].innerHTML = clienteModificado.saldo;
+    tr.children[4].innerHTML = clienteModificado.cuit;
+    tr.children[5].innerHTML = clienteModificado.condicionIva;
 });
 
 salir.addEventListener('click',e=>{
