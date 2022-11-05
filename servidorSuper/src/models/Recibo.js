@@ -32,6 +32,14 @@ const Recibo = new mongoose.Schema({
     tipo_venta:{
         type:String,
         default:"CD"
+    },
+    vendedor:{
+        type:String,
+        default:""
+    },
+    caja:{
+        type:String,
+        default:""
     }
 });
 

@@ -38,10 +38,6 @@ const Venta = new mongoose.Schema({
         type:String,
         default:""
     },
-    caja:{
-        type:String,
-        default:""
-    },
     F:{
         type:Boolean,
         default: false
@@ -57,6 +53,14 @@ const Venta = new mongoose.Schema({
     afip:{
         type:Object,
         default:{}
+    },
+    caja:{
+        type:String,
+        default:""
+    },
+    vendedor:{
+        type:String,
+        default:""
     }
 });
 
