@@ -21,5 +21,6 @@ app.use('/morel/recibo',require('./routes/recibo'));
 app.use('/morel/numero',require('./routes/numero'));
 app.use('/morel/rubro',require('./routes/rubro'));
 app.use('/morel/gastos',require('./routes/gasto'));
+app.use('/morel/vendedores',require('./routes/vendedor'));
 
 module.exports = app;
