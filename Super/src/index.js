@@ -80,11 +80,11 @@ ipcMain.on('imprimir',(e,args)=>{
 ipcMain.on('imprimir-ventana',(e,args)=>{
   nuevaVentana.webContents.print({silent:true},(success,errorType)=>{
     if (success) {
-       ventanaPrincipal.focus();
-      // k nuevaVentana.close();
+      ventanaPrincipal.focus();
+      nuevaVentana.close();
     }else{
-       ventanaPrincipal.focus();
-      //  nuevaVentana && nuevaVentana.close();
+      ventanaPrincipal.focus();
+      nuevaVentana && nuevaVentana.close();
     };
   });
 });
@@ -96,7 +96,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
     width: ancho,
     modal:true,
     parent:ventanaPrincipal,
-    show:true,
+    show:false,
     webPreferences:{
       nodeIntegration: true,
       contextIsolation:false
@@ -141,6 +141,12 @@ const hacerMenu = () => {
           label:"Rubros",
           click(){
             abrirVentana("rubros/rubros.html",600,900)
+          }
+        },
+        {
+          label:"Vendedores",
+          click(){
+            abrirVentana("vendedores/vendedores.html",600,500);
           }
         },
         {
