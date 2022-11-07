@@ -1,5 +1,3 @@
-const vendedor = [{"permiso":2,"_id":"63664d625cc1612264e2ad54","nombre":"Agustin","codigo":"0210","__v":0}];
-
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
@@ -16,8 +14,10 @@ const eliminar = document.querySelector('.eliminar');
 
 let seleccionado
 
-window.addEventListener('load',e=>{
-    listarVendedores(vendedor)
+window.addEventListener('load',async e=>{
+    let vendedores = (await axios.get(`${URL}vendedores`)).data
+    console.log(vendedores)
+    listarVendedores(vendedores)
 });
 
 
