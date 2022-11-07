@@ -71,7 +71,7 @@ agregar.addEventListener('click',e=>{
             vendedorNuevo.permiso = document.getElementById('permisos').value;
             try {
                 await axios.post(`${URL}vendedores`,vendedorNuevo);
-                listarVendedores(vendedor);
+                listarVendedores(vendedorNuevo);
             } catch (error) {
                 console.log(error);
                 await sweet.fire({
@@ -117,9 +117,8 @@ modificar.addEventListener('click',e=>{
                 vendedorNuevo.nombre = document.getElementById('nombre').value.toUpperCase();
                 vendedorNuevo.codigo = document.getElementById('codigo').value;
                 vendedorNuevo.permiso = document.getElementById('permisos').value;
-
                 try {
-                    await axios.put(`${URL}vendores/id/${seleccionado.id}`,vendedorNuevo);
+                    await axios.put(`${URL}vendedores/id/${seleccionado.id}`,vendedorNuevo);
                 } catch (error) {
                     console.log(error)
                     sweet.fire({
