@@ -46,6 +46,14 @@ const movProducto = new mongoose.Schema({
     tipo_comp:{
         type:String,
         default:"Comprobante"
+    },
+    caja:{
+        type:String,
+        default: ""
+    },
+    vendedor:{
+        type:String,
+        default: ""
     }
 });
 
