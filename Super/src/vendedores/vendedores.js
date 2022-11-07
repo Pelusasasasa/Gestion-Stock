@@ -12,10 +12,12 @@ const agregar = document.querySelector('.agregar');
 const modificar = document.querySelector('.modificar');
 const eliminar = document.querySelector('.eliminar');
 
+let vendedores = [];
+
 let seleccionado
 
 window.addEventListener('load',async e=>{
-    let vendedores = (await axios.get(`${URL}vendedores`)).data
+    vendedores = (await axios.get(`${URL}vendedores`)).data
     listarVendedores(vendedores)
 });
 
@@ -70,7 +72,8 @@ agregar.addEventListener('click',e=>{
             vendedorNuevo.permiso = document.getElementById('permisos').value;
             try {
                 await axios.post(`${URL}vendedores`,vendedorNuevo);
-                listarVendedores(vendedor);
+                vendedores.push(vendedorNuevo)
+                listarVendedores(vendedores);
             } catch (error) {
                 console.log(error);
                 await sweet.fire({
