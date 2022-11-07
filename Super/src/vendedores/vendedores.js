@@ -16,7 +16,6 @@ let seleccionado
 
 window.addEventListener('load',async e=>{
     let vendedores = (await axios.get(`${URL}vendedores`)).data
-    console.log(vendedores)
     listarVendedores(vendedores)
 });
 
@@ -119,7 +118,11 @@ modificar.addEventListener('click',e=>{
                 vendedorNuevo.permiso = document.getElementById('permisos').value;
 
                 try {
-                    await axios.put(`${URL}vendores/id/${seleccionado.id}`,vendedorNuevo);
+                    await axios.put(`${URL}vendedores/id/${seleccionado.id}`,vendedorNuevo);
+                    await sweet.fire({
+                        title:`${vendedorNuevo.nombre} Modificado`
+                    });
+                    location.reload();
                 } catch (error) {
                     console.log(error)
                     sweet.fire({
@@ -135,6 +138,10 @@ eliminar.addEventListener('click',async e=>{
     if (seleccionado) {
         try {
             await axios.delete(`${URL}vendedores/id/${seleccionado.id}`);
+            await sweet.fire({
+                title:`${seleccionado.children[1].innerHTML} Eliminado`
+            });
+            location.reload();
         } catch (error) {
             console.log(error);
             await sweet.fire({
