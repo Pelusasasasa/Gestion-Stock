@@ -72,8 +72,7 @@ agregar.addEventListener('click',e=>{
             vendedorNuevo.permiso = document.getElementById('permisos').value;
             try {
                 await axios.post(`${URL}vendedores`,vendedorNuevo);
-                vendedores.push(vendedorNuevo)
-                listarVendedores(vendedores);
+                location.reload();
             } catch (error) {
                 console.log(error);
                 await sweet.fire({
