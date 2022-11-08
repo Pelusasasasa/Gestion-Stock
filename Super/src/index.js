@@ -152,7 +152,7 @@ const hacerMenu = () => {
         {
           label:"Alicuotas",
           click(){
-            abrirVentana("alicuotas/alicuotas.html",400,500)
+            abrirVentana("alicuotas/alicuotas.html",400,500);
           }
         },
         {

@@ -1,3 +1,14 @@
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+};
+
+//parte de la configuracion
+let vendedor = getParameterByName('vendedor');
+const archivo = require('../configuracion.json');
+
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
@@ -194,6 +205,8 @@ imprimir.addEventListener('click',async e=>{
     recibo.tipo_comp = "Recibo";
     recibo.descuento = 0;
     recibo.precio = parseFloat(total.value);
+    recibo.vendedor = vendedor ? vendedor : "";
+    recibo.caja = archivo.caja;
     try{
         if (tarjeta.checked) {
             recibo.cod_comp = 11;

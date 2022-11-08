@@ -19,9 +19,23 @@ window.addEventListener('load',e=>{
     verVendedores = archivo.vendedores; 
 });
 //Al tocar el atajo de teclado, abrimos ventanas
-document.addEventListener('keyup',e=>{
+document.addEventListener('keyup',async e=>{
     if (e.keyCode === 112) {
-        location.href = "./venta/index.html"
+        if (verVendedores) {
+            const vendedor = await verificarUsuarios();
+            if (vendedor) {
+                location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
+                ipcRenderer.send('sacar-cierre');
+            }else{
+                await sweet.fire({
+                    title:"Contraseña incorrecta"
+                })
+                ventas.click()
+            }
+        }else{
+            location.href = "./venta/index.html";
+            ipcRenderer.send('sacar-cierre');
+        }
     }else if(e.keyCode === 113){
         const opciones = {
             path:"clientes/agregarCliente.html",
