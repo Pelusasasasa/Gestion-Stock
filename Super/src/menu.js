@@ -75,10 +75,9 @@ ventas.addEventListener('click',async e=>{
             ventas.click()
         }
     }else{
-        // location.href = "./venta/index.html";
-        // ipcRenderer.send('sacar-cierre');
+        location.href = "./venta/index.html";
+        ipcRenderer.send('sacar-cierre');
     }
-    
 });
 
 const productos = document.querySelector('.productos');
@@ -109,8 +108,22 @@ consulta.addEventListener('click',e=>{
 });
 
 const recibo = document.querySelector('.recibo');
-recibo.addEventListener('click',e=>{
-    location.href = "./recibo/recibo.html";
+recibo.addEventListener('click',async e=>{
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            location.href = `./recibo/recibo.html?vendedor=${vendedor.nombre}`;
+            ipcRenderer.send('sacar-cierre');
+        }else{
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            })
+            recibo.click();
+        }
+    }else{
+        location.href = "./recibo/recibo.html";
+        ipcRenderer.send('sacar-cierre');
+    }
 });
 
 const notaCredito = document.querySelector('.notaCredito');
