@@ -5,6 +5,8 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+let vendedor = getParameterByName('vendedor');
+
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
@@ -307,6 +309,7 @@ facturar.addEventListener('click',async e=>{
     venta.direccion = direccion.value;
 
     venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+    venta.vendedor = vendedor ? vendedor : "";
     
     venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
     venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
@@ -325,7 +328,7 @@ facturar.addEventListener('click',async e=>{
                 alerta.children[1].innerHTML = "Generando Venta";
             }
             for (let producto of listaProductos){
-                await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp);
+                await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
                 if (!(producto.producto.productoCreado)) {
                     await descontarStock(producto);
                 }
@@ -379,8 +382,6 @@ const listarCliente = async(id)=>{
         codBarra.focus();
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')
     }else{
-    
-
         codigo.value = "";
         codigo.focus();
     }
@@ -411,7 +412,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
 }
 
 //Cargamos el movimiento de producto a la BD
-const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tipo_comp)=>{
+const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tipo_comp,caja,vendedor="")=>{
     const movimiento = {};
     movimiento.tipo_venta = tipo_venta;
     movimiento.codProd = producto._id;
@@ -422,7 +423,9 @@ const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tip
     movimiento.precio = producto.precio //parseFloat(redondear(producto.precio - (producto.precio * parseFloat(descuentoPor.value) / 100),2));
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
-    movimiento.tipo_comp = tipo_comp
+    movimiento.tipo_comp = tipo_comp;
+    movimiento.caja = caja,
+    movimiento.vendedor = vendedor
     movimientos.push(movimiento);
 };
 
