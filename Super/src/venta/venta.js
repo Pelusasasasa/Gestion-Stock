@@ -5,6 +5,8 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+console.log(getParameterByName('vendedor'))
+
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;

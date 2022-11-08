@@ -12,11 +12,11 @@ ipcRenderer.send('poner-cierre');
 const {abrirVentana, ponerNumero} = require('./helpers');
 
 const cajaTexto = document.querySelector('.cajaTexto');
-let vendedor;
+let verVendedores;
 
 window.addEventListener('load',e=>{
     cajaTexto.innerHTML = archivo.caja;
-    vendedor = archivo.vendedores; 
+    verVendedores = archivo.vendedores; 
 });
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',e=>{
@@ -47,6 +47,7 @@ document.addEventListener('keyup',e=>{
 });
 
 const verificarUsuarios = async()=>{
+    let retorno
     await sweet.fire({
         title: "Contraseña",
         input:"text",
@@ -54,16 +55,25 @@ const verificarUsuarios = async()=>{
         showCancelButton:true
     }).then(async({isConfirmed,value})=>{
         if (isConfirmed) {
-            console.log((await axios.get(`${URL}vendedores/id/${value}`)).data);
+            retorno = ((await axios.get(`${URL}vendedores/id/${value}`)).data);
         }
-    })
+    });
+    return retorno
 }
 
 const ventas = document.querySelector('.ventas');
-ventas.addEventListener('click',e=>{
-    console.log(vendedor)
-    if (vendedor) {
-        verificarUsuarios()
+ventas.addEventListener('click',async e=>{
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
+            ipcRenderer.send('sacar-cierre');
+        }else{
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            })
+            ventas.click()
+        }
     }else{
         // location.href = "./venta/index.html";
         // ipcRenderer.send('sacar-cierre');
