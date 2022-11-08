@@ -16,7 +16,7 @@ vendedorCTRL.post = async(req,res)=>{
 
 vendedorCTRL.getForId = async(req,res)=>{
     const {id} = req.params;
-    const vendedor = await Vendedor.findOne({_id:id});
+    const vendedor = await Vendedor.findOne({codigo:id});
     res.send(JSON.stringify(vendedor))
 }
 
