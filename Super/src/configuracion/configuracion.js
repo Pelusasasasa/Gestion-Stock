@@ -3,7 +3,7 @@ const fs = require('fs');
 const { cerrarVentana } = require('../helpers');
 
 const caja = document.getElementById('caja');
-const multiple = document.querySelectorAll("input[name=multiplesUsuarios]");
+const multiple = document.querySelectorAll("input[name=multipleVendedores]");
 const multipleStockNegativos = document.querySelectorAll("input[name=stockNegativo]");
 
 
@@ -15,11 +15,10 @@ const noStockNegativo = document.getElementById('noStockNegativo');
 
 const modificar = document.querySelector('.modificar');
 
-console.log(archivo.stockNegativo)
 
 window.addEventListener('load',e=>{
-    caja.value = archivo.caja;
-    archivo.multipleUsuarios === false ? no.checked = true : si.checked = true;
+    caja.value = archivo.caja;  
+    archivo.vendedores === false ? no.checked = true : si.checked = true;
     archivo.stockNegativo === false ? noStockNegativo.checked = true : siStockNegativo.checked = true;
 });
 
@@ -27,7 +26,7 @@ window.addEventListener('load',e=>{
 modificar.addEventListener('click',async e=>{
     const objeto = {};
     objeto.caja = caja.value;
-    objeto.multipleUsuarios = await verMultiplesUsuarios(multiple);
+    objeto.vendedores = await verMultiplesUsuarios(multiple);
     objeto.stockNegativo = await verMultiplesUsuarios(multipleStockNegativos);
     
     fs.writeFile('src/configuracion.json',JSON.stringify(objeto),(error)=>{
