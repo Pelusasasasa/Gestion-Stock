@@ -12,9 +12,11 @@ ipcRenderer.send('poner-cierre');
 const {abrirVentana, ponerNumero} = require('./helpers');
 
 const cajaTexto = document.querySelector('.cajaTexto');
+let vendedor;
 
 window.addEventListener('load',e=>{
     cajaTexto.innerHTML = archivo.caja;
+    vendedor = archivo.vendedores; 
 });
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',e=>{
@@ -42,12 +44,31 @@ document.addEventListener('keyup',e=>{
         }
         ipcRenderer.send('abrir-ventana',opciones);
     }
-})
+});
+
+const verificarUsuarios = async()=>{
+    await sweet.fire({
+        title: "Contraseña",
+        input:"text",
+        confirmButtonText:"Aceptar",
+        showCancelButton:true
+    }).then(async({isConfirmed,value})=>{
+        if (isConfirmed) {
+            console.log((await axios.get(`${URL}vendedores/id/${value}`)).data);
+        }
+    })
+}
 
 const ventas = document.querySelector('.ventas');
 ventas.addEventListener('click',e=>{
-    location.href = "./venta/index.html";
-    ipcRenderer.send('sacar-cierre');
+    console.log(vendedor)
+    if (vendedor) {
+        verificarUsuarios()
+    }else{
+        // location.href = "./venta/index.html";
+        // ipcRenderer.send('sacar-cierre');
+    }
+    
 });
 
 const productos = document.querySelector('.productos');
