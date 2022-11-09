@@ -361,7 +361,9 @@ const listarVentas = async (ventas)=>{
         const tdProducto =  document.createElement('td');
         const tdCantidad =  document.createElement('td');
         const tdPrecio =  document.createElement('td');
-        const tdPrecioTotal =  document.createElement('td');
+        const tdPrecioTotal = document.createElement('td');
+        const tdVendedor = document.createElement('td');
+        const tdCaja = document.createElement('td');
 
         tdNumero.innerHTML = venta.numero;
         tdFecha.innerHTML = `${hora}:${minutos}:${segundos}`;
@@ -369,6 +371,8 @@ const listarVentas = async (ventas)=>{
         tdCodProducto.innerHTML = venta.tipo_comp;
         tdProducto.innerHTML = "";
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
+        tdVendedor.innerHTML = venta.vendedor;
+        tdCaja.innerHTML = venta.caja;
 
         tr.appendChild(tdNumero);
         tr.appendChild(tdFecha);
@@ -378,6 +382,9 @@ const listarVentas = async (ventas)=>{
         tr.appendChild(tdCantidad);
         tr.appendChild(tdPrecio);
         tr.appendChild(tdPrecioTotal);
+        tr.appendChild(tdVendedor);
+        tr.appendChild(tdCaja);
+
         tbody.appendChild(tr);
 
         //aca listamos los productos de cada venta

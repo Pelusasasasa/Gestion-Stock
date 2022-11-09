@@ -200,3 +200,11 @@ animation: spin 1s linear infinite
   transform: rotate(360deg);
 }
 }
+
+footer .hijoFooter{
+  margin-left: auto;
+}
+
+footer main,footer button{
+  margin: 0 1rem;
+}
