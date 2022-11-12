@@ -104,22 +104,36 @@ document.addEventListener('keydown',e=>{
                 cambiarSituacion(situacion);
             }
         },{once:true})
+    }else if(e.keyCode === 113){
+        const opciones = {
+            path:"clientes/agregarCliente.html",
+            ancho: 900,
+            altura: 600
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 114){
         const opciones = {
-            path:"productos/cambio.html",
+            path:"productos/agregarProducto.html",
             ancho:900,
             altura:650
         };
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 115){
-        impresion.checked = !impresion.checked;
+        const opciones = {
+            path: "productos/cambio.html",
+            ancho:1200,
+            altura:600,
+        }
+        ipcRenderer.send('abrir-ventana',opciones); 
     }else if(e.keyCode === 116){
         const opciones = {
             path:"gastos/gastos.html",
             ancho:500,
             altura:400
         }
-        ipcRenderer.send('abrir-ventana',opciones);
+        ipcRenderer.send('abrir-ventana',opciones);   
+    }else if(e.keyCode === 117){
+        impresion.checked = !impresion.checked;
     }
 });
 

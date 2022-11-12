@@ -11,11 +11,9 @@ ipcRenderer.send('poner-cierre');
 
 const {abrirVentana, ponerNumero} = require('./helpers');
 
-const cajaTexto = document.querySelector('.cajaTexto');
 let verVendedores;
 
 window.addEventListener('load',e=>{
-    cajaTexto.innerHTML = archivo.caja;
     verVendedores = archivo.vendedores; 
 });
 //Al tocar el atajo de teclado, abrimos ventanas
@@ -45,11 +43,18 @@ document.addEventListener('keyup',async e=>{
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 114){
         const opciones = {
-            path:"productos/cambio.html",
-            ancho:500,
-            altura:500
+            path:"prouctos/agregarProducto.html",
+            ancho:1200,
+            altura:800
         };
         ipcRenderer.send('abrir-ventana',opciones);
+    }else if(e.keyCode === 115){
+        const opciones = {
+            path: "productos/cambio.html",
+            ancho: 1200,
+            altura:500
+        }
+        ipcRenderer.send('abrir-ventana',opciones)
     }else if(e.keyCode === 116){
         const opciones = {
             path:"gastos/gastos.html",
