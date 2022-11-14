@@ -87,7 +87,7 @@ ventas.addEventListener('click',async e=>{
         if (vendedor) {
             location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
             ipcRenderer.send('sacar-cierre');
-        }else{
+        }else if(vendedor === null){
             await sweet.fire({
                 title:"Contraseña incorrecta"
             })
