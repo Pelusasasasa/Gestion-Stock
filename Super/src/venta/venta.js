@@ -5,6 +5,8 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+let vendedor = getParameterByName('vendedor');
+
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
@@ -102,22 +104,36 @@ document.addEventListener('keydown',e=>{
                 cambiarSituacion(situacion);
             }
         },{once:true})
+    }else if(e.keyCode === 113){
+        const opciones = {
+            path:"clientes/agregarCliente.html",
+            ancho: 900,
+            altura: 600
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 114){
         const opciones = {
-            path:"productos/cambio.html",
+            path:"productos/agregarProducto.html",
             ancho:900,
             altura:650
         };
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 115){
-        impresion.checked = !impresion.checked;
+        const opciones = {
+            path: "productos/cambio.html",
+            ancho:1000,
+            altura:550,
+        }
+        ipcRenderer.send('abrir-ventana',opciones); 
     }else if(e.keyCode === 116){
         const opciones = {
             path:"gastos/gastos.html",
             ancho:500,
             altura:400
         }
-        ipcRenderer.send('abrir-ventana',opciones);
+        ipcRenderer.send('abrir-ventana',opciones);   
+    }else if(e.keyCode === 117){
+        impresion.checked = !impresion.checked;
     }
 });
 
@@ -307,6 +323,7 @@ facturar.addEventListener('click',async e=>{
     venta.direccion = direccion.value;
 
     venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+    venta.vendedor = vendedor ? vendedor : "";
     
     venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
     venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
@@ -325,7 +342,7 @@ facturar.addEventListener('click',async e=>{
                 alerta.children[1].innerHTML = "Generando Venta";
             }
             for (let producto of listaProductos){
-                await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp);
+                await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
                 if (!(producto.producto.productoCreado)) {
                     await descontarStock(producto);
                 }
@@ -379,8 +396,6 @@ const listarCliente = async(id)=>{
         codBarra.focus();
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')
     }else{
-    
-
         codigo.value = "";
         codigo.focus();
     }
@@ -411,7 +426,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
 }
 
 //Cargamos el movimiento de producto a la BD
-const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tipo_comp)=>{
+const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tipo_comp,caja,vendedor="")=>{
     const movimiento = {};
     movimiento.tipo_venta = tipo_venta;
     movimiento.codProd = producto._id;
@@ -422,7 +437,9 @@ const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tip
     movimiento.precio = producto.precio //parseFloat(redondear(producto.precio - (producto.precio * parseFloat(descuentoPor.value) / 100),2));
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
-    movimiento.tipo_comp = tipo_comp
+    movimiento.tipo_comp = tipo_comp;
+    movimiento.caja = caja,
+    movimiento.vendedor = vendedor
     movimientos.push(movimiento);
 };
 

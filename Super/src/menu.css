@@ -30,9 +30,13 @@
     margin-bottom: 0;
 }
 
-.final{
-    display: flex;
-    justify-content: space-between;
+.informacion{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+}
+
+.informacion p{
+    margin: 0.5rem;
 }
 
 #imprimirVenta main{
