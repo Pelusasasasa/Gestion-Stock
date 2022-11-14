@@ -38,21 +38,21 @@ document.addEventListener('keyup',async e=>{
         const opciones = {
             path:"clientes/agregarCliente.html",
             ancho:1200,
-            altura:900
+            altura:500
         }
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 114){
         const opciones = {
-            path:"prouctos/agregarProducto.html",
+            path:"productos/agregarProducto.html",
             ancho:1200,
-            altura:800
+            altura:550
         };
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(e.keyCode === 115){
         const opciones = {
             path: "productos/cambio.html",
-            ancho: 1200,
-            altura:500
+            ancho: 1000,
+            altura:550
         }
         ipcRenderer.send('abrir-ventana',opciones)
     }else if(e.keyCode === 116){

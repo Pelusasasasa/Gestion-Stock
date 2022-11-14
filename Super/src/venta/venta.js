@@ -121,8 +121,8 @@ document.addEventListener('keydown',e=>{
     }else if(e.keyCode === 115){
         const opciones = {
             path: "productos/cambio.html",
-            ancho:1200,
-            altura:600,
+            ancho:1000,
+            altura:550,
         }
         ipcRenderer.send('abrir-ventana',opciones); 
     }else if(e.keyCode === 116){
