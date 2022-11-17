@@ -297,7 +297,7 @@ borrar.addEventListener('click',async e=>{
             } catch (error) {
                 
             }
-        }else if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
+        }else if (isConfirmed && seleccion.children[3].innerHTML !== "Recibo") {
            try {
                 await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
                 location.reload();
@@ -305,7 +305,7 @@ borrar.addEventListener('click',async e=>{
             console.log(error)
             sweet.fire({title:"No se puedo eliminar " + title})
            }
-        }else if(isConfirmed && seleccion.children[4].innerHTML === "Recibo"){
+        }else if(isConfirmed && seleccion.children[3].innerHTML === "Recibo"){
             try {
                 await axios.delete(`${URL}recibo/id/${seleccion.children[0].innerHTML}`);
                 location.reload();
