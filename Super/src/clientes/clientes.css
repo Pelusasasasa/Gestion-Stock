@@ -214,8 +214,17 @@ table tbody tr td{
 /*Arreglar Saldo*/
 .arreglarSaldo .informacion{
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    /* justify-content: space-around; */
     margin: 2rem 0;
+}
+
+.arreglarSaldo .informacion #id{
+    width: 8rem;
+}
+
+.arreglarSaldo .informacion #nombre{
+    width: 40rem;
 }
 
 
