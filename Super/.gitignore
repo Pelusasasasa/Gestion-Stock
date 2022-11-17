@@ -87,3 +87,6 @@ typings/
 
 # Electron-Forge
 out/
+
+#logo
+src/img/*.ico
