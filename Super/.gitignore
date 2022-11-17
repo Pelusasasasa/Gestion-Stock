@@ -87,3 +87,8 @@ typings/
 
 # Electron-Forge
 out/
+
+supermercado-win32-x64
+
+#logo
+src/img/*.ico

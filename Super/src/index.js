@@ -167,6 +167,12 @@ const hacerMenu = () => {
       label: "Productos",
       submenu:[
         {
+          label:"Agregar Producto",
+          click(){
+            abrirVentana("productos/agregarProducto.html",650,900)
+          }
+        },
+        {
           label:"Cambio de Producto",
           click(){
             abrirVentana("productos/cambio.html",650,900)

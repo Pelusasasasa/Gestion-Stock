@@ -66,7 +66,7 @@ clienteCTRL.modificarCliente = async(req,res)=>{
 
 clienteCTRL.eliminarCliente = async(req,res) =>{
     const {id} = req.params;
-    const cliente = await Clientes.findOneAndRemove({_id:id});
+    const cliente = await Clientes.findOneAndDelete({_id:id});
     console.log(`Cliente ${cliente.nombre} Eliminado`)
     res.send(`Cliente ${cliente.nombre} Eliminado`);
 }

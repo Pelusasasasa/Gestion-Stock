@@ -45,8 +45,10 @@ modificar.addEventListener('click',async e=>{
 });
 
 saldoNuevo.addEventListener('keyup',e=>{
-    saldoNuevo.value = saldoNuevo.value !== "" ? saldoNuevo.value : saldoViejo.value;
-    modificar.focus();
+    if (e.keyCode === 13) {
+        saldoNuevo.value = saldoNuevo.value !== "" ? saldoNuevo.value : saldoViejo.value;
+        modificar.focus();
+    }
 });
 
 document.addEventListener('keyup',e=>{
