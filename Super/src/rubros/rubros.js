@@ -82,6 +82,16 @@ document.addEventListener('keyup',e=>{
     }
 });
 
+nombre.addEventListener('keypress',e=>{
+   if (e.keyCode === 13) {
+    if (agregar.classList.contains('none')) {
+        modificar.focus();
+    }else{
+        agregar.focus();
+    }
+   }
+});
+
 nombre.addEventListener('focus',e=>{
     nombre.select();
 });

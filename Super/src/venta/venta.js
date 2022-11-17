@@ -53,9 +53,6 @@ const alerta = document.querySelector('.alerta');
 const body = document.querySelector('body');
 
 
-//audio
-const audio = document.getElementById('audio');
-
 let tipoFactura = getParameterByName("tipoFactura");
 let facturaAnterior;
 
@@ -190,7 +187,6 @@ codBarra.addEventListener('keypress',async e=>{
         //     botones: false
         // }
         // ipcRenderer.send('abrir-ventana',opciones);
-        audio.play();
         precioU.focus();
     }
     if(e.keyCode === 37){
@@ -507,7 +503,6 @@ const listarProducto =async(id)=>{
         precioU.value = "";
         codBarra.focus();  
     }else{
-        audio.play();
         precioU.focus();
     }
         
