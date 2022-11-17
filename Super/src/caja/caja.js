@@ -285,7 +285,6 @@ tbody.addEventListener('click',async e=>{
 borrar.addEventListener('click',async e=>{
     let title = filtro === "Ingresos" ? "Venta" : "Gasto";
     
-
     await sweet.fire({
         title:`Borrar ${title}?`,
         confirmButtonText:"Aceptar",
@@ -298,7 +297,7 @@ borrar.addEventListener('click',async e=>{
             } catch (error) {
                 
             }
-        }else if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
+        }else if (isConfirmed && seleccion.children[3].innerHTML !== "Recibo") {
            try {
                 await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
                 location.reload();
@@ -306,10 +305,16 @@ borrar.addEventListener('click',async e=>{
             console.log(error)
             sweet.fire({title:"No se puedo eliminar " + title})
            }
-        }else if(isConfirmed && seleccion.children[4].innerHTML === "Recibo"){
-            await sweet.fire({
-                title:"No se puede borrar un recibo"
-            })
+        }else if(isConfirmed && seleccion.children[3].innerHTML === "Recibo"){
+            try {
+                await axios.delete(`${URL}recibo/id/${seleccion.children[0].innerHTML}`);
+                location.reload();
+            } catch (error) {
+                console.log(error)
+                await sweet.fire({
+                    title:"No se puede borrar un recibo"
+                })
+            }
         }
     });
 });
