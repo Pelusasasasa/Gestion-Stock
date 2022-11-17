@@ -74,7 +74,7 @@ ventaCTRL.deleteVenta = async(req,res)=>{
     const {id,tipo} = req.params;
     console.log(id)
     console.log(tipo)
-    await Venta.findOneAndRemove({_id:id,tipo_venta:tipo});
+    await Venta.findOneAndDelete({_id:id,tipo_venta:tipo});
     console.log(`Venta ${id} Eliminada`)
     res.send(`Venta ${id} Eliminada`);
 }

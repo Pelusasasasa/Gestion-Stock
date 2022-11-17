@@ -88,10 +88,7 @@ typings/
 # Electron-Forge
 out/
 
-<<<<<<< HEAD
 supermercado-win32-x64
 
-=======
->>>>>>> frontend
 #logo
 src/img/*.ico

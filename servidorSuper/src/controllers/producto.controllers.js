@@ -116,7 +116,7 @@ productoCTRL.cargarProducto = async(req,res)=>{
 
 productoCTRL.eliminarProducto = async(req,res)=>{
     const {id} = req.params;
-    const producto = await Producto.findOneAndRemove({_id:id});
+    const producto = await Producto.findOneAndDelete({_id:id});
     res.send(`Producto ${producto.descripcion} eliminado`);
 }
 

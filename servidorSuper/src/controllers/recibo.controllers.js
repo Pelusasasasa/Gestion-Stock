@@ -60,4 +60,11 @@ reciboCTRL.getForNumber = async(req,res)=>{
     res.send(recibo)
 }
 
+reciboCTRL.deleteForNumber = async(req,res)=>{
+    const {number} = req.params;
+    await Recibo.findOneAndDelete({numero:number});
+    console.log(`recibo con el numero ${number} borrada`)
+    res.end()
+}
+
 module.exports = reciboCTRL;
