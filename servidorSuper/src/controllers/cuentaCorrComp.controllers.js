@@ -38,7 +38,7 @@ compensadaCTRL.modificarCompensada = async(req,res)=>{
 
 compensadaCTRL.eliminarCuenta = async(req,res)=>{
     const {id} = req.params;
-    const compensada = await CuentaCompensada.findOneAndRemove({_id:id});
+    const compensada = await CuentaCompensada.findOneAndDelete({_id:id});
     res.send(`Cuenta ${id} Eliminada`);
 }
 module.exports = compensadaCTRL;
