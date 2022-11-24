@@ -60,7 +60,7 @@ ipcMain.on('poner-cierre',e=>{
 });
 
 ipcMain.on('abrir-ventana',(e,args)=>{
-  abrirVentana(args.path,args.altura,args.ancho)
+  abrirVentana(args.path,args.altura,args.ancho,args.reinicio)
   nuevaVentana.on('ready-to-show',async()=>{
     nuevaVentana.webContents.send('informacion',args)
   })
@@ -113,6 +113,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
+    console.log(reinicio)
     if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
       ventanaPrincipal.reload()
     }

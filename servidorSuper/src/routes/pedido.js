@@ -2,11 +2,14 @@ const {Router} = require('express');
 
 const router = Router();
 
-const { getAll, post } = require('../controllers/pedido.controllers');
+const { getAll, post, deleteForId, putForId } = require('../controllers/pedido.controllers');
 
 router.route('/')
     .get(getAll)
     .post(post)
+router.route('/id/:id')
+    .put(putForId)
+    .delete(deleteForId)
 
 
 module.exports = router;
