@@ -297,8 +297,47 @@ borrar.addEventListener('click',e=>{
     console.log(listaProductos);
 });
 
-remito.addEventListener('click',e=>{
-    
+remito.addEventListener('click',async e=>{
+    const venta = {};
+    venta.fecha = new Date();
+    venta.numero = (await axios.get(`${URL}numero/Remito`)).data + 1;
+    venta.idCliente = codigo.value;
+    venta.cliente = nombre.value;
+    venta.tipo_comp = "Remito";
+    venta.tipo_venta = "R";
+    venta.caja = archivo.caja;
+    venta.vendedor = vendedor;
+
+    //VER COMO HACER PARA QUE SE HAGA CON IMPRESORA A4
+    // if (impresion.checked) {
+    //     ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
+    // }
+
+    for(let producto of listaProductos){
+        await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor)
+    }
+
+    try {
+        await axios.put(`${URL}numero/Remito`,{Remito:venta.numero});
+    } catch (error) {
+        sweet.fire({title:"No se pudo modificar el numero"})
+    }
+
+    try {
+        await axios.post(`${URL}movimiento`,movimientos);
+    } catch (error) {
+        sweet.fire({
+            title:"No se puedo cargar Los movimientos"
+        })
+    }
+    try {
+        await axios.post(`${URL}remitos`,venta);
+    } catch (error) {
+        sweet.fire({
+            title:"No se pudo cargar el remito, pero si los movimientos"
+        })
+    }
+    location.reload();
 })
 
 facturar.addEventListener('click',async e=>{
