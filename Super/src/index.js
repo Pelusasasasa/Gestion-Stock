@@ -210,6 +210,12 @@ const hacerMenu = () => {
       ]
     },
     {
+      label:"Pedidos",
+      click(){
+        ventanaPrincipal.loadFile('src/pedidos/pedidos.html')
+      }
+    },
+    {
       label:"Configuracion",
       click(){
         abrirVentana('configuracion/configuracion.html',500,500,false)
