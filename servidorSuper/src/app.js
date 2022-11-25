@@ -23,6 +23,7 @@ app.use('/morel/numero',require('./routes/numero'));
 app.use('/morel/rubro',require('./routes/rubro'));
 app.use('/morel/gastos',require('./routes/gasto'));
 app.use('/morel/pedidos',require('./routes/pedido'));
+app.use('/morel/servicios',require('./routes/servicio'));
 
 
 module.exports = app;
