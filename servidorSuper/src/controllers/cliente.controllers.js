@@ -26,7 +26,7 @@ clienteCTRL.id = async(req,res)=>{
 
 clienteCTRL.getClienteId = async(req,res)=>{
     const {id} = req.params;
-    const cliente = (await Clientes.find({_id:id}))[0];
+    const cliente = (await Clientes.findOne({_id:id}));
     res.send(cliente);
 }
 

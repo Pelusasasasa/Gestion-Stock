@@ -26,7 +26,7 @@ const Servicio = new Schema({
         type:String,
         default:""
     },
-    nombre:{
+    producto:{
         type:String,
         require:true
     },
