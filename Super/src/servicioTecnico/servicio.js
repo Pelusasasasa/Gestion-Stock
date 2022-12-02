@@ -47,7 +47,7 @@ const listarServicios = (lista)=>{
         tdDetalles.innerHTML = servicio.detalles;
         tdAcciones.classList.add('acciones');
         tdAcciones.innerHTML = `
-            <span id=detalle class=material-icons>article</span>
+            <span id=edit class=material-icons>edit</span>
             <span id=delete class=material-icons>delete</span>
 
         `
@@ -92,7 +92,7 @@ tbody.addEventListener('click',e=>{
                 }
             }
         })
-    }else if(e.target.id === "detalle"){
+    }else if(e.target.id === "edit"){
         ipcRenderer.send('abrir-ventana',{
             path:`servicioTecnico/agregarServicio.html`,
             ancho:1200,

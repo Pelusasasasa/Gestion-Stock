@@ -4,6 +4,7 @@ const URL = process.env.URL;
 
 const {cerrarVentana, ultimaC} = require('../helpers');
 
+const dolar = document.querySelector('#dolar');
 const contado = document.querySelector('#contado');
 const cuentaCorriente = document.querySelector('#cuentaCorriente');
 const recibo = document.querySelector('#recibo');
@@ -23,6 +24,7 @@ window.addEventListener('load',async e=>{
 
     try {
         let facturas = await ultimaC();
+        console.log(facturas)
         facturaC.value = facturas.facturaC;
         notaC.value = facturas.notaC;
     } catch (error) {
@@ -32,6 +34,7 @@ window.addEventListener('load',async e=>{
     (numeros.Contado === 0 || numeros["Cuenta Corriente"] === 0 || numeros.Recibo === 0 || numeros !== "") && cargar.classList.add('none');
     if (numeros !== "") {
         id = numeros._id;
+        dolar.value = numeros.Dolar.toFixed(2)
         contado.value = numeros.Contado.toString().padStart(8,'0');
         recibo.value = numeros.Recibo.toString().padStart(8,'0');
         cuentaCorriente.value = numeros["Cuenta Corriente"].toString().padStart(8,'0');
@@ -45,7 +48,8 @@ cargar.addEventListener('click',async e=>{
         "Cuenta Corriente": 0,
         "Contado": 0,
         "Recibo": 0,
-        "Remito": 0
+        "Remito": 0,
+        "Dolar":0
     }
     await axios.post(`${URL}numero`,numero);
     location.reload();
