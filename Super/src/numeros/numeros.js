@@ -4,9 +4,11 @@ const URL = process.env.URL;
 
 const {cerrarVentana, ultimaC} = require('../helpers');
 
+const dolar = document.querySelector('#dolar');
 const contado = document.querySelector('#contado');
 const cuentaCorriente = document.querySelector('#cuentaCorriente');
 const recibo = document.querySelector('#recibo');
+const remito = document.querySelector('#remito');
 const facturaC = document.querySelector('#facturaC');
 const notaC = document.querySelector('#notaC');
 
@@ -22,6 +24,7 @@ window.addEventListener('load',async e=>{
 
     try {
         let facturas = await ultimaC();
+        console.log(facturas)
         facturaC.value = facturas.facturaC;
         notaC.value = facturas.notaC;
     } catch (error) {
@@ -31,19 +34,22 @@ window.addEventListener('load',async e=>{
     (numeros.Contado === 0 || numeros["Cuenta Corriente"] === 0 || numeros.Recibo === 0 || numeros !== "") && cargar.classList.add('none');
     if (numeros !== "") {
         id = numeros._id;
-        contado.value = numeros.Contado.toString().padStart(8,'0')
-        recibo.value = numeros.Recibo.toString().padStart(8,'0')
-        cuentaCorriente.value = numeros["Cuenta Corriente"].toString().padStart(8,'0')
+        dolar.value = numeros.Dolar.toFixed(2)
+        contado.value = numeros.Contado.toString().padStart(8,'0');
+        recibo.value = numeros.Recibo.toString().padStart(8,'0');
+        cuentaCorriente.value = numeros["Cuenta Corriente"].toString().padStart(8,'0');
+        remito.value = numeros["Remito"].toString().padStart(8,'0');
     }
 });
-
 
 //aca lo que hacemos es poner un boton para que si los numeros no estan cargados se carguen por primera vez
 cargar.addEventListener('click',async e=>{
     const numero = {
         "Cuenta Corriente": 0,
         "Contado": 0,
-        "Recibo": 0
+        "Recibo": 0,
+        "Remito": 0,
+        "Dolar":0
     }
     await axios.post(`${URL}numero`,numero);
     location.reload();
@@ -68,7 +74,6 @@ guardar.addEventListener('click',async e=>{
     await axios.put(`${URL}numero`,numero);
     window.close();
 });
-
 
 salir.addEventListener('click',e=>{
     window.close();

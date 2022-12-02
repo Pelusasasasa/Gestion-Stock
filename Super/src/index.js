@@ -60,7 +60,7 @@ ipcMain.on('poner-cierre',e=>{
 });
 
 ipcMain.on('abrir-ventana',(e,args)=>{
-  abrirVentana(args.path,args.altura,args.ancho)
+  abrirVentana(args.path,args.altura,args.ancho,args.reinicio)
   nuevaVentana.on('ready-to-show',async()=>{
     nuevaVentana.webContents.send('informacion',args)
   })
@@ -113,6 +113,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
+    console.log(reinicio)
     if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
       ventanaPrincipal.reload()
     }
@@ -134,7 +135,11 @@ const hacerMenu = () => {
         {
           label:"Numeros",
           click(){
+<<<<<<< HEAD
             abrirVentana("numeros/numeros.html",700,400)
+=======
+            abrirVentana("numeros/numeros.html",500,700)
+>>>>>>> frontend
           }
         },
         {
@@ -208,6 +213,18 @@ const hacerMenu = () => {
           }
         }
       ]
+    },
+    {
+      label:"Pedidos",
+      click(){
+        ventanaPrincipal.loadFile('src/pedidos/pedidos.html')
+      }
+    },
+    {
+      label:"Servicio Tecnico",
+      click(){
+        ventanaPrincipal.loadFile('src/servicioTecnico/servicio.html')
+      }
     },
     {
       label:"Configuracion",

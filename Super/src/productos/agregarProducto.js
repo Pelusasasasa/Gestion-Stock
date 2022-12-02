@@ -12,6 +12,7 @@ const total = document.querySelector('#total');
 const guardar = document.querySelector('.guardar');
 
 const sweet  = require('sweetalert2');
+const {cerrarVentana,apretarEnter} = require('../helpers');
 
 const axios = require('axios');
 require('dotenv').config()
@@ -28,7 +29,10 @@ const traerRubros = async()=>{
 }
 
 traerRubros();
-const {cerrarVentana,apretarEnter} = require('../helpers');
+
+window.addEventListener('load',async e=>{
+    dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
+});
 
 impuesto.addEventListener('blur',e=>{
     impuesto.value = impuesto.value === "" ? 0 : impuesto.value;

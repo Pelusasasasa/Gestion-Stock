@@ -1,31 +1,3 @@
-.productoSeleccionado{
-    background-color: rgb(167, 164, 164);
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-      Arial, sans-serif;
-  
-  }
-  
-  html {
-    box-sizing: border-box;
-    font-size: 62.5%;
-  }
-  *,
-  *:before,
-  *:after {
-    box-sizing: inherit;
-  }
-  body {
-    font-size: 1.6rem;
-    padding: 0 2rem;
-    background-color: burlywood;
-  }
-
-.none{
-    display: none !important;
-}
 
 .productos{
     display: flex;
@@ -105,6 +77,19 @@ button:hover{
 }
 
 /*agregar Producto y  modificarlo*/
+
+#titulo{
+    justify-content: end;
+    margin: auto .5rem;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+h1{
+    margin: auto;
+}
+
 .agregarProducto,.modificarProducto{
     display: flex;
     text-align: center;

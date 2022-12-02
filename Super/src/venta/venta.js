@@ -44,6 +44,7 @@ const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
 const facturar = document.querySelector('.facturar');
 const volver = document.querySelector('.volver');
 const borrar = document.querySelector(".borrar");
+const remito = document.getElementById("remito");
 const impresion = document.querySelector("#impresion");
 
 //alerta
@@ -284,7 +285,60 @@ const verTipoVenta = ()=>{
         }
     });
     return retornar;
-}
+};
+
+borrar.addEventListener('click',e=>{
+    total.value = redondear(totalGlobal -  parseFloat(seleccionado.children[5].innerHTML),2);
+    totalGlobal = parseFloat(total.value);
+    listaProductos =  listaProductos.filter(({cantidad,producto})=>producto.idTabla !== seleccionado.id);
+    tbody.removeChild(seleccionado);
+    seleccionado = "";
+    codBarra.focus();
+    console.log(listaProductos);
+});
+
+remito.addEventListener('click',async e=>{
+    const venta = {};
+    venta.fecha = new Date();
+    venta.numero = (await axios.get(`${URL}numero/Remito`)).data + 1;
+    venta.idCliente = codigo.value;
+    venta.cliente = nombre.value;
+    venta.tipo_comp = "Remito";
+    venta.tipo_venta = "R";
+    venta.caja = archivo.caja;
+    venta.vendedor = vendedor;
+
+    //VER COMO HACER PARA QUE SE HAGA CON IMPRESORA A4
+    // if (impresion.checked) {
+    //     ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
+    // }
+
+    for(let producto of listaProductos){
+        await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor)
+    }
+
+    try {
+        await axios.put(`${URL}numero/Remito`,{Remito:venta.numero});
+    } catch (error) {
+        sweet.fire({title:"No se pudo modificar el numero"})
+    }
+
+    try {
+        await axios.post(`${URL}movimiento`,movimientos);
+    } catch (error) {
+        sweet.fire({
+            title:"No se puedo cargar Los movimientos"
+        })
+    }
+    try {
+        await axios.post(`${URL}remitos`,venta);
+    } catch (error) {
+        sweet.fire({
+            title:"No se pudo cargar el remito, pero si los movimientos"
+        })
+    }
+    location.reload();
+})
 
 facturar.addEventListener('click',async e=>{
     alerta.classList.remove('none');
@@ -520,38 +574,6 @@ tbody.addEventListener('click',e=>{
     }
 });
 
-//falta hacer con el total
-
-
-// tbody.addEventListener('dblclick',e=>{
-//     if (e.target.nodeName === "TD") {
-//         console.log(seleccionado)
-//         seleccionado && seleccionado.classList.remove('seleccionado');
-//         seleccionado = e.target.parentNode;
-//         seleccionado.classList.add('seleccionado');
-
-//         const tr = e.target.parentNode;
-//         sweet.fire({
-//             title:"Cambio De Precio",
-//             input:"number",
-//             showCancelButton:true,
-//             confirmButtonText:"Aceptar"
-//         }).then(({isConfirmed,value})=>{
-//             if (isConfirmed && value !== "") {
-//                 const totalViejo = parseFloat(tr.children[5].innerHTML);
-//                 tr.children[4].innerHTML = parseFloat(value).toFixed(2);
-//                 tr.children[5].innerHTML = redondear(parseFloat(value) * parseFloat(tr.children[0].innerHTML),2);
-//                 const producto = listaProductos.find(producto => producto._id === tr._id)
-//                 console.log(producto)
-//                 producto.producto.precio = parseFloat(value)
-                
-//                 total.value = redondear(parseFloat(total.value) - totalViejo + (parseFloat(value)*producto.cantidad),2)
-//             }
-//         })
-//     }
-// });
-
-///Guardamos el saldo del cliente
 
 const sumarSaldo = async(id,nuevoSaldo,venta)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -585,15 +607,7 @@ const sacarIva = (lista) => {
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),cantIva]
 }
 
-borrar.addEventListener('click',e=>{
-    total.value = redondear(totalGlobal -  parseFloat(seleccionado.children[5].innerHTML),2);
-    totalGlobal = parseFloat(total.value);
-    listaProductos =  listaProductos.filter(({cantidad,producto})=>producto.idTabla !== seleccionado.id);
-    tbody.removeChild(seleccionado);
-    seleccionado = "";
-    codBarra.focus();
-    console.log(listaProductos);
-});
+
 
 codigo.addEventListener('focus',e=>{
     codigo.select();
@@ -704,3 +718,35 @@ const listarRubros = async()=>{
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
 })
+
+//falta hacer con el total
+
+// tbody.addEventListener('dblclick',e=>{
+//     if (e.target.nodeName === "TD") {
+//         console.log(seleccionado)
+//         seleccionado && seleccionado.classList.remove('seleccionado');
+//         seleccionado = e.target.parentNode;
+//         seleccionado.classList.add('seleccionado');
+
+//         const tr = e.target.parentNode;
+//         sweet.fire({
+//             title:"Cambio De Precio",
+//             input:"number",
+//             showCancelButton:true,
+//             confirmButtonText:"Aceptar"
+//         }).then(({isConfirmed,value})=>{
+//             if (isConfirmed && value !== "") {
+//                 const totalViejo = parseFloat(tr.children[5].innerHTML);
+//                 tr.children[4].innerHTML = parseFloat(value).toFixed(2);
+//                 tr.children[5].innerHTML = redondear(parseFloat(value) * parseFloat(tr.children[0].innerHTML),2);
+//                 const producto = listaProductos.find(producto => producto._id === tr._id)
+//                 console.log(producto)
+//                 producto.producto.precio = parseFloat(value)
+                
+//                 total.value = redondear(parseFloat(total.value) - totalViejo + (parseFloat(value)*producto.cantidad),2)
+//             }
+//         })
+//     }
+// });
+
+///Guardamos el saldo del cliente

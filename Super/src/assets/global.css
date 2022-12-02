@@ -71,3 +71,22 @@ select{
   font-size: 2rem;
   padding: 1rem;
 }
+
+.acciones{
+  display: flex;
+  justify-content: space-around;
+  cursor: pointer;
+}
+
+
+.tool:hover .tooltip{
+  display: block;
+  position: absolute;
+}
+
+.tooltip{
+  display: none;
+  background-color: gray;
+  color: white;
+  border: .1rem solid black;
+}
