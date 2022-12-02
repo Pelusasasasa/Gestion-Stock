@@ -10,7 +10,6 @@ let pedidos;
 const tbody = document.querySelector('tbody');
 
 const agregar = document.getElementById('agregar');
-const eliminar = document.getElementById('eliminar');
 const salir = document.getElementById('salir');
 
 let seleccionado;
@@ -23,7 +22,7 @@ window.addEventListener('load',async e=>{
     await listarPedidos(pedidos);
 });
 
-const listarPedidos = (lista) => {
+const listarPedidos = async(lista) => {
     for(let pedido of lista){
         const tr = document.createElement('tr');
         
@@ -38,22 +37,34 @@ const listarPedidos = (lista) => {
         const tdStock = document.createElement('td');
         const tdEstadoPedido = document.createElement('td');
         const tdObservaciones = document.createElement('td');
+        const tdAcciones = document.createElement('td');
 
         const inputEstado = document.createElement('input');
 
         inputEstado.value = pedido.estadoPedido;
+        tdAcciones.classList.add('acciones')
 
         const fecha = pedido.fecha.slice(0,10).split('-',3);
 
         tdFecha.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
         tdCodigo.innerHTML = pedido.codigo;
         tdProducto.innerHTML = pedido.producto;
-        tdCantidad.innerHTML = pedido.cantidad;
+        tdCantidad.innerHTML = pedido.cantidad.toFixed(2);
         tdCliente.innerHTML = pedido.cliente;
         tdTelefono.innerHTML = pedido.telefono;
         tdStock.innerHTML = pedido.stock;
         tdEstadoPedido.appendChild(inputEstado);
-        tdObservaciones.innerHTML = pedido.observaciones
+        tdObservaciones.innerHTML = pedido.observaciones;
+        tdAcciones.innerHTML = `
+        <div id=edit class=tool>
+            <span id=edit class=material-icons>edit</span>
+            <p class=tooltip>Modificar</p>
+        </div>
+        <div id=delete class=tool>
+            <span id=delete class=material-icons>delete</span>
+            <p class=tooltip>Eliminar</p>
+        </div>
+        `
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCodigo);
@@ -64,6 +75,7 @@ const listarPedidos = (lista) => {
         tr.appendChild(tdStock);
         tr.appendChild(tdEstadoPedido);
         tr.appendChild(tdObservaciones);
+        tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
     }
@@ -72,15 +84,23 @@ const listarPedidos = (lista) => {
     inputSeleccionado = seleccionado.children[7].children[0];
 };
 
-tbody.addEventListener('click',e=>{
+tbody.addEventListener('click',async e=>{
     seleccionado && seleccionado.classList.remove('seleccionado');
-    seleccionado = e.target.nodeName === "TD" ? e.target.parentNode : e.target.parentNode.parentNode;
-    seleccionado.classList.add('seleccionado');
+    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+        subSeleccionado = e.target;
+    }else if(e.target.nodeName === "INPUT" || e.target.nodeName === "DIV"){
+        seleccionado = e.target.parentNode.parentNode;
+        subSeleccionado = e.target.parentNode;
+    }else if(e.target.nodeName === "SPAN"){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+        subSeleccionado = e.target.parentNode.parentNode;
+    }
 
     inputSeleccionado = seleccionado.children[7].children[0];
 
-    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-    subSeleccionado = e.target.nodeName === "TD" ? e.target : e.target.parentNode;
+    seleccionado.classList.add('seleccionado');
     subSeleccionado.classList.add('subSeleccionado');
 
     inputSeleccionado.addEventListener('change',async e=>{
@@ -90,23 +110,10 @@ tbody.addEventListener('click',e=>{
         location.reload();
     });
 
-    e.target.nodeName === "INPUT" && e.target.select()
-    
-});
+    e.target.nodeName === "INPUT" && e.target.select();
 
-
-agregar.addEventListener('click',e=>{
-    ipcRenderer.send('abrir-ventana',{
-        path:"pedidos/agregarPedidos.html",
-        ancho:500,
-        altura:550,
-        reinicio:true
-    });
-});
-
-eliminar.addEventListener('click',async e=>{
-    if (seleccionado) {
-        sweet.fire({
+    if (e.target.innerHTML === "delete") {
+        await sweet.fire({
             title:"Seguro Eliminar pedido?",
             confirmButtonText:"Aceptar",
             showCancelButton:true
@@ -122,8 +129,33 @@ eliminar.addEventListener('click',async e=>{
                 }
             }
         })
+    }else if(e.target.innerHTML === "edit"){
+        ipcRenderer.send('abrir-ventana',{
+            path:"pedidos/agregarPedidos.html",
+            ancho:500,
+            altura:550,
+            reinicio:true,
+            informacion:seleccionado.id
+        });
     }
+    
 });
+
+
+agregar.addEventListener('click',e=>{
+    ipcRenderer.send('abrir-ventana',{
+        path:"pedidos/agregarPedidos.html",
+        ancho:500,
+        altura:550,
+        reinicio:true
+    });
+});
+
+document.addEventListener('keyup',e=>{
+    if (e.keyCode === 27) {
+        location.href = '../menu.html';
+    };
+})
 
 salir.addEventListener('click',e=>{
     location.href = '../menu.html';

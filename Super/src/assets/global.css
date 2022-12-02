@@ -75,6 +75,7 @@ select{
 .acciones{
   display: flex;
   justify-content: space-around;
+  cursor: pointer;
 }
 
 

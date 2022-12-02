@@ -19,6 +19,12 @@ pedidoCTRL.putForId = async(req,res)=>{
     await Pedido.findByIdAndUpdate({_id:id},req.body);
     console.log(`Pedido ${req.body.producto} Mificado el estado a ${req.body.estadoPedido}`);
     res.send();
+};
+
+pedidoCTRL.getForId = async(req,res)=>{
+    const {id} = req.params;
+    const pedido = await Pedido.findOne({_id:id});
+    res.send(pedido)
 }
 
 pedidoCTRL.deleteForId = async(req,res)=>{
@@ -26,6 +32,6 @@ pedidoCTRL.deleteForId = async(req,res)=>{
     await Pedido.findOneAndDelete({_id:id});
     console.log(`Pedido ${id} Eliminado`)
     res.send()
-}
+};
 
 module.exports = pedidoCTRL;

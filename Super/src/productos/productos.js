@@ -64,7 +64,7 @@ const listar = (productos)=>{
         tdStock.innerHTML = redondear(stock,2);
         tdMarca.innerHTML = marca;
         tdAcciones.innerHTML = `
-        <div id=edit class=tool>
+            <div id=edit class=tool>
                 <span id=edit class=material-icons>edit</span>
                 <p class=tooltip>Modificar</p>
             </div>
