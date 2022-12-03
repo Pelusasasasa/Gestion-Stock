@@ -22,12 +22,8 @@ app.use('/morel/historica',require('./routes/historica'));
 app.use('/morel/numero',require('./routes/numero'));
 app.use('/morel/rubro',require('./routes/rubro'));
 app.use('/morel/gastos',require('./routes/gasto'));
-<<<<<<< HEAD
 app.use('/morel/vendedores',require('./routes/vendedor'));
-=======
 app.use('/morel/pedidos',require('./routes/pedido'));
 app.use('/morel/servicios',require('./routes/servicio'));
-
->>>>>>> frontend
 
 module.exports = app;
