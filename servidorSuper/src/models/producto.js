@@ -24,6 +24,10 @@ const Producto = new mongoose.Schema({
         type: Number,
         required: true
     },
+    costoDolar:{
+        type: Number,
+        required: true
+    },
     impuesto:{
         type:Number,
         default: 0

@@ -113,7 +113,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
-    console.log(reinicio)
+
     if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
       ventanaPrincipal.reload()
     }
@@ -135,11 +135,7 @@ const hacerMenu = () => {
         {
           label:"Numeros",
           click(){
-<<<<<<< HEAD
-            abrirVentana("numeros/numeros.html",700,400)
-=======
-            abrirVentana("numeros/numeros.html",500,700)
->>>>>>> frontend
+            abrirVentana("numeros/numeros.html",550,700)
           }
         },
         {
@@ -171,6 +167,12 @@ const hacerMenu = () => {
     {
       label: "Productos",
       submenu:[
+        {
+          label:"Modificar Codigo",
+          click(){
+            abrirVentana("productos/modificarCodigo.html",500,500)
+          }
+        },
         {
           label:"Agregar Producto",
           click(){
