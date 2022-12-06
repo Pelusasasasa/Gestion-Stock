@@ -50,7 +50,7 @@ productoCTRL.traerProducto = async(req,res)=>{
             producto.push(rubro.rubro);
         });
     }else{
-        producto = (await Producto.find({_id:id}))[0];
+        producto = (await Producto.findOne({_id:id}));
     }
     res.send(producto);
 }

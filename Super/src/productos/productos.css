@@ -159,3 +159,20 @@ h1{
 .marcas .inputs main input{
     padding: .5rem;
 }
+
+/*Modificar Codigo*/
+
+#modificarCodigo h1{
+    text-align: center;
+}
+
+#modificarCodigo main{
+    display: flex;
+    flex-direction: column;
+    margin: 3rem auto;
+}
+
+
+#codigo,#nuevoCodigo{
+    width: 30%;
+}

@@ -168,6 +168,12 @@ const hacerMenu = () => {
       label: "Productos",
       submenu:[
         {
+          label:"Modificar Codigo",
+          click(){
+            abrirVentana("productos/modificarCodigo.html",500,500)
+          }
+        },
+        {
           label:"Agregar Producto",
           click(){
             abrirVentana("productos/agregarProducto.html",650,900)
