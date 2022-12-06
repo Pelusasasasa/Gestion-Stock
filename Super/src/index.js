@@ -113,7 +113,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
-    console.log(reinicio)
+
     if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
       ventanaPrincipal.reload()
     }

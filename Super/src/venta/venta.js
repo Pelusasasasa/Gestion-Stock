@@ -43,7 +43,6 @@ const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
 //botones
 const facturar = document.querySelector('.facturar');
 const volver = document.querySelector('.volver');
-const borrar = document.querySelector(".borrar");
 const remito = document.getElementById("remito");
 const impresion = document.querySelector("#impresion");
 
@@ -150,32 +149,6 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-nombre.addEventListener('keypress',e=>{
-    apretarEnter(e,telefono);
-});
-
-telefono.addEventListener('keypress',e=>{
-    apretarEnter(e,localidad);
-});
-
-localidad.addEventListener('keypress',e=>{
-    apretarEnter(e,direccion);
-});
-
-direccion.addEventListener('keypress',e=>{
-    apretarEnter(e,codBarra);
-});
-
-cantidad.addEventListener('keypress',async e=>{
-    apretarEnter(e,codBarra)
-});
-
-cantidad.addEventListener('keydown',e=>{
-    if(e.keyCode === 39){
-        codBarra.focus();
-    }
-});
-
 let listaProductos = [];
 
 codBarra.addEventListener('keypress',async e=>{
@@ -235,6 +208,16 @@ const crearProducto = ()=>{
             <td></td>
             <td>${parseFloat(producto.precio).toFixed(2)}</td>
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
+            <td class=acciones>
+                <div class=tool>
+                    <span class=material-icons>post_add</span>
+                    <p class=tooltip>Agregar Nº serie</p>
+                </div>
+                <div class=tool>
+                    <span class=material-icons>delete</span>
+                    <p class=tooltip>Eliminar</p>
+                </div>
+            </td>
         </tr>
     `;
 
@@ -286,16 +269,6 @@ const verTipoVenta = ()=>{
     });
     return retornar;
 };
-
-borrar.addEventListener('click',e=>{
-    total.value = redondear(totalGlobal -  parseFloat(seleccionado.children[5].innerHTML),2);
-    totalGlobal = parseFloat(total.value);
-    listaProductos =  listaProductos.filter(({cantidad,producto})=>producto.idTabla !== seleccionado.id);
-    tbody.removeChild(seleccionado);
-    seleccionado = "";
-    codBarra.focus();
-    console.log(listaProductos);
-});
 
 remito.addEventListener('click',async e=>{
     const venta = {};
@@ -539,6 +512,16 @@ const listarProducto =async(id)=>{
             <td>${producto.marca}</td>
             <td>${parseFloat(precioU.value).toFixed(2)}</td>
             <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
+            <td class=acciones>
+                <div class=tool>
+                    <span class=material-icons>post_add</span>
+                    <p class=tooltip>Agregar Nº serie</p>
+                </div>
+                <div class=tool>
+                    <span class=material-icons>delete</span>
+                    <p class=tooltip>Eliminar</p>
+                </div>
+            </td>
         </tr>
     `;
         total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
@@ -565,12 +548,39 @@ const listarProducto =async(id)=>{
 let seleccionado;
 //Hacemos para que se seleccione un tr
 
-tbody.addEventListener('click',e=>{
+tbody.addEventListener('click',async e=>{
+    seleccionado && seleccionado.classList.remove('seleccionado');
     if (e.target.nodeName === "TD") {
-        console.log(seleccionado)
-        seleccionado && seleccionado.classList.remove('seleccionado');
         seleccionado = e.target.parentNode;
-        seleccionado.classList.add('seleccionado');
+    }else if(e.target.nodeName === "DIV"){
+        seleccionado = e.target.parentNode.parentNode;
+    }else if(e.target.nodeName === "SPAN"){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+    }
+    seleccionado.classList.add('seleccionado');
+
+    if (e.target.innerHTML === "post_add") {
+        await sweet.fire({
+            title:"Nº Series",
+            html:`
+                <textarea name="series" id="series" cols="30" rows="10"></textarea>
+            `
+        }).then(()=>{
+            // document.getElementById('series').value
+            const objeto = listaProductos.find(objeto => objeto.producto.idTabla === seleccionado.id);
+            objeto.series = document.getElementById('series').value.split('\n');
+        })
+    }else if(e.target.innerHTML === "delete"){
+        sweet.fire({
+            title:"Borrar?",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(({isConfirmed})=>{
+            tbody.removeChild(seleccionado);
+            total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[5].innerHTML),2);
+            totalGlobal = parseFloat(total.value);
+            listaProductos = listaProductos.filter(({producto,cantidad}) => {producto.idTabla === seleccionado.id});
+        })
     }
 });
 
@@ -718,6 +728,33 @@ const listarRubros = async()=>{
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
 })
+
+nombre.addEventListener('keypress',e=>{
+    apretarEnter(e,telefono);
+});
+
+telefono.addEventListener('keypress',e=>{
+    apretarEnter(e,localidad);
+});
+
+localidad.addEventListener('keypress',e=>{
+    apretarEnter(e,direccion);
+});
+
+direccion.addEventListener('keypress',e=>{
+    apretarEnter(e,codBarra);
+});
+
+cantidad.addEventListener('keypress',async e=>{
+    apretarEnter(e,codBarra)
+});
+
+cantidad.addEventListener('keydown',e=>{
+    if(e.keyCode === 39){
+        codBarra.focus();
+    }
+});
+
 
 //falta hacer con el total
 
