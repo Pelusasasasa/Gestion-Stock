@@ -60,7 +60,7 @@ ipcMain.on('poner-cierre',e=>{
 });
 
 ipcMain.on('abrir-ventana',(e,args)=>{
-  abrirVentana(args.path,args.altura,args.ancho)
+  abrirVentana(args.path,args.altura,args.ancho,args.reinicio)
   nuevaVentana.on('ready-to-show',async()=>{
     nuevaVentana.webContents.send('informacion',args)
   })
@@ -113,6 +113,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
+
     if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
       ventanaPrincipal.reload()
     }
@@ -134,7 +135,7 @@ const hacerMenu = () => {
         {
           label:"Numeros",
           click(){
-            abrirVentana("numeros/numeros.html",500,400)
+            abrirVentana("numeros/numeros.html",550,700)
           }
         },
         {
@@ -166,6 +167,12 @@ const hacerMenu = () => {
     {
       label: "Productos",
       submenu:[
+        {
+          label:"Modificar Codigo",
+          click(){
+            abrirVentana("productos/modificarCodigo.html",500,500)
+          }
+        },
         {
           label:"Agregar Producto",
           click(){
@@ -208,6 +215,18 @@ const hacerMenu = () => {
           }
         }
       ]
+    },
+    {
+      label:"Pedidos",
+      click(){
+        ventanaPrincipal.loadFile('src/pedidos/pedidos.html')
+      }
+    },
+    {
+      label:"Servicio Tecnico",
+      click(){
+        ventanaPrincipal.loadFile('src/servicioTecnico/servicio.html')
+      }
     },
     {
       label:"Configuracion",

@@ -13,10 +13,8 @@ let ventanaSecundaria = false;
 const seleccion = document.querySelector('#seleccion');
 const tbody = document.querySelector('tbody');
 const agregar = document.querySelector('.agregar');
-const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 const buscador = document.querySelector('#buscarProducto');
-const eliminar = document.querySelector('.eliminar');
 
 window.addEventListener('load',async e=>{
     filtrar();
@@ -54,21 +52,34 @@ const listar = (productos)=>{
         const tdPrecio = document.createElement('td');
         const tdStock = document.createElement('td');
         const tdMarca = document.createElement('td');
+        const tdAcciones = document.createElement('td');
         
         tdPrecio.classList.add('text-rigth');
         tdStock.classList.add('text-rigth');
+        tdAcciones.classList.add('acciones')
 
         tdId.innerHTML = _id;
         tdDescripcion.innerHTML = descripcion;
         tdPrecio.innerHTML = redondear(precio,2);
         tdStock.innerHTML = redondear(stock,2);
         tdMarca.innerHTML = marca;
+        tdAcciones.innerHTML = `
+            <div id=edit class=tool>
+                <span id=edit class=material-icons>edit</span>
+                <p class=tooltip>Modificar</p>
+            </div>
+            <div id=delete class=tool>
+                <span id=delete class=material-icons>delete</span>
+                <p class=tooltip>Eliminar</p>
+            </div>
+        `
 
         tr.appendChild(tdId);
         tr.appendChild(tdDescripcion);
         tr.appendChild(tdPrecio);
         tr.appendChild(tdStock);
         tr.appendChild(tdMarca);
+        tr.appendChild(tdAcciones)
         
         tbody.appendChild(tr);
 
@@ -105,12 +116,45 @@ buscador.addEventListener('keyup',e=>{
 //cuando ahcemos un click en un tr lo ponemos como que esta seleccionado
 tbody.addEventListener('click',e=>{
     seleccionado && seleccionado.classList.toggle('seleccionado');
-    seleccionado = e.target.parentNode;
-    seleccionado.classList.toggle('seleccionado');
-
     subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-    subSeleccionado = e.target;
+
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+        subSeleccionado = e.target;
+
+    }else if(e.target.nodeName === "DIV"){
+        seleccionado = e.target.parentNode.parentNode;
+        subSeleccionado = e.target.parentNode;
+    }else if(e.target.nodeName === "SPAN"){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+        subSeleccionado = e.target.parentNode.parentNode;
+    };
+
+    seleccionado.classList.toggle('seleccionado');
     subSeleccionado.classList.add('subSeleccionado');
+
+    if (e.target.innerHTML === "delete") {
+        sweet.fire({
+            title:"Seguro Borrar " + seleccionado.children[1].innerHTML,
+            "showCancelButton":true,
+            "confirmButtonText":"Aceptar"
+        }).then(async (result)=>{
+            if (result.isConfirmed) {
+                const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
+                await sweet.fire({title:mensaje});
+                tbody.removeChild(seleccionado);
+            }
+        })
+    }else if(e.target.innerHTML === "edit"){
+        const opciones = {
+            path: "./productos/modificarProducto.html",
+            botones:true,
+            informacion:seleccionado.id,
+            altura:600
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
+    }
+
 })
 
 agregar.addEventListener('click',e=>{
@@ -121,40 +165,6 @@ agregar.addEventListener('click',e=>{
     }
     ipcRenderer.send('abrir-ventana',opciones);
 })
-
-//al hacer click abrimos la ventana de modifcar un producto
-modificar.addEventListener('click',e=>{
-    if (seleccionado) {
-        const opciones = {
-            path: "./productos/modificarProducto.html",
-            botones:true,
-            informacion:seleccionado.id,
-            altura:600
-        }
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else{
-        sweet.fire({title:"Producto no seleccionado"});
-    }
-});
-
-//Aca elminamos un producto si es que esta seleccionado
-eliminar.addEventListener('click',async e=>{
-    if(seleccionado){
-        sweet.fire({
-            title:"Seguro Borrar " + seleccionado.children[1].innerHTML,
-            "showCancelButton":true,
-            "confirmButtonText":"Aceptar"
-        }).then(async (result)=>{
-            if (result.isConfirmed) {
-                const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
-                    sweet.fire({title:mensaje});
-                     location.reload(); 
-            }
-        })
-    }else{
-        sweet.file({title:"No se selecciono ningun producto"});
-    }
-});
 
 
 const body = document.querySelector('body');

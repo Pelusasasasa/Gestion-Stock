@@ -1,32 +1,17 @@
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-      Arial, sans-serif;
-  
- }
-  
- html {
-    box-sizing: border-box;
-    font-size: 62.5%;
- }
- *,
- *:before,
- *:after {
-    box-sizing: inherit;
- }
- 
- body {
-    font-size: 1.6rem;
-    padding: 0 2rem;
-    background-color: burlywood;
- }
+   font-size: 1.6rem;
+   padding: 0 2rem;
+   background-color: burlywood;
+}
  
 .inputs{
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
 }
 
 .inputs main{
-    margin: 2rem 0;
+    margin: 1rem 0;
     display: flex;
     flex-direction: column;
 }

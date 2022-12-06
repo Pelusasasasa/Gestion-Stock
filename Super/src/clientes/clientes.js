@@ -12,8 +12,6 @@ const tbody = document.querySelector('tbody');
 const agregar = document.querySelector('.agregar');
 const nombre = document.querySelector('#nombre');
 const botones = document.querySelector('.botones');
-const modificar = document.querySelector('.modificar');
-const eliminar = document.querySelector('.eliminar');
 const salir = document.querySelector('.salir');
 
 //variables
@@ -55,33 +53,6 @@ agregar.addEventListener('click',e=>{
     ipcRenderer.send('abrir-ventana',{path:"./clientes/agregarCliente.html",altura:500,ancho:1200});
 });
 
-//abrimos una ventana para moficiar el cliente
-modificar.addEventListener('click',e=>{
-    seleccionado ? ipcRenderer.send('abrir-ventana',{path:"clientes/modificarCliente.html",altura:500,informacion:seleccionado.id}) : sweet.fire({title:"Cliente no seleccionado"});
-});
-
-//Eliminamos un cliente
-eliminar.addEventListener('click',async e=>{
-    if (seleccionado) {
-        await sweet.fire({
-            title:"Seguro eliminar " + seleccionado.children[1].innerHTML,
-            confirmButtonText:"Aceptar",
-            showCancelButton:true
-        }).then(async({isConfirmed})=>{
-            if (isConfirmed) {
-                const mensaje = (await axios.delete(`${URL}clientes/id/${seleccionado.id}`)).data;
-                await sweet.fire({
-                    title:mensaje
-                });
-                location.reload();
-            }
-        })
-    }else{
-        await sweet.fire({
-            title:"Cliente no seleccionado"
-        });
-    }
-})
 
 //listamos los clientes, con sus datos
 const listarClientes = async(clientes)=>{
@@ -96,7 +67,10 @@ const listarClientes = async(clientes)=>{
         const tdCuit = document.createElement('td');
         const tdCondicionIva = document.createElement('td');
         const tdSaldo = document.createElement('td');
-    
+        const tdAcciones = document.createElement('td');
+
+        tdAcciones.classList.add('acciones');
+
         tdId.innerHTML = _id;
         tdNombre.innerHTML = nombre;
         tdDireccion.innerHTML = direccion;
@@ -104,6 +78,16 @@ const listarClientes = async(clientes)=>{
         tdCuit.innerHTML = cuit ? cuit : ""
         tdCondicionIva.innerHTML = condicionIva ? condicionIva : ""
         tdSaldo.innerHTML = saldo.toFixed(2);
+        tdAcciones.innerHTML = `
+            <div class=tool>
+                <span class=material-icons>edit</span>
+                <p class=tooltip>Modificar</p>
+            </div>
+            <div>
+                <span class=material-icons>delete</span>
+                <p class=tooltip>Eliminar</p>
+            </div>
+        `
 
         tr.appendChild(tdId);
         tr.appendChild(tdNombre);
@@ -112,6 +96,7 @@ const listarClientes = async(clientes)=>{
         tr.appendChild(tdCuit);
         tr.appendChild(tdCondicionIva);
         tr.appendChild(tdSaldo);
+        tr.appendChild(tdAcciones)
 
         tbody.appendChild(tr);
     };
@@ -123,16 +108,46 @@ const listarClientes = async(clientes)=>{
 }
 
 //si hacemos click en un tr que se cambie el seleccionado
-tbody.addEventListener('click',e=>{
-    if(e.target.nodeName === "TD"){
+tbody.addEventListener('click',async e=>{
         seleccionado && seleccionado.classList.remove('seleccionado');
-        seleccionado = e.target.parentNode;
-        seleccionado.classList.add('seleccionado');
-
         subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-        subSeleccionado = e.target;
+
+        if (e.target.nodeName === "TD") {
+            seleccionado = e.target.parentNode;
+            subSeleccionado = e.target;
+        }else if(e.target.nodeName === "DIV"){
+            seleccionado = e.target.parentNode.parentNode;
+            subSeleccionado = e.target.parentNode
+        }else if(e.target.nodeName){
+            seleccionado = e.target.parentNode.parentNode.parentNode;
+            subSeleccionado = e.target.parentNode.parentNode;
+        }
+
+        seleccionado.classList.add('seleccionado');
         subSeleccionado.classList.add('subSeleccionado');
-    }
+
+
+        if (e.target.innerHTML === "delete") {
+            await sweet.fire({
+                title:"Seguro eliminar " + seleccionado.children[1].innerHTML,
+                confirmButtonText:"Aceptar",
+                showCancelButton:true
+            }).then(async({isConfirmed})=>{
+                if (isConfirmed) {
+                    const mensaje = (await axios.delete(`${URL}clientes/id/${seleccionado.id}`)).data;
+                    await sweet.fire({
+                        title:mensaje
+                    });
+                    tbody.removeChild(seleccionado);
+                }
+            })
+        }else if(e.target.innerHTML === "edit"){
+            ipcRenderer.send('abrir-ventana',
+                {path:"clientes/modificarCliente.html",
+                altura:500,
+                informacion:seleccionado.id
+            });
+        }
 });
 
 document.addEventListener('keydown',e=>{

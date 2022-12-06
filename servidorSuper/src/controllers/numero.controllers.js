@@ -18,6 +18,12 @@ numeroCTRL.modificarNumeros = async(req,res)=>{
     res.send(`Numeros Modificados`);
 };
 
+numeroCTRL.traerNumero = async(req,res)=>{
+    const {numero} = req.params;
+    const numeros = await Numero.findOne();
+    res.send(`${numeros[numero]}`);
+}
+
 numeroCTRL.modificarNumero = async(req,res)=>{
     const {numero} = req.params;
     const numeros = (await Numero.find())[0];
