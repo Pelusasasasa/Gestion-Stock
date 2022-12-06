@@ -173,6 +173,6 @@ h1{
 }
 
 
-#codigo,#nuevoCodigo{
+#modificarCodigo, #codigo #nuevoCodigo{
     width: 30%;
 }

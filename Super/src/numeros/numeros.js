@@ -20,13 +20,13 @@ const cargar = document.querySelector('.cargar');
 const salir = document.querySelector('.salir');
 
 let id;
+let dolarTraido;
 
 window.addEventListener('load',async e=>{
     const numeros =(await axios.get(`${URL}numero`)).data;
 
     try {
         let facturas = await ultimaC();
-        console.log(facturas)
         facturaC.value = facturas.facturaC;
         notaC.value = facturas.notaC;
     } catch (error) {
@@ -36,7 +36,8 @@ window.addEventListener('load',async e=>{
     (numeros.Contado === 0 || numeros["Cuenta Corriente"] === 0 || numeros.Recibo === 0 || numeros !== "") && cargar.classList.add('none');
     if (numeros !== "") {
         id = numeros._id;
-        dolar.value = numeros.Dolar.toFixed(2)
+        dolarTraido = numeros.Dolar;
+        dolar.value = numeros.Dolar.toFixed(2);
         contado.value = numeros.Contado.toString().padStart(8,'0');
         recibo.value = numeros.Recibo.toString().padStart(8,'0');
         cuentaCorriente.value = numeros["Cuenta Corriente"].toString().padStart(8,'0');
@@ -77,6 +78,11 @@ guardar.addEventListener('click',async e=>{
     numero["Cuenta Corriente"] = parseInt(cuentaCorriente.value);
     numero.Dolar = dolar.value;
     numero.Remito = remito.value;
+
+    if (dolarTraido !== parseFloat(dolar.value)) {
+        await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
+    }
+
     try {
         await axios.put(`${URL}numero`,numero);
         window.close();

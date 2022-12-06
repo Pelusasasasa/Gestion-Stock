@@ -1,5 +1,6 @@
 const productoCTRL = {};
 
+const { find } = require('../models/producto');
 const Producto = require('../models/producto');
 
 productoCTRL.descontarStock = async(req,res)=>{
@@ -146,5 +147,18 @@ productoCTRL.putMarcas = async(req,res)=>{
         mensaje:"Producto Modificados",
         estado:true
     }))
+};
+
+productoCTRL.cambioPreciosPorDolar = async(req,res)=>{
+    const {dolar} = req.params;
+    const productos = await Producto.find({costoDolar:{$ne:0}});
+    
+    for(let producto of productos){
+        const costoIva = parseFloat((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100))*parseFloat(dolar).toFixed(2))
+        producto.precio = (costoIva*producto.ganancia/100 + costoIva).toFixed(2);
+        await Producto.findOneAndUpdate({_id:producto._id},producto);
+    }
+    console.log("Cambios el precio de los productos con dolares");
+    res.end();
 }
 module.exports = productoCTRL
