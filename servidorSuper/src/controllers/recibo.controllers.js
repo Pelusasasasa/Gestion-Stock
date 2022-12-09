@@ -39,7 +39,6 @@ reciboCTRL.recibosMes = async(req,res)=>{
             {fecha:{$lte:fechaConMesSig}}
         ]
     });
-    console.log(recibos)
     res.send(recibos);
 };
 
@@ -59,7 +58,6 @@ reciboCTRL.recibosAnio = async(req,res)=>{
 
 reciboCTRL.getForNumber = async(req,res)=>{
     const {number} = req.params;
-    console.log(number)
     const recibo = await Recibo.findOne({numero:number});
     res.send(recibo)
 }

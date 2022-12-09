@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const uri = "mongodb://127.0.0.1/gestion";
+const uri = "mongodb://127.0.0.1/morel";
 
 mongoose.connect(uri,{
     useUnifiedTopology:true,

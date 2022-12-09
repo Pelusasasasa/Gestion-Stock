@@ -108,7 +108,6 @@ productoCTRL.cargarProducto = async(req,res)=>{
             mensaje = `Producto ${producto.descripcion} No cargado`;
         }
     }
-    console.log(mensaje)
     res.send(JSON.stringify({
         mensaje,
         estado

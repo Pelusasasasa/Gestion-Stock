@@ -50,7 +50,6 @@ clienteCTRL.cargarCliente = async(req,res)=>{
             mensaje = (`Cliente ${cliente.nombre} No Fue Cargado`)
         }
     }
-    console.log(mensaje)
     res.send(JSON.stringify({
         mensaje,
         estado
