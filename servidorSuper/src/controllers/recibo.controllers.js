@@ -4,6 +4,8 @@ const Recibo = require('../models/Recibo');
 
 
 reciboCTRL.cargarRecibo = async(req,res)=>{
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+    const nuevaCompensada = new CuentaComp(req.body);
     const nuevoRecibo = new Recibo(req.body);
     await nuevoRecibo.save();
     res.send(`Recibo ${req.body.numero} cargado`)

@@ -3,6 +3,8 @@ const gastoCTRL = {};
 const Gasto = require('../models/Gasto');
 
 gastoCTRL.post = async(req,res)=>{
+    const now = new Date();
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const gasto = new Gasto(req.body);
     await gasto.save();
     console.log(`Gasto ${req.body.descripcion} con el importe de ${gasto.importe} Cagrgado`);
@@ -11,7 +13,13 @@ gastoCTRL.post = async(req,res)=>{
 
 gastoCTRL.forDay = async(req,res)=>{
     const {fecha} = req.params;
-    const gastos = await Gasto.find({fecha:fecha});
+    let diaSiguiente = fecha + "T23:59:59";
+    const gastos = await Gasto.find({
+        $and: [
+            {fecha: {$gte: new Date(fecha)}},
+            {fecha: {$lte: new Date(diaSiguiente)}}
+          ]
+    });
     res.send(gastos)
 }
 

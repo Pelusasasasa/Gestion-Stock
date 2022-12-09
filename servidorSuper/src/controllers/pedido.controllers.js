@@ -3,6 +3,8 @@ const pedidoCTRL = {};
 const Pedido = require('../models/Pedido');
 
 pedidoCTRL.post = async(req,res)=>{
+    const now = new Date();
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const pedido = new Pedido(req.body);
     await pedido.save();
     console.log(`Pedido ${req.body.producto} Cargado`)
