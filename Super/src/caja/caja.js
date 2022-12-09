@@ -42,7 +42,7 @@ let filtro = "Ingresos";
 const fechaHoy = new Date();
 let d = fechaHoy.getDate();
 let m = fechaHoy.getMonth() + 1;
-let a = fechaHoy.getFullYear();
+let a = fechaHoy.getFullYear(); 
 
 m = m<10 ? `0${m}`: m;
 d = d<10 ? `0${d}`: d;
@@ -181,7 +181,7 @@ botonDia.addEventListener('click',async e=>{
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-        cuentasCorrientes = ventas.fil(venta=>venta.tipo_venta === "CC");
+        cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
         if (filtro === "Ingresos") {
             listarVentas([...ventas,...recibos]);
         }else{
@@ -349,11 +349,14 @@ const listarVentas = async (ventas)=>{
     let totalVenta = 0;
 
     for await(let venta of lista){
-        const fecha = new Date(venta.fecha);
-        const hora = fecha.getHours();
-        const minutos = fecha.getMinutes();
-        let segundos = fecha.getSeconds(); 
-        segundos=segundos<10 ? `0${segundos}` : segundos;
+        const fecha = venta.fecha.slice(11,18).split(':',3);
+        let hora = fecha[0];
+        let minutos = fecha[1];
+        let segundos = fecha[2];
+
+        // hora = hora < 10 ? `0${hora}` : hora;
+        // minutos = minutos < 10 ? `0${minutos}` : minutos;
+        segundos = segundos < 10 ? `0${segundos}` : segundos;
 
         const tr = document.createElement('tr');
         tr.id = venta._id;
@@ -376,7 +379,7 @@ const listarVentas = async (ventas)=>{
         tdCodProducto.innerHTML = venta.tipo_comp;
         tdProducto.innerHTML = "";
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
-        tdVendedor.innerHTML = venta.vendedor;
+        tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
         tdCaja.innerHTML = venta.caja;
 
         tr.appendChild(tdNumero);

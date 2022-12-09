@@ -78,14 +78,18 @@ select{
   cursor: pointer;
 }
 
+.tool{
+  position: relative;
+}
 
 .tool:hover .tooltip{
   display: block;
-  position: absolute;
 }
 
 .tooltip{
   display: none;
+  position: absolute;
+  z-index: 1;
   background-color: gray;
   color: white;
   border: .1rem solid black;

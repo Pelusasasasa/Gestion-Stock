@@ -1,10 +1,12 @@
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter,selecciona_value} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
+
+const dolar = document.getElementById('dolar');
 
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
@@ -12,6 +14,7 @@ const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const stock = document.querySelector('#stock');
 const costo = document.querySelector('#costo');
+const costoDolar = document.querySelector('#costoDolar');
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
 const ganancia = document.querySelector('#ganancia');
@@ -22,6 +25,7 @@ const salir = document.querySelector('.salir');
 
 //Recibimos la informacion del producto para luego llenar los inputs
 ipcRenderer.on('informacion',async (e,args)=>{
+    dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
     const {informacion}= args;
     const rubros = (await axios.get(`${URL}rubro`)).data;
     for await(let {rubro,numero} of rubros){
@@ -43,11 +47,16 @@ const llenarInputs = async(codigoProducto)=>{
     marca.value = producto.marca;
     stock.value = producto.stock;
     select.value = producto.rubro;
-    costo.value = producto.costo;
-    impuesto.value = producto.impuesto;
-    costoIva.value = (producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2);
-    ganancia.value = producto.ganancia;
-    total.value = producto.precio;    
+    costo.value = producto.costo.toFixed(2);
+    costoDolar.value = producto.costoDolar.toFixed(2);
+    impuesto.value = producto.impuesto.toFixed(2);
+    if (producto.costoDolar !== 0) {
+        costoIva.value = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(dolar.value),2);
+    }else{
+        costoIva.value = (producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2);
+    }
+    ganancia.value = producto.ganancia.toFixed(2);
+    total.value = producto.precio.toFixed(2);    
 }
 
 //al hacer click modificamos los productos con el valor de los inputs
@@ -59,6 +68,7 @@ modificar.addEventListener('click',async e=>{
     producto.rubro = rubro.value.trim();
     producto.stock = parseFloat(stock.value).toFixed(2);
     producto.costo = parseFloat(costo.value).toFixed(2);
+    producto.costoDolar = parseFloat(costoDolar.value).toFixed(2);
     producto.impuesto = parseFloat(impuesto.value).toFixed(2);
     producto.ganancia = parseFloat(ganancia.value).toFixed(2);
     producto.precio = parseFloat(total.value).toFixed(2);
@@ -80,7 +90,6 @@ descripcion.addEventListener('keypress',e=>{
     apretarEnter(e,marca);
 });
 
-
 marca.addEventListener('keypress',e=>{
     apretarEnter(e,rubro);
 });
@@ -97,8 +106,11 @@ stock.addEventListener('keypress',e=>{
     apretarEnter(e,costo);
 });
 
-
 costo.addEventListener('keypress',e=>{
+    apretarEnter(e,costoDolar);
+});
+
+costoDolar.addEventListener('keypress',e=>{
     apretarEnter(e,impuesto);
 });
 
@@ -118,48 +130,48 @@ total.addEventListener('keypress',e=>{
     apretarEnter(e,modificar);
 });
 
-
-
 descripcion.addEventListener('focus',e=>{
-    selecciona_value(descripcion.id);
+    descripcion.select()
 });
-
 
 marca.addEventListener('focus',e=>{
-    selecciona_value(marca.id);
-});
-
-rubro.addEventListener('focus',e=>{
-   
+    marca.select()
 });
 
 stock.addEventListener('focus',e=>{
-    selecciona_value(stock.id);
+    stock.select()
 });
 
-
 costo.addEventListener('focus',e=>{
-    selecciona_value(costo.id);
+    costo.select()
+});
+
+costoDolar.addEventListener('focus',e=>{
+    costoDolar.select()
 });
 
 impuesto.addEventListener('focus',e=>{
-    selecciona_value(impuesto.id);
+    impuesto.select()
 });
 
 costoIva.addEventListener('focus',e=>{
-    selecciona_value(costoIva.id);
+    costoIva.select()
 });
 
 ganancia.addEventListener('focus',e=>{
-    selecciona_value(ganancia.id);
+    ganancia.select()
 });
 
 total.addEventListener('focus',e=>{
-    selecciona_value(total.id);
+    total.select()
 });
 
 impuesto.addEventListener('blur',e=>{
-    costoIva.value = (parseFloat(costo.value) + (parseFloat(costo.value) * parseFloat(impuesto.value) / 100 )).toFixed(2);
+    if (parseFloat(costoDolar.value) !== 0) {
+        costoIva.value = redondear((parseFloat(costoDolar.value) + (parseFloat(costoDolar.value) * parseFloat(impuesto.value) / 100 ))*parseFloat(dolar.value),2);
+    }else{
+        costoIva.value = (parseFloat(costo.value) + (parseFloat(costo.value) * parseFloat(impuesto.value) / 100 )).toFixed(2);
+    }
 });
 
 ganancia.addEventListener('blur',e=>{

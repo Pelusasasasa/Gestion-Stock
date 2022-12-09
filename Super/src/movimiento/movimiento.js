@@ -30,7 +30,7 @@ window.addEventListener('load',async e => {
         option.value = rubro.rubro;
         select.appendChild(option);
     };
-    traerProductos(select.value);
+    traerProductos(select.value,mes);
 });
 
 
@@ -47,12 +47,11 @@ const traerProductos = async(rubro,mes)=>{
     d = d<10 ? `0${d}` : d;
 
     let movimiento;
-    console.log(mes)
     if (mes) {
         const mMasUno = parseInt(m)<10 ? `0${parseInt(m)}` : parseInt(m);
         const mMasDos = parseInt(mMasUno)<10 ? `0${parseInt(mMasUno) + 1}` :parseInt(mMasUno) + 1;
         const fechaDesde = `${a}-${mMasUno}-01`;
-        const fechaHasta = `${a}-${mMasDos}-01`;
+        const fechaHasta = `${mMasDos === 13 ? parseFloat(a)+1 : a}-${mMasDos === 13 ? "01" : mMasDos}-01`;
         movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${fechaDesde}/${fechaHasta}`)).data;
     }else{
         movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${desde.value}/${a}-${m}-${d}`)).data;

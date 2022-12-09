@@ -4,6 +4,8 @@ const Recibo = require('../models/Recibo');
 
 
 reciboCTRL.cargarRecibo = async(req,res)=>{
+    const now = new Date();
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const nuevoRecibo = new Recibo(req.body);
     await nuevoRecibo.save();
     res.send(`Recibo ${req.body.numero} cargado`)
@@ -29,13 +31,15 @@ reciboCTRL.recibosMes = async(req,res)=>{
     mes = mes>12 ? 1 : mes;
 
     let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`)
-    let fechaConMesSig = new Date(`${hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
+    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
+    console.log(fechaConMesSig)
     const recibos = await Recibo.find({
         $and:[
             {fecha:{$gte:fechaConMes}},
             {fecha:{$lte:fechaConMesSig}}
         ]
     });
+    console.log(recibos)
     res.send(recibos);
 };
 

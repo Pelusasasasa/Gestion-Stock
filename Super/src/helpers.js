@@ -1,10 +1,14 @@
 const funciones = {}
 const Afip = require('@afipsdk/afip.js');
 const { clipboard } = require('electron');
-const afip = new Afip({CUIT:20416104655});
+
+const archivo = require('./configuracion.json');
+
+const afip = new Afip({CUIT:archivo.cuit});
 
 const sweet = require('sweetalert2');
 
+let puntoVenta = archivo.puntoVenta;
 
 //cerramos la ventana al apretrar escape
 funciones.cerrarVentana = (e)=>{
@@ -48,11 +52,11 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
 
     console.log(serverStatus) // mostramos el estado del servidor
 
-    let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher('3',venta.cod_comp);
+    let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher(puntoVenta,venta.cod_comp);
     console.log(ultimaElectronica);
 
     console.log(parseFloat(venta.facturaAnterior));
-    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),3,11);
+    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,11);
     
     let data = {
         'cantReg':1,
@@ -70,7 +74,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'ImpIVA': 0,
         'ImpTrib': 0,
         'MonId': 'PES',
-        'PtoVta': 3,
+        'PtoVta': puntoVenta,
         'MonCotiz' 	: 1,
     };
 
@@ -89,7 +93,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         ver: 1,
         fecha: fecha,
         cuit: 20416104655,
-        ptoVta: 3,
+        ptoVta: puntoVenta,
         tipoCmp: venta.cod_comp,
         nroCmp: ultimaElectronica + 1,
         importe: data.ImpTotal,
@@ -104,7 +108,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     const QR = await generarQR(textoQR);
 
     return {
-        puntoVenta: 3,
+        puntoVenta: puntoVenta,
         QR,
         numero:ultimaElectronica + 1,
         cae: res.CAE,
@@ -176,8 +180,8 @@ funciones.recorrerFlechas = (code)=>{
 //devolvemos la ultimaFactura C y ultima Nota de credito C
 funciones.ultimaC = async()=>{
     try {
-        const facturaC = await afip.ElectronicBilling.getLastVoucher(3,11); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
-        const notaC = await afip.ElectronicBilling.getLastVoucher(3,13);
+        const facturaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,11); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
+        const notaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,13);
         return {
             facturaC,
             notaC

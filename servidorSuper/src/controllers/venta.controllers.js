@@ -7,15 +7,18 @@ ventaCTRL.getVenta = async(req,res)=>{
     const {id,tipo} = req.params;
     const venta = await Venta.find({numero:id,tipo_venta:tipo});
     res.send(venta[0]);
-}
+};
 
 ventaCTRL.modificarVenta = async(req,res)=>{
     const {id,tipo} = req.params;
     delete req.body._id;
     const venta = await Venta.findOneAndUpdate({numero:id,tipo_venta:tipo},req.body);
     res.send(`Venta ${id} actualizada`);
-}
+};
+
 ventaCTRL.cargarVenta = async(req,res)=>{
+    const now = new Date();
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const venta = new Venta(req.body);
     await venta.save();
     if (req.body.F) {
@@ -24,7 +27,7 @@ ventaCTRL.cargarVenta = async(req,res)=>{
 
     console.log(`Venta con el numero: ${venta.numero} Cargada`);
     res.send("Venta Guardada");
-}
+};
 
 ventaCTRL.VentasDia = async(req,res)=>{
     const {fecha} = req.params;
@@ -38,7 +41,7 @@ ventaCTRL.VentasDia = async(req,res)=>{
     
     });
     res.send(ventas);
-}
+};
 
 ventaCTRL.ventasMes = async(req,res)=>{
     const {fecha} = req.params;
@@ -46,13 +49,13 @@ ventaCTRL.ventasMes = async(req,res)=>{
     mes = mes>12 ? 1 : mes;
     let hoy = new Date();
     let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
-    let fechaConMesSig = new Date(`${hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
+    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
     const ventas = await Venta.find({
     $and:[
-        {fecha:{$gte:fechaConMes}},
-        {fecha:{$lte:fechaConMesSig}}
+        {fecha:{$gte:new Date(fechaConMes)}},
+        {fecha:{$lte:new Date(fechaConMesSig)}}
     ]
-}); 
+});
     res.send(ventas);
 };
 

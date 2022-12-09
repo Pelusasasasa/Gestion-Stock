@@ -10,6 +10,8 @@ historicaCTRL.cargarHistorica = async(req,res)=>{
     });
     let id = arreglo.length !== 0 ? Math.max(...arreglo) : 0;
     req.body._id = id + 1; 
+    const now = new Date();
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const historica = new Historica(req.body);
     await historica.save();
     console.log(`Historica ${req.body.nro_venta} Guardada al cliente ${req.body.cliente}`);
