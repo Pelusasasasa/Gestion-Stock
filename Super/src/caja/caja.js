@@ -158,7 +158,6 @@ botonMes.addEventListener('click',async e=>{
         ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
         cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-        console.log(ventas)
         if (filtro === "Ingresos") {
             listarVentas([...ventas,...recibos]);    
         }else{
@@ -182,7 +181,7 @@ botonDia.addEventListener('click',async e=>{
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-        cuentasCorrientes = ventas.fil(venta=>venta.tipo_venta === "CC");
+        cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
         if (filtro === "Ingresos") {
             listarVentas([...ventas,...recibos]);
         }else{
@@ -443,7 +442,6 @@ const listarVentas = async (ventas)=>{
 }
 
 const listarGastos = (gastos)=>{
-    console.log(gastos)
     tbodyGastos.innerHTML = "";
     let totalVenta = 0;
     for(let gasto of gastos){

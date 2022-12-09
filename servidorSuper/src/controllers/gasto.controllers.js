@@ -29,7 +29,7 @@ gastoCTRL.forMonth = async(req,res)=>{
     mes = mes>12 ? 1 : mes;
     let hoy = new Date();
     let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
-    let fechaConMesSig = new Date(`${hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
+    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
     const gastos = await Gasto.find({
         $and:[
             {fecha:{$gte:fechaConMes}},

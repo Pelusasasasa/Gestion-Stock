@@ -1,6 +1,6 @@
-const {Schema,model} = require('mongoose');
+const mongoose = require('mongoose');
 
-const Pedido = new Schema({
+const Pedido =  new mongoose.Schema({
     producto:{
         type:String,
         require:true
@@ -39,4 +39,4 @@ const Pedido = new Schema({
     }
 });
 
-module.exports = model('Pedido',Pedido);
+module.exports = mongoose.model('Pedido',Pedido);
