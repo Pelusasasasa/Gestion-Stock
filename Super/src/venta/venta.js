@@ -43,7 +43,6 @@ const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
 //botones
 const facturar = document.querySelector('.facturar');
 const volver = document.querySelector('.volver');
-const remito = document.getElementById("remito");
 const impresion = document.querySelector("#impresion");
 
 //alerta
@@ -210,10 +209,6 @@ const crearProducto = ()=>{
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
             <td class=acciones>
                 <div class=tool>
-                    <span class=material-icons>post_add</span>
-                    <p class=tooltip>Agregar Nº serie</p>
-                </div>
-                <div class=tool>
                     <span class=material-icons>delete</span>
                     <p class=tooltip>Eliminar</p>
                 </div>
@@ -269,49 +264,6 @@ const verTipoVenta = ()=>{
     });
     return retornar;
 };
-
-remito.addEventListener('click',async e=>{
-    const venta = {};
-    venta.fecha = new Date();
-    venta.numero = (await axios.get(`${URL}numero/Remito`)).data + 1;
-    venta.idCliente = codigo.value;
-    venta.cliente = nombre.value;
-    venta.tipo_comp = "Remito";
-    venta.tipo_venta = "R";
-    venta.caja = archivo.caja;
-    venta.vendedor = vendedor;
-
-    //VER COMO HACER PARA QUE SE HAGA CON IMPRESORA A4
-    // if (impresion.checked) {
-    //     ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
-    // }
-
-    for(let producto of listaProductos){
-        await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor)
-    }
-
-    try {
-        await axios.put(`${URL}numero/Remito`,{Remito:venta.numero});
-    } catch (error) {
-        sweet.fire({title:"No se pudo modificar el numero"})
-    }
-
-    try {
-        await axios.post(`${URL}movimiento`,movimientos);
-    } catch (error) {
-        sweet.fire({
-            title:"No se puedo cargar Los movimientos"
-        })
-    }
-    try {
-        await axios.post(`${URL}remitos`,venta);
-    } catch (error) {
-        sweet.fire({
-            title:"No se pudo cargar el remito, pero si los movimientos"
-        })
-    }
-    location.reload();
-})
 
 facturar.addEventListener('click',async e=>{
     alerta.classList.remove('none');
@@ -514,10 +466,6 @@ const listarProducto =async(id)=>{
             <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
             <td class=acciones>
                 <div class=tool>
-                    <span class=material-icons>post_add</span>
-                    <p class=tooltip>Agregar Nº serie</p>
-                </div>
-                <div class=tool>
                     <span class=material-icons>delete</span>
                     <p class=tooltip>Eliminar</p>
                 </div>
@@ -559,18 +507,7 @@ tbody.addEventListener('click',async e=>{
     }
     seleccionado.classList.add('seleccionado');
 
-    if (e.target.innerHTML === "post_add") {
-        await sweet.fire({
-            title:"Nº Series",
-            html:`
-                <textarea name="series" id="series" cols="30" rows="10"></textarea>
-            `
-        }).then(()=>{
-            // document.getElementById('series').value
-            const objeto = listaProductos.find(objeto => objeto.producto.idTabla === seleccionado.id);
-            objeto.series = document.getElementById('series').value.split('\n');
-        })
-    }else if(e.target.innerHTML === "delete"){
+ if(e.target.innerHTML === "delete"){
         sweet.fire({
             title:"Borrar?",
             confirmButtonText:"Aceptar",

@@ -223,12 +223,6 @@ const hacerMenu = () => {
       }
     },
     {
-      label:"Servicio Tecnico",
-      click(){
-        ventanaPrincipal.loadFile('src/servicioTecnico/servicio.html')
-      }
-    },
-    {
       label:"Configuracion",
       click(){
         abrirVentana('configuracion/configuracion.html',700,700,false)
