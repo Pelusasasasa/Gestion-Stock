@@ -231,7 +231,7 @@ const hacerMenu = () => {
     {
       label:"Configuracion",
       click(){
-        abrirVentana('configuracion/configuracion.html',500,500,false)
+        abrirVentana('configuracion/configuracion.html',700,700,false)
       }
     },
     {
