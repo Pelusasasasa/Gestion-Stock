@@ -7,6 +7,7 @@ const URL = process.env.URL;
 
 const {recorrerFlechas, copiar} = require('../helpers');
 
+const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
 
 const agregar = document.querySelector('.agregar');
@@ -43,6 +44,7 @@ nombre.addEventListener('keyup',filtrar);
 ipcRenderer.on('informacion',(e,args)=>{
     if (!args.botones) {
         botones.classList.add('none');
+        thead.querySelector('th.acciones').parentNode.removeChild((thead.querySelector('th.acciones')));
         ventanaSecundaria = true;
     } 
 });
@@ -96,7 +98,11 @@ const listarClientes = async(clientes)=>{
         tr.appendChild(tdCuit);
         tr.appendChild(tdCondicionIva);
         tr.appendChild(tdSaldo);
-        tr.appendChild(tdAcciones)
+        if (!ventanaSecundaria) {
+            tr.appendChild(tdAcciones);
+            
+        }
+        
 
         tbody.appendChild(tr);
     };
