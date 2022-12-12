@@ -15,7 +15,6 @@ app.use('/gestion/productos',require('./routes/producto'));
 app.use('/gestion/clientes',require('./routes/cliente'));
 app.use('/gestion/ventas',require('./routes/venta'));
 app.use('/gestion/recibo',require('./routes/recibo'));
-app.use('/gestion/remitos',require('./routes/remito'));
 app.use('/gestion/movimiento',require('./routes/movProducto'));
 app.use('/gestion/compensada',require('./routes/compensada'));
 app.use('/gestion/historica',require('./routes/historica'));

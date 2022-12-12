@@ -18,6 +18,7 @@ const direccion = document.querySelector('#direccion');
 const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
 const condicionFacturacion = document.querySelector('#condicionFacturacion');
+const observaciones = document.querySelector('#observaciones');
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
@@ -31,6 +32,7 @@ const ponerInputs = async(id)=>{
     cuit.value = cliente.cuit ? cliente.cuit : "";
     condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
     condicionFacturacion.value = cliente.condicionFacturacion;
+    observaciones.value = cliente.observaciones;
 }
 
 nombre.addEventListener('keypress',e=>{
@@ -90,6 +92,7 @@ modificar.addEventListener('click',async e=>{
     cliente.condicionFacturacion = condicionFacturacion.value;
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;
+    cliente.observaciones = observaciones.value;
     const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
     await sweet.fire({title:mensaje});
     ipcRenderer.send('enviar-ventana-principal',cliente);

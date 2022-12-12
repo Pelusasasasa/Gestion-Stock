@@ -13,6 +13,7 @@ const direccion = document.querySelector('#direccion');
 const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
 const condicionFacturacion = document.querySelector('#condicionFacturacion');
+const observaciones = document.querySelector('#observaciones');
 const agregar = document.querySelector('.agregar');
 const salir = document.querySelector('.salir');
 
@@ -20,9 +21,6 @@ window.addEventListener('load',async e=>{
     const id = (await axios.get(`${URL}clientes`)).data;
     codigo.value = id;
 });
-
-
-
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,condicionFacturacion);
@@ -51,6 +49,11 @@ cuit.addEventListener('keypress',e=>{
 
 condicion.addEventListener('keypress',e=>{
     e.preventDefault();
+    apretarEnter(e,observaciones);
+});
+
+observaciones.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,agregar);
 });
 
@@ -68,6 +71,7 @@ agregar.addEventListener('click',async e=>{
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;
     cliente.condicionFacturacion = condicionFacturacion.value;
+    cliente.observaciones = observaciones.value;
     const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
     await sweet.fire({
         title:mensaje

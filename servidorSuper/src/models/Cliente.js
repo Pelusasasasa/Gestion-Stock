@@ -34,6 +34,10 @@ const Cliente = new mongoose.Schema({
     condicionIva:{
         type:String,
         default:"Consumidor Final"
+    },
+    observaciones:{
+        type:String,
+        default:""
     }
 });
 
