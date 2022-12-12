@@ -401,7 +401,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
 }
 
 //Cargamos el movimiento de producto a la BD
-const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tipo_comp,caja,vendedor="")=>{
+const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_venta,tipo_comp,caja,vendedor="")=>{
     const movimiento = {};
     movimiento.tipo_venta = tipo_venta;
     movimiento.codProd = producto._id;
@@ -414,6 +414,7 @@ const cargarMovimiento = async({cantidad,producto},numero,cliente,tipo_venta,tip
     movimiento.nro_venta = numero;
     movimiento.tipo_comp = tipo_comp;
     movimiento.caja = caja,
+    movimiento.series = series;
     movimiento.vendedor = vendedor
     movimientos.push(movimiento);
 };
@@ -510,8 +511,20 @@ tbody.addEventListener('click',async e=>{
         seleccionado = e.target.parentNode.parentNode.parentNode;
     }
     seleccionado.classList.add('seleccionado');
-
-     if(e.target.innerHTML === "delete"){
+    if (e.target.innerHTML === "post_add") {
+        await sweet.fire({
+            title:"Nro Series",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true,
+            input:"textarea"
+        }).then(({isConfirmed,value})=>{
+            if (isConfirmed) {
+                const objeto = listaProductos.find(({producto}) => producto.idTabla === seleccionado.id);
+                objeto.series = value.split('\n')
+            }
+        })
+    }
+    if(e.target.innerHTML === "delete"){
         sweet.fire({
             title:"Borrar?",
             confirmButtonText:"Aceptar",
@@ -521,7 +534,7 @@ tbody.addEventListener('click',async e=>{
             total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[5].innerHTML),2);
             totalGlobal = parseFloat(total.value);
             listaProductos = listaProductos.filter(({producto,cantidad}) => {producto.idTabla === seleccionado.id});
-        })
+        });
     }
 });
 
