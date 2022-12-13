@@ -9,12 +9,36 @@ const archivo = require('./configuracion.json');
 
 ipcRenderer.send('poner-cierre');
 
-const {abrirVentana, ponerNumero} = require('./helpers');
+const {abrirVentana, ponerNumero, cargarVendedor} = require('./helpers');
 
 let verVendedores;
 
-window.addEventListener('load',e=>{
-    verVendedores = archivo.vendedores; 
+window.addEventListener('load',async e=>{
+    verVendedores = archivo.vendedores;
+    const vendedores = (await axios.get(`${URL}vendedores/`)).data;
+    console.log(verVendedores)
+    if (!vendedores.find(vendedor => vendedor.permiso === 0) && verVendedores) {
+        sweet.fire({
+            title:"Cargar un Vendedor con permiso en 0 inicial",
+            html: await cargarVendedor(),
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(async({isConfirmed})=>{
+            if (isConfirmed) {
+                const nuevoVendedor = {};
+                nuevoVendedor.codigo = document.getElementById('codigo').value;
+                nuevoVendedor.nombre = document.getElementById('nombre').value.toUpperCase();
+                nuevoVendedor.permiso = document.getElementById('permisos').value;
+                try {
+                    await axios.post(`${URL}vendedores`,nuevoVendedor);
+                } catch (error) {
+                    sweet.fire({
+                        title:"no se pudo cargar el vendedor"
+                    })
+                }
+            }
+        })
+    }
 });
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',async e=>{

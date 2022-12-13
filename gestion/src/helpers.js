@@ -232,4 +232,24 @@ funciones.ponerNumero = async()=>{
     })
 }
 
+funciones.cargarVendedor = async()=>{
+    const html = `
+    <section>
+        <main>
+            <label htmlFor="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre" />
+        </main>
+        <main>
+            <label htmlFor="codigo">Codigo</label>
+            <input type="text" name="codigo" id="codigo" />
+        </main>
+        <main>
+            <label htmlFor="permisos">Permisos</label>
+            <input type="number" name="permisos" id="permisos" />
+        </main>
+    </section>
+    `
+    return html;
+}
+
 module.exports = funciones;

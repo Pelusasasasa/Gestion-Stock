@@ -9,7 +9,6 @@ const tbody = document.querySelector('tbody');
 
 //botones
 const agregar = document.querySelector('.agregar');
-const modificar = document.querySelector('.modificar');
 const eliminar = document.querySelector('.eliminar');
 
 let vendedores = [];
@@ -17,7 +16,7 @@ let vendedores = [];
 let seleccionado
 
 window.addEventListener('load',async e=>{
-    vendedores = (await axios.get(`${URL}vendedores`)).data
+    vendedores = (await axios.get(`${URL}vendedores`)).data;
     listarVendedores(vendedores)
 });
 
@@ -31,15 +30,29 @@ const listarVendedores = (lista)=>{
         const tdCodigo = document.createElement('td');
         const tdNombre = document.createElement('td');
         const tdPermiso = document.createElement('td');
+        const tdAcciones = document.createElement('td');
 
+        tdAcciones.classList.add('acciones');
 
         tdCodigo.innerHTML = vendedor.codigo;
         tdNombre.innerHTML = vendedor.nombre;
         tdPermiso.innerHTML = vendedor.permiso;
 
+        tdAcciones.innerHTML = `
+            <div class=tool>
+                <span class=material-icons>edit</span>
+                <p class=tooltip>Modificar</p>
+            </div>
+            <div class=tool>
+                <span class=material-icons>delete</span>
+                <p class=tooltip>Eliminar</p>
+            </div>
+        `
+
         tr.appendChild(tdCodigo);
         tr.appendChild(tdNombre);
         tr.appendChild(tdPermiso);
+        tr.appendChild(tdAcciones)
 
         tbody.appendChild(tr)
     }
@@ -84,18 +97,25 @@ agregar.addEventListener('click',e=>{
     })
 });
 
-tbody.addEventListener('click',e=>{
+tbody.addEventListener('click',async e=>{
     seleccionado && seleccionado.classList.remove('seleccionado')
-    seleccionado = e.target.nodeName === "TD" ? e.target.parentNode : e.target;
-    seleccionado.classList.add('seleccionado');
-});
+    
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+    }else if(e.target.nodeName === "DIV"){
+        console.log(e.target)
+        seleccionado = e.target.parentNode.parentNode;
+    }else if(e.target.nodeName === "SPAN"){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+    }
 
-modificar.addEventListener('click',e=>{
-    if (seleccionado) {
+    seleccionado.classList.add('seleccionado');
+
+    if (e.target.innerHTML === "edit") {
         sweet.fire({
             title:"Modificar Vendedor",
             html:`
-                <section>
+                <section class=input>
                     <main>
                         <label htmlFor="nombre">Nombre</label>
                         <input type="text" name="nombre" value=${seleccionado.children[1].innerHTML} id="nombre" />
@@ -133,25 +153,27 @@ modificar.addEventListener('click',e=>{
                 }
             }
         })
+    }else if(e.target.innerHTML === "delete"){
+        await sweet.fire({
+            title:"Eliminar Vendedor?",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(async({isConfirmed})=>{
+            if (isConfirmed) {
+                try {
+                    await axios.delete(`${URL}vendedores/id/${seleccionado.id}`);
+                    tbody.removeChild(seleccionado);
+                } catch (error) {
+                    console.log(error)
+                    sweet.fire({
+                        title:"No se pudo borrar vendedor"
+                    })
+                }
+            }
+        })
     }
 });
 
-eliminar.addEventListener('click',async e=>{
-    if (seleccionado) {
-        try {
-            await axios.delete(`${URL}vendedores/id/${seleccionado.id}`);
-            await sweet.fire({
-                title:`${seleccionado.children[1].innerHTML} Eliminado`
-            });
-            location.reload();
-        } catch (error) {
-            console.log(error);
-            await sweet.fire({
-                title:"No se pudo eliminar el vendedor"
-            })
-        }
-    }
-});
 
 document.addEventListener('keyup',e=>{
     cerrarVentana(e)
