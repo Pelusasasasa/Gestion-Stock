@@ -201,6 +201,10 @@ animation: spin 1s linear infinite
 }
 }
 
+.totales input[type=number]{
+  width: 15rem;
+}
+
 footer .hijoFooter{
   margin-left: auto;
 }

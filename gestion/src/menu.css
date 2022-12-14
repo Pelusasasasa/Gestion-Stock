@@ -47,5 +47,9 @@
 
 #imprimirVenta input,#imprimirVenta select{
     font-size: 1.8rem;
+}
 
+label{
+    display: inline-block;
+    width: 7rem;
 }

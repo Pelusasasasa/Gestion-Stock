@@ -1,3 +1,14 @@
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+let vendedor = getParameterByName("vendedor")
+let permiso = getParameterByName("permiso");
+permiso = permiso === "" ? 0 : parseInt(permiso);
+
 const { ipcRenderer } = require("electron");
 const sweet = require('sweetalert2');
 
@@ -68,7 +79,7 @@ const listar = (productos)=>{
                 <span id=edit class=material-icons>edit</span>
                 <p class=tooltip>Modificar</p>
             </div>
-            <div id=delete class=tool>
+            <div id=delete class="tool ${permiso !== 0 && "none"}">
                 <span id=delete class=material-icons>delete</span>
                 <p class=tooltip>Eliminar</p>
             </div>

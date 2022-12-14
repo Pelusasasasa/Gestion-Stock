@@ -16,7 +16,6 @@ let verVendedores;
 window.addEventListener('load',async e=>{
     verVendedores = archivo.vendedores;
     const vendedores = (await axios.get(`${URL}vendedores`)).data;
-    console.log(verVendedores)
     if (!vendedores.find(vendedor => vendedor.permiso === 0) && verVendedores) {
         sweet.fire({
             title:"Cargar un Vendedor con permiso en 0 inicial",
@@ -36,6 +35,8 @@ window.addEventListener('load',async e=>{
                         title:"no se pudo cargar el vendedor"
                     })
                 }
+            }else{
+                location.reload();
             }
         })
     }
@@ -43,21 +44,7 @@ window.addEventListener('load',async e=>{
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',async e=>{
     if (e.keyCode === 112) {
-        if (verVendedores) {
-            const vendedor = await verificarUsuarios();
-            if (vendedor) {
-                location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
-                ipcRenderer.send('sacar-cierre');
-            }else{
-                await sweet.fire({
-                    title:"Contraseña incorrecta"
-                })
-                ventas.click()
-            }
-        }else{
-            location.href = "./venta/index.html";
-            ipcRenderer.send('sacar-cierre');
-        }
+        ventas.click()
     }else if(e.keyCode === 113){
         const opciones = {
             path:"clientes/agregarCliente.html",
@@ -123,21 +110,54 @@ ventas.addEventListener('click',async e=>{
     }
 });
 
-const productos = document.querySelector('.productos');
-productos.addEventListener('click',e=>{
-    location.href = "./productos/productos.html";
-    ipcRenderer.send('sacar-cierre');
-});
 
 const clientes = document.querySelector('.clientes');
-clientes.addEventListener('click',e=>{
-    location.href = "./clientes/clientes.html";
-    ipcRenderer.send('sacar-cierre');
+clientes.addEventListener('click',async e=>{
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            location.href = `./clientes/clientes.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
+            ipcRenderer.send('sacar-cierre');
+        }
+    }else{
+        location.href = `./clientes/clientes.html`;
+        ipcRenderer.send('sacar-cierre');
+    }
+    
 });
 
+const productos = document.querySelector('.productos');
+productos.addEventListener('click',async e=>{
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
+            ipcRenderer.send('sacar-cierre');
+        }
+    }else{
+        location.href = `./productos/productos.html`;
+        ipcRenderer.send('sacar-cierre');
+    }
+});
+
+
 const caja = document.querySelector('.caja');
-caja.addEventListener('click',e=>{
-    location.href = "./caja/caja.html";
+caja.addEventListener('click',async e=>{
+
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            if (vendedor.permiso === 2) {
+                sweet.fire({
+                    title:"No tiene Permisos para ingresar a Caja"
+                })
+            }else{
+                location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;    
+            }
+        }
+    }else{
+        location.href = "./caja/caja.html";
+    }
 });
 
 const movimiento = document.querySelector('.movimiento');

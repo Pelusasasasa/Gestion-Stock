@@ -64,6 +64,7 @@ let porcentajeH = 0;
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
+
     if (tipoFactura === "notaCredito") {
         
         situacion = "blanco";//Pnemos la situacion en blanco
