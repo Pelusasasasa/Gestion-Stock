@@ -209,6 +209,10 @@ const crearProducto = ()=>{
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
             <td class=acciones>
                 <div class=tool>
+                        <span class=material-icons>post_add</span>
+                        <p class=tooltip>Agregar Nº serie</p>
+                </div>
+                <div class=tool>
                     <span class=material-icons>delete</span>
                     <p class=tooltip>Eliminar</p>
                 </div>
