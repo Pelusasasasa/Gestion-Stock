@@ -15,7 +15,7 @@ let verVendedores;
 
 window.addEventListener('load',async e=>{
     verVendedores = archivo.vendedores;
-    const vendedores = (await axios.get(`${URL}vendedores/`)).data;
+    const vendedores = (await axios.get(`${URL}vendedores`)).data;
     console.log(verVendedores)
     if (!vendedores.find(vendedor => vendedor.permiso === 0) && verVendedores) {
         sweet.fire({

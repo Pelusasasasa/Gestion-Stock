@@ -14,6 +14,12 @@ vendedorCTRL.getAll = async(req,res)=>{
     res.send(vendedores);
 }
 
+vendedorCTRL.getForId = async(req,res)=>{
+    const {id} = req.params;
+    const vendedor = await Vendedor.findOne({codigo:id});
+    res.send(vendedor)
+}
+
 vendedorCTRL.putForId = async(req,res)=>{
     const {id} = req.params;
     await Vendedor.findOneAndUpdate({_id:id},req.body);
