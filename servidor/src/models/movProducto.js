@@ -47,6 +47,10 @@ const movProducto = new mongoose.Schema({
         type:String,
         default:"Comprobante"
     },
+    series:{
+        type:Array,
+        default:[]
+    }
 });
 
 module.exports = mongoose.model('MovProducto',movProducto);

@@ -22,6 +22,7 @@ let trSeleccionado = "";
 let clienteTraido = {};
 let listaCompensada = [];
 let listaHistorica = [];
+let movimientos
 
 let tipoLista = "compensada";
 
@@ -99,7 +100,7 @@ const listarVentas = async(lista)=>{
         const tdTipo = document.createElement('td');
         const tdImporte = document.createElement('td');
         const tdPagado = document.createElement('td');
-        const tdSaldo = document.createElement('td');
+        const tdSaldo = document.createElement('td');   
 
         const date = new Date(venta.fecha);
         let day = date.getDate();
@@ -126,9 +127,6 @@ const listarVentas = async(lista)=>{
         }else{
             tdSaldo.innerHTML = venta.saldo.toFixed(2); 
         }
-        
-        
-
         tr.appendChild(tdFecha);
         tr.appendChild(tdNumero);
         tr.appendChild(tdCliente);
@@ -149,7 +147,7 @@ tbodyVenta.addEventListener('click',async e=>{
         trSeleccionado = e.target.parentNode;
         trSeleccionado.classList.add('seleccionado');
 
-        const movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
+        movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
         tbodyProducto.innerHTML = "";
         listarProductos(movimientos)
     }
@@ -169,7 +167,7 @@ const listarProductos = async(movimientos)=>{
         month = month === 13 ? 1 : month;
 
         const tr = document.createElement('tr');
-        tr._id = movimiento.id;
+        tr.id = movimiento._id;
 
         const tdFecha = document.createElement('td');
         const tdCodigo = document.createElement('td');
@@ -177,7 +175,9 @@ const listarProductos = async(movimientos)=>{
         const tdCantidad = document.createElement('td');
         const tdPrecio = document.createElement('td');
         const tdTotal = document.createElement('td');
+        const tdSeries = document.createElement('td');
 
+        tdSeries.classList.add('acciones');
 
         tdFecha.innerHTML = `${day}/${month}/${year}`;
         tdCodigo.innerHTML = movimiento.codProd;
@@ -185,6 +185,12 @@ const listarProductos = async(movimientos)=>{
         tdCantidad.innerHTML = movimiento.cantidad;
         tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = (movimiento.precio * movimiento.cantidad).toFixed(2);
+        tdSeries.innerHTML = `
+            <div class=tool>
+                <span class=material-icons>post_add</span>
+                <p class=tooltip>Ver</p>
+            </div>
+        `
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCodigo);
@@ -192,10 +198,31 @@ const listarProductos = async(movimientos)=>{
         tr.appendChild(tdCantidad);
         tr.appendChild(tdPrecio);
         tr.appendChild(tdTotal);
+        tr.appendChild(tdSeries);
 
         tbodyProducto.appendChild(tr);
     })
 };
+
+tbodyProducto.addEventListener('click',e=>{
+    if (e.target.innerHTML === "post_add") {
+        const movimientoSeleccionado = movimientos.find(movimiento => movimiento._id === parseInt(e.target.parentNode.parentNode.parentNode.id));
+        let valor = "";
+        movimientoSeleccionado.series.forEach(serie=>{
+            if (valor) {
+                valor = valor + "\n" + serie
+            }else{
+                valor = serie
+            }
+        });
+        sweet.fire({
+            title:"Series",
+            input:"textarea",
+            inputValue:valor
+            
+        })
+    }
+});
 
 //cuando tocamos actualizar una venta, actualizamos con los precios de hoy en dia
 actualizar.addEventListener('click',async e=>{
