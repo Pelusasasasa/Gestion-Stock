@@ -1,0 +1,118 @@
+
+.empresa{
+    display: flex;
+    flex-direction: column;
+    border: .1rem solid black;
+}
+
+.empresa main{
+    display: flex;
+    justify-content: space-around;
+}
+
+.titulo h3,.titulo p,.datosEmpresa p,.contactoEmpresa p,.contactoEmpresa div,.direccionEmpresa p,.iva p{
+    width: 100%;
+}
+
+.titulo h3{
+    margin: auto 1rem;
+}
+
+.titulo .tipoFactura, .numeroVenta{
+    text-align: center;
+}
+
+.datosEmpresa p:not(.nombre){
+    text-align: center;
+}
+
+.datosEmpresa .nombre{
+    margin: auto 1rem;
+}
+
+.contactoEmpresa p,.direccionEmpresa p{
+    margin: auto 1rem;
+}
+
+.contactoEmpresa svg{
+    width: 1rem;
+}
+
+.direccionEmpresa{
+    justify-self: self-start;
+}
+
+.iva{
+    margin: auto 1rem;
+}
+
+.iva p:not(.tipoIva){
+    text-align: center;
+}
+
+.informacionCliente{
+    border: .1rem solid black;
+    display: flex;
+    flex-direction: column;
+}
+.informacionCliente .nombre,.informacionCliente .domicilio{
+    display: flex;
+    justify-content: space-around;
+}
+
+.nombre h4,.nombre p,.domicilio p{
+    width: 100%;
+}
+
+.nombre h4,.cuit p{
+    margin: auto 1rem;
+}
+
+
+.domicilio p:not(.calle){
+    text-align: center;
+}
+
+.tabla{
+    height: auto;
+    min-height: 50vh;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.thead{
+    text-align: center;
+    border: .1rem solid black;
+}
+
+.tbody{
+    text-align: center;
+}
+
+.total{
+    display: flex;
+    border: .1rem solid black;
+    justify-content: space-around;
+}
+
+.total main{
+    width: 100%;
+}
+
+.total .subTotal{
+    margin: auto 1rem;
+    justify-self: self-start;
+}
+
+.total .todo{
+    margin: auto 1rem;
+    justify-self: flex-end;
+}
+
+.todo p{
+    font-weight: 900;
+    text-align: end;
+}
