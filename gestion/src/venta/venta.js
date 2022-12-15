@@ -516,11 +516,26 @@ tbody.addEventListener('click',async e=>{
     }
     seleccionado.classList.add('seleccionado');
     if (e.target.innerHTML === "post_add") {
+        //Traemops el producto seleccionado para ver si tiene nuemores de series ya cargados y asi mostrarlos
+        const producto = listaProductos.find(({producto})=>producto.idTabla === seleccionado.id);
+        let valor = "";
+
+        if (producto.series) {
+            producto.series.forEach(serie=>{
+                if (valor) {
+                    valor = valor + "\n" + serie
+                }else{
+                    valor = serie;
+                }
+            });
+        };//Ponemos el con saltos de lineas para que se muestre correctamente
+
         await sweet.fire({
             title:"Nro Series",
             confirmButtonText:"Aceptar",
             showCancelButton:true,
-            input:"textarea"
+            input:"textarea",
+            inputValue:valor //Si tiene un valor lo ponemos por defecto
         }).then(({isConfirmed,value})=>{
             if (isConfirmed) {
                 const objeto = listaProductos.find(({producto}) => producto.idTabla === seleccionado.id);
