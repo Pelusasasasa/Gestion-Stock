@@ -267,95 +267,101 @@ const verTipoVenta = ()=>{
 };
 
 facturar.addEventListener('click',async e=>{
-    alerta.classList.remove('none');
-    const numeros = (await axios.get(`${URL}numero`)).data;
-    const venta = {};
-
-    venta.cliente = nombre.value;
-    venta.fecha = new Date();
-    if (tipoFactura) {
-        venta.tipo_comp = "Nota Credito C";
-    }else if(situacion === "blanco"){
-        venta.tipo_comp = "Factura C"
+    if (codigo.value === "") {
+        sweet.fire({
+            title:"Poner un codigo de cliente"
+        })
     }else{
-        venta.tipo_comp = "Comprobante"
-    };
-    venta.idCliente = codigo.value === "" ? "1" : codigo.value;
-    venta.precio = parseFloat(total.value);
-    venta.tipo_venta = await verTipoVenta();
-    venta.listaProductos = listaProductos;
-    
-    //Ponemos propiedades para la factura electronica
-    venta.cod_comp = tipoFactura ? 13 : 11;
-    venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
-    venta.cod_doc = await verCodigoDocumento(cuit.value);
-    venta.condicionIva = condicionIva.value;
-    const [iva21,iva0,gravado21,gravado0,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
-    venta.iva21 = iva21;
-    venta.iva0 = iva0;
-    venta.gravado0 = gravado0;
-    venta.gravado21 = gravado21;
-    venta.cantIva = cantIva;
-    venta.direccion = direccion.value;
+        alerta.classList.remove('none');
+        const numeros = (await axios.get(`${URL}numero`)).data;
+        const venta = {};
 
-    venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
-    venta.vendedor = vendedor ? vendedor : "";
-    
-    venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
-    venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
+        venta.cliente = nombre.value;
+        venta.fecha = new Date();
+        if (tipoFactura) {
+            venta.tipo_comp = "Nota Credito C";
+        }else if(situacion === "blanco"){
+            venta.tipo_comp = "Factura C"
+        }else{
+            venta.tipo_comp = "Comprobante"
+        };
+        venta.idCliente = codigo.value;
+        venta.precio = parseFloat(total.value);
+        venta.tipo_venta = await verTipoVenta();
+        venta.listaProductos = listaProductos;
+        
+        //Ponemos propiedades para la factura electronica
+        venta.cod_comp = tipoFactura ? 13 : 11;
+        venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
+        venta.cod_doc = await verCodigoDocumento(cuit.value);
+        venta.condicionIva = condicionIva.value;
+        const [iva21,iva0,gravado21,gravado0,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
+        venta.iva21 = iva21;
+        venta.iva0 = iva0;
+        venta.gravado0 = gravado0;
+        venta.gravado21 = gravado21;
+        venta.cantIva = cantIva;
+        venta.direccion = direccion.value;
 
-    if (venta.tipo_venta === "CC") {
-        await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
-    }else{
-        await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
-    }
-        try {
-            if (situacion === "blanco") {
-                alerta.classList.remove('none');
-                venta.afip = await cargarFactura(venta,facturaAnterior ? true : false);
-                venta.F = true;
-            }else{
-                alerta.children[1].innerHTML = "Generando Venta";
-            }
-            for (let producto of listaProductos){
-                await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
-                if (!(producto.producto.productoCreado)) {
-                    await descontarStock(producto);
-                }
-                //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
-            }
-            await axios.put(`${URL}productos`,descuentoStock)
-            await axios.post(`${URL}movimiento`,movimientos);
-           //sumamos al cliente el saldo y agregamos la venta a la lista de venta
-            venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
+        venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+        venta.vendedor = vendedor ? vendedor : "";
+        
+        venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
+        venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
 
-
-           //Ponemos en la cuenta conpensada si es CC
-            venta.tipo_venta === "CC" && await ponerEnCuentaCompensada(venta);
-            venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta,parseFloat(saldo.value));
-
-            if (venta.tipo_venta === "CC" &&  parseFloat(inputRecibo.value) !== 0) {
-                await hacerRecibo(numeros.Recibo);
-            }
-       
-            const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
-
-            await axios.post(`${URL}ventas`,venta);
-
-            if (impresion.checked) {
-                ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
-            }
-
-            location.reload();  
-        } catch (error) {
-            
-            await sweet.fire({
-                title:"No se pudo generar la venta"
-            });
-            console.log(error)
-        }finally{
-            alerta.classList.add('none');
+        if (venta.tipo_venta === "CC") {
+            await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
+        }else{
+            await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
         }
+            try {
+                if (situacion === "blanco") {
+                    alerta.classList.remove('none');
+                    venta.afip = await cargarFactura(venta,facturaAnterior ? true : false);
+                    venta.F = true;
+                }else{
+                    alerta.children[1].innerHTML = "Generando Venta";
+                }
+                for (let producto of listaProductos){
+                    await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
+                    if (!(producto.producto.productoCreado)) {
+                        await descontarStock(producto);
+                    }
+                    //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
+                }
+                await axios.put(`${URL}productos`,descuentoStock)
+                await axios.post(`${URL}movimiento`,movimientos);
+            //sumamos al cliente el saldo y agregamos la venta a la lista de venta
+                venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
+
+
+            //Ponemos en la cuenta conpensada si es CC
+                venta.tipo_venta === "CC" && await ponerEnCuentaCompensada(venta);
+                venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta,parseFloat(saldo.value));
+
+                if (venta.tipo_venta === "CC" &&  parseFloat(inputRecibo.value) !== 0) {
+                    await hacerRecibo(numeros.Recibo);
+                }
+        
+                const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
+
+                await axios.post(`${URL}ventas`,venta);
+
+                if (impresion.checked) {
+                    ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
+                }
+
+                location.reload();  
+            } catch (error) {
+                
+                await sweet.fire({
+                    title:"No se pudo generar la venta"
+                });
+                console.log(error)
+            }finally{
+                alerta.classList.add('none');
+            }
+    }
 })
 
 //Lo que hacemos es listar el cliente traido

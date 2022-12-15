@@ -234,7 +234,7 @@ actualizar.addEventListener('click',async e=>{
         //traemos los movimientos de productos de esa cuenta compensada
         const movimientos = (await axios.get(`${URL}movimiento/${trSeleccionado.id}/CC`)).data;
         //Traemos la venta de lo seleccionado
-        const venta = (await axios.get(`${URL}ventas/id/${trSeleccionado.id}/CC`)).data;
+        const venta = (await axios.get(`${URL}ventas/numeroYtipo/${trSeleccionado.id}/CC`)).data;
         //Traemos el cliente
         const  cliente = (await axios.get(`${URL}clientes/id/${cuentaCompensada.idCliente}`)).data;
 

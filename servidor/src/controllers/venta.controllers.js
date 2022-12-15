@@ -3,13 +3,13 @@ const ventaCTRL = {};
 const Venta = require('../models/Venta');
 const funcion = require('../assets/js/pdf');
 
-ventaCTRL.getVenta = async(req,res)=>{
-    const {id,tipo} = req.params;
-    const venta = await Venta.find({numero:id,tipo_venta:tipo});
+ventaCTRL.getForId = async(req,res)=>{
+    const {id} = req.params;
+    const venta = await Venta.find({numero:id});
     res.send(venta[0]);
 };
 
-ventaCTRL.modificarVenta = async(req,res)=>{
+ventaCTRL.putForId = async(req,res)=>{
     const {id,tipo} = req.params;
     delete req.body._id;
     const venta = await Venta.findOneAndUpdate({numero:id,tipo_venta:tipo},req.body);
@@ -73,13 +73,17 @@ ventaCTRL.ventaAnio = async(req,res)=>{
     res.send(ventas);
 }
 
-ventaCTRL.deleteVenta = async(req,res)=>{
-    const {id,tipo} = req.params;
-    console.log(id)
-    console.log(tipo)
-    await Venta.findOneAndRemove({_id:id,tipo_venta:tipo});
+ventaCTRL.deleteForId = async(req,res)=>{
+    const {id} = req.params;
+    await Venta.findOneAndRemove({_id:id});
     console.log(`Venta ${id} Eliminada`)
     res.send(`Venta ${id} Eliminada`);
+}
+
+ventaCTRL.getForNumberAndType = async(req,res)=>{
+    const {numero,tipo} = req.params;
+    const venta = Venta.findOne({numero:numero,tipo_venta:tipo});
+    res.send(venta);
 }
 
 module.exports = ventaCTRL;

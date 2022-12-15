@@ -218,9 +218,9 @@ funciones.ponerNumero = async()=>{
         const tipo = document.getElementById('tipo');
         const numero = document.getElementById('numero');
         if (isConfirmed) {
-            let venta = (await axios.get(`${URL}ventas/id/${numero.value}/${tipo.value}`)).data;
+            let venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/${tipo.value}`)).data;
             if (!venta) {
-               venta = (await axios.get(`${URL}ventas/id/${numero.value}/T`)).data; 
+               venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/T`)).data; 
             }
             const cliente = (await axios.get(`${URL}clientes/id/${venta.idCliente}`)).data;
             let movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;
