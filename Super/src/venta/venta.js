@@ -266,7 +266,12 @@ const verTipoVenta = ()=>{
 };
 
 facturar.addEventListener('click',async e=>{
-    alerta.classList.remove('none');
+    if (codigo.value === "") {
+        await sweet.fire({
+            title:"Poner Un Codigo del Cliente"
+        })
+    }else{
+        alerta.classList.remove('none');
     const numeros = (await axios.get(`${URL}numero`)).data;
     const venta = {};
 
@@ -355,6 +360,7 @@ facturar.addEventListener('click',async e=>{
         }finally{
             alerta.classList.add('none');
         }
+    }
 })
 
 //Lo que hacemos es listar el cliente traido
