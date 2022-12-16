@@ -239,12 +239,6 @@ const hacerMenu = () => {
       }
     },
     {
-      label:"Imprimir",
-      click(){
-        abrirVentana('impresiones/imprimirComprobante.html',1000,1000,false)
-      }
-    },
-    {
       label:"tools",
       accelerator: process.platform == "darwin" ? "Comand+D" : "Ctrl+D",
       click(item,focusedWindow){
