@@ -1,6 +1,7 @@
 const archivo = require('../configuracion.json');
 const fs = require('fs');
 const { cerrarVentana } = require('../helpers');
+const path = require('path');
 
 const caja = document.getElementById('caja');
 const multiple = document.querySelectorAll("input[name=multipleVendedores]");
@@ -36,7 +37,7 @@ modificar.addEventListener('click',async e=>{
     objeto.puntoVenta = puntoVenta.value;
     objeto.cuit = cuit.value;
     
-    fs.writeFile('src/configuracion.json',JSON.stringify(objeto),(error)=>{
+    fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
         console.log("Informacion Recibida");
     })

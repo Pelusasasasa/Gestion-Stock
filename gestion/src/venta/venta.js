@@ -290,6 +290,7 @@ facturar.addEventListener('click',async e=>{
         };
         venta.idCliente = codigo.value;
         venta.precio = parseFloat(total.value);
+        venta.descuento = descuento;
         venta.tipo_venta = await verTipoVenta();
         venta.listaProductos = listaProductos;
         
@@ -477,10 +478,6 @@ const listarProducto =async(id)=>{
             <td>${parseFloat(precioU.value).toFixed(2)}</td>
             <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
             <td class=acciones>
-                <div class=tool>
-                    <span class=material-icons>post_add</span>
-                    <p class=tooltip>Agregar Nº serie</p>
-                </div>
                 <div class=tool>
                     <span class=material-icons>delete</span>
                     <p class=tooltip>Eliminar</p>
