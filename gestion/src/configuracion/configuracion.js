@@ -1,7 +1,15 @@
 const archivo = require('../configuracion.json');
 const fs = require('fs');
-const { cerrarVentana } = require('../helpers');
+const { cerrarVentana, verificarUsuarios } = require('../helpers');
 const path = require('path');
+
+const axios = require('axios');
+require('dotenv').config();
+const URL = process.env.URL;
+
+const sweet = require('sweetalert2');
+
+const {vendedores} = require('../configuracion.json')
 
 const caja = document.getElementById('caja');
 const multiple = document.querySelectorAll("input[name=multipleVendedores]");
@@ -19,7 +27,22 @@ const cuit = document.getElementById('cuit');
 const modificar = document.querySelector('.modificar');
 
 
-window.addEventListener('load',e=>{
+window.addEventListener('load',async e=>{
+
+    const vendedor = await verificarUsuarios();
+
+    if (vendedor === "") {
+        await sweet.fire({
+            title:"Contraseña incorrecta"
+        });
+        location.reload();
+    }else if(vendedor.permiso !== 0){
+        await sweet.fire({
+            title:"Acceso denegado"
+        });
+        window.close();
+    }
+
     caja.value = archivo.caja;  
     archivo.vendedores === false ? no.checked = true : si.checked = true;
     archivo.stockNegativo === false ? noStockNegativo.checked = true : siStockNegativo.checked = true;

@@ -5,6 +5,8 @@ const sweet = require('sweetalert2');
 
 const {cerrarVentana, verificarUsuarios} = require('../helpers')
 
+const {vendedores:verVendedores} = require('../configuracion.json')
+
 const tbody = document.querySelector('tbody');
 
 //botones
@@ -16,18 +18,21 @@ let vendedores = [];
 let seleccionado
 
 window.addEventListener('load',async e=>{
-    const vendedor = await verificarUsuarios();
 
-    if (vendedor === "") {
-        await sweet.fire({
-            title:"Contraseña incorrecta"
-        });
-        location.reload();
-    }else if(vendedor.permiso !== 0){
-        await sweet.fire({
-            title:"Acceso Denegado"
-        });
-        window.close();
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+
+        if (vendedor === "") {
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            });
+            location.reload();
+        }else if(vendedor.permiso !== 0){
+            await sweet.fire({
+                title:"Acceso Denegado"
+            });
+            window.close();
+        }
     }
 
     vendedores = (await axios.get(`${URL}vendedores`)).data;

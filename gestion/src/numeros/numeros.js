@@ -4,6 +4,8 @@ const URL = process.env.URL;
 
 const sweet = require('sweetalert2');
 
+const {vendedores} = require('../configuracion.json')
+
 const {cerrarVentana, ultimaC, verificarUsuarios} = require('../helpers');
 
 const dolar = document.querySelector('#dolar');
@@ -22,19 +24,22 @@ const salir = document.querySelector('.salir');
 let id;
 let dolarTraido;
 
-window.addEventListener('load',async e=>{
+console.log(vendedores)
 
-    const vendedor = await verificarUsuarios();
-    if (vendedor === "") {
-        await sweet.fire({
-            title:"Contraseña Incorrecta"
-        });
-        location.reload();
-    }else if (vendedor.permiso !== 0) {
-        await sweet.fire({
-            title:"Acceso denegado"
-        })
-        window.close();
+window.addEventListener('load',async e=>{
+    if (vendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor === "") {
+            await sweet.fire({
+                title:"Contraseña Incorrecta"
+            });
+            location.reload();
+        }else if (vendedor.permiso !== 0) {
+            await sweet.fire({
+                title:"Acceso denegado"
+            })
+            window.close();
+        }
     }
 
     const numeros =(await axios.get(`${URL}numero`)).data;
