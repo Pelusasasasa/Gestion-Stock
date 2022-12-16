@@ -9,7 +9,16 @@ const archivo = require('./configuracion.json');
 
 ipcRenderer.send('poner-cierre');
 
-const {abrirVentana, ponerNumero, cargarVendedor} = require('./helpers');
+const {abrirVentana, ponerNumero, cargarVendedor, verificarUsuarios} = require('./helpers');
+
+const ventas = document.querySelector('.ventas');
+const clientes = document.querySelector('.clientes');
+const caja = document.querySelector('.caja');
+const productos = document.querySelector('.productos');
+const movimiento = document.querySelector('.movimiento');
+const consulta = document.querySelector('.consulta');
+const recibo = document.querySelector('.recibo');
+const notaCredito = document.querySelector('.notaCredito');
 
 let verVendedores;
 
@@ -76,29 +85,15 @@ document.addEventListener('keyup',async e=>{
     }
 });
 
-const verificarUsuarios = async()=>{
-    let retorno
-    await sweet.fire({
-        title: "Contraseña",
-        input:"text",
-        confirmButtonText:"Aceptar",
-        showCancelButton:true
-    }).then(async({isConfirmed,value})=>{
-        if (isConfirmed) {
-            retorno = ((await axios.get(`${URL}vendedores/id/${value}`)).data);
-        }
-    });
-    return retorno
-}
 
-const ventas = document.querySelector('.ventas');
 ventas.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
+        console.log(vendedor)
         if (vendedor) {
             location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
             ipcRenderer.send('sacar-cierre');
-        }else if(vendedor === null){
+        }else if(vendedor === ""){
             await sweet.fire({
                 title:"Contraseña incorrecta"
             })
@@ -111,13 +106,17 @@ ventas.addEventListener('click',async e=>{
 });
 
 
-const clientes = document.querySelector('.clientes');
 clientes.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
         if (vendedor) {
             location.href = `./clientes/clientes.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
             ipcRenderer.send('sacar-cierre');
+        }else if(vendedor === ""){
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            })
+            clientes.click()
         }
     }else{
         location.href = `./clientes/clientes.html`;
@@ -126,13 +125,18 @@ clientes.addEventListener('click',async e=>{
     
 });
 
-const productos = document.querySelector('.productos');
+
 productos.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
         if (vendedor) {
             location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
             ipcRenderer.send('sacar-cierre');
+        }else if(vendedor === ""){
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            })
+            productos.click()
         }
     }else{
         location.href = `./productos/productos.html`;
@@ -141,9 +145,8 @@ productos.addEventListener('click',async e=>{
 });
 
 
-const caja = document.querySelector('.caja');
-caja.addEventListener('click',async e=>{
 
+caja.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
         if (vendedor) {
@@ -154,34 +157,37 @@ caja.addEventListener('click',async e=>{
             }else{
                 location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;    
             }
+        }else if(vendedor === ""){
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            })
+            caja.click()
         }
     }else{
         location.href = "./caja/caja.html";
     }
 });
 
-const movimiento = document.querySelector('.movimiento');
+
 movimiento.addEventListener('click',e=>{
     location.href = "./movimiento/movimiento.html";
 });
 
-const consulta = document.querySelector('.consulta');
 consulta.addEventListener('click',e=>{
     location.href = "./consultarCuenta/consultarCuenta.html";
 });
 
-const recibo = document.querySelector('.recibo');
 recibo.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
         if (vendedor) {
             location.href = `./recibo/recibo.html?vendedor=${vendedor.nombre}`;
             ipcRenderer.send('sacar-cierre');
-        }else{
+        }else if(vendedor === ""){
             await sweet.fire({
                 title:"Contraseña incorrecta"
             })
-            recibo.click();
+            clientes.click()
         }
     }else{
         location.href = "./recibo/recibo.html";
@@ -189,7 +195,6 @@ recibo.addEventListener('click',async e=>{
     }
 });
 
-const notaCredito = document.querySelector('.notaCredito');
 notaCredito.addEventListener('click',e=>{
     location.href = "./venta/index.html?tipoFactura=notaCredito";
     ipcRenderer.send('sacar-cierre');

@@ -1,7 +1,7 @@
 const { app, BrowserWindow,Menu } = require('electron');
 const { ipcMain } = require('electron/main');
-const { ipcRenderer } = require('electron/renderer');
 const path = require('path');
+const { verificarUsuarios } = require('./helpers');
 var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
 
 

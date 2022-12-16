@@ -3,7 +3,7 @@ require("dotenv").config();
 const URL = process.env.URL;
 const sweet = require('sweetalert2');
 
-const {cerrarVentana} = require('../helpers')
+const {cerrarVentana, verificarUsuarios} = require('../helpers')
 
 const tbody = document.querySelector('tbody');
 
@@ -16,6 +16,20 @@ let vendedores = [];
 let seleccionado
 
 window.addEventListener('load',async e=>{
+    const vendedor = await verificarUsuarios();
+
+    if (vendedor === "") {
+        await sweet.fire({
+            title:"Contraseña incorrecta"
+        });
+        location.reload();
+    }else if(vendedor.permiso !== 0){
+        await sweet.fire({
+            title:"Acceso Denegado"
+        });
+        window.close();
+    }
+
     vendedores = (await axios.get(`${URL}vendedores`)).data;
     listarVendedores(vendedores)
 });
