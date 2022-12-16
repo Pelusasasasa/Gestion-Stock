@@ -429,6 +429,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
 //Descontamos el stock
 const descontarStock = async({cantidad,producto})=>{
     delete producto.idTabla;
+    delete producto.precio;
     if (facturaAnterior) {
         producto.stock += cantidad;
     }else{

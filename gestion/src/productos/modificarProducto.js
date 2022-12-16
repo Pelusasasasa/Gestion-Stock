@@ -63,8 +63,8 @@ const llenarInputs = async(codigoProducto)=>{
 modificar.addEventListener('click',async e=>{
     const producto = {};
     producto._id = codigo.value;
-    producto.descripcion = descripcion.value.trim();
-    producto.marca = marca.value.trim();
+    producto.descripcion = descripcion.value.trim().toUpperCase();
+    producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim();
     producto.stock = parseFloat(stock.value).toFixed(2);
     producto.costo = parseFloat(costo.value).toFixed(2);

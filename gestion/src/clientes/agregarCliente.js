@@ -64,14 +64,14 @@ document.addEventListener('keydown',e=>{
 agregar.addEventListener('click',async e=>{
     const cliente = {};
     cliente._id = codigo.value;
-    cliente.nombre = nombre.value;
-    cliente.localidad = localidad.value;
-    cliente.telefono = telefono.value;
-    cliente.direccion = direccion.value;
+    cliente.nombre = nombre.value.trim().toUpperCase();
+    cliente.localidad = localidad.value.trim().toUpperCase();
+    cliente.telefono = telefono.value.trim();
+    cliente.direccion = direccion.value.trim().toUpperCase();
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;
     cliente.condicionFacturacion = condicionFacturacion.value;
-    cliente.observaciones = observaciones.value;
+    cliente.observaciones = observaciones.value.trim().toUpperCase();
     const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
     await sweet.fire({
         title:mensaje
