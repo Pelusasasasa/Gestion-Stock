@@ -61,6 +61,7 @@ let totalGlobal = 0;
 let idProducto = 0;
 let situacion = "negro";
 let porcentajeH = 0;
+let descuento = 0;
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
@@ -240,9 +241,9 @@ ipcRenderer.on('recibir',(e,args)=>{
     tipo === "Ningun cliente" && nombre.focus();
 });
 
-porcentaje.addEventListener('keyup',async e=>{
-    if (e.key === "Enter" || e.key === "Tab") {
-        porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value
+porcentaje.addEventListener('change',async e=>{
+        porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value;
+        descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100,2);
         for await(let {cantidad,producto} of listaProductos){       
             totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2))
             producto.precio = parseFloat(redondear(producto.precio / (porcentajeH/100 + 1),2));
@@ -253,9 +254,7 @@ porcentaje.addEventListener('keyup',async e=>{
             totalGlobal = parseFloat(redondear(totalGlobal + producto.precio*cantidad,2));
             total.value = totalGlobal.toFixed(2);
         }
-            console.log(totalGlobal)
         porcentajeH = parseFloat(porcentaje.value);
-    }
 });
 
 //Vemos que input tipo radio esta seleccionado
@@ -283,6 +282,7 @@ facturar.addEventListener('click',async e=>{
     }else{
         venta.tipo_comp = "Comprobante"
     };
+
     venta.idCliente = codigo.value === "" ? "1" : codigo.value;
     venta.precio = parseFloat(total.value);
     venta.tipo_venta = await verTipoVenta();
@@ -300,7 +300,7 @@ facturar.addEventListener('click',async e=>{
     venta.gravado21 = gravado21;
     venta.cantIva = cantIva;
     venta.direccion = direccion.value;
-
+    venta.descuento = descuento;
     venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
     venta.vendedor = vendedor ? vendedor : "";
     
@@ -346,7 +346,7 @@ facturar.addEventListener('click',async e=>{
             await axios.post(`${URL}ventas`,venta);
 
             if (impresion.checked) {
-                ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
+                ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
             }
 
             location.reload();  

@@ -71,14 +71,18 @@ ipcMain.on('enviar-ventana-principal',(e,args)=>{
 });
 
 ipcMain.on('imprimir',(e,args)=>{
-  abrirVentana("ticket/ticket.html",800,500);
+  if (args[0] === "blanco") {
+    abrirVentana("ticket/ticket.html",800,500);
+  }else{
+    abrirVentana("impresiones/imprimirComprobante.html",800,500);
+  }
   nuevaVentana.webContents.on('did-finish-load',function() {
     nuevaVentana.webContents.send('imprimir',JSON.stringify(args));
   });
 });
 
 ipcMain.on('imprimir-ventana',(e,args)=>{
-  nuevaVentana.webContents.print({silent:true},(success,errorType)=>{
+  nuevaVentana.webContents.print({silent:false},(success,errorType)=>{
     if (success) {
       ventanaPrincipal.focus();
       nuevaVentana.close();
@@ -107,7 +111,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   nuevaVentana.setMenuBarVisibility(false);
 
   nuevaVentana.on('ready-to-show',()=>{
-    if (direccion !== "ticket/ticket.html") {
+    if (direccion !== "ticket/ticket.html" && direccion !== "impresiones/imprimirComprobante.html") {
       nuevaVentana.show();
     }
   })

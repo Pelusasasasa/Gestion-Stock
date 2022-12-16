@@ -15,11 +15,13 @@
 }
 
 .titulo h3{
-    margin: auto 1rem;
+    margin: 0 1rem;
 }
 
-.titulo .tipoFactura, .numeroVenta{
+.titulo .tipoFactura, .titulo .numeroVenta{
     text-align: center;
+    margin: 0 ;
+
 }
 
 .datosEmpresa p:not(.nombre){
