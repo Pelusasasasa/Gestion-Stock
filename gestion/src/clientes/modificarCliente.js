@@ -85,14 +85,14 @@ direccion.addEventListener('focus',e=>{
 modificar.addEventListener('click',async e=>{
     const cliente = {};
     cliente._id = codigo.value;
-    cliente.nombre = nombre.value;
-    cliente.localidad = localidad.value;
+    cliente.nombre = nombre.value.toUpperCase();
+    cliente.localidad = localidad.value.toUpperCase();
     cliente.telefono = telefono.value;
-    cliente.direccion = direccion.value.to;
+    cliente.direccion = direccion.value.toUpperCase();
     cliente.condicionFacturacion = condicionFacturacion.value;
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;
-    cliente.observaciones = observaciones.value;
+    cliente.observaciones = observaciones.value.toUpperCase();
     const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
     await sweet.fire({title:mensaje});
     ipcRenderer.send('enviar-ventana-principal',cliente);

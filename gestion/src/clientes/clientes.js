@@ -1,3 +1,14 @@
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+let vendedor = getParameterByName("vendedor")
+let permiso = getParameterByName("permiso");
+permiso = permiso === "" ? 0 : parseInt(permiso);
+
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
 
@@ -85,12 +96,11 @@ const listarClientes = async(clientes)=>{
                 <span class=material-icons>edit</span>
                 <p class=tooltip>Modificar</p>
             </div>
-            <div>
+            <div class="tool ${permiso !== 0 && "none"}">
                 <span class=material-icons>delete</span>
                 <p class=tooltip>Eliminar</p>
             </div>
         `
-
         tr.appendChild(tdId);
         tr.appendChild(tdNombre);
         tr.appendChild(tdDireccion);

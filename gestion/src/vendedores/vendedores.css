@@ -28,3 +28,12 @@ table tbody tr:hover{
     background-color: #3E6D9C;
     cursor: pointer;
 }
+
+label{
+    width: 5rem;
+    display: inline-block;
+}
+
+main{
+    margin: 2rem;
+}

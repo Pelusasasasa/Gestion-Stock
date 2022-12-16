@@ -151,7 +151,7 @@ const hacerMenu = () => {
         {
           label:"Vendedores",
           click(){
-            abrirVentana("vendedores/vendedores.html",600,500);
+            abrirVentana("vendedores/vendedores.html",600,800);
           }
         },
         {

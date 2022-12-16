@@ -5,7 +5,7 @@ const URL = process.env.URL;
 const { cerrarVentana, redondear } = require("../helpers");
 const sweet = require('sweetalert2');
 
-let seleccion;
+let seleccionado;
 let subSeleccionado;
 
 const tarjeta = document.querySelector('.tarjeta');
@@ -19,7 +19,7 @@ const dia = document.querySelector('.dia');
 const mes = document.querySelector('.mes');
 const anio = document.querySelector('.anio');
 
-let seleccionado = document.querySelector('.seleccionado');
+let botonSeleccionado = document.querySelector('.seleccionado');
 
 const fecha = document.querySelector('#fecha');
 const selectMes = document.querySelector('#mes');
@@ -95,7 +95,7 @@ window.addEventListener('load',async e=>{
 });
 
 const verQueTraer = async()=>{
-    if (seleccionado.classList.contains("botonDia")) {
+    if (botonSeleccionado.classList.contains("botonDia")) {
         if (filtro === "Ingresos") {
             ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
             recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
@@ -103,7 +103,7 @@ const verQueTraer = async()=>{
         }else{
             return ((await axios.get(`${URL}gastos/dia/${fecha.value}`)).data);
         }
-    }else if(seleccionado.classList.contains("mes")){
+    }else if(botonSeleccionado.classList.contains("mes")){
         if (filtro === "Ingresos") {
             ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
             recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
@@ -144,9 +144,9 @@ contado.addEventListener('click',e=>{
 
 //muestra las ventas del mes cuando tocamos en el boton
 botonMes.addEventListener('click',async e=>{
-    seleccionado.classList.remove('seleccionado');
-    seleccionado = botonMes;
-    seleccionado.classList.add('seleccionado');
+    botonSeleccionado.classList.remove('seleccionado');
+    botonSeleccionado = botonMes;
+    botonSeleccionado.classList.add('seleccionado');
 
     mes.classList.remove('none');
     dia.classList.add('none');
@@ -172,12 +172,12 @@ botonMes.addEventListener('click',async e=>{
 
 //muestra las ventas del dia cuando tocamos en el boton
 botonDia.addEventListener('click',async e=>{
-    seleccionado.classList.remove('seleccionado');
-    seleccionado = botonDia;
+    botonSeleccionado.classList.remove('seleccionado');
+    botonSeleccionado = botonDia;
     dia.classList.remove('none');
     mes.classList.add('none');
     anio.classList.add('none');
-    seleccionado.classList.add('seleccionado');
+    botonSeleccionado.classList.add('seleccionado');
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
@@ -195,12 +195,12 @@ botonDia.addEventListener('click',async e=>{
 
 //muestra las ventas del año cuando tocamos en el boton
 botonAnio.addEventListener('click',async e=>{
-    seleccionado.classList.remove('seleccionado');
-    seleccionado = botonAnio;
+    botonSeleccionado.classList.remove('seleccionado');
+    botonSeleccionado = botonAnio;
     anio.classList.remove('none');
     dia.classList.add('none');
     mes.classList.add('none');
-    seleccionado.classList.add('seleccionado');
+    botonSeleccionado.classList.add('seleccionado');
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
         ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
         recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
@@ -269,12 +269,45 @@ inputAnio.addEventListener('keypress',async e=>{
     }
 });
 
+
 tbody.addEventListener('click',async e=>{
     const id = e.target.nodeName === "TD" ? e.target.parentNode.id : e.target.id;
     
-    seleccion && seleccion.classList.remove('seleccionado');
-    seleccion = document.getElementById(id);
-    seleccion.classList.add('seleccionado');
+    seleccionado && seleccionado.classList.remove('seleccionado');
+
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+    }else if(e.target.nodeName === "DIV"){
+        seleccionado = e.target.parentNode.parentNode;
+    }else if(e.target.nodeName === "SPAN"){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+    }
+
+    seleccionado.classList.add('seleccionado');
+
+    if (e.target.innerHTML === "delete") {
+        sweet.fire({
+            title:"Seguro quiere borrar la Venta",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(async({isConfirmed})=>{
+            if (isConfirmed) {
+                try {
+                    await axios.delete(`${URL}ventas/id/${seleccionado.id}/${seleccionado.children[3].innerHTML}`);
+                    tbody.removeChild(seleccionado);
+                    total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[7].innerHTML),2);
+                } catch (error) {
+                    sweet.fire({
+                        title:"No se puede borrar la venta"
+                    });
+                    console.log(error)
+                }
+            }
+        })
+    }else if(e.target.innerHTML === "edit"){
+        
+    }
+
     const trs = document.querySelectorAll("tbody .venta" + id)
 
     for await(let tr of trs){
@@ -282,47 +315,10 @@ tbody.addEventListener('click',async e=>{
     }
 });
 
-borrar.addEventListener('click',async e=>{
-    let title = filtro === "Ingresos" ? "Venta" : "Gasto";
-    
-    await sweet.fire({
-        title:`Borrar ${title}?`,
-        confirmButtonText:"Aceptar",
-        showCancelButton:true
-    }).then(async({isConfirmed})=>{
-        if (!seleccion.children[4]) {
-            try {
-                await axios.delete(`${URL}gastos/id/${seleccion.id}`);
-                location.reload();
-            } catch (error) {
-                
-            }
-        }else if (isConfirmed && seleccion.children[4].innerHTML !== "Recibo") {
-           try {
-                await axios.delete(`${URL}ventas/id/${seleccion.id}/${seleccion.children[3].innerHTML}`);
-                location.reload();
-           } catch (error) {
-            console.log(error)
-            sweet.fire({title:"No se puedo eliminar " + title})
-           }
-        }else if(isConfirmed && seleccion.children[4].innerHTML === "Recibo"){
-            try {
-                await axios.delete(`${URL}recibo/id/${seleccion.children[0].innerHTML}`);
-                location.reload();
-            } catch (error) {
-                console.log(error)
-                await sweet.fire({
-                    title:"No se puede borrar un recibo"
-                })
-            }
-        }
-    });
-});
-
 tbodyGastos.addEventListener('click',e=>{
-    seleccion && seleccion.classList.remove('seleccionado')
-    seleccion = e.target.nodeName === "TD" ? e.target.parentNode : e.target
-    seleccion.classList.add('seleccionado')
+    seleccionado && seleccionado.classList.remove('seleccionado')
+    seleccionado = e.target.nodeName === "TD" ? e.target.parentNode : e.target
+    seleccionado.classList.add('seleccionado')
 });
 
 const listarVentas = async (ventas)=>{
@@ -372,6 +368,9 @@ const listarVentas = async (ventas)=>{
         const tdPrecioTotal = document.createElement('td');
         const tdVendedor = document.createElement('td');
         const tdCaja = document.createElement('td');
+        const tdAcciones = document.createElement('td');
+
+        tdAcciones.classList.add('acciones')
 
         tdNumero.innerHTML = venta.numero;
         tdFecha.innerHTML = `${hora}:${minutos}:${segundos}`;
@@ -381,6 +380,16 @@ const listarVentas = async (ventas)=>{
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
         tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
         tdCaja.innerHTML = venta.caja;
+        tdAcciones.innerHTML = `
+            <div class=tool>
+                    <span class=material-icons>edit</span>
+                    <p class=tooltip>Modificar</p>
+                </div>
+            <div class=tool>
+                <span class=material-icons>delete</span>
+                <p class=tooltip>Eliminar</p>
+            </div>
+        `
 
         tr.appendChild(tdNumero);
         tr.appendChild(tdFecha);
@@ -392,6 +401,7 @@ const listarVentas = async (ventas)=>{
         tr.appendChild(tdPrecioTotal);
         tr.appendChild(tdVendedor);
         tr.appendChild(tdCaja);
+        tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
 

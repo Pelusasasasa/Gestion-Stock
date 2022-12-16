@@ -9,31 +9,42 @@ const archivo = require('./configuracion.json');
 
 ipcRenderer.send('poner-cierre');
 
-const {abrirVentana, ponerNumero} = require('./helpers');
+const {abrirVentana, ponerNumero, cargarVendedor} = require('./helpers');
 
 let verVendedores;
 
-window.addEventListener('load',e=>{
-    verVendedores = archivo.vendedores; 
+window.addEventListener('load',async e=>{
+    verVendedores = archivo.vendedores;
+    const vendedores = (await axios.get(`${URL}vendedores`)).data;
+    if (!vendedores.find(vendedor => vendedor.permiso === 0) && verVendedores) {
+        sweet.fire({
+            title:"Cargar un Vendedor con permiso en 0 inicial",
+            html: await cargarVendedor(),
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(async({isConfirmed})=>{
+            if (isConfirmed) {
+                const nuevoVendedor = {};
+                nuevoVendedor.codigo = document.getElementById('codigo').value;
+                nuevoVendedor.nombre = document.getElementById('nombre').value.toUpperCase();
+                nuevoVendedor.permiso = document.getElementById('permisos').value;
+                try {
+                    await axios.post(`${URL}vendedores`,nuevoVendedor);
+                } catch (error) {
+                    sweet.fire({
+                        title:"no se pudo cargar el vendedor"
+                    })
+                }
+            }else{
+                location.reload();
+            }
+        })
+    }
 });
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',async e=>{
     if (e.keyCode === 112) {
-        if (verVendedores) {
-            const vendedor = await verificarUsuarios();
-            if (vendedor) {
-                location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
-                ipcRenderer.send('sacar-cierre');
-            }else{
-                await sweet.fire({
-                    title:"Contraseña incorrecta"
-                })
-                ventas.click()
-            }
-        }else{
-            location.href = "./venta/index.html";
-            ipcRenderer.send('sacar-cierre');
-        }
+        ventas.click()
     }else if(e.keyCode === 113){
         const opciones = {
             path:"clientes/agregarCliente.html",
@@ -99,21 +110,54 @@ ventas.addEventListener('click',async e=>{
     }
 });
 
-const productos = document.querySelector('.productos');
-productos.addEventListener('click',e=>{
-    location.href = "./productos/productos.html";
-    ipcRenderer.send('sacar-cierre');
-});
 
 const clientes = document.querySelector('.clientes');
-clientes.addEventListener('click',e=>{
-    location.href = "./clientes/clientes.html";
-    ipcRenderer.send('sacar-cierre');
+clientes.addEventListener('click',async e=>{
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            location.href = `./clientes/clientes.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
+            ipcRenderer.send('sacar-cierre');
+        }
+    }else{
+        location.href = `./clientes/clientes.html`;
+        ipcRenderer.send('sacar-cierre');
+    }
+    
 });
 
+const productos = document.querySelector('.productos');
+productos.addEventListener('click',async e=>{
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
+            ipcRenderer.send('sacar-cierre');
+        }
+    }else{
+        location.href = `./productos/productos.html`;
+        ipcRenderer.send('sacar-cierre');
+    }
+});
+
+
 const caja = document.querySelector('.caja');
-caja.addEventListener('click',e=>{
-    location.href = "./caja/caja.html";
+caja.addEventListener('click',async e=>{
+
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor) {
+            if (vendedor.permiso === 2) {
+                sweet.fire({
+                    title:"No tiene Permisos para ingresar a Caja"
+                })
+            }else{
+                location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;    
+            }
+        }
+    }else{
+        location.href = "./caja/caja.html";
+    }
 });
 
 const movimiento = document.querySelector('.movimiento');
