@@ -252,4 +252,19 @@ funciones.cargarVendedor = async()=>{
     return html;
 }
 
+funciones.verificarUsuarios = async()=>{
+    let retorno
+    await sweet.fire({
+        title: "Contraseña",
+        input:"text",
+        confirmButtonText:"Aceptar",
+        showCancelButton:true
+    }).then(async({isConfirmed,value})=>{
+        if (isConfirmed) {
+            retorno = ((await axios.get(`${URL}vendedores/id/${value}`)).data);
+        }
+    });
+    return retorno
+}
+
 module.exports = funciones;

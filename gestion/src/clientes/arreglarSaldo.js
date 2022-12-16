@@ -1,10 +1,12 @@
-const {cerrarVentana,apretarEnter} = require('../helpers');
+const {cerrarVentana,apretarEnter, verificarUsuarios} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.URL;
+
+const {vendedores} = require('../configuracion.json')
 
 const codigo = document.getElementById('id');
 const nombre = document.getElementById('nombre');
@@ -16,6 +18,23 @@ const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
 let cliente;
+
+window.addEventListener('load',async e=>{
+    if (vendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor === "") {
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            });
+            location.reload();
+        }else if(vendedor.permiso !== 0){
+            await sweet.fire({
+                title:"Acceso denegado"
+            });
+            window.close();
+        }
+    }
+});
 
 const listarCliente = async(cliente)=>{
     nombre.value = cliente.nombre;
