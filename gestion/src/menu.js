@@ -71,8 +71,8 @@ document.addEventListener('keyup',async e=>{
     }else if(e.keyCode === 115){
         const opciones = {
             path: "productos/cambio.html",
-            ancho: 1000,
-            altura:550
+            ancho: 900,
+            altura:750
         }
         ipcRenderer.send('abrir-ventana',opciones)
     }else if(e.keyCode === 116){

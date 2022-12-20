@@ -14,6 +14,7 @@ const guardar = document.querySelector('.guardar');
 
 const sweet  = require('sweetalert2');
 const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
+const archivo = require('../configuracion.json');
 
 const axios = require('axios');
 require('dotenv').config()
@@ -32,6 +33,9 @@ const traerRubros = async()=>{
 traerRubros();
 
 window.addEventListener('load',async e=>{
+    if (!archivo.dolar) {
+        costoDolar.setAttribute('disabled','')
+    }
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
 });
 
@@ -90,7 +94,11 @@ stock.addEventListener('keypress',e=>{
 })
 
 costo.addEventListener('keypress',e=>{
-    apretarEnter(e,costoDolar);
+    if (costoDolar.hasAttribute('disabled')) {
+        apretarEnter(e,impuesto); 
+    }else{
+        apretarEnter(e,costoDolar);
+    }
 });
 
 costoDolar.addEventListener('keypress',e=>{
