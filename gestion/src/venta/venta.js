@@ -217,6 +217,9 @@ const crearProducto = ()=>{
             </td>
         </tr>
     `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
 
     total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)),2);
     totalGlobal = parseFloat(total.value);
@@ -481,6 +484,9 @@ const listarProducto =async(id)=>{
             </td>
         </tr>
     `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
         total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
         totalGlobal = parseFloat(total.value);
         }else if(producto !== "" && productoYaUsado){

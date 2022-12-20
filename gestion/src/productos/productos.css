@@ -6,7 +6,11 @@
 
 .buscador fieldset{
     display: flex;
-    /* justify-content: space-around; */
+    justify-content: space-around;
+}
+
+.caja#input{
+    width: 50%;
 }
 
 .caja{
@@ -19,10 +23,6 @@
 .caja input,select{
     padding: .5rem;
     font-size: 1.5rem;
-}  
-
-.caja input{
-    width: 200%;
 }
 
 .tabla{
