@@ -11,6 +11,7 @@ function getParameterByName(name) {
 };
 
 const sweet = require('sweetalert2');
+const { agregarMovimientoVendedores } = require('../helpers');
 
 const title = document.querySelector('title');
 
@@ -121,6 +122,7 @@ agregar.addEventListener('click',async e=>{
 
     try {
         await axios.post(`${URL}pedidos`,pedido);
+        await agregarMovimientoVendedores(`Agrego el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor)
         window.close();
     } catch (error) {
         sweet.fire({

@@ -2,11 +2,16 @@ const funciones = {}
 const Afip = require('@afipsdk/afip.js');
 const { clipboard } = require('electron');
 
+
+
 const archivo = require('./configuracion.json');
 
 const afip = new Afip({CUIT:archivo.cuit});
 
 const sweet = require('sweetalert2');
+const axios = require('axios');
+require('dotenv').config();
+const URL = process.env.URL;
 
 let puntoVenta = archivo.puntoVenta;
 
@@ -265,6 +270,15 @@ funciones.verificarUsuarios = async()=>{
         }
     });
     return retorno
+}
+
+funciones.agregarMovimientoVendedores = async(descripcion,vendedor)=>{
+    const movimiento = {};
+    movimiento.descripcion = descripcion;
+    movimiento.fecha = new Date();
+    movimiento.vendedor = vendedor;
+
+    await axios.post(`${URL}movVendedores`,movimiento)
 }
 
 module.exports = funciones;

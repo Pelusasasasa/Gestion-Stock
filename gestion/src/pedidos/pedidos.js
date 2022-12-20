@@ -153,7 +153,8 @@ tbody.addEventListener('click',async e=>{
             ancho:500,
             altura:550,
             reinicio:true,
-            informacion:seleccionado.id
+            informacion:seleccionado.id,
+            vendedor:vendedor.nombre
         });
     }
     
