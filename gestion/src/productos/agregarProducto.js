@@ -16,6 +16,8 @@ const sweet  = require('sweetalert2');
 const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
 const archivo = require('../configuracion.json');
 
+const archivo = require('../configuracion.json');
+
 const axios = require('axios');
 require('dotenv').config()
 const URL = process.env.URL;
@@ -34,7 +36,7 @@ traerRubros();
 
 window.addEventListener('load',async e=>{
     if (!archivo.dolar) {
-        costoDolar.setAttribute('disabled','')
+        costoDolar.setAttribute('disabled',"");
     }
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
 });
@@ -95,7 +97,7 @@ stock.addEventListener('keypress',e=>{
 
 costo.addEventListener('keypress',e=>{
     if (costoDolar.hasAttribute('disabled')) {
-        apretarEnter(e,impuesto); 
+        apretarEnter(e,impuesto);
     }else{
         apretarEnter(e,costoDolar);
     }

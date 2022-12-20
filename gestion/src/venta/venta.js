@@ -282,19 +282,8 @@ facturar.addEventListener('click',async e=>{
         }else if(situacion === "blanco"){
             venta.tipo_comp = "Factura C"
         }else{
-            alerta.classList.remove('none');
-            const numeros = (await axios.get(`${URL}numero`)).data;
-            const venta = {};
-
-            venta.cliente = nombre.value;
-            venta.fecha = new Date();
-            if (tipoFactura) {
-                venta.tipo_comp = "Nota Credito C";
-            }else if(situacion === "blanco"){
-                venta.tipo_comp = "Factura C"
-            }else{
-                venta.tipo_comp = "Comprobante"
-            };
+            venta.tipo_comp = "Comprobante"
+        };
             venta.idCliente = codigo.value;
             venta.precio = parseFloat(total.value);
             venta.descuento = descuento;
@@ -373,7 +362,6 @@ facturar.addEventListener('click',async e=>{
                     alerta.classList.add('none');
                 }
         }
-    }
 })
 
 //Lo que hacemos es listar el cliente traido
