@@ -362,7 +362,7 @@ facturar.addEventListener('click',async e=>{
                     alerta.classList.add('none');
                 }
         }
-})
+});
 
 //Lo que hacemos es listar el cliente traido
 const listarCliente = async(id)=>{

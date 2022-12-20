@@ -164,7 +164,16 @@ caja.addEventListener('click',async e=>{
             caja.click()
         }
     }else{
-        location.href = "./caja/caja.html";
+        await sweet.fire({
+            title:"Contraseña",
+            input:"password",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(({isConfirmed,value})=>{
+            if (isConfirmed && value === "41610465") {
+                location.href = "./caja/caja.html";
+            }
+        })
     }
 });
 
