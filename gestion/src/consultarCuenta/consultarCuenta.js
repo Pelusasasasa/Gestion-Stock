@@ -185,12 +185,6 @@ const listarProductos = async(movimientos)=>{
         tdCantidad.innerHTML = movimiento.cantidad;
         tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = (movimiento.precio * movimiento.cantidad).toFixed(2);
-        tdSeries.innerHTML = `
-            <div class=tool>
-                <span class=material-icons>post_add</span>
-                <p class=tooltip>Ver</p>
-            </div>
-        `
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCodigo);
@@ -198,31 +192,10 @@ const listarProductos = async(movimientos)=>{
         tr.appendChild(tdCantidad);
         tr.appendChild(tdPrecio);
         tr.appendChild(tdTotal);
-        tr.appendChild(tdSeries);
 
         tbodyProducto.appendChild(tr);
     })
 };
-
-tbodyProducto.addEventListener('click',e=>{
-    if (e.target.innerHTML === "post_add") {
-        const movimientoSeleccionado = movimientos.find(movimiento => movimiento._id === parseInt(e.target.parentNode.parentNode.parentNode.id));
-        let valor = "";
-        movimientoSeleccionado.series.forEach(serie=>{
-            if (valor) {
-                valor = valor + "\n" + serie
-            }else{
-                valor = serie
-            }
-        });
-        sweet.fire({
-            title:"Series",
-            input:"textarea",
-            inputValue:valor
-            
-        })
-    }
-});
 
 //cuando tocamos actualizar una venta, actualizamos con los precios de hoy en dia
 actualizar.addEventListener('click',async e=>{
