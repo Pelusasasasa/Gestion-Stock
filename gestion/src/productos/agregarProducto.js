@@ -36,11 +36,7 @@ traerRubros();
 
 window.addEventListener('load',async e=>{
     if (!archivo.dolar) {
-<<<<<<< HEAD
-        costoDolar.setAttribute('disabled','')
-=======
         costoDolar.setAttribute('disabled',"");
->>>>>>> frontend
     }
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
 });
@@ -101,11 +97,7 @@ stock.addEventListener('keypress',e=>{
 
 costo.addEventListener('keypress',e=>{
     if (costoDolar.hasAttribute('disabled')) {
-<<<<<<< HEAD
-        apretarEnter(e,impuesto); 
-=======
         apretarEnter(e,impuesto);
->>>>>>> frontend
     }else{
         apretarEnter(e,costoDolar);
     }

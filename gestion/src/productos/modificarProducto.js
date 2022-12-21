@@ -29,17 +29,9 @@ const salir = document.querySelector('.salir');
 
 //Recibimos la informacion del producto para luego llenar los inputs
 ipcRenderer.on('informacion',async (e,args)=>{
-<<<<<<< HEAD
-
     if (!archivo.dolar) {
         costoDolar.setAttribute('disabled',"");
     }
-    
-=======
-    if (!archivo.dolar) {
-        costoDolar.setAttribute('disabled',"");
-    }
->>>>>>> frontend
     dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
     const {informacion}= args;
     const rubros = (await axios.get(`${URL}rubro`)).data;
@@ -126,11 +118,7 @@ costo.addEventListener('keypress',e=>{
     }else{
         apretarEnter(e,costoDolar);
     }
-<<<<<<< HEAD
 });
-=======
-})
->>>>>>> frontend
 
 costoDolar.addEventListener('keypress',e=>{
     apretarEnter(e,impuesto);
