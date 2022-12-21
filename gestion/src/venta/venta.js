@@ -221,6 +221,9 @@ const crearProducto = ()=>{
             </td>
         </tr>
     `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
 
     total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)),2);
     totalGlobal = parseFloat(total.value);
@@ -333,7 +336,7 @@ facturar.addEventListener('click',async e=>{
                     }
                     //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
                 }
-                await axios.put(`${URL}productos`,descuentoStock)
+                await axios.put(`${URL}productos/descontarStock`,descuentoStock)
                 await axios.post(`${URL}movimiento`,movimientos);
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
                 venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
@@ -433,7 +436,6 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
 //Descontamos el stock
 const descontarStock = async({cantidad,producto})=>{
     delete producto.idTabla;
-    delete producto.precio;
     if (facturaAnterior) {
         producto.stock += cantidad;
     }else{
@@ -485,6 +487,9 @@ const listarProducto =async(id)=>{
             </td>
         </tr>
     `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
         total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
         totalGlobal = parseFloat(total.value);
         }else if(producto !== "" && productoYaUsado){

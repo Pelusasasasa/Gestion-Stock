@@ -29,18 +29,20 @@ const modificar = document.querySelector('.modificar');
 
 window.addEventListener('load',async e=>{
 
-    const vendedor = await verificarUsuarios();
+    if (vendedores) {
+        const vendedor = await verificarUsuarios();
 
-    if (vendedor === "") {
-        await sweet.fire({
-            title:"Contraseña incorrecta"
-        });
-        location.reload();
-    }else if(vendedor.permiso !== 0){
-        await sweet.fire({
-            title:"Acceso denegado"
-        });
-        window.close();
+        if (vendedor === "") {
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            });
+            location.reload();
+        }else if(vendedor.permiso !== 0){
+            await sweet.fire({
+                title:"Acceso denegado"
+            });
+            window.close();
+        }
     }
 
     caja.value = archivo.caja;  

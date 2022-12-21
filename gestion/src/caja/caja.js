@@ -406,6 +406,7 @@ const listarVentas = async (ventas)=>{
         tbody.appendChild(tr);
 
         //aca listamos los productos de cada venta
+        console.log(venta)
         if (venta.listaProductos) {
            for await(let {cantidad,producto} of  venta.listaProductos){
                 if (producto.length !== 0) {
@@ -427,6 +428,7 @@ const listarVentas = async (ventas)=>{
                     tdClienteProducto.innerHTML = venta.cliente;
                     tdIdProducto.innerHTML = producto._id === undefined ? " " : producto._id;
                     tdDescripcion.innerHTML = producto.descripcion;
+                    console.log(producto)
                     tdCantidad.innerHTML = cantidad.toFixed(2);
                     tdPrecioProducto.innerHTML = producto.precio.toFixed(2);
                     tdTotalProducto.innerHTML = (cantidad*producto.precio).toFixed(2);
