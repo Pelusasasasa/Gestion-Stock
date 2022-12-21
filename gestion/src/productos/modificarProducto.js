@@ -10,8 +10,6 @@ const archivo = require('../configuracion.json')
 
 const dolar = document.getElementById('dolar');
 
-const archivo = require('../configuracion.json');
-
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const marca = document.querySelector('#marca');

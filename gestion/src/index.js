@@ -135,7 +135,7 @@ const hacerMenu = () => {
         {
           label:"Numeros",
           click(){
-            abrirVentana("numeros/numeros.html",700,400)
+            abrirVentana("numeros/numeros.html",500,800)
           }
         },
         {
