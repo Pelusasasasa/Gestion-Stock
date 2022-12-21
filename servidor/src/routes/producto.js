@@ -5,10 +5,11 @@ const {traerProducto,descontarStock,traerPrecio,cargarProducto,eliminarProducto,
 
 router.route('/')
     .post(cargarProducto)
-    .put(descontarStock)
 router.route('/marcas')
     .get(traerMarcas)
     .put(putMarcas)
+router.route('/descontarStock')
+    .put(descontarStock)
 router.route('/CambioDolar/:dolar')
     .put(cambioPreciosPorDolar)
 router.route('/traerPrecio/:id')

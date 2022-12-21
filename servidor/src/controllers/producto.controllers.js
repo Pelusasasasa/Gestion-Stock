@@ -6,6 +6,7 @@ const Producto = require('../models/producto');
 productoCTRL.descontarStock = async(req,res)=>{
     const array = req.body;
     for await(let producto of array){
+        delete producto.precio;
         await Producto.findOneAndUpdate({_id:producto._id},producto);
         console.log(`Producto ${producto.descripcion} modificado el stock a: ${producto.stock}`)
     };

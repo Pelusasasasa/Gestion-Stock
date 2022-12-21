@@ -24,7 +24,6 @@ const salir = document.querySelector('.salir');
 let id;
 let dolarTraido;
 
-console.log(vendedores)
 
 window.addEventListener('load',async e=>{
     if (vendedores) {

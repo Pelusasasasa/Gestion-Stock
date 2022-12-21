@@ -3,7 +3,15 @@ const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.URL;
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+};
+
 const sweet = require('sweetalert2');
+const { agregarMovimientoVendedores } = require('../helpers');
 
 const title = document.querySelector('title');
 
@@ -14,6 +22,9 @@ const cliente = document.getElementById('cliente');
 const telefono = document.getElementById('telefono');
 const stock = document.getElementById('stock');
 const observaciones = document.getElementById('observaciones');
+const vendedor = document.getElementById('vendedor');
+
+vendedor.value = getParameterByName('vendedor')
 
 const agregar = document.getElementById('agregar');
 const modificar = document.getElementById('modificar');
@@ -107,9 +118,11 @@ agregar.addEventListener('click',async e=>{
     pedido.telefono = telefono.value;
     pedido.stock = stock.value;
     pedido.observaciones = observaciones.value.toUpperCase();
+    pedido.vendedor = vendedor.value;
 
     try {
         await axios.post(`${URL}pedidos`,pedido);
+        await agregarMovimientoVendedores(`Agrego el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor)
         window.close();
     } catch (error) {
         sweet.fire({
@@ -128,6 +141,7 @@ modificar.addEventListener('click',async e=>{
     pedido.telefono = telefono.value;
     pedido.stock = stock.value;
     pedido.observaciones = observaciones.value.toUpperCase();
+    pedido.vendedor = vendedor.value;
     
     try {
         await axios.put(`${URL}pedidos/id/${modificar.id}`,pedido);
@@ -152,6 +166,9 @@ ipcRenderer.on('informacion',async (e,args)=>{
         modificar.id = args.informacion;
         listarPedido(pedido);
     }
+    if (args.vendedor) {
+        vendedor.value = args.vendedor;
+    }
 });
 
 document.addEventListener('keyup',e=>{
@@ -167,7 +184,7 @@ const listarPedido = (pedido)=>{
     cliente.value = pedido.cliente;
     telefono.value = pedido.telefono;
     stock.value = pedido.stock;
-    observaciones.value = pedido.observaciones
-
+    observaciones.value = pedido.observaciones;
+    vendedor.value = pedido.vendedor;
 }
 

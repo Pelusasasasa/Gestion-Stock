@@ -5,6 +5,9 @@ const URL = process.env.URL;
 
 const sweet = require('sweetalert2');
 
+const {vendedores} = require('../configuracion.json');
+const { verificarUsuarios } = require('../helpers');
+
 let pedidos;
 
 const tbody = document.querySelector('tbody');
@@ -16,8 +19,20 @@ let seleccionado;
 let subSeleccionado;
 let inputSeleccionado;
 
+let vendedor = "";
 
 window.addEventListener('load',async e=>{
+    if (vendedores) {
+        vendedor = await verificarUsuarios();
+        if (vendedor === "") {
+            await sweet.fire({
+                title:"Contraseña Incorrecta"
+            });
+            location.reload();
+        }else if(!vendedor){
+            location.href = "../menu.html";
+        }
+    }
     pedidos = (await axios.get(`${URL}pedidos`)).data;
     await listarPedidos(pedidos);
 });
@@ -38,6 +53,7 @@ const listarPedidos = async(lista) => {
         const tdEstadoPedido = document.createElement('td');
         const tdObservaciones = document.createElement('td');
         const tdAcciones = document.createElement('td');
+        const tdVendedor = document.createElement('td');
 
         const inputEstado = document.createElement('input');
 
@@ -55,6 +71,7 @@ const listarPedidos = async(lista) => {
         tdStock.innerHTML = pedido.stock;
         tdEstadoPedido.appendChild(inputEstado);
         tdObservaciones.innerHTML = pedido.observaciones;
+        tdVendedor.innerHTML = pedido.vendedor;
         tdAcciones.innerHTML = `
         <div id=edit class=tool>
             <span id=edit class=material-icons>edit</span>
@@ -75,6 +92,7 @@ const listarPedidos = async(lista) => {
         tr.appendChild(tdStock);
         tr.appendChild(tdEstadoPedido);
         tr.appendChild(tdObservaciones);
+        tr.appendChild(tdVendedor);
         tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
@@ -135,7 +153,8 @@ tbody.addEventListener('click',async e=>{
             ancho:500,
             altura:550,
             reinicio:true,
-            informacion:seleccionado.id
+            informacion:seleccionado.id,
+            vendedor:vendedor.nombre
         });
     }
     
@@ -144,10 +163,11 @@ tbody.addEventListener('click',async e=>{
 
 agregar.addEventListener('click',e=>{
     ipcRenderer.send('abrir-ventana',{
-        path:"pedidos/agregarPedidos.html",
+        path:`pedidos/agregarPedidos.html`,
         ancho:500,
         altura:550,
-        reinicio:true
+        reinicio:true,
+        vendedor:vendedor.nombre
     });
 });
 

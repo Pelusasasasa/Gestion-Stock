@@ -6,6 +6,8 @@ const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
 
+const archivo = require('../configuracion.json')
+
 const dolar = document.getElementById('dolar');
 
 const archivo = require('../configuracion.json');
@@ -27,11 +29,17 @@ const salir = document.querySelector('.salir');
 
 //Recibimos la informacion del producto para luego llenar los inputs
 ipcRenderer.on('informacion',async (e,args)=>{
+<<<<<<< HEAD
 
     if (!archivo.dolar) {
         costoDolar.setAttribute('disabled',"");
     }
     
+=======
+    if (!archivo.dolar) {
+        costoDolar.setAttribute('disabled',"");
+    }
+>>>>>>> frontend
     dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
     const {informacion}= args;
     const rubros = (await axios.get(`${URL}rubro`)).data;
@@ -102,7 +110,6 @@ marca.addEventListener('keypress',e=>{
 });
 
 rubro.addEventListener('keydown',e=>{
-    console.log(e.keyCode)
     if (e.key === "Enter") {
         e.preventDefault();
         stock.focus();
@@ -119,7 +126,11 @@ costo.addEventListener('keypress',e=>{
     }else{
         apretarEnter(e,costoDolar);
     }
+<<<<<<< HEAD
 });
+=======
+})
+>>>>>>> frontend
 
 costoDolar.addEventListener('keypress',e=>{
     apretarEnter(e,impuesto);
