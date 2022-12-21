@@ -36,6 +36,10 @@ const Pedido =  new mongoose.Schema({
     observaciones:{
         type:String,
         default:""
+    },
+    vendedor:{
+        type:String,
+        default:""
     }
 });
 

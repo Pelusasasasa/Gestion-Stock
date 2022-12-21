@@ -1,1 +1,12 @@
+<<<<<<< HEAD
+{   
+    "caja":"Caja 1",
+    "vendedores":false,
+    "stockNegativo":false,
+    "puntoVenta":"3",
+    "cuit":"20416104655",
+    "dolar":false
+}
+=======
 {"caja":"Caja 1","vendedores":false,"stockNegativo":false,"puntoVenta":"3","cuit":"20416104655","dolar":false}
+>>>>>>> 0dece35a7f0f7d4f2d445003d7d844393854b851

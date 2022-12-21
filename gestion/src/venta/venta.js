@@ -217,6 +217,9 @@ const crearProducto = ()=>{
             </td>
         </tr>
     `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
 
     total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)),2);
     totalGlobal = parseFloat(total.value);
@@ -308,33 +311,29 @@ facturar.addEventListener('click',async e=>{
             
             venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
             venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
-
-            if (venta.tipo_venta === "CC") {
-                await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
-            }else{
-                await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
-            }
-                try {
-                    if (situacion === "blanco") {
-                        alerta.classList.remove('none');
-                        venta.afip = await cargarFactura(venta,facturaAnterior ? true : false);
-                        venta.F = true;
-                    }else{
-                        alerta.children[1].innerHTML = "Generando Venta";
+        if (venta.tipo_venta === "CC") {
+            await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
+        }else{
+            await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
+        }
+            try {
+                if (situacion === "blanco") {
+                    alerta.classList.remove('none');
+                    venta.afip = await cargarFactura(venta,facturaAnterior ? true : false);
+                    venta.F = true;
+                }else{
+                    alerta.children[1].innerHTML = "Generando Venta";
+                }
+                for (let producto of listaProductos){
+                    await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
+                    if (!(producto.producto.productoCreado)) {
+                        await descontarStock(producto);
                     }
-                    for (let producto of listaProductos){
-                        await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
-                        if (!(producto.producto.productoCreado)) {
-                            await descontarStock(producto);
-                        }
-                        //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
-                    }
-                    await axios.put(`${URL}productos`,descuentoStock)
-                    await axios.post(`${URL}movimiento`,movimientos);
-                //sumamos al cliente el saldo y agregamos la venta a la lista de venta
-                    venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
-
-
+                    //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
+                }
+                await axios.put(`${URL}productos/descontarStock`,descuentoStock)
+                await axios.post(`${URL}movimiento`,movimientos);
+                
                 //Ponemos en la cuenta conpensada si es CC
                     venta.tipo_venta === "CC" && await ponerEnCuentaCompensada(venta);
                     venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta,parseFloat(saldo.value));
@@ -429,7 +428,6 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
 //Descontamos el stock
 const descontarStock = async({cantidad,producto})=>{
     delete producto.idTabla;
-    delete producto.precio;
     if (facturaAnterior) {
         producto.stock += cantidad;
     }else{
@@ -481,6 +479,9 @@ const listarProducto =async(id)=>{
             </td>
         </tr>
     `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
         total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
         totalGlobal = parseFloat(total.value);
         }else if(producto !== "" && productoYaUsado){

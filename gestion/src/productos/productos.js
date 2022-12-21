@@ -118,10 +118,11 @@ const filtrar = async()=>{
 buscador.addEventListener('keyup',e=>{
     if ((buscador.value === "" && e.keyCode === 40) || (buscador.value === "" && e.keyCode === 39)) {
         buscador.blur();
-    }else{
-        filtrar();
     }
-    
+});
+
+buscador.addEventListener('change',e=>{
+    filtrar();
 });
 
 //cuando ahcemos un click en un tr lo ponemos como que esta seleccionado
