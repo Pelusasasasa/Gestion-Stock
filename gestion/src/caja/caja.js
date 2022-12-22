@@ -405,14 +405,16 @@ const listarVentas = async (ventas)=>{
 
         tbody.appendChild(tr);
 
-        //aca listamos los productos de cada venta
-        console.log(venta)
-        if (venta.listaProductos) {
-           for await(let {cantidad,producto} of  venta.listaProductos){
-                if (producto.length !== 0) {
+        //aca listamos los productos de cada venta traidos desde el movimiento
+        const movimientos = (await axios.get(`${URL}movimiento/${tdNumero.innerHTML}/${venta.tipo_venta}`)).data;
+        if (movimientos) {
+           for await(let {cantidad,precio,fecha,cliente,codProd,producto,nro_venta,descripcion} of  movimientos){
                     const trProducto = document.createElement('tr');
                     trProducto.classList.add('none');
                     trProducto.classList.add(`venta${venta._id}`);
+
+                    const date = fecha.slice(0,10).split('-',3);
+                    const hora = fecha.slice(11,19).split(':',3);
 
                     const tdNumeroProducto = document.createElement('td');
                     const tdFechaProducto = document.createElement('td');
@@ -423,15 +425,14 @@ const listarVentas = async (ventas)=>{
                     const tdPrecioProducto = document.createElement('td');
                     const tdTotalProducto = document.createElement('td');
 
-                    tdNumeroProducto.innerHTML = venta.numero;
-                    tdFechaProducto.innerHTML = tdFecha.innerHTML;
-                    tdClienteProducto.innerHTML = venta.cliente;
-                    tdIdProducto.innerHTML = producto._id === undefined ? " " : producto._id;
-                    tdDescripcion.innerHTML = producto.descripcion;
-                    console.log(producto)
+                    tdNumeroProducto.innerHTML = nro_venta;
+                    tdFechaProducto.innerHTML = `${date[2]}/${date[1]}/${date[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
+                    tdClienteProducto.innerHTML = cliente;
+                    tdIdProducto.innerHTML = codProd === undefined ? " " : codProd;
+                    tdDescripcion.innerHTML = producto;
                     tdCantidad.innerHTML = cantidad.toFixed(2);
-                    tdPrecioProducto.innerHTML = producto.precio.toFixed(2);
-                    tdTotalProducto.innerHTML = (cantidad*producto.precio).toFixed(2);
+                    tdPrecioProducto.innerHTML = precio.toFixed(2);
+                    tdTotalProducto.innerHTML = (cantidad*precio).toFixed(2);
 
                     trProducto.appendChild(tdNumeroProducto);
                     trProducto.appendChild(tdFechaProducto);
@@ -444,10 +445,7 @@ const listarVentas = async (ventas)=>{
 
                     tbody.appendChild(trProducto);
             };
-            };
         }
-        
-
         totalVenta += venta.tipo_comp === "Nota Credito C" ? venta.precio * -1 : venta.precio;
     };
     total.value = totalVenta.toFixed(2);

@@ -111,7 +111,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   nuevaVentana.setMenuBarVisibility(false);
 
   nuevaVentana.on('ready-to-show',()=>{
-    if (direccion !== "ticket/ticket.html" && direccion !== "impresiones/imprimirComprobante.html") {
+    if (direccion !== "ticket/ticket.html" /*&& direccion !== "impresiones/imprimirComprobante.html"*/) {
       nuevaVentana.show();
     }
   })

@@ -281,4 +281,15 @@ funciones.agregarMovimientoVendedores = async(descripcion,vendedor)=>{
     await axios.post(`${URL}movVendedores`,movimiento)
 }
 
+//Funcion que sirve para sacar el costo mas iva de los productos por si lo usamos
+funciones.sacarCosto = (costo,costoDolar,impuesto,dolar)=>{
+    if (costoDolar !== 0) {
+        const retorno = redondear((costoDolar + costoDolar*impuesto/100) * dolar,2)
+        return retorno
+    }else{
+        const retorno = redondear(costo +(costo*impuesto/100),2);
+        return retorno
+    }
+}
+
 module.exports = funciones;

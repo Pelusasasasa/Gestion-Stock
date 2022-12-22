@@ -13,7 +13,7 @@ const URL = process.env.URL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, sacarCosto} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -24,6 +24,8 @@ const localidad = document.querySelector('#localidad');
 const direccion = document.querySelector('#direccion');
 const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
+const lista = document.querySelector('#lista');
+
 
 //Parte Producto
 const cantidad = document.querySelector('#cantidad');
@@ -62,9 +64,12 @@ let idProducto = 0;
 let situacion = "negro";
 let porcentajeH = 0;
 let descuento = 0;
+let dolar = 0;
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
+
+    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
 
     if (tipoFactura === "notaCredito") {
         
@@ -355,7 +360,7 @@ facturar.addEventListener('click',async e=>{
                 await axios.post(`${URL}ventas`,venta);
 
                 if (impresion.checked) {
-                    ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
+                    ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 
                 location.reload();  
@@ -423,13 +428,13 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
-    movimiento.precio = producto.precio //parseFloat(redondear(producto.precio - (producto.precio * parseFloat(descuentoPor.value) / 100),2));
+    movimiento.precio = lista === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
     movimiento.tipo_comp = tipo_comp;
     movimiento.caja = caja,
     movimiento.series = series;
-    movimiento.vendedor = vendedor
+    movimiento.vendedor = vendedor;
     movimientos.push(movimiento);
 };
 
@@ -446,65 +451,94 @@ const descontarStock = async({cantidad,producto})=>{
 
 //Lo que hacemos es listar el producto traido
 const listarProducto =async(id)=>{
-        let producto = (await axios.get(`${URL}productos/${id}`)).data;
-        producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
+        let producto = (await axios.get(`${URL}productos/${id}`)).data;//buscamos el producto por codigo
+        producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;//buscamos el producto por descripcion
+        //ponemos el precio del producto con un descuento si es que hay
         producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
+        //Buscamos si el produto ya esta cargado
         if (producto !== "") {
-       const productoYaUsado = listaProductos.find(({producto: product})=>{
+        const productoYaUsado = listaProductos.find(({producto: product})=>{
            if (product._id === producto._id) {
                return product
            };
         });
+
         if(producto !== "" && !productoYaUsado){
-        if (producto.stock === 0 && archivo.stockNegativo) {
-            await sweet.fire({
-                title:"Producto con Stock en 0"
+            if (producto.stock === 0 && archivo.stockNegativo) {
+                await sweet.fire({
+                    title:"Producto con Stock en 0"
+                });
+            };
+            if (producto.stock - (parseFloat(cantidad.value)) < 0 && archivo.stockNegativo) {
+                await sweet.fire({
+                    title:"Producto con Stock menor a 0",
+                });
+            }
+
+            listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
+
+            codBarra.value = producto._id;
+            //ponemos en el input el precio de el producto ya se para consumidor final o para instalador
+            precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)
+
+            idProducto++;
+            producto.idTabla = `${idProducto}`; 
+
+                tbody.innerHTML += `
+                <tr id=${producto.idTabla}>
+                    <td>${cantidad.value}</td>
+                    <td>${codBarra.value}</td>
+                    <td>${producto.descripcion.toUpperCase()}</td>
+                    <td>${producto.marca}</td>
+                    <td>${parseFloat(precioU.value).toFixed(2)}</td>
+                    <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
+                    <td class=acciones>
+                        <div class=tool>
+                            <span class=material-icons>post_add</span>
+                            <p class=tooltip>Series</p>
+                        </div>
+                        <div class=tool>
+                            <span class=material-icons>delete</span>
+                            <p class=tooltip>Eliminar</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            tbody.scrollIntoView({//hacemos un scroll al final del producto cargado ultimo
+                block:"end"
             });
-        };
-        if (producto.stock - (parseFloat(cantidad.value)) < 0 && archivo.stockNegativo) {
-            await sweet.fire({
-                title:"Producto con Stock menor a 0",
-            });
-        }
-        listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
-        codBarra.value = producto._id;
-        precioU.value = redondear(producto.precio,2);
-        idProducto++;
-        producto.idTabla = `${idProducto}`;
-        tbody.innerHTML += `
-        <tr id=${producto.idTabla}>
-            <td>${cantidad.value}</td>
-            <td>${codBarra.value}</td>
-            <td>${producto.descripcion.toUpperCase()}</td>
-            <td>${producto.marca}</td>
-            <td>${parseFloat(precioU.value).toFixed(2)}</td>
-            <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
-            <td class=acciones>
-                <div class=tool>
-                    <span class=material-icons>delete</span>
-                    <p class=tooltip>Eliminar</p>
-                </div>
-            </td>
-        </tr>
-    `;
-    tbody.scrollIntoView({
-        block:"end"
-    });
+
         total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
         totalGlobal = parseFloat(total.value);
+
         }else if(producto !== "" && productoYaUsado){
-            productoYaUsado.cantidad += parseFloat(cantidad.value)
+
+            productoYaUsado.cantidad += parseFloat(cantidad.value);
             producto.idTabla = productoYaUsado.producto.idTabla;
+
             const tr = document.getElementById(producto.idTabla);
             tr.children[0].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) + parseFloat(cantidad.value),2);
-            tr.children[5].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * producto.precio,2);
-            total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
+            let precio = tr.children[5];
+            
+            const cantidadNueva = parseFloat(tr.children[0].innerHTML);
+            //si lista es 1 entonces redondeamos para el precio comun simplemente
+            if (lista.value === "1") {
+                precio.innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * producto.precio,2);
+                total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
+            }else{
+            //Si la lista es 2 entonces redondeamos con el costo simplemente
+                precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)),2);
+                total.value = redondear(parseFloat(total.value) + parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)),2);
+            }
             totalGlobal = parseFloat(total.value);
         }
+
         cantidad.value = "1.00";
         codBarra.value = "";
         precioU.value = "";
         codBarra.focus();  
+
     }else{
         precioU.focus();
     }
