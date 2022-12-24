@@ -171,8 +171,3 @@ h1{
     flex-direction: column;
     margin: 3rem auto;
 }
-
-
-#modificarCodigo, #codigo #nuevoCodigo{
-    width: 30%;
-}

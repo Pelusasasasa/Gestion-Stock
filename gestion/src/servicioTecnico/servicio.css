@@ -1,17 +1,29 @@
 .listaServicio .table{
-    height: 50vh;
+    height: 70vh;
     background-color: white;
     overflow: scroll;
 }
+.table{
+    width: 100%;
+}
 
 .table table{
-    table-layout: fixed;
+    font-size: 2rem;
+    /* table-layout: fixed; */
     width: 100%;
     border-collapse: collapse;
 }
 
+table thead{
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
 .table table th,.table table td{
     border: .1rem solid black;
+    white-space: nowrap;
+    padding: 0 .5rem;
 }
 
 .acciones{
@@ -60,4 +72,21 @@ table td:hover{
 
 textarea{
     font-size: 2rem;
+}
+
+.retiro{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.retiro fieldset{
+    display: flex;
+    justify-content: space-around;
+    /* width: 50%; */
+}
+
+.retiro fieldset input{
+    transform: scale(1.5);
+    align-self: center;
 }

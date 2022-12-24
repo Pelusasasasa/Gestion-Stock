@@ -12,6 +12,14 @@ const Gasto = new mongoose.Schema({
     importe:{
         type:Number,
         default:0
+    },
+    vendedor:{
+        type:String,
+        default:""
+    },
+    caja:{
+        type:String,
+        default:""
     }
 });
 

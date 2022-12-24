@@ -3,16 +3,33 @@ require("dotenv").config();
 const URL = process.env.URL;
 
 const sweet = require('sweetalert2');
-const {cerrarVentana} = require('../helpers');
+const {cerrarVentana, verificarUsuarios} = require('../helpers');
 
 const fecha = document.getElementById('fecha');
 const descripcion = document.getElementById('descripcion');
 const importe = document.getElementById('importe');
-
+const inputVendedor = document.getElementById('vendedor');
 const aceptar = document.querySelector('.aceptar');
 const salir = document.querySelector('.salir');
 
-window.addEventListener('load',e=>{
+const {caja,vendedores} = require('../configuracion.json');
+
+let vendedor;
+
+window.addEventListener('load',async e=>{
+    console.log(vendedores)
+    if (vendedores) {
+        vendedor = await verificarUsuarios();
+
+        if (vendedor) {
+            inputVendedor.value = vendedor.nombre;
+        }else{
+            await sweet.fire({
+                title:"Contraseña Incorrecta"
+            });
+            location.reload();
+        }
+    }
 
     const date = new Date();
     let day = date.getDate();
@@ -51,7 +68,8 @@ aceptar.addEventListener('click',async e=>{
     gasto.fecha = fecha.value;
     gasto.descripcion = descripcion.value.toUpperCase();
     gasto.importe = importe.value;
-    console.log(gasto)
+    gasto.vendedor = inputVendedor.value;
+    gasto.caja = caja;
     try {
         await axios.post(`${URL}gastos`,gasto);
         window.close();

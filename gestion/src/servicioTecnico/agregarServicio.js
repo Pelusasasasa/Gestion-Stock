@@ -2,6 +2,8 @@ const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
 
+const {caja} = require('../configuracion.json');
+
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 
@@ -20,11 +22,18 @@ const detalles = document.getElementById('detalles');
 const egreso = document.querySelector('.egreso');
 const inputEgreso = document.getElementById('fechaEgreso');
 
+const mostrador = document.getElementById('mostrador');
+const vendedor = document.getElementById('vendedor');
+const codigoRMA = document.getElementById('codigoRMA')
+
+
 const agregar = document.getElementById('agregar');
 const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 ipcRenderer.on('informacion',async (e,args)=>{
+    vendedor.value = args.vendedor;
+    mostrador.checked = true
     if (args.informacion) {
         let servicio = (await axios.get(`${URL}servicios/id/${args.informacion}`)).data;
         listarServicio(servicio);
@@ -48,9 +57,9 @@ ipcRenderer.on('informacion',async (e,args)=>{
 });
 
 const listarServicio = (servicio)=>{
+    console.log(servicio)
     cliente.value = servicio.cliente;
-    direccion.vlaue = servicio.direccion;
-    email.value = servicio.email;
+    direccion.value = servicio.direccion;
     telefono.value = servicio.telefono;
     idCliente.value = servicio.idCliente;
 
@@ -59,6 +68,8 @@ const listarServicio = (servicio)=>{
     marca.value = servicio.marca;
     serie.value = servicio.numeroSerie;
     detalles.value = servicio.detalles;
+
+    codigoRMA.value = servicio.codigoRMA;
 }
 
 idCliente.addEventListener('keypress',async e=>{
@@ -86,12 +97,6 @@ cliente.addEventListener('keypress',e=>{
 });
 
 direccion.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        email.focus();
-    }
-});
-
-email.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
         telefono.focus();
     }
@@ -121,6 +126,17 @@ marca.addEventListener('keypress',e=>{
     }
 });
 
+serie.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        detalles.focus();
+    }
+});
+
+codigoRMA.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        agregar.focus();
+    }
+});
 const listarCliente = (elem)=>{
     cliente.value = elem.nombre;
     direccion.value = elem.direccion;
@@ -132,16 +148,26 @@ agregar.addEventListener('click',async e=>{
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
     servicio.direccion = direccion.value.toUpperCase();
-    servicio.email = email.value.toUpperCase();
     servicio.telefono = telefono.value;
 
     servicio.producto = producto.value.toUpperCase();
     servicio.modelo = modelo.value.toUpperCase();
     servicio.marca = marca.value.toUpperCase();
-    servicio.serie = serie.value;
-
+    servicio.numeroSerie = serie.value;
+    
     servicio.detalles = detalles.value.toUpperCase();
     
+    if (mostrador.checked) {
+        servicio.retiro = "MOSTRADOR";
+    }else{
+        servicio.retiro = "RESIDENCIA";
+    }
+    servicio.caja = caja.toUpperCase();
+    servicio.codigoRMA = codigoRMA.value;
+    servicio.vendedor = vendedor.value;
+
+
+
     try {
         await axios.post(`${URL}servicios`,servicio);
         window.close();
@@ -157,7 +183,6 @@ modificar.addEventListener('click',async e=>{
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
     servicio.direccion = direccion.value.toUpperCase();
-    servicio.email = email.value.toUpperCase();
     servicio.telefono = telefono.value;
 
     servicio.producto = producto.value.toUpperCase();
@@ -169,6 +194,16 @@ modificar.addEventListener('click',async e=>{
 
     servicio.fechaEgreso = inputEgreso.value;
     servicio.total = total.value;
+
+
+    if (mostrador.checked) {
+        servicio.retiro = "MOSTRADOR";
+    }else{
+        servicio.retiro = "RESIDENCIA";
+    }
+    servicio.caja = caja;
+    servicio.codigoRMA = codigoRMA.value;
+    servicio.vendedor = vendedor.value;
 
     try {
         await axios.put(`${URL}servicios/id/${modificar.id}`,servicio);

@@ -14,6 +14,7 @@ const {vendedores} = require('../configuracion.json')
 const caja = document.getElementById('caja');
 const multiple = document.querySelectorAll("input[name=multipleVendedores]");
 const multipleStockNegativos = document.querySelectorAll("input[name=stockNegativo]");
+const dolar = document.querySelectorAll('input[name=dolar]');
 
 
 const si = document.getElementById('si');
@@ -21,6 +22,11 @@ const no = document.getElementById('no');
 
 const siStockNegativo = document.getElementById('siStockNegativo');
 const noStockNegativo = document.getElementById('noStockNegativo');
+
+const siDolar = document.getElementById('siDolar');
+const noDolar = document.getElementById('noDolar');
+
+
 const puntoVenta = document.getElementById('puntoVenta');
 const cuit = document.getElementById('cuit');
 
@@ -48,9 +54,9 @@ window.addEventListener('load',async e=>{
     caja.value = archivo.caja;  
     archivo.vendedores === false ? no.checked = true : si.checked = true;
     archivo.stockNegativo === false ? noStockNegativo.checked = true : siStockNegativo.checked = true;
+    archivo.dolar === false ? noDolar.checked : siDolar.checked = true;
     cuit.value = archivo.cuit;
     puntoVenta.value = archivo.puntoVenta;
-
 });
 
 

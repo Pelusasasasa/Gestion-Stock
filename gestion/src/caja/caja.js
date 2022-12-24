@@ -2,8 +2,20 @@ const axios  = require("axios");
 require("dotenv").config();
 const URL = process.env.URL;
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+let vendedor = getParameterByName('vendedor');
+let permiso = getParameterByName('permiso');
+
 const { cerrarVentana, redondear } = require("../helpers");
 const sweet = require('sweetalert2');
+
+const {vendedores} = require('../configuracion.json');
 
 let seleccionado;
 let subSeleccionado;
@@ -49,10 +61,15 @@ d = d<10 ? `0${d}`: d;
 
 pestaña.addEventListener('click',async e=>{
     if (e.target.parentNode.nodeName === "MAIN") {
-        document.querySelector('.pestañaSeleccionada') && document.querySelector('.pestañaSeleccionada').classList.remove('pestañaSeleccionada');
-        e.target.parentNode.classList.add('pestañaSeleccionada');
-        filtro = e.target.innerHTML;
-
+        if (vendedores && permiso !== "0" && e.target.innerHTML === "Gastos") {
+            await sweet.fire({
+                title:"No tiene permisos"
+            });
+        }else{
+            document.querySelector('.pestañaSeleccionada') && document.querySelector('.pestañaSeleccionada').classList.remove('pestañaSeleccionada');
+            e.target.parentNode.classList.add('pestañaSeleccionada');
+            filtro = e.target.innerHTML;
+        }
         if (filtro === "Gastos") {
             document.querySelector('.gastos').classList.remove('none');
             document.querySelector('.listado').classList.add('none');
@@ -461,6 +478,8 @@ const listarGastos = (gastos)=>{
             <td>${fecha[2]}/${fecha[1]}/${fecha[0]}</td>
             <td>${gasto.descripcion}</td>
             <td>${redondear(gasto.importe * -1,2)}</td>
+            <td>${gasto.vendedor}</td>
+            <td>${gasto.caja}</td>
         </tr>
     `
     tbodyGastos.innerHTML += tr;

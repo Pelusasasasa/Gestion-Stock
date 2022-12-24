@@ -68,7 +68,6 @@ productoCTRL.modificarProducto = async(req,res)=>{
     let producto;
     let mensaje;
     let estado;
-    req.body.rubro !== "" ? (req.body.rubro = req.body.rubro.toUpperCase()) : "";
     try {
         producto = await Producto.findOneAndUpdate({_id:id},req.body);
         mensaje = `Producto ${producto.descripcion} Modificado`;

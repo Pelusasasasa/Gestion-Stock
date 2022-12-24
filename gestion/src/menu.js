@@ -79,7 +79,7 @@ document.addEventListener('keyup',async e=>{
         const opciones = {
             path:"gastos/gastos.html",
             ancho:500,
-            altura:400
+            altura:550
         }
         ipcRenderer.send('abrir-ventana',opciones);
     }
