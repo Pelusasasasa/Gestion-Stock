@@ -170,7 +170,6 @@ productoCTRL.productosPorMarcas = async(req,res)=>{
         const productos = await Producto.find({marca:marca});
         arreglo.push(...productos);
     };
-    console.log(arreglo)
     res.send(arreglo)
 }
 
