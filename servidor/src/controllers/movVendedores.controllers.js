@@ -10,4 +10,9 @@ movimientoCTRL.post = async(req,res)=>{
     res.end();
 };
 
+movimientoCTRL.getAll = async(req,res)=>{
+    const movimientos = await Movimiento.find();
+    res.send(movimientos)
+}
+
 module.exports = movimientoCTRL;

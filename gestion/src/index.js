@@ -146,9 +146,20 @@ const hacerMenu = () => {
         },
         {
           label:"Vendedores",
-          click(){
-            abrirVentana("vendedores/vendedores.html",600,800);
-          }
+          submenu:[
+            {
+              label:"Informacion Vendedores",
+              click(){
+                abrirVentana("vendedores/vendedores.html",600,800);
+              }
+            },
+            {
+              label:"Movimiento Vendedores",
+                click(){
+                  abrirVentana("vendedores/movimientoVendedores.html",600,1100);
+                }
+            }
+          ]
         },
         {
           label:"Alicuotas",
