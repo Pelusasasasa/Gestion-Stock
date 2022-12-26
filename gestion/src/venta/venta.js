@@ -595,7 +595,7 @@ total.addEventListener('focus',e=>{
 
 cantidad.addEventListener('focus',e=>{
     cantidad.select();
-})
+});
 
 porcentaje.addEventListener('focus',e=>{
     porcentaje.select();
@@ -603,7 +603,7 @@ porcentaje.addEventListener('focus',e=>{
 
 inputRecibo.addEventListener('focus',e=>{
     inputRecibo.select();
-})
+});
 
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {

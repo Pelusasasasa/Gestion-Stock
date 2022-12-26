@@ -29,6 +29,13 @@ rubroCTRL.putRubro = async(req,res)=>{
     res.send(`Rubro ${req.body.rubro} Modificado`)
 }
 
+rubroCTRL.deleteForId = async(req,res)=>{
+    const {id} = req.params;
+    console.log(id)
+    await Rubros.findOneAndDelete({_id:id});
+    res.send();
+}
+
 
 module.exports = rubroCTRL;
 
