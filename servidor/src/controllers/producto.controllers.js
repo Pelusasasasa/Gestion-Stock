@@ -1,6 +1,5 @@
 const productoCTRL = {};
 
-const { find } = require('../models/producto');
 const Producto = require('../models/producto');
 
 productoCTRL.descontarStock = async(req,res)=>{
@@ -141,7 +140,7 @@ productoCTRL.putMarcas = async(req,res)=>{
         producto.costo =  (producto.costo + producto.costo*porcentaje/100).toFixed(2);
         const impuesto = producto.costo + producto.costo*producto.impuesto/100;
         const ganancia = impuesto*producto.ganancia/100;
-        producto.precio = (impuesto + ganancia).toFixed(2);
+        producto.precio = (impuesto + ganancia).toFixed(2);http://fiestadelaplayaderio.com.ar/
         await Producto.findOneAndUpdate({_id:producto._id},producto)
     }
     res.send(JSON.stringify({
@@ -162,4 +161,17 @@ productoCTRL.cambioPreciosPorDolar = async(req,res)=>{
     console.log("Cambios el precio de los productos con dolares");
     res.end();
 }
+
+productoCTRL.productosPorMarcas = async(req,res)=>{
+    let {lista} = req.params;
+    lista = JSON.parse(lista);
+    let arreglo = [];
+    for await(let marca of lista){
+        const productos = await Producto.find({marca:marca});
+        arreglo.push(...productos);
+    };
+    console.log(arreglo)
+    res.send(arreglo)
+}
+
 module.exports = productoCTRL

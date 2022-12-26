@@ -176,3 +176,16 @@ h1{
 #modificarCodigo, #codigo #nuevoCodigo{
     width: 30%;
 }
+
+.listaPrecios{
+    text-align: center;
+}
+
+.listaPrecios .listar{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+}
+
+.listaPrecios .listar input{
+    transform: scale(1.5);
+}
