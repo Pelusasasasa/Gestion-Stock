@@ -37,3 +37,12 @@ label{
 main{
     margin: 2rem;
 }
+
+.informacion{
+    display: flex;
+    justify-content: space-around;
+}
+.informacion main{
+    display: flex;
+    flex-direction: column;
+}

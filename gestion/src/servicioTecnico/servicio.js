@@ -3,6 +3,9 @@ const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.URL;
 const sweet = require('sweetalert2');
+const { verificarUsuarios } = require('../helpers');
+
+const {vendedores} = require('../configuracion.json');
 
 const tbody = document.querySelector('tbody');
 
@@ -15,6 +18,17 @@ let seleccionado;
 let subSeleccionado;
 
 window.addEventListener('load',async e=>{
+
+    const vendedor = await verificarUsuarios();
+    if (vendedores && vendedor === "") {
+       await sweet.fire({
+        title:"Contraseña incorrecta"
+       });
+       location.reload();
+    }else if(vendedores && !vendedor){
+        location.href = '../menu.html';
+    }
+
     servicios = (await axios.get(`${URL}servicios`)).data;
     listarServicios(servicios);
 });

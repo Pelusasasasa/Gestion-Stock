@@ -12,7 +12,6 @@ const dolar = document.querySelector('#dolar');
 const contado = document.querySelector('#contado');
 const cuentaCorriente = document.querySelector('#cuentaCorriente');
 const recibo = document.querySelector('#recibo');
-const remito = document.querySelector('#remito');
 const facturaC = document.querySelector('#facturaC');
 const notaC = document.querySelector('#notaC');
 
@@ -59,7 +58,6 @@ window.addEventListener('load',async e=>{
         contado.value = numeros.Contado.toString().padStart(8,'0');
         recibo.value = numeros.Recibo.toString().padStart(8,'0');
         cuentaCorriente.value = numeros["Cuenta Corriente"].toString().padStart(8,'0');
-        remito.value = numeros["Remito"].toString().padStart(8,'0');
     }
 });
 
@@ -69,7 +67,6 @@ cargar.addEventListener('click',async e=>{
         "Cuenta Corriente": 0,
         "Contado": 0,
         "Recibo": 0,
-        "Remito": 0,
         "Dolar":0
     }
     await axios.post(`${URL}numero`,numero);
@@ -84,7 +81,6 @@ modificar.addEventListener('click',e=>{
     contado.removeAttribute('disabled');
     cuentaCorriente.removeAttribute('disabled');
     recibo.removeAttribute('disabled');
-    remito.removeAttribute('disabled');
 });
 
 //Aca cuando modificamos los numeros despues los guardamos
@@ -95,7 +91,6 @@ guardar.addEventListener('click',async e=>{
     numero.Recibo = parseInt(recibo.value);
     numero["Cuenta Corriente"] = parseInt(cuentaCorriente.value);
     numero.Dolar = dolar.value;
-    numero.Remito = remito.value;
 
     if (dolarTraido !== parseFloat(dolar.value)) {
         await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
@@ -126,10 +121,6 @@ cuentaCorriente.addEventListener('focus',e=>{
 
 recibo.addEventListener('focus',e=>{
     recibo.select();
-});
-
-remito.addEventListener('focus',e=>{
-    remito.select();
 });
 
 salir.addEventListener('click',e=>{

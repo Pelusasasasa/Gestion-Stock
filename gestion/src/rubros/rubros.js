@@ -25,12 +25,26 @@ const listar = async(rubros)=>{
 
         const tdNumero = document.createElement('td');
         const tdNombre = document.createElement('td');
+        const tdAcciones = document.createElement('td');
+
+        tdAcciones.classList.add('acciones');
 
         tdNumero.innerHTML = numero;
         tdNombre.innerHTML = rubro;
+        tdAcciones.innerHTML = `
+            <div class=tool>
+                <span class=material-icons>edit</span>
+                <p class=tooltip>Modificar</p>
+            </div>
+            <div class=tool>
+                <span class=material-icons>delete</span>
+                <p class=tooltip>Eliminar</p>
+            </div>
+        `
 
         tr.appendChild(tdNumero);
         tr.appendChild(tdNombre);
+        tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
     }
@@ -55,12 +69,46 @@ agregar.addEventListener('click',async e=>{
     nombre.focus();
 });
 
-tbody.addEventListener('click',e=>{
-    seleccionado = e.path[1];
+tbody.addEventListener('click',async e=>{
+
+    seleccionado && seleccionado.classList.remove('seleccionado');
+
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+    }else if(e.target.nodeName === "SPAN"){
+        seleccionado = e.target.parentNode.parentNode;
+    }else if(e.target.nodeName === "DIV"){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+    }
+
+    seleccionado.classList.add('seleccionado');
+
     agregar.classList.add('none');
     modificar.classList.remove('none');
     numero.value = seleccionado.children[0].innerHTML;
     nombre.value = seleccionado.children[1].innerHTML;
+
+    if (e.target.innerHTML === "edit") {
+        
+    }else if(e.target.innerHTML === "delete"){
+        await sweet.fire({
+            title:"Eliminar Rubro ?",
+            showCancelButton:true,
+            confirmButtonText:"Aceptar"
+        }).then(async({isConfirmed})=>{
+            if (isConfirmed) {
+                try {
+                    await axios.delete(`${URL}rubro/codigo/${seleccionado.id}`);
+                    tbody.removeChild(seleccionado);
+                } catch (error) {
+                    console.log(error);
+                    sweet.fire({
+                        title:"No se pudo borrar el rubro"
+                    })
+                }
+            }
+        });
+    }
 });
 
 modificar.addEventListener('click',e=>{

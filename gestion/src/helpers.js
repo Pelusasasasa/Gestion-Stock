@@ -272,7 +272,7 @@ funciones.verificarUsuarios = async()=>{
     return retorno
 }
 
-funciones.agregarMovimientoVendedores = async(descripcion,vendedor)=>{
+funciones.agregarMovimientoVendedores = async(descripcion,vendedor = "")=>{
     const movimiento = {};
     movimiento.descripcion = descripcion;
     movimiento.fecha = new Date();

@@ -563,9 +563,7 @@ const sacarIva = (lista) => {
         cantIva = 2;
     }
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),cantIva]
-}
-
-
+};
 
 codigo.addEventListener('focus',e=>{
     codigo.select();
@@ -593,7 +591,7 @@ total.addEventListener('focus',e=>{
 
 cantidad.addEventListener('focus',e=>{
     cantidad.select();
-})
+});
 
 porcentaje.addEventListener('focus',e=>{
     porcentaje.select();
@@ -601,7 +599,7 @@ porcentaje.addEventListener('focus',e=>{
 
 inputRecibo.addEventListener('focus',e=>{
     inputRecibo.select();
-})
+});
 
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {

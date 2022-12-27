@@ -13,14 +13,16 @@ const total = document.querySelector('#total');
 const guardar = document.querySelector('.guardar');
 
 const sweet  = require('sweetalert2');
-const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
-const archivo = require('../configuracion.json');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
 
 const archivo = require('../configuracion.json');
 
 const axios = require('axios');
+const { ipcRenderer } = require('electron');
 require('dotenv').config()
 const URL = process.env.URL;
+
+let vendedor;
 
 const traerRubros = async()=>{
     const rubros =  (await axios.get(`${URL}rubro`)).data;
@@ -33,6 +35,10 @@ const traerRubros = async()=>{
 }
 
 traerRubros();
+
+ipcRenderer.on('informacion',(e,args)=>{
+    vendedor = args.vendedor;
+});
 
 window.addEventListener('load',async e=>{
     if (!archivo.dolar) {
@@ -67,7 +73,8 @@ guardar.addEventListener('click',async ()=>{
     producto.ganancia = ganancia.value;
     producto.precio = total.value;
     const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data
-    sweet.fire({
+    await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+    await sweet.fire({
         title:mensaje
     })
     if (estado) {

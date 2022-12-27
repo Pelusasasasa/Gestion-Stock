@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -26,6 +26,8 @@ const total = document.querySelector('#total');
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
+let vendedor;
+
 
 //Recibimos la informacion del producto para luego llenar los inputs
 ipcRenderer.on('informacion',async (e,args)=>{
@@ -34,6 +36,7 @@ ipcRenderer.on('informacion',async (e,args)=>{
     }
     dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
     const {informacion}= args;
+    vendedor = args.vendedor;
     const rubros = (await axios.get(`${URL}rubro`)).data;
     for await(let {rubro,numero} of rubros){
         const option = document.createElement('option');
@@ -81,6 +84,7 @@ modificar.addEventListener('click',async e=>{
     producto.precio = parseFloat(total.value).toFixed(2);
     const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
     await ipcRenderer.send('informacion-a-ventana',producto);
+    await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
     await sweet.fire({
         title:mensaje
     })

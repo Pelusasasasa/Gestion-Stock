@@ -1,13 +1,16 @@
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter,selecciona_value} = require('../helpers');
+const {cerrarVentana,apretarEnter,selecciona_value, agregarMovimientoVendedores} = require('../helpers');
 
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.URL;
 
-ipcRenderer.on('informacion',(e,{informacion})=>{
-    ponerInputs(informacion)
+let vendedor;
+
+ipcRenderer.on('informacion',(e,{informacion,vendedor:vende})=>{
+    ponerInputs(informacion);
+    vendedor = vende;
 })
 
 const codigo = document.querySelector('#codigo');
@@ -93,10 +96,17 @@ modificar.addEventListener('click',async e=>{
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;
     cliente.observaciones = observaciones.value.toUpperCase();
-    const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
-    await sweet.fire({title:mensaje});
-    ipcRenderer.send('enviar-ventana-principal',cliente);
-    window.close();
+    try {
+        const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
+        console.log(vendedor)
+        agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
+        await sweet.fire({title:mensaje});
+        ipcRenderer.send('enviar-ventana-principal',cliente);
+        window.close();
+    } catch (error) {
+        sweet.fire({title:"No se pudo modificar el cliente"});
+        console.log(error)
+    }
 })
 
 document.addEventListener('keydown',e=>{
