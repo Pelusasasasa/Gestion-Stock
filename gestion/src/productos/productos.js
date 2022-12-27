@@ -13,7 +13,7 @@ const { ipcRenderer } = require("electron");
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
-const { recorrerFlechas,copiar, redondear } = require("../helpers");
+const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores } = require("../helpers");
 require("dotenv").config();
 const URL = process.env.URL;
 
@@ -152,9 +152,17 @@ tbody.addEventListener('click',e=>{
             "confirmButtonText":"Aceptar"
         }).then(async (result)=>{
             if (result.isConfirmed) {
-                const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
-                await sweet.fire({title:mensaje});
-                tbody.removeChild(seleccionado);
+                try {
+                    const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
+                    await sweet.fire({title:mensaje});
+                    tbody.removeChild(seleccionado);
+                    await agregarMovimientoVendedores(`Elimino el producto ${seleccionado.children[1].innerHTML} con el precio ${seleccionado.children[2].innerHTML}`,vendedor);
+                } catch (error) {
+                    console.log(error);
+                    sweet.fire({
+                        title:"No se pudo borrar el producto"
+                    })
+                }
             }
         })
     }else if(e.target.innerHTML === "edit"){
@@ -162,7 +170,8 @@ tbody.addEventListener('click',e=>{
             path: "./productos/modificarProducto.html",
             botones:true,
             informacion:seleccionado.id,
-            altura:600
+            altura:600,
+            vendedor:vendedor
         }
         ipcRenderer.send('abrir-ventana',opciones);
     }
@@ -173,7 +182,8 @@ agregar.addEventListener('click',e=>{
     const opciones = {
         path: "./productos/agregarProducto.html",
         botones:true,
-        altura:600
+        altura:600,
+        vendedor:vendedor
     }
     ipcRenderer.send('abrir-ventana',opciones);
 })

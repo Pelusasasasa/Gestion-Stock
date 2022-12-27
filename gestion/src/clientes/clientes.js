@@ -16,7 +16,7 @@ const axios = require('axios');
 require('dotenv').config()
 const URL = process.env.URL;
 
-const {recorrerFlechas, copiar} = require('../helpers');
+const {recorrerFlechas, copiar, agregarMovimientoVendedores} = require('../helpers');
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
@@ -63,7 +63,7 @@ ipcRenderer.on('informacion',(e,args)=>{
 
 //abrimos una ventana para agregar cliente
 agregar.addEventListener('click',e=>{
-    ipcRenderer.send('abrir-ventana',{path:"./clientes/agregarCliente.html",altura:500,ancho:1200});
+    ipcRenderer.send('abrir-ventana',{path:"./clientes/agregarCliente.html",altura:500,ancho:1200,vendedor:vendedor});
 });
 
 
@@ -112,8 +112,6 @@ const listarClientes = async(clientes)=>{
             tr.appendChild(tdAcciones);
             
         }
-        
-
         tbody.appendChild(tr);
     };
     seleccionado = tbody.firstElementChild;
@@ -150,18 +148,27 @@ tbody.addEventListener('click',async e=>{
                 showCancelButton:true
             }).then(async({isConfirmed})=>{
                 if (isConfirmed) {
-                    const mensaje = (await axios.delete(`${URL}clientes/id/${seleccionado.id}`)).data;
-                    await sweet.fire({
-                        title:mensaje
-                    });
-                    tbody.removeChild(seleccionado);
+                    try {
+                        const mensaje = (await axios.delete(`${URL}clientes/id/${seleccionado.id}`)).data;
+                        agregarMovimientoVendedores(`Elimino el cliente ${seleccionado.children[1].innerHTML} con direccion en ${seleccionado.children[2].innerHTML}`,vendedor);
+                        await sweet.fire({
+                            title:mensaje
+                        });
+                        tbody.removeChild(seleccionado);
+                    } catch (error) {
+                        console.log(error)
+                        sweet.fire({
+                            title:"No se pudo Eliminar el cliente"
+                        })
+                    }
                 }
             })
         }else if(e.target.innerHTML === "edit"){
             ipcRenderer.send('abrir-ventana',
                 {path:"clientes/modificarCliente.html",
                 altura:500,
-                informacion:seleccionado.id
+                informacion:seleccionado.id,
+                vendedor:vendedor
             });
         }
 });

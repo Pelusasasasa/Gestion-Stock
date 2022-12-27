@@ -145,6 +145,7 @@ modificar.addEventListener('click',async e=>{
     
     try {
         await axios.put(`${URL}pedidos/id/${modificar.id}`,pedido);
+        await agregarMovimientoVendedores(`Modifico el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor);
         window.close();
     } catch (error) {
         sweet.fire({

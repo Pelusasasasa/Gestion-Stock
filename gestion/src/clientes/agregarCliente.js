@@ -1,7 +1,8 @@
-const {cerrarVentana,apretarEnter} = require('../helpers');
+const {cerrarVentana,apretarEnter, agregarMovimientoVendedores} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
+const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.URL;
 
@@ -17,10 +18,16 @@ const observaciones = document.querySelector('#observaciones');
 const agregar = document.querySelector('.agregar');
 const salir = document.querySelector('.salir');
 
+let vendedor;
+
 window.addEventListener('load',async e=>{
     const id = (await axios.get(`${URL}clientes`)).data;
     codigo.value = id;
+    ipcRenderer.on('informacion',(e,args)=>{
+        vendedor = args.vendedor;
+    })
 });
+
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,condicionFacturacion);
@@ -72,13 +79,22 @@ agregar.addEventListener('click',async e=>{
     cliente.condicionIva = condicionIva.value;
     cliente.condicionFacturacion = condicionFacturacion.value;
     cliente.observaciones = observaciones.value.trim().toUpperCase();
-    const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
-    await sweet.fire({
-        title:mensaje
-    });
-    if (estado) {
-        window.close();
+    try {
+        const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
+        await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
+        await sweet.fire({
+            title:mensaje
+        });
+        if (estado) {
+            window.close();
+        }
+    } catch (error) {
+        console.log(error)
+        sweet.fire({
+            title:"No se pudo agregar un cliente"
+        })
     }
+
 });
 
 salir.addEventListener('click',e=>{

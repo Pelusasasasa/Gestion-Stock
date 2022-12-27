@@ -3,6 +3,9 @@ const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.URL;
 const sweet = require('sweetalert2');
+const { verificarUsuarios } = require('../helpers');
+
+const {vendedores} = require('../configuracion.json');
 
 const {caja,vendedores} = require('../configuracion.json');
 const { verificarUsuarios } = require('../helpers');

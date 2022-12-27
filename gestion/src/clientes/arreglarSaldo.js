@@ -1,4 +1,6 @@
-const {cerrarVentana,apretarEnter, verificarUsuarios} = require('../helpers');
+
+let vendedor
+const {cerrarVentana,apretarEnter, verificarUsuarios, agregarMovimientoVendedores} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -21,7 +23,7 @@ let cliente;
 
 window.addEventListener('load',async e=>{
     if (vendedores) {
-        const vendedor = await verificarUsuarios();
+        vendedor = await verificarUsuarios();
         if (vendedor === "") {
             await sweet.fire({
                 title:"Contraseña incorrecta"
@@ -58,9 +60,17 @@ codigo.addEventListener('keyup',async e=>{
 
 
 modificar.addEventListener('click',async e=>{
-    cliente.saldo = saldoNuevo.value;
-    (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente));
-    window.close();
+    try {
+        cliente.saldo = saldoNuevo.value;
+        (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente));
+        agregarMovimientoVendedores(`Modifico el saldo del cliente ${cliente.nombre} de ${saldoViejo.value} a ${saldoNuevo.value}`,vendedor);
+        window.close();
+    } catch (error) {
+        console.log(error)
+        sweet.fire({
+            title:"No se pudo modificar el saldo"
+        })
+    }
 });
 
 saldoNuevo.addEventListener('keyup',e=>{

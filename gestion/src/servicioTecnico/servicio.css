@@ -1,5 +1,5 @@
 .listaServicio .table{
-    height: 70vh;
+    height: 80vh;
     background-color: white;
     overflow: scroll;
 }
@@ -34,7 +34,6 @@ table thead{
 table td:hover{
     cursor: pointer;
 }
-
 
 .cliente fieldset{
     display: flex;

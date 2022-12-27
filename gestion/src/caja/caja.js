@@ -1,7 +1,3 @@
-const axios  = require("axios");
-require("dotenv").config();
-const URL = process.env.URL;
-
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -10,9 +6,13 @@ function getParameterByName(name) {
 }
 
 let vendedor = getParameterByName('vendedor');
-let permiso = getParameterByName('permiso');
 
-const { cerrarVentana, redondear } = require("../helpers");
+
+const axios  = require("axios");
+require("dotenv").config();
+const URL = process.env.URL;
+
+const { cerrarVentana, redondear, agregarMovimientoVendedores } = require("../helpers");
 const sweet = require('sweetalert2');
 
 const {vendedores} = require('../configuracion.json');
@@ -40,7 +40,6 @@ const inputAnio = document.querySelector('#anio');
 const tbody = document.querySelector('.tbodyListado');
 const tbodyGastos = document.querySelector('.tbodyGastos');
 const volver = document.querySelector('.volver');
-const borrar = document.querySelector('.borrar');
 const total = document.querySelector('#total');
 
 const pestaña = document.querySelector('.pestaña')
@@ -311,6 +310,7 @@ tbody.addEventListener('click',async e=>{
             if (isConfirmed) {
                 try {
                     await axios.delete(`${URL}ventas/id/${seleccionado.id}/${seleccionado.children[3].innerHTML}`);
+                    await agregarMovimientoVendedores(`Elimino la venta ${seleccionado.children[0].innerHTML} con el precio ${seleccionado.children[7].innerHTML}`,vendedor);
                     tbody.removeChild(seleccionado);
                     total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[7].innerHTML),2);
                 } catch (error) {

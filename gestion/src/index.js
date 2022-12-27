@@ -1,7 +1,7 @@
-const { app, BrowserWindow,Menu } = require('electron');
+const { dialog, app, BrowserWindow,Menu } = require('electron');
 const { ipcMain } = require('electron/main');
 const path = require('path');
-const { verificarUsuarios } = require('./helpers');
+
 var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
 
 
@@ -129,6 +129,11 @@ ipcMain.on('informacion-a-ventana',(e,args)=>{
   ventanaPrincipal.webContents.send('informacion-a-ventana',JSON.stringify(args));
 })
 
+ipcMain.handle('saveDialog',async(e,args)=>{
+  const path = (await dialog.showSaveDialog()).filePath;
+  return path
+});
+
 const hacerMenu = () => {
   //Hacemos el menu
 
@@ -150,9 +155,20 @@ const hacerMenu = () => {
         },
         {
           label:"Vendedores",
-          click(){
-            abrirVentana("vendedores/vendedores.html",600,800);
-          }
+          submenu:[
+            {
+              label:"Informacion Vendedores",
+              click(){
+                abrirVentana("vendedores/vendedores.html",600,800);
+              }
+            },
+            {
+              label:"Movimiento Vendedores",
+                click(){
+                  abrirVentana("vendedores/movimientoVendedores.html",600,1100);
+                }
+            }
+          ]
         },
         {
           label:"Alicuotas",
@@ -195,6 +211,12 @@ const hacerMenu = () => {
             abrirVentana('productos/marcas.html',300,500,true);
           }
         },
+        {
+          label:"Lista de Precios",
+          click(){
+            abrirVentana('productos/listaPrecios.html',1000,1000)
+          }
+        }
       ]
     },
     {
