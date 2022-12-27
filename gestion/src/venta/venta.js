@@ -565,9 +565,7 @@ const sacarIva = (lista) => {
         cantIva = 2;
     }
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),cantIva]
-}
-
-
+};
 
 codigo.addEventListener('focus',e=>{
     codigo.select();
