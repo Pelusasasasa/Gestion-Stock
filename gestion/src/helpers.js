@@ -272,11 +272,11 @@ funciones.verificarUsuarios = async()=>{
     return retorno
 }
 
-funciones.agregarMovimientoVendedores = async(descripcion,vendedor = "")=>{
+funciones.agregarMovimientoVendedores = async(descripcion,vendedor)=>{
     const movimiento = {};
     movimiento.descripcion = descripcion;
     movimiento.fecha = new Date();
-    movimiento.vendedor = vendedor;
+    movimiento.vendedor = vendedor ? vendedor : "TOMAS";
 
     await axios.post(`${URL}movVendedores`,movimiento)
 }

@@ -335,6 +335,7 @@ facturar.addEventListener('click',async e=>{
                 await axios.post(`${URL}movimiento`,movimientos);
                 
                 //Ponemos en la cuenta conpensada si es CC
+                    venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
                     venta.tipo_venta === "CC" && await ponerEnCuentaCompensada(venta);
                     venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta,parseFloat(saldo.value));
 

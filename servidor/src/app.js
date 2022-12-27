@@ -23,5 +23,6 @@ app.use('/morel/gastos',require('./routes/gasto'));
 app.use('/morel/pedidos',require('./routes/pedido'));
 app.use('/morel/servicios',require('./routes/servicio'));
 app.use('/morel/vendedores',require('./routes/vendedor'));
+app.use('/morel/movVendedores',require('./routes/movVendedores'));
 
 module.exports = app;
