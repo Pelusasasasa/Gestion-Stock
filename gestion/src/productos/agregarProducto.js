@@ -1,4 +1,5 @@
 const salir = document.querySelector('.salir');
+
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const marca = document.querySelector('#marca');
@@ -82,8 +83,18 @@ guardar.addEventListener('click',async ()=>{
     } 
 });
 
-codigo.addEventListener('keypress',e=>{
-    apretarEnter(e,descripcion);
+codigo.addEventListener('keypress',async e=>{
+if (e.keyCode === 13) {
+    const prodcutoExistente = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+    if (prodcutoExistente) {
+        await sweet.fire({
+            title:"Codigo Ya Utilizado"
+        });
+        codigo.value = "";
+    }else{
+        apretarEnter(e,descripcion);
+    }
+}
 })
 
 descripcion.addEventListener('keypress',e=>{
