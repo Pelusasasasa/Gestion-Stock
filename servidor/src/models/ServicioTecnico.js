@@ -18,10 +18,6 @@ const Servicio = new Schema({
         type:String,
         default:""
     },
-    email:{
-        type:String,
-        default:""
-    },
     telefono:{
         type:String,
         default:""
@@ -38,7 +34,7 @@ const Servicio = new Schema({
         type:String,
         require:true
     },
-    numeroSerie:{
+    serie:{
         type:String,
         default:""
     },
@@ -52,6 +48,10 @@ const Servicio = new Schema({
     },
     fechaEgreso:{
         type:Date,
+    },
+    vendedor:{
+        type:String,
+        default:""
     }
 });
 

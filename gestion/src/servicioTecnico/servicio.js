@@ -17,10 +17,12 @@ let servicios;
 let seleccionado;
 let subSeleccionado;
 
+let vendedor;
+
 window.addEventListener('load',async e=>{
 
     if (vendedores) {
-        const vendedor = await verificarUsuarios();
+        vendedor = await verificarUsuarios();
         if (vendedores && vendedor === "") {
            await sweet.fire({
             title:"Contraseña incorrecta"
@@ -47,20 +49,26 @@ const listarServicios = (lista)=>{
         const tdCliente = document.createElement('td');
         const tdTelefono = document.createElement('td');
         const tdDireccion = document.createElement('td');
-        const tdEmail = document.createElement('td');
         const tdProducto = document.createElement('td');
+        const tdMarca = document.createElement('td');
+        const tdModelo = document.createElement('td');
         const tdNumeroSerie = document.createElement('td');
         const tdDetalles = document.createElement('td');
+        const tdImporte = document.createElement('td');
+        const tdEgreso = document.createElement('td');
         const tdAcciones = document.createElement('td');
 
         tdFechaIngreso.innerHTML = `${fechaIngreso[2]}/${fechaIngreso[1]}/${fechaIngreso[0]}`;
         tdCliente.innerHTML = servicio.cliente;
         tdTelefono.innerHTML = servicio.telefono;
         tdDireccion.innerHTML = servicio.direccion;
-        tdEmail.innerHTML = servicio.email;
         tdProducto.innerHTML = servicio.producto;
-        tdNumeroSerie.innerHTML = servicio.numeroSerie;
+        tdMarca.innerHTML = servicio.producto;
+        tdModelo.innerHTML = servicio.producto;
+        tdNumeroSerie.innerHTML = servicio.serie;
         tdDetalles.innerHTML = servicio.detalles;
+        tdImporte.innerHTML = servicio.total.toFixed(2);
+        tdEgreso.innerHTML = servicio.fechaEgreso;
         tdAcciones.classList.add('acciones');
         tdAcciones.innerHTML = `
             <span id=edit class=material-icons>edit</span>
@@ -72,10 +80,13 @@ const listarServicios = (lista)=>{
         tr.appendChild(tdCliente);
         tr.appendChild(tdTelefono);
         tr.appendChild(tdDireccion);
-        tr.appendChild(tdEmail);
         tr.appendChild(tdProducto);
+        tr.appendChild(tdMarca);
+        tr.appendChild(tdModelo);
         tr.appendChild(tdNumeroSerie);
         tr.appendChild(tdDetalles);
+        tr.appendChild(tdImporte);
+        tr.appendChild(tdEgreso);
         tr.appendChild(tdAcciones);
         
         tbody.appendChild(tr);
@@ -113,7 +124,8 @@ tbody.addEventListener('click',e=>{
             path:`servicioTecnico/agregarServicio.html`,
             ancho:1200,
             altura:550,
-            informacion:seleccionado.id
+            informacion:seleccionado.id,
+            vendedor:vendedor
         })
     }
 });
@@ -122,7 +134,8 @@ agregar.addEventListener('click',e=>{
     ipcRenderer.send('abrir-ventana',{
         path:"servicioTecnico/agregarServicio.html",
         ancho:1200,
-        altura:550
+        altura:550,
+        vendedor:vendedor
     })
 });
 
