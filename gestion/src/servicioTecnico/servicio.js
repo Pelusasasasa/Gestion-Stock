@@ -19,14 +19,16 @@ let subSeleccionado;
 
 window.addEventListener('load',async e=>{
 
-    const vendedor = await verificarUsuarios();
-    if (vendedores && vendedor === "") {
-       await sweet.fire({
-        title:"Contraseña incorrecta"
-       });
-       location.reload();
-    }else if(vendedores && !vendedor){
-        location.href = '../menu.html';
+    if (vendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedores && vendedor === "") {
+           await sweet.fire({
+            title:"Contraseña incorrecta"
+           });
+           location.reload();
+        }else if(vendedores && !vendedor){
+            location.href = '../menu.html';
+        }
     }
 
     servicios = (await axios.get(`${URL}servicios`)).data;
