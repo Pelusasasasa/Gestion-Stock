@@ -5,9 +5,10 @@ const URL = process.env.URL;
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 
+const {agregarMovimientoVendedores} = require('../helpers')
+
 const idCliente = document.getElementById('idCliente');
 const cliente = document.getElementById('cliente');
-const email = document.getElementById('email');
 const direccion = document.getElementById('direccion');
 const telefono = document.getElementById('telefono');
 
@@ -19,14 +20,19 @@ const detalles = document.getElementById('detalles');
 
 const egreso = document.querySelector('.egreso');
 const inputEgreso = document.getElementById('fechaEgreso');
+const total = document.getElementById('total');
+const vendedor = document.getElementById('vendedor');
 
 const agregar = document.getElementById('agregar');
 const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
+let servicio;
+
 ipcRenderer.on('informacion',async (e,args)=>{
+    vendedor.value = args.vendedor.nombre;
     if (args.informacion) {
-        let servicio = (await axios.get(`${URL}servicios/id/${args.informacion}`)).data;
+        servicio = (await axios.get(`${URL}servicios/id/${args.informacion}`)).data;
         listarServicio(servicio);
 
         egreso.classList.remove('none');
@@ -50,7 +56,6 @@ ipcRenderer.on('informacion',async (e,args)=>{
 const listarServicio = (servicio)=>{
     cliente.value = servicio.cliente;
     direccion.vlaue = servicio.direccion;
-    email.value = servicio.email;
     telefono.value = servicio.telefono;
     idCliente.value = servicio.idCliente;
 
@@ -59,6 +64,8 @@ const listarServicio = (servicio)=>{
     marca.value = servicio.marca;
     serie.value = servicio.numeroSerie;
     detalles.value = servicio.detalles;
+
+    vendedor.value = servicio.vendedor;
 }
 
 idCliente.addEventListener('keypress',async e=>{
@@ -86,12 +93,6 @@ cliente.addEventListener('keypress',e=>{
 });
 
 direccion.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        email.focus();
-    }
-});
-
-email.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
         telefono.focus();
     }
@@ -132,13 +133,15 @@ agregar.addEventListener('click',async e=>{
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
     servicio.direccion = direccion.value.toUpperCase();
-    servicio.email = email.value.toUpperCase();
     servicio.telefono = telefono.value;
 
     servicio.producto = producto.value.toUpperCase();
     servicio.modelo = modelo.value.toUpperCase();
     servicio.marca = marca.value.toUpperCase();
     servicio.serie = serie.value;
+
+    servicio.total = total.value;
+    servicio.vendedor = vendedor.value;
 
     servicio.detalles = detalles.value.toUpperCase();
     
@@ -153,25 +156,27 @@ agregar.addEventListener('click',async e=>{
 });
 
 modificar.addEventListener('click',async e=>{
-    const servicio = {};
-    servicio.idCliente = idCliente.value;
-    servicio.cliente = cliente.value.toUpperCase();
-    servicio.direccion = direccion.value.toUpperCase();
-    servicio.email = email.value.toUpperCase();
-    servicio.telefono = telefono.value;
+    const servicioNuevo = {};
+    servicioNuevo.idCliente = idCliente.value;
+    servicioNuevo.cliente = cliente.value.toUpperCase();
+    servicioNuevo.direccion = direccion.value.toUpperCase();
+    servicioNuevo.telefono = telefono.value;
 
-    servicio.producto = producto.value.toUpperCase();
-    servicio.modelo = modelo.value.toUpperCase();
-    servicio.marca = marca.value.toUpperCase();
-    servicio.serie = serie.value;
+    servicioNuevo.producto = producto.value.toUpperCase();
+    servicioNuevo.modelo = modelo.value.toUpperCase();
+    servicioNuevo.marca = marca.value.toUpperCase();
+    servicioNuevo.serie = serie.value;
 
-    servicio.detalles = detalles.value.toUpperCase();
+    servicioNuevo.detalles = detalles.value.toUpperCase();
 
-    servicio.fechaEgreso = inputEgreso.value;
-    servicio.total = total.value;
+    servicioNuevo.fechaEgreso = inputEgreso.value;
+    servicioNuevo.total = total.value;
+    servicio.vendedor = vendedor.value;
 
+
+    await modificacionesEnServicios(servicio,servicioNuevo)
     try {
-        await axios.put(`${URL}servicios/id/${modificar.id}`,servicio);
+        await axios.put(`${URL}servicios/id/${modificar.id}`,servicioNuevo);
         window.close();
     } catch (error) {
         sweet.fire({
@@ -179,6 +184,37 @@ modificar.addEventListener('click',async e=>{
         })
     }
 });
+
+
+const modificacionesEnServicios = async(servicioViejo,servicioNuevo)=>{
+    if (servicioViejo.cliente !== servicioNuevo.cliente) {
+        await agregarMovimientoVendedores(`Se modifico el cliente ${servicioViejo.cliente} a ${servicioNuevo.cliente}`,vendedor.value);
+    }
+    if (servicioViejo.detalles !== servicioNuevo.detalles) {
+        await agregarMovimientoVendedores(`Se modifico el detalle ${servicioViejo.detalles} a ${servicioNuevo.detalles}`,vendedor.value);
+    }
+    if (servicioViejo.marca !== servicioNuevo.marca) {
+        await agregarMovimientoVendedores(`Se modifico la marca ${servicioViejo.marca} a ${servicioNuevo.marca}`,vendedor.value);
+    }
+    if (servicioViejo.modelo !== servicioNuevo.modelo) {
+        await agregarMovimientoVendedores(`Se modifico el modelo ${servicioViejo.modelo} a ${servicioNuevo.modelo}`,vendedor.value);
+    }
+    if (servicioViejo.producto !== servicioNuevo.producto) {
+        await agregarMovimientoVendedores(`Se modifico el prodcuto ${servicioViejo.producto} a ${servicioNuevo.producto}`,vendedor.value);
+    }
+    if (servicioViejo.serie !== servicioNuevo.serie) {
+        await agregarMovimientoVendedores(`Se modifico el numero de serie ${servicioViejo.serie} a ${servicioNuevo.serie}`,vendedor.value);
+    }
+    if (servicioViejo.telefono !== servicioNuevo.telefono) {
+        await agregarMovimientoVendedores(`Se modifico el telefono ${servicioViejo.telefono} a ${servicioNuevo.telefono}`,vendedor.value);
+    }
+    if (servicioViejo.total !== servicioNuevo.total) {
+        await agregarMovimientoVendedores(`Se modifico el total ${servicioViejo.total} a ${servicioNuevo.total}`,vendedor.value);
+    }
+    if (servicioViejo.direccion !== servicioNuevo.direccion) {
+        await agregarMovimientoVendedores(`Se modifico la direccion ${servicioViejo.direccion} a ${servicioNuevo.direccion}`,vendedor.value);
+    }
+}
 
 salir.addEventListener('click',e=>{
     window.close();
