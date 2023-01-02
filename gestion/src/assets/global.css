@@ -94,3 +94,7 @@ select{
   color: white;
   border: .1rem solid black;
 }
+
+table tbody{
+  white-space: nowrap;
+}

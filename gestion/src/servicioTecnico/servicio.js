@@ -44,6 +44,7 @@ const listarServicios = (lista)=>{
         tr.id = servicio._id;
 
         const fechaIngreso  = servicio.fecha.slice(0,10).split('-',3);
+        const fechaEgreso = servicio.fechaEgreso.slice(0,10).split('-',3);
 
         const tdFechaIngreso = document.createElement('td');
         const tdCliente = document.createElement('td');
@@ -70,7 +71,7 @@ const listarServicios = (lista)=>{
         tdNumeroSerie.innerHTML = servicio.serie;
         tdDetalles.innerHTML = servicio.detalles;
         tdImporte.innerHTML = servicio.total.toFixed(2);
-        tdEgreso.innerHTML = servicio.fechaEgreso;
+        tdEgreso.innerHTML = `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}`
         tdAcciones.classList.add('acciones');
         tdAcciones.innerHTML = `
             <span id=edit class=material-icons>edit</span>
@@ -102,6 +103,7 @@ tbody.addEventListener('dblclick',e=>{
             path:`servicioTecnico/agregarServicio.html`,
             ancho:1200,
             altura:550,
+            reinicio:true,
             informacion:seleccionado.id,
             vendedor:vendedor.nombre
         });
@@ -150,6 +152,7 @@ agregar.addEventListener('click',e=>{
         path:"servicioTecnico/agregarServicio.html",
         ancho:1200,
         altura:550,
+        reinicio:true,
         vendedor:vendedor
     })
 });

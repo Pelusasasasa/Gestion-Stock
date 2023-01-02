@@ -60,7 +60,8 @@ ipcMain.on('poner-cierre',e=>{
 });
 
 ipcMain.on('abrir-ventana',(e,args)=>{
-  abrirVentana(args.path,args.altura,args.ancho,args.reinicio)
+  abrirVentana(args.path,args.altura,args.ancho,args.reinicio);
+  console.log(args.reinicio)
   nuevaVentana.on('ready-to-show',async()=>{
     nuevaVentana.webContents.send('informacion',args)
   })
@@ -117,7 +118,6 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
-
     if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
       ventanaPrincipal.reload()
     }
@@ -222,12 +222,12 @@ const hacerMenu = () => {
     {
       label:"Clientes",
       submenu:[
-        {
-          label:"Agregar Cliente",
-          click(){
-            abrirVentana("clientes/agregarCliente.html",1200,900);
-          }
-        },
+        // {
+        //   label:"Agregar Cliente",
+        //   click(){
+        //     abrirVentana("clientes/agregarCliente.html",1200,900);
+        //   }
+        // },
         {
           label:"Listado Saldos",
           click(){

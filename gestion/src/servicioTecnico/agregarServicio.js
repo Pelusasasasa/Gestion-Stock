@@ -134,6 +134,22 @@ serie.addEventListener('keypress',e=>{
     }
 });
 
+fechaEgreso.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        total.focus();
+    }
+});
+
+total.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        if (agregar.classList.contains('none')) {
+            modificar.focus();
+        }else{
+            agregar.focus();
+        }
+    }
+});
+
 const listarCliente = (elem)=>{
     cliente.value = elem.nombre;
     direccion.value = elem.direccion;
@@ -153,10 +169,10 @@ agregar.addEventListener('click',async e=>{
     servicio.serie = serie.value;
 
     servicio.total = total.value;
+    servicio.fechaEgreso = inputEgreso.value;
     servicio.vendedor = vendedor.value;
 
     servicio.detalles = detalles.value.toUpperCase();
-    servicio.vendedor = vendedor.value;
 
     try {
         await axios.post(`${URL}servicios`,servicio);
