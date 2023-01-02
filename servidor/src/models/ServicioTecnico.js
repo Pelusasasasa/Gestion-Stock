@@ -34,7 +34,7 @@ const Servicio = new Schema({
         type:String,
         default:""
     },
-    numeroSerie:{
+    serie:{
         type:String,
         default:""
     },
@@ -52,6 +52,7 @@ const Servicio = new Schema({
     vendedor:{
         type:String,
         default:""
+<<<<<<< HEAD
     },
     caja:{
         type:String,
@@ -64,6 +65,8 @@ const Servicio = new Schema({
     codigoRMA:{
         type:String,
         default:""
+=======
+>>>>>>> frontend
     }
 });
 

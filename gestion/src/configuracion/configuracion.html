@@ -25,19 +25,51 @@
             <input type="number" name="puntoVenta" id="puntoVenta">
         </main>
         <main>
-            <p>Multiples Vendedores?</p>
-            <label for="si">Si</label>
-            <input type="radio" name="multipleVendedores" id="si" value="true">
-            <label for="no">No</label>
-            <input type="radio" value="false" name="multipleVendedores" id="no">
+            <label for="condIva">Condicion de Iva</label>
+            <select name="condIva" id="condIva">
+                <option value="Monotributo">Monotributo</option>
+                <option value="Inscripto">Responsable Inscripto</option>
+            </select>
+        </main>
+        <main>
+            <fieldset>
+                <legend>Multiples Vendedores?</legend>
+                <div>
+                    <label for="si">Si</label>
+                    <input type="radio" name="multipleVendedores" id="si" value="true">
+                </div>
+                <div>
+                    <label for="no">No</label>
+                    <input type="radio" value="false" name="multipleVendedores" id="no">
+                </div>
+            </fieldset>
         </main>
 
         <main>
-            <p>Alerta Stock Negativo</p>
-            <label for="si">Si</label>
-            <input type="radio" name="stockNegativo" id="siStockNegativo" value="true">
-            <label for="no">No</label>
-            <input type="radio" value="false" name="stockNegativo" id="noStockNegativo">
+            <fieldset>
+                <legend>Alerta Stock Negativo</legend>
+                <div>
+                    <label for="siStockNegativo">Si</label>
+                    <input type="radio" name="stockNegativo" id="siStockNegativo" value="true">
+                </div>
+                <div>
+                    <label for="noStockNegativo">No</label>
+                    <input type="radio" value="false" name="stockNegativo" id="noStockNegativo">
+            </fieldset>
+            </div>
+        </main>
+        <main>
+            <fieldset>
+                <legend>Dolar</legend>
+                <div>
+                    <label for="siDolar">Si</label>
+                    <input type="radio" value="true" name="dolar" id="siDolar">
+                </div>
+                <div>
+                    <label for="noDolar">No</label>
+                    <input type="radio" value="false" name="dolar" id="noDolar">
+                </div>
+            </fieldset>
         </main>
         <main>
             <p>Dolar</p>

@@ -12,9 +12,12 @@ const sweet = require('sweetalert2');
 const {vendedores} = require('../configuracion.json')
 
 const caja = document.getElementById('caja');
+const puntoVenta = document.getElementById('puntoVenta');
+const cuit = document.getElementById('cuit');
+const condIva = document.getElementById('condIva');
 const multiple = document.querySelectorAll("input[name=multipleVendedores]");
 const multipleStockNegativos = document.querySelectorAll("input[name=stockNegativo]");
-const dolar = document.querySelectorAll('input[name=dolar]');
+const dolar = document.querySelectorAll("input[name=dolar]");
 
 
 const si = document.getElementById('si');
@@ -25,10 +28,6 @@ const noStockNegativo = document.getElementById('noStockNegativo');
 
 const siDolar = document.getElementById('siDolar');
 const noDolar = document.getElementById('noDolar');
-
-
-const puntoVenta = document.getElementById('puntoVenta');
-const cuit = document.getElementById('cuit');
 
 const modificar = document.querySelector('.modificar');
 
@@ -54,19 +53,23 @@ window.addEventListener('load',async e=>{
     caja.value = archivo.caja;  
     archivo.vendedores === false ? no.checked = true : si.checked = true;
     archivo.stockNegativo === false ? noStockNegativo.checked = true : siStockNegativo.checked = true;
-    archivo.dolar === false ? noDolar.checked : siDolar.checked = true;
+    archivo.dolar === false ? noDolar.checked = true : siDolar.checked = true;
     cuit.value = archivo.cuit;
     puntoVenta.value = archivo.puntoVenta;
+    condIva.value = archivo.condIva;
+
 });
 
 
 modificar.addEventListener('click',async e=>{
     const objeto = {};
     objeto.caja = caja.value;
-    objeto.vendedores = await verMultiplesUsuarios(multiple);
-    objeto.stockNegativo = await verMultiplesUsuarios(multipleStockNegativos);
+    objeto.vendedores = await verMultiplesRadios(multiple);
+    objeto.stockNegativo = await verMultiplesRadios(multipleStockNegativos);
     objeto.puntoVenta = puntoVenta.value;
     objeto.cuit = cuit.value;
+    objeto.dolar = await verMultiplesRadios(dolar);
+    objeto.condIva = condIva.value;
     
     fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
@@ -75,7 +78,7 @@ modificar.addEventListener('click',async e=>{
 })
 
 
-const verMultiplesUsuarios = (lista)=>{
+const verMultiplesRadios = (lista)=>{
     for(let elem of lista){
         if (elem.checked && elem.value === "true") {
             return true

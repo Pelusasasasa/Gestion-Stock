@@ -1,5 +1,9 @@
+.listaServicio h1{
+    text-align: center;
+}
+
 .listaServicio .table{
-    height: 80vh;
+    height: 75vh;
     background-color: white;
     overflow: scroll;
 }
@@ -12,6 +16,7 @@
     /* table-layout: fixed; */
     width: 100%;
     border-collapse: collapse;
+    white-space: nowrap;
 }
 
 table thead{

@@ -13,6 +13,18 @@ movimientoCTRL.post = async(req,res)=>{
 movimientoCTRL.getAll = async(req,res)=>{
     const movimientos = await Movimiento.find();
     res.send(movimientos)
-}
+};
+
+movimientoCTRL.getForNameAndDate = async(req,res)=>{
+    const {name,desde} = req.params;
+    const fecha = new Date(desde);
+    const movimientos = await Movimiento.find({
+        $and:[
+            {fecha:{$gte:desde}},
+            {vendedor:name}
+        ]
+    });
+    res.send(movimientos);
+};
 
 module.exports = movimientoCTRL;
