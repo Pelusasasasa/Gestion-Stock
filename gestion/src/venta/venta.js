@@ -399,7 +399,7 @@ const listarCliente = async(id)=>{
         saldo.value = cliente.saldo;
         telefono.value = cliente.telefono;
         localidad.value = cliente.localidad;
-        cuit.value = cliente.cuit;
+        cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final"
         codBarra.focus();
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')

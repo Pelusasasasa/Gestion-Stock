@@ -23,9 +23,10 @@ let vendedor;
 window.addEventListener('load',async e=>{
     const id = (await axios.get(`${URL}clientes`)).data;
     codigo.value = id;
-    ipcRenderer.on('informacion',(e,args)=>{
-        vendedor = args.vendedor;
-    })
+});
+
+ipcRenderer.on('informacion',(e,args)=>{
+    vendedor = args.vendedor;
 });
 
 
