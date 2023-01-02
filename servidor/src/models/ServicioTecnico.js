@@ -52,21 +52,6 @@ const Servicio = new Schema({
     vendedor:{
         type:String,
         default:""
-<<<<<<< HEAD
-    },
-    caja:{
-        type:String,
-        default:""
-    },
-    retiro:{
-        type:String,
-        default:"RESIDENCIA"
-    },
-    codigoRMA:{
-        type:String,
-        default:""
-=======
->>>>>>> frontend
     }
 });
 

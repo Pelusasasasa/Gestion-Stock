@@ -24,9 +24,7 @@ const egreso = document.querySelector('.egreso');
 const inputEgreso = document.getElementById('fechaEgreso');
 const total = document.getElementById('total');
 
-const mostrador = document.getElementById('mostrador');
 const vendedor = document.getElementById('vendedor');
-const codigoRMA = document.getElementById('codigoRMA')
 
 
 const agregar = document.getElementById('agregar');
@@ -78,6 +76,7 @@ const listarServicio = (servicio)=>{
 idCliente.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && idCliente.value !== "") {
         const cliente = (await axios.get(`${URL}clientes/id/${idCliente.value}`)).data;
+        console.log(cliente)
         if (cliente) {
             listarCliente(cliente);
             producto.focus();
@@ -135,11 +134,6 @@ serie.addEventListener('keypress',e=>{
     }
 });
 
-codigoRMA.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        agregar.focus();
-    }
-});
 const listarCliente = (elem)=>{
     cliente.value = elem.nombre;
     direccion.value = elem.direccion;
@@ -162,17 +156,7 @@ agregar.addEventListener('click',async e=>{
     servicio.vendedor = vendedor.value;
 
     servicio.detalles = detalles.value.toUpperCase();
-    
-    if (mostrador.checked) {
-        servicio.retiro = "MOSTRADOR";
-    }else{
-        servicio.retiro = "RESIDENCIA";
-    }
-    servicio.caja = caja.toUpperCase();
-    servicio.codigoRMA = codigoRMA.value;
     servicio.vendedor = vendedor.value;
-
-
 
     try {
         await axios.post(`${URL}servicios`,servicio);

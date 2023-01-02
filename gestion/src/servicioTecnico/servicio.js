@@ -3,9 +3,6 @@ const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.URL;
 const sweet = require('sweetalert2');
-const { verificarUsuarios } = require('../helpers');
-
-const {vendedores} = require('../configuracion.json');
 
 const {caja,vendedores} = require('../configuracion.json');
 const { verificarUsuarios } = require('../helpers');
@@ -60,6 +57,7 @@ const listarServicios = (lista)=>{
         const tdImporte = document.createElement('td');
         const tdEgreso = document.createElement('td');
         const tdAcciones = document.createElement('td');
+        const tdVendedor = document.createElement('td');
         
 
         tdFechaIngreso.innerHTML = `${fechaIngreso[2]}/${fechaIngreso[1]}/${fechaIngreso[0]}`;
@@ -78,7 +76,7 @@ const listarServicios = (lista)=>{
             <span id=edit class=material-icons>edit</span>
             <span id=delete class=material-icons>delete</span>
         `
-
+        console.log(servicio)
         tdVendedor.innerHTML = servicio.vendedor;
 
         tr.appendChild(tdFechaIngreso);

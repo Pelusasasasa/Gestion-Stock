@@ -162,12 +162,12 @@ codBarra.addEventListener('keypress',async e=>{
         listarProducto(codBarra.value);
     }else if(e.key === "Enter" && codBarra.value === ""){
         //Esto abre una ventana donde lista todos los productos
-        // const opciones = {
-        //     path: "./productos/productos.html",
-        //     botones: false
-        // }
-        // ipcRenderer.send('abrir-ventana',opciones);
-        precioU.focus();
+        const opciones = {
+            path: "./productos/productos.html",
+            botones: false
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
+        // precioU.focus();
     }
     if(e.keyCode === 37){
         cantidad.focus();
@@ -323,7 +323,7 @@ facturar.addEventListener('click',async e=>{
         venta.listaProductos = listaProductos;
         
         //Ponemos propiedades para la factura electronica
-        venta.cod_comp = await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value);
+        venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
         venta.tipo_comp = await verTipoComprobante(venta.cod_comp);
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
@@ -344,11 +344,11 @@ facturar.addEventListener('click',async e=>{
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
         venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
 
-        // if (venta.tipo_venta === "CC") {
-        //     await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
-        // }else{
-        //     await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
-        // }
+        if (venta.tipo_venta === "CC") {
+            await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
+        }else{
+            await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
+        }
             try {
                 if (situacion === "blanco") {
                     alerta.classList.remove('none');
@@ -451,7 +451,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
-    movimiento.precio = lista === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
+    movimiento.precio = lista.value === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
     movimiento.tipo_comp = tipo_comp;
