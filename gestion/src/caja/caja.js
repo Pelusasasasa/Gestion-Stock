@@ -6,7 +6,7 @@ function getParameterByName(name) {
 }
 
 let vendedor = getParameterByName('vendedor');
-
+let permiso = getParameterByName('permiso');
 
 const axios  = require("axios");
 require("dotenv").config();
