@@ -31,13 +31,14 @@ const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 codigo.addEventListener('keypress',async e=>{
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 && descripcion.value !== "") {
         const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
         if (producto) {
             listarProducto(producto);
         }
-        descripcion.focus();
     }
+        descripcion.focus();
+
 });
 
 descripcion.addEventListener('keypress',e=>{
@@ -112,7 +113,7 @@ observaciones.addEventListener('focus',e=>{
 agregar.addEventListener('click',async e=>{
     const pedido = {};
     pedido.codigo = codigo.value;
-    pedido.producto = descripcion.value;
+    pedido.producto = descripcion.value.toUpperCase();
     pedido.cantidad = cantidad.value;
     pedido.cliente = cliente.value.toUpperCase();
     pedido.telefono = telefono.value;
@@ -135,7 +136,7 @@ agregar.addEventListener('click',async e=>{
 modificar.addEventListener('click',async e=>{
     const pedido = {};
     pedido.codigo = codigo.value;
-    pedido.producto = descripcion.value;
+    pedido.producto = descripcion.value.toUpperCase();
     pedido.cantidad = cantidad.value;
     pedido.cliente = cliente.value.toUpperCase();
     pedido.telefono = telefono.value;
