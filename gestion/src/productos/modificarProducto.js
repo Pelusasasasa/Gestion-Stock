@@ -106,7 +106,7 @@ marca.addEventListener('keypress',e=>{
     apretarEnter(e,rubro);
 });
 
-rubro.addEventListener('keydown',e=>{
+rubro.addEventListener('keypress',e=>{
     if (e.key === "Enter") {
         e.preventDefault();
         provedor.focus();
@@ -114,7 +114,7 @@ rubro.addEventListener('keydown',e=>{
 });
 
 provedor.addEventListener('keypress',e=>{
-    apretarEnter(e,costo);
+    apretarEnter(e,stock);
 });
 
 stock.addEventListener('keypress',e=>{
@@ -158,7 +158,7 @@ marca.addEventListener('focus',e=>{
 });
 
 provedor.addEventListener('focus',e=>{
-    stock.select()
+    provedor.select()
 });
 
 stock.addEventListener('focus',e=>{
