@@ -300,13 +300,6 @@ facturar.addEventListener('click',async e=>{
 
         venta.cliente = nombre.value;
         venta.fecha = new Date();
-        // if (tipoFactura) {
-        //     venta.tipo_comp = "Nota Credito C";
-        // }else if(situacion === "blanco"){
-        //     venta.tipo_comp = "Factura C"
-        // }else{
-        //     venta.tipo_comp = "Comprobante"
-        // };
         venta.idCliente = codigo.value;
         venta.precio = parseFloat(total.value);
         venta.descuento = descuento;

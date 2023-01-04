@@ -89,17 +89,21 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         }
     ]);
 
-    venta.iva105 !== 0 && (data.Iva.push({
-        'Id':4,
-        'BaseImp':venta.gravado105,
-        'Importe':venta.iva105
-    }));
-
-    venta.iva21 !== 0 && (data.Iva.push({
-        'Id':5,
-        'BaseImp':venta.gravado21,
-        'Importe':venta.iva21
-    }));
+    if (archivo.condIva === "Inscripto") {
+        venta.iva105 !== 0 && (data.Iva.push({
+            'Id':4,
+            'BaseImp':venta.gravado105,
+            'Importe':venta.iva105
+        }));
+    
+        venta.iva21 !== 0 && (data.Iva.push({
+            'Id':5,
+            'BaseImp':venta.gravado21,
+            'Importe':venta.iva21
+        }));
+    }else{
+        delete data.Iva
+    }
 
     console.log(data)
     const res = await afip.ElectronicBilling.createVoucher(data); //creamos la factura electronica

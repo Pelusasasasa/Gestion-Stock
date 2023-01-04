@@ -50,15 +50,6 @@ const Venta = new mongoose.Schema({
         type:Object,
         default:{}
     },
-<<<<<<< HEAD
-    caja:{
-        type:String,
-        default:""
-    },
-    vendedor:{
-        type:String,
-        default:""
-=======
 
     //Para la afip
     num_doc:{
@@ -96,7 +87,6 @@ const Venta = new mongoose.Schema({
     cantIva:{
         type:Number,
         default:0
->>>>>>> frontend
     }
 
 });
