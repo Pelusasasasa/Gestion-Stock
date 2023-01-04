@@ -4,6 +4,7 @@ const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
+const provedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
 const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
@@ -67,6 +68,7 @@ guardar.addEventListener('click',async ()=>{
     producto.descripcion = descripcion.value.trim().toUpperCase();
     producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim();
+    producto.provedor = provedor.value.toUpperCase().trim();
     producto.stock = stock.value;
     producto.costo = costo.value;
     producto.costoDolar = costoDolar.value;
@@ -74,7 +76,7 @@ guardar.addEventListener('click',async ()=>{
     producto.ganancia = ganancia.value;
     producto.precio = total.value;
     const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data
-    await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+    vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
     await sweet.fire({
         title:mensaje
     })
@@ -106,6 +108,13 @@ marca.addEventListener('keypress',e=>{
 })
 
 rubro.addEventListener('keypress',e=>{
+    if (e.key === "Enter") {
+        e.preventDefault();
+        provedor.focus();
+    }
+});
+
+provedor.addEventListener('keypress',e=>{
     apretarEnter(e,stock);
 })
 
@@ -161,11 +170,8 @@ marca.addEventListener('focus',e=>{
     marca.select();
 });
 
-rubro.addEventListener('keypress',e=>{
-    if (e.key === "Enter") {
-        e.preventDefault();
-        stock.focus();
-    }
+provedor.addEventListener('focus',e=>{
+    provedor.select();
 });
 
 stock.addEventListener('focus',e=>{

@@ -2,8 +2,6 @@ const funciones = {}
 const Afip = require('@afipsdk/afip.js');
 const { clipboard } = require('electron');
 
-
-
 const archivo = require('./configuracion.json');
 
 const afip = new Afip({CUIT:archivo.cuit});
@@ -52,16 +50,16 @@ funciones.redondear = (numero,decimales)=>{
 }
 
 funciones.cargarFactura = async (venta,notaCredito)=>{
+    console.log(venta)
     const fecha = new Date(Date.now()-((new Date()).getTimezoneOffset()*60000)).toISOString().split('T')[0];
     const serverStatus = await afip.ElectronicBilling.getServerStatus();
-
     console.log(serverStatus) // mostramos el estado del servidor
 
     let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher(puntoVenta,venta.cod_comp);
     console.log(ultimaElectronica);
 
     console.log(parseFloat(venta.facturaAnterior));
-    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,11);
+    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,venta.cod_comp);
     
     let data = {
         'cantReg':1,
@@ -74,15 +72,15 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'CbteFch': parseInt(fecha.replace(/-/g, '')),
         'ImpTotal':venta.precio,
         'ImpTotConc':0,
-        'ImpNeto':venta.precio,
+        'ImpNeto': parseFloat(redondear(venta.gravado21 + venta.gravado0 + venta.gravado105,2)),
         'ImpOpEx': 0,
-        'ImpIVA': 0,
+        'ImpIVA': parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)),
         'ImpTrib': 0,
         'MonId': 'PES',
         'PtoVta': puntoVenta,
         'MonCotiz' 	: 1,
+        'Iva':[],
     };
-
     notaCredito && (data.CbtesAsoc = [
         {
             "Tipo":ventaAnterior.CbteTipo,
@@ -90,6 +88,19 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
             "Nro":ventaAnterior.CbteHasta
         }
     ]);
+
+    venta.iva105 !== 0 && (data.Iva.push({
+        'Id':4,
+        'BaseImp':venta.gravado105,
+        'Importe':venta.iva105
+    }));
+
+    venta.iva21 !== 0 && (data.Iva.push({
+        'Id':5,
+        'BaseImp':venta.gravado21,
+        'Importe':venta.iva21
+    }));
+
     console.log(data)
     const res = await afip.ElectronicBilling.createVoucher(data); //creamos la factura electronica
     console.log(res)
@@ -97,7 +108,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     const qr = {
         ver: 1,
         fecha: fecha,
-        cuit: 20416104655,
+        cuit: archivo.cuit,
         ptoVta: puntoVenta,
         tipoCmp: venta.cod_comp,
         nroCmp: ultimaElectronica + 1,
@@ -127,8 +138,7 @@ async function generarQR(texto) {
     const url = `https://www.afip.gob.ar/fe/qr/?p=${texto}`;
     const QR = await qrCode.toDataURL(url);
     return QR;
-}
-
+};
 
 funciones.recorrerFlechas = (code)=>{
     if (code === 40 && seleccionado.nextElementSibling) {
@@ -185,13 +195,14 @@ funciones.recorrerFlechas = (code)=>{
 //devolvemos la ultimaFactura C y ultima Nota de credito C
 funciones.ultimaC = async()=>{
     try {
-        const facturaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,11); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
+        const facturaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,11  ); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
         const notaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,13);
         return {
             facturaC,
             notaC
         }
     } catch (error) {
+        console.log(error)
         return {
             facturaC:0,
             notaC:0
@@ -279,6 +290,69 @@ funciones.agregarMovimientoVendedores = async(descripcion,vendedor)=>{
     movimiento.vendedor = vendedor ? vendedor : "TOMAS";
 
     await axios.post(`${URL}movVendedores`,movimiento)
+};
+
+//Vemos el codigo de comprobante para las faturas
+funciones.verCodigoComprobante = async(notaCredito,cuit = "00000000",condIva)=>{
+    if (archivo.condIva === "Monotributo") {
+        if (notaCredito) {
+            return 13
+        }else{
+            return 11
+        }
+    }else if(archivo.condIva === "Inscripto"){
+        if (notaCredito) {
+            if (cuit.length === 11 && condIva === "Inscripto") {
+                return 3
+            }else if(cuit.length === 11 && condIva !== "Inscripto"){
+                await sweet.fire({
+                    title:"No se puede hacer una Nota Credito A a un No Inscripto"
+                });
+                return 0
+            }else if(cuit.length === 8 && condIva !== "Inscripto"){
+                return 8
+            }else{
+                await sweet.fire({
+                    title:"No se puede hacer una Nota Credito B a un Inscripto"
+                });
+                return 0
+            }
+        }else{
+            if (cuit.length === 11 && condIva === "Inscripto") {
+                return 1
+            }else if(cuit.length === 11 && condIva !== "Inscripto"){
+                await sweet.fire({
+                    title:"No se puede hacer una Factura A a un No Inscripto"
+                });
+                return 0
+            }else if(cuit.length === 8 && condIva !== "Inscripto"){
+                return 6
+            }else{
+                await sweet.fire({
+                    title:"No se puede hacer una Nota Credito B a un Inscripto"
+                });
+                return 0
+            }
+        }
+    }
+};
+
+funciones.verTipoComprobante = async(codigo)=>{
+    let retorno = "Comprobante";
+    if (codigo === 1) {
+        retorno = "Factura A";
+    }else if(codigo === 3){
+        retorno = "Nota Credito A";
+    }else if(codigo === 6){
+        retorno = "Factura B";
+    }else if(codigo === 8){
+        retorno = "Nota Credito B";
+    }else if(codigo === 11){
+        retorno = "Factura C";
+    }else if(codigo === 13){
+        retorno = "Nota Credito C";
+    }
+    return retorno
 }
 
 module.exports = funciones;

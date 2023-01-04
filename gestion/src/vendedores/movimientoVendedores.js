@@ -1,21 +1,39 @@
-
-
 const axios = require('axios');
+const { verificarUsuarios } = require('../helpers');
 require('dotenv').config();
 const URL = process.env.URL;
+
+const sweet = require('sweetalert2');
+
+const {vendedores:verVendedores} = require('../configuracion.json');
 
 const fecha = document.getElementById('fecha');
 const select = document.getElementById('vendedores');
 
 const tbody = document.querySelector('tbody');
 
-let vendedores
+let vendedores;
 
 window.addEventListener('load',async e=>{
 
+    if (verVendedores) {
+        const vendedor = await verificarUsuarios();
+        if (vendedor === "") {
+            await sweet.fire({
+                title:"Contraseña Incorrecta"
+            });
+            location.reload();
+        }else if (!vendedor) {
+            window.close();
+        }else if(vendedor.permiso !== 0){
+            await sweet.fire({title:"Permisos Denegados"});
+            window.close();
+        };
+    }
+
     const date = new Date()
     let day = date.getDate();
-    let month = date.getMonth();
+    let month = date.getMonth() + 1;
     let year = date.getFullYear();
 
     month = month === 13 ? 1 : month
@@ -26,21 +44,23 @@ window.addEventListener('load',async e=>{
     fecha.value = `${year}-${month}-${day}`;
 
     vendedores = (await axios.get(`${URL}vendedores`)).data;
-    const movimientos = (await axios.get(`${URL}movVendedores`)).data;
-    listarVendedores(vendedores);
+    await listarVendedores(vendedores);
+
+    const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
     listarMovimientos(movimientos)
 });
 
 const listarVendedores = (lista)=>{
     lista.forEach(vendedor => {
         const option = document.createElement('option');
-        option.value = vendedor._id;
+        option.value = vendedor.nombre;
         option.text = vendedor.nombre;
         select.appendChild(option)
     });
 };
 
 const listarMovimientos = (lista)=>{
+    tbody.innerHTML = "";
     lista.forEach(elem =>{
         const tr = document.createElement('tr');
 
@@ -60,4 +80,27 @@ const listarMovimientos = (lista)=>{
 
         tbody.appendChild(tr)
     });
-}
+};
+
+select.addEventListener('change',async ()=>{
+    const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+    listarMovimientos(movimientos);
+});
+
+fecha.addEventListener('change',async ()=>{
+    const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+    listarMovimientos(movimientos);
+});
+
+fecha.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        select.focus();
+    }
+});
+
+
+document.addEventListener('keyup',e=>{
+    if (e.keyCode === 27) {
+        window.close();
+    }
+})

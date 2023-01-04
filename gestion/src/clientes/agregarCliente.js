@@ -23,9 +23,10 @@ let vendedor;
 window.addEventListener('load',async e=>{
     const id = (await axios.get(`${URL}clientes`)).data;
     codigo.value = id;
-    ipcRenderer.on('informacion',(e,args)=>{
-        vendedor = args.vendedor;
-    })
+});
+
+ipcRenderer.on('informacion',(e,args)=>{
+    vendedor = args.vendedor;
 });
 
 
@@ -81,7 +82,7 @@ agregar.addEventListener('click',async e=>{
     cliente.observaciones = observaciones.value.trim().toUpperCase();
     try {
         const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
-        await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
+        vendedor && await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
         await sweet.fire({
             title:mensaje
         });

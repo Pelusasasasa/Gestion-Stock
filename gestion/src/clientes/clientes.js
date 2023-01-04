@@ -150,7 +150,7 @@ tbody.addEventListener('click',async e=>{
                 if (isConfirmed) {
                     try {
                         const mensaje = (await axios.delete(`${URL}clientes/id/${seleccionado.id}`)).data;
-                        agregarMovimientoVendedores(`Elimino el cliente ${seleccionado.children[1].innerHTML} con direccion en ${seleccionado.children[2].innerHTML}`,vendedor);
+                        vendedor && agregarMovimientoVendedores(`Elimino el cliente ${seleccionado.children[1].innerHTML} con direccion en ${seleccionado.children[2].innerHTML}`,vendedor);
                         await sweet.fire({
                             title:mensaje
                         });

@@ -14,6 +14,7 @@ const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
+const provedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
 const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
@@ -53,6 +54,7 @@ const llenarInputs = async(codigoProducto)=>{
     const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
     descripcion.value = producto.descripcion;
     marca.value = producto.marca;
+    provedor.value = producto.provedor;
     stock.value = producto.stock;
     select.value = producto.rubro;
     costo.value = producto.costo.toFixed(2);
@@ -73,7 +75,8 @@ modificar.addEventListener('click',async e=>{
     producto._id = codigo.value;
     producto.descripcion = descripcion.value.trim().toUpperCase();
     producto.marca = marca.value.trim().toUpperCase();
-    producto.rubro = rubro.value.trim();
+    producto.rubro = rubro.value.trim().toUpperCase();
+    producto.provedor = provedor.value.trim().toUpperCase();
     producto.stock = parseFloat(stock.value).toFixed(2);
     producto.costo = parseFloat(costo.value).toFixed(2);
     producto.costoDolar = parseFloat(costoDolar.value).toFixed(2);
@@ -82,7 +85,7 @@ modificar.addEventListener('click',async e=>{
     producto.precio = parseFloat(total.value).toFixed(2);
     const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
     await ipcRenderer.send('informacion-a-ventana',producto);
-    await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+    vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
     await sweet.fire({
         title:mensaje
     })
@@ -106,8 +109,12 @@ marca.addEventListener('keypress',e=>{
 rubro.addEventListener('keydown',e=>{
     if (e.key === "Enter") {
         e.preventDefault();
-        stock.focus();
+        provedor.focus();
     }
+});
+
+provedor.addEventListener('keypress',e=>{
+    apretarEnter(e,costo);
 });
 
 stock.addEventListener('keypress',e=>{
@@ -148,6 +155,10 @@ descripcion.addEventListener('focus',e=>{
 
 marca.addEventListener('focus',e=>{
     marca.select()
+});
+
+provedor.addEventListener('focus',e=>{
+    stock.select()
 });
 
 stock.addEventListener('focus',e=>{

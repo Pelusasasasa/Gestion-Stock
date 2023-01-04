@@ -156,7 +156,7 @@ tbody.addEventListener('click',e=>{
                     const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
                     await sweet.fire({title:mensaje});
                     tbody.removeChild(seleccionado);
-                    await agregarMovimientoVendedores(`Elimino el producto ${seleccionado.children[1].innerHTML} con el precio ${seleccionado.children[2].innerHTML}`,vendedor);
+                    vendedor && await agregarMovimientoVendedores(`Elimino el producto ${seleccionado.children[1].innerHTML} con el precio ${seleccionado.children[2].innerHTML}`,vendedor);
                 } catch (error) {
                     console.log(error);
                     sweet.fire({

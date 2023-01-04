@@ -42,10 +42,6 @@ const Venta = new mongoose.Schema({
         type:Boolean,
         default: false
     },
-    num_doc:{
-        type:String,
-        default:""
-    },
     condicionIva:{
         type:String,
         default:"Consumidor Final"
@@ -54,6 +50,7 @@ const Venta = new mongoose.Schema({
         type:Object,
         default:{}
     },
+<<<<<<< HEAD
     caja:{
         type:String,
         default:""
@@ -61,7 +58,47 @@ const Venta = new mongoose.Schema({
     vendedor:{
         type:String,
         default:""
+=======
+
+    //Para la afip
+    num_doc:{
+        type:String,
+        default:""
+    },
+    cod_comp:{
+        type:Number,
+        default:0
+    },
+    cod_doc:{
+        type:Number,
+        default:0
+    },
+    condicionIva:{
+        type:String,
+        default:"Consumidor Final"
+    },
+    iva21:{
+        type:Number,
+        default:0
+    },
+    iva105:{
+        type:Number,
+        default:0
+    },
+    gravado21:{
+        type:Number,
+        default:0
+    },
+    gravado105:{
+        type:Number,
+        default:0
+    },
+    cantIva:{
+        type:Number,
+        default:0
+>>>>>>> frontend
     }
+
 });
 
 module.exports = mongoose.model('Venta',Venta);

@@ -82,7 +82,7 @@ ventaCTRL.deleteForId = async(req,res)=>{
 
 ventaCTRL.getForNumberAndType = async(req,res)=>{
     const {numero,tipo} = req.params;
-    const venta = Venta.findOne({numero:numero,tipo_venta:tipo});
+    const venta = await Venta.findOne({numero:numero,tipo_venta:tipo});
     res.send(venta);
 }
 
