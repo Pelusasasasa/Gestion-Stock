@@ -31,7 +31,7 @@ const Pedido =  new mongoose.Schema({
     },
     estadoPedido:{
         type:String,
-        default:"Sin Pedir"
+        default:"SIN PEDIR"
     },
     observaciones:{
         type:String,

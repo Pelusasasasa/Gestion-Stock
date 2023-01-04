@@ -303,7 +303,7 @@ tbody.addEventListener('click',async e=>{
             if (isConfirmed) {
                 try {
                     await axios.delete(`${URL}ventas/id/${seleccionado.id}/${seleccionado.children[3].innerHTML}`);
-                    await agregarMovimientoVendedores(`Elimino la venta ${seleccionado.children[0].innerHTML} con el precio ${seleccionado.children[7].innerHTML}`,vendedor);
+                    vendedor && await agregarMovimientoVendedores(`Elimino la venta ${seleccionado.children[0].innerHTML} con el precio ${seleccionado.children[7].innerHTML}`,vendedor);
                     tbody.removeChild(seleccionado);
                     total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[7].innerHTML),2);
                 } catch (error) {

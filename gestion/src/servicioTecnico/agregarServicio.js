@@ -174,7 +174,7 @@ modificar.addEventListener('click',async e=>{
     servicio.vendedor = vendedor.value;
 
 
-    await modificacionesEnServicios(servicio,servicioNuevo)
+    vendedor.value && await modificacionesEnServicios(servicio,servicioNuevo)
     try {
         await axios.put(`${URL}servicios/id/${modificar.id}`,servicioNuevo);
         window.close();

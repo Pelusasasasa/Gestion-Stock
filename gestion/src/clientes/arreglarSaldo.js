@@ -63,7 +63,7 @@ modificar.addEventListener('click',async e=>{
     try {
         cliente.saldo = saldoNuevo.value;
         (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente));
-        agregarMovimientoVendedores(`Modifico el saldo del cliente ${cliente.nombre} de ${saldoViejo.value} a ${saldoNuevo.value}`,vendedor);
+        vendedor && await agregarMovimientoVendedores(`Modifico el saldo del cliente ${cliente.nombre} de ${saldoViejo.value} a ${saldoNuevo.value}`,vendedor);
         window.close();
     } catch (error) {
         console.log(error)

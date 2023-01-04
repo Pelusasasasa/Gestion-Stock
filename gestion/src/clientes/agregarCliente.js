@@ -82,7 +82,7 @@ agregar.addEventListener('click',async e=>{
     cliente.observaciones = observaciones.value.trim().toUpperCase();
     try {
         const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
-        await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
+        vendedor && await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
         await sweet.fire({
             title:mensaje
         });

@@ -98,8 +98,7 @@ modificar.addEventListener('click',async e=>{
     cliente.observaciones = observaciones.value.toUpperCase();
     try {
         const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
-        console.log(vendedor)
-        agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
+        vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
         await sweet.fire({title:mensaje});
         ipcRenderer.send('enviar-ventana-principal',cliente);
         window.close();
