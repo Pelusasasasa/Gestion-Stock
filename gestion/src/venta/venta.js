@@ -383,10 +383,11 @@ facturar.addEventListener('click',async e=>{
                 await axios.post(`${URL}ventas`,venta);
 
                 if (impresion.checked) {
+                    console.log(venta.fecha)
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 
-                location.reload();  
+                // location.reload();  
             } catch (error) {
                 
                 await sweet.fire({

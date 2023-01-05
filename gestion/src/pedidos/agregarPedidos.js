@@ -31,14 +31,22 @@ const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 codigo.addEventListener('keypress',async e=>{
+<<<<<<< HEAD
     if (e.keyCode === 13 && descripcion.value !== "") {
+=======
+    if (e.keyCode === 13 && codigo.value !== "") {
+>>>>>>> frontend
         const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
         if (producto) {
             listarProducto(producto);
         }
     }
+<<<<<<< HEAD
         descripcion.focus();
 
+=======
+    descripcion.focus();
+>>>>>>> frontend
 });
 
 descripcion.addEventListener('keypress',e=>{
@@ -113,8 +121,8 @@ observaciones.addEventListener('focus',e=>{
 agregar.addEventListener('click',async e=>{
     const pedido = {};
     pedido.codigo = codigo.value;
-    pedido.producto = descripcion.value.toUpperCase();
-    pedido.cantidad = cantidad.value;
+    pedido.producto = descripcion.value.trim().toUpperCase();
+    pedido.cantidad = cantidad.value !== "" ? cantidad.value : 0;
     pedido.cliente = cliente.value.toUpperCase();
     pedido.telefono = telefono.value;
     pedido.stock = stock.value;
@@ -123,7 +131,7 @@ agregar.addEventListener('click',async e=>{
 
     try {
         await axios.post(`${URL}pedidos`,pedido);
-        await agregarMovimientoVendedores(`Agrego el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor)
+        vendedor.value && await agregarMovimientoVendedores(`Agrego el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor)
         window.close();
     } catch (error) {
         sweet.fire({
@@ -146,7 +154,7 @@ modificar.addEventListener('click',async e=>{
     
     try {
         await axios.put(`${URL}pedidos/id/${modificar.id}`,pedido);
-        await agregarMovimientoVendedores(`Modifico el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor);
+        vendedor.value && await agregarMovimientoVendedores(`Modifico el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor);
         window.close();
     } catch (error) {
         sweet.fire({

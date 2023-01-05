@@ -7,6 +7,7 @@ const {apretarEnter} = require('../helpers')
 
 const codigo = document.querySelector('#codigo');
 const marca = document.querySelector('#marca');
+const provedor = document.querySelector('#provedor');
 const descripcion = document.querySelector('#descripcion');
 const stockViejo = document.querySelector('#stockViejo');
 const stock = document.querySelector('#stock');
@@ -29,12 +30,13 @@ codigo.addEventListener('keypress',async e=>{
         if (producto !== "") {
             costo.value = producto.costo.toFixed(2);
             marca.value = producto.marca;
+            provedor.value = producto.provedor;
             iva.value = producto.impuesto.toFixed(2);
             ganancia.value = producto.ganancia.toFixed(2);
             descripcion.value = producto.descripcion;
             stockViejo.value = producto.stock.toFixed(2);
             precio.value = producto.precio.toFixed(2);
-            descripcion.focus();
+            provedor.focus();
         }else{
             await sweet.fire({
                 title:"No Existe producto con ese codigo"
@@ -44,7 +46,7 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-descripcion.addEventListener('keypress',e=>{
+provedor.addEventListener('keypress',e=>{
     apretarEnter(e,stock);
 });
 
@@ -90,6 +92,7 @@ nuevoPrecio.addEventListener('keypress',e=>{
     apretarEnter(e,guardar);
 })
 guardar.addEventListener('click',async e=>{
+    producto.provedor = provedor.value.trim().toUpperCase();
     producto.costo = nuevoCosto.value !== "" ? parseFloat(nuevoCosto.value) : producto.costo;
     producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
     producto.ganancia = parseFloat(nuevaGanancia.value);
