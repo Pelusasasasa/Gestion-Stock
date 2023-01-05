@@ -308,7 +308,7 @@ facturar.addEventListener('click',async e=>{
         
         //Ponemos propiedades para la factura electronica
         venta.cod_comp = await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value);
-        venta.tipo_comp = await verTipoComprobante(venta.cod_comp);
+        venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value;
@@ -321,8 +321,7 @@ facturar.addEventListener('click',async e=>{
         venta.gravado105 = gravado105;
         venta.cantIva = cantIva;
         venta.direccion = direccion.value;
-
-        venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+        venta.caja = archivo.caja; //vemos en que caja se hizo la venta
         venta.vendedor = vendedor ? vendedor : "";
         
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";

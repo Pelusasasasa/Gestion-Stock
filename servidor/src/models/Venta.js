@@ -42,6 +42,10 @@ const Venta = new mongoose.Schema({
         type:Boolean,
         default: false
     },
+    caja:{
+        type:String,
+        default: ""
+    },
     condicionIva:{
         type:String,
         default:"Consumidor Final"
