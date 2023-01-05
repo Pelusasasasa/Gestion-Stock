@@ -72,9 +72,9 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'CbteFch': parseInt(fecha.replace(/-/g, '')),
         'ImpTotal':venta.precio,
         'ImpTotConc':0,
-        'ImpNeto': parseFloat(redondear(venta.gravado21 + venta.gravado0 + venta.gravado105,2)),
+        'ImpNeto': archivo.condIva === "Inscripto" ? parseFloat(redondear(venta.gravado21 + venta.gravado0 + venta.gravado105,2)) : venta.precio,
         'ImpOpEx': 0,
-        'ImpIVA': parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)),
+        'ImpIVA': archivo.condIva === "Inscripto" ? parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)) : 0,
         'ImpTrib': 0,
         'MonId': 'PES',
         'PtoVta': puntoVenta,
@@ -101,10 +101,15 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
             'BaseImp':venta.gravado21,
             'Importe':venta.iva21
         }));
+
+        venta.gravado0 !== 0 && (data.Iva.push({
+            'Id':3,
+            'BaseImp':venta.gravado0,
+            'Importe':venta.iva0
+        }));
     }else{
         delete data.Iva
     }
-
     console.log(data)
     const res = await afip.ElectronicBilling.createVoucher(data); //creamos la factura electronica
     console.log(res)

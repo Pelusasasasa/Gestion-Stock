@@ -328,11 +328,11 @@ facturar.addEventListener('click',async e=>{
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
         venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
 
-        // if (venta.tipo_venta === "CC") {
-        //     await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
-        // }else{
-        //     await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
-        // }
+        if (venta.tipo_venta === "CC") {
+            await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
+        }else{
+            await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
+        }
             try {
                 if (situacion === "blanco") {
                     alerta.classList.remove('none');
@@ -577,10 +577,10 @@ const sacarIva = (lista) => {
             gravado105 += cantidad*producto.precio/1.105
             totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);
         }else{
-            gravado0 += parseFloat(cantidad)*(parseFloat(producto.precio/1));
-            totalIva0 += parseFloat(cantidad)*(parseFloat(producto.precio)-(parseFloat(producto.precio))/1);
+            gravado0 += cantidad*producto.precio/1;
+            totalIva0 += (cantidad*producto.precio)-(producto.precio/1);
         }
-    })
+    });
     let cantIva = 0
     if (gravado0 !== 0) {
         cantIva++;
