@@ -65,23 +65,36 @@ cuit.addEventListener('keypress',e=>{
 
 condicionIva.addEventListener('keypress',e=>{
     e.preventDefault();
+    apretarEnter(e,observaciones);
+});
+
+observaciones.addEventListener('keypress',e=>{
     apretarEnter(e,modificar);
 });
 
+
 nombre.addEventListener('focus',e=>{
-    selecciona_value(nombre.id);
+    nombre.select();
 });
 
 localidad.addEventListener('focus',e=>{
-    selecciona_value(localidad.id);
+    localidad.select();
 });
 
 telefono.addEventListener('focus',e=>{
-    selecciona_value(telefono.id);
+    telefono.select();
 });
 
 direccion.addEventListener('focus',e=>{
-    selecciona_value(direccion.id);
+    direccion.select();
+});
+
+cuit.addEventListener('focus',e=>{
+    cuit.select();
+});
+
+observaciones.addEventListener('focus',e=>{
+    observaciones.select();
 });
 
 
@@ -98,8 +111,7 @@ modificar.addEventListener('click',async e=>{
     cliente.observaciones = observaciones.value.toUpperCase();
     try {
         const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
-        console.log(vendedor)
-        agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
+        vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
         await sweet.fire({title:mensaje});
         ipcRenderer.send('enviar-ventana-principal',cliente);
         window.close();

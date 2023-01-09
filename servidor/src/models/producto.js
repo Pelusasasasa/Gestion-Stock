@@ -16,6 +16,10 @@ const Producto = new mongoose.Schema({
         type:String,
         default:""
     },
+    provedor:{
+        type:String,
+        default:""
+    },
     stock:{
         type: Number,
         required: true
