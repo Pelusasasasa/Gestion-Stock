@@ -11,19 +11,22 @@ const axios = require('axios');
 require('dotenv').config();
 const URL = process.env.URL;
 
-let internetAvalible = require('internet-available');
-
 let puntoVenta = archivo.puntoVenta;
 
+let internetAvalible = require('internet-available');
+
+//Sirve para ver si hay internet o no
 funciones.verSiHayInternet = () => {
+    let retorno = true
     internetAvalible({
         timeout:1000,
         retries:5
     }).then(()=>{
-        return true
+        retorno = true
     }).catch(()=>{
-        return false
-    })
+        retorno = false
+    });
+    return retorno
 }
 
 //cerramos la ventana al apretrar escape
