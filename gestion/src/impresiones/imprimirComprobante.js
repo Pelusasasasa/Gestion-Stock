@@ -34,17 +34,18 @@ window.addEventListener('load',e=>{
 });
 
 const ponerDatosVenta = (datos)=>{
-    const fecha = datos.fecha.slice(0,10).split('-',3);
-    const hora = datos.fecha.slice(11,19).split(':',3);
-    console.log(datos)
+    const now = new Date(datos.fecha);
+    const aux = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+    const fecha = aux.slice(0,10).split('-',3);
+    const hora = aux.slice(11,19).split(':',3);
     numero.innerHTML = datos.numero.toString().padStart(8,'0');
     date.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
     tipoPago.innerHTML = datos.tipo_venta;
     vendedor.innerHTML = datos.vendedor;
 
-    subTotal.innerHTML = datos.precio + datos.descuento;
-    descuento.innerHTML = datos.descuento;
-    total.innerHTML = datos.precio;
+    subTotal.innerHTML = redondear(datos.precio + datos.descuento,2);
+    descuento.innerHTML = datos.descuento.toFixed(2);
+    total.innerHTML = datos.precio.toFixed(2);
 }
 
 const ponerDatosClientes = (datos)=>{
@@ -69,7 +70,7 @@ const ponerDatosArticulos = (datos)=>{
         tdCantidad.innerHTML = movimiento.cantidad.toFixed(2);
         tdCodigo.innerHTML = movimiento.codProd ?  movimiento.codProd : "" ;
         tdDescripcion.innerHTML = movimiento.producto;
-        tdPrecio.innerHTML = movimiento.precio;
+        tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = redondear(movimiento.cantidad * movimiento.precio,2);
 
         tr.appendChild(tdCantidad);

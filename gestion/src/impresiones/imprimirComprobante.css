@@ -1,4 +1,8 @@
 
+body{
+    font-size: .8rem;
+}
+
 .empresa{
     display: flex;
     flex-direction: column;
@@ -21,18 +25,17 @@
 .titulo .tipoFactura, .titulo .numeroVenta{
     text-align: center;
     margin: 0 ;
-
 }
 
 .datosEmpresa p:not(.nombre){
     text-align: center;
 }
 
-.datosEmpresa .nombre{
-    margin: auto 1rem;
+.datosEmpresa p{
+    margin: .5rem 1rem;
 }
 
-.contactoEmpresa p,.direccionEmpresa p{
+.contactoEmpresa p,.direccionEmpresa p,.iva p{
     margin: auto 1rem;
 }
 
@@ -42,10 +45,6 @@
 
 .direccionEmpresa{
     justify-self: self-start;
-}
-
-.iva{
-    margin: auto 1rem;
 }
 
 .iva p:not(.tipoIva){
@@ -61,13 +60,12 @@
     display: flex;
     justify-content: space-around;
 }
-
 .nombre h4,.nombre p,.domicilio p{
     width: 100%;
 }
 
-.nombre h4,.cuit p{
-    margin: auto 1rem;
+.nombre p,.cuit p{
+    margin: 0 1rem;
 }
 
 
