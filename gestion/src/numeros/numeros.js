@@ -6,14 +6,18 @@ const sweet = require('sweetalert2');
 
 const {vendedores} = require('../configuracion.json')
 
-const {cerrarVentana, ultimaC, verificarUsuarios} = require('../helpers');
+const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB} = require('../helpers');
 
 const dolar = document.querySelector('#dolar');
 const contado = document.querySelector('#contado');
 const cuentaCorriente = document.querySelector('#cuentaCorriente');
 const recibo = document.querySelector('#recibo');
+const facturaA = document.querySelector('#facturaA');
+const notaA = document.querySelector('#notaA');
 const facturaC = document.querySelector('#facturaC');
 const notaC = document.querySelector('#notaC');
+const facturaB = document.querySelector('#facturaB');
+const notaB = document.querySelector('#notaB');
 
 const modificar = document.querySelector('.modificar');
 const guardar = document.querySelector('.guardar');
@@ -43,9 +47,14 @@ window.addEventListener('load',async e=>{
     const numeros =(await axios.get(`${URL}numero`)).data;
 
     try {
-        let facturas = await ultimaC();
-        facturaC.value = facturas.facturaC;
-        notaC.value = facturas.notaC;
+        let facturasC = await ultimaC();
+        let facturasAB = await ultimaAB();
+        facturaA.value = facturasAB.facturaA;
+        notaA.value = facturasAB.notaA;
+        facturaB.value = facturasAB.facturaB
+        notaB.value = facturasAB.notaB;
+        facturaC.value = facturasC.facturaC;
+        notaC.value = facturasC.notaC;
     } catch (error) {
         console.log(error)
     }

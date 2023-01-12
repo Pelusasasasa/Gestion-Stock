@@ -219,7 +219,7 @@ funciones.recorrerFlechas = (code)=>{
 //devolvemos la ultimaFactura C y ultima Nota de credito C
 funciones.ultimaC = async()=>{
     try {
-        const facturaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,11  ); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
+        const facturaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,11); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
         const notaC = await afip.ElectronicBilling.getLastVoucher(puntoVenta,13);
         return {
             facturaC,
@@ -230,6 +230,29 @@ funciones.ultimaC = async()=>{
         return {
             facturaC:0,
             notaC:0
+        }
+    }
+}
+
+funciones.ultimaAB = async()=>{
+    try {
+        const facturaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,6); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
+        const notaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,8);
+        const facturaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,1);
+        const notaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,3);
+        return {
+            facturaB,
+            notaB,
+            facturaA,
+            notaA
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            facturaB:0,
+            notaB:0,
+            facturaA:0,
+            notaA:0
         }
     }
 }
