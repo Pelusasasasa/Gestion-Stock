@@ -13,7 +13,7 @@ const URL = process.env.URL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -282,6 +282,10 @@ facturar.addEventListener('click',async e=>{
         sweet.fire({
             title:"Poner un codigo de cliente"
         });
+    }else if(!verSiHayInternet() && situacion === "blanco"){
+        await sweet.fire({
+            title:"No se puede hacer la factura porque no hay internet"
+        })
     }else if(cuit.value.length === 11 && condicionIva.value !== "Inscripto" && archivo.condIva === "Inscripto"){
         if (tipoFactura) {
             await sweet.fire({
@@ -309,13 +313,6 @@ facturar.addEventListener('click',async e=>{
 
         venta.cliente = nombre.value;
         venta.fecha = new Date();
-        // if (tipoFactura) {
-        //     venta.tipo_comp = "Nota Credito C";
-        // }else if(situacion === "blanco"){
-        //     venta.tipo_comp = "Factura C"
-        // }else{
-        //     venta.tipo_comp = "Comprobante"
-        // };
         venta.idCliente = codigo.value;
         venta.precio = parseFloat(total.value);
         venta.descuento = descuento;
@@ -650,10 +647,10 @@ const sacarIva = (lista) => {
             gravado105 += cantidad*producto.precio/1.105
             totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);
         }else{
-            gravado0 += parseFloat(cantidad)*(parseFloat(producto.precio/1));
-            totalIva0 += parseFloat(cantidad)*(parseFloat(producto.precio)-(parseFloat(producto.precio))/1);
+            gravado0 += cantidad*producto.precio/1;
+            totalIva0 += (cantidad*producto.precio)-(producto.precio/1);
         }
-    })
+    });
     let cantIva = 0
     if (gravado0 !== 0) {
         cantIva++;
@@ -664,7 +661,7 @@ const sacarIva = (lista) => {
     if (gravado105 !== 0) {
         cantIva++;
     }
-    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),totalIva105,gravado105,cantIva]
+    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
 };
 
 codigo.addEventListener('focus',e=>{
