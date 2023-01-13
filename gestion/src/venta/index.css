@@ -6,12 +6,12 @@
 
 }
 
-.rojo{
-  background-color: rgb(182, 6, 6);
+.negro{
+  background-color: rgb(0, 0, 0);
   color: white;
 }
 
-.rojo th,.rojo td{
+.negro th,.negro td{
   color: black;
 } 
 

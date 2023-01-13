@@ -61,7 +61,7 @@ let movimientos = [];
 let descuentoStock = [];
 let totalGlobal = 0;
 let idProducto = 0;
-let situacion = "negro";
+let situacion = "blanco";
 let porcentajeH = 0;
 let descuento = 0;
 let dolar = 0;
@@ -102,7 +102,7 @@ document.addEventListener('keydown',e=>{
     if (e.keyCode === 18) {
         document.addEventListener('keydown',event=>{
             if (event.keyCode === 120) {
-                body.classList.toggle('rojo');
+                body.classList.toggle('negro');
                 situacion = situacion === "negro" ? "blanco" : "negro";
                 cambiarSituacion(situacion);
             }
@@ -403,7 +403,7 @@ facturar.addEventListener('click',async e=>{
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 
-                // location.reload();  
+                location.reload();  
             } catch (error) {
                 
                 await sweet.fire({
