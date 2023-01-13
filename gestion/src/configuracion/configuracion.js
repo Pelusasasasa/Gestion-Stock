@@ -74,7 +74,9 @@ modificar.addEventListener('click',async e=>{
     fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
         console.log("Informacion Recibida");
-    })
+    });
+
+    window.close();
 })
 
 

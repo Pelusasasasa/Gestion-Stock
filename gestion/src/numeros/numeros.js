@@ -4,7 +4,7 @@ const URL = process.env.URL;
 
 const sweet = require('sweetalert2');
 
-const {vendedores} = require('../configuracion.json')
+const {vendedores,condIva} = require('../configuracion.json')
 
 const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB} = require('../helpers');
 
@@ -14,10 +14,10 @@ const cuentaCorriente = document.querySelector('#cuentaCorriente');
 const recibo = document.querySelector('#recibo');
 const facturaA = document.querySelector('#facturaA');
 const notaA = document.querySelector('#notaA');
-const facturaC = document.querySelector('#facturaC');
-const notaC = document.querySelector('#notaC');
 const facturaB = document.querySelector('#facturaB');
 const notaB = document.querySelector('#notaB');
+const facturaC = document.querySelector('#facturaC');
+const notaC = document.querySelector('#notaC');
 
 const modificar = document.querySelector('.modificar');
 const guardar = document.querySelector('.guardar');
@@ -29,6 +29,15 @@ let dolarTraido;
 
 
 window.addEventListener('load',async e=>{
+    if (condIva === "Inscripto") {
+        facturaC.parentNode.classList.add('none');
+        notaC.parentNode.classList.add('none');
+    }else{
+        facturaA.parentNode.classList.add('none');
+        notaA.parentNode.classList.add('none');
+        facturaB.parentNode.classList.add('none');
+        notaB.parentNode.classList.add('none');
+    }
     if (vendedores) {
         const vendedor = await verificarUsuarios();
         if (vendedor === "") {
@@ -47,14 +56,14 @@ window.addEventListener('load',async e=>{
     const numeros =(await axios.get(`${URL}numero`)).data;
 
     try {
-        let facturasC = await ultimaC();
+        let facturas = await ultimaC();
         let facturasAB = await ultimaAB();
         facturaA.value = facturasAB.facturaA;
+        facturaB.value = facturasAB.facturaB;
+        facturaC.value = facturas.facturaC;
         notaA.value = facturasAB.notaA;
-        facturaB.value = facturasAB.facturaB
         notaB.value = facturasAB.notaB;
-        facturaC.value = facturasC.facturaC;
-        notaC.value = facturasC.notaC;
+        notaC.value = facturas.notaC;
     } catch (error) {
         console.log(error)
     }
