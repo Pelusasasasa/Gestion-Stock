@@ -71,7 +71,7 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
         if (venta.tipo_comp !== "Recibo") {
             listado.innerHTML += `
                 <main>
-                    <p>${elem.producto}</p>
+                    <p>${elem.producto.slice(0,25)}</p>
                     <p>${(elem.precio * elem.cantidad).toFixed(2)}</p>
                 </main>
                 <main class = "linea">
