@@ -84,7 +84,7 @@ ipcMain.on('imprimir',(e,args)=>{
 ipcMain.on('imprimir-ventana',(e,args)=>{
   const option = {};
   option.silent = false;
-  option.deviceName = situacion === "blanco" && "SAM4S GIANT-100";
+  option.deviceName = args === "blanco" && "SAM4S GIANT-100";
   nuevaVentana.webContents.print(option,(success,errorType)=>{
     if (success) {
       ventanaPrincipal.focus();

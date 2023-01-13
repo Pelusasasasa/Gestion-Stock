@@ -32,10 +32,10 @@ const descripcion = document.querySelector('.descripcion');
 
 ipcRenderer.on('imprimir',(e,args)=>{
     const [situacion,venta,cliente,listado] = JSON.parse(args);
-    listar(venta,cliente,listado);
+    listar(situacion,venta,cliente,listado);
 });
 
-const listar = async(venta,clienteTraido,lista)=>{
+const listar = async(situacion,venta,clienteTraido,lista)=>{
     let date = new Date(venta.fecha);
     let day = date.getDate();
     let month = date.getMonth() + 1;
