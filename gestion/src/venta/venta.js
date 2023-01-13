@@ -311,8 +311,13 @@ facturar.addEventListener('click',async e=>{
         venta.listaProductos = listaProductos;
         
         //Ponemos propiedades para la factura electronica
-        venta.cod_comp = await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value);
-        venta.tipo_comp = await verTipoComprobante(venta.cod_comp);
+        if(venta.tipo_venta !== "PP"){
+            venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
+            venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
+        }else{
+            venta.cod_comp = 0;
+            venta.tipo_comp === "Presupuesto"
+        }
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value;
@@ -330,10 +335,18 @@ facturar.addEventListener('click',async e=>{
         venta.vendedor = vendedor ? vendedor : "";
         
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
-        venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
+        if (venta.tipo_venta === "CC") {
+            venta.numero = numeros["Cuenta Corriente"] + 1;
+        }else if(venta.tipo_venta === "PP"){
+            venta.numero = numeros["Presupuesto"] + 1;
+        }else if(venta.tipo_venta === "CD"){
+            venta.numero = numeros["Contado"] + 1;
+        };
 
         if (venta.tipo_venta === "CC") {
             await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
+        }else if(venta.tipo_venta === "PP"){
+            await axios.put(`${URL}numero/Presupuesto`,{"Presupuesto":venta.numero});
         }else{
             await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
         }
@@ -345,6 +358,7 @@ facturar.addEventListener('click',async e=>{
                 }else{
                     alerta.children[1].innerHTML = "Generando Venta";
                 }
+
                 for (let producto of listaProductos){
                     await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
                     if (!(producto.producto.productoCreado)) {
@@ -352,8 +366,9 @@ facturar.addEventListener('click',async e=>{
                     }
                     //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
                 }
-                await axios.put(`${URL}productos/descontarStock`,descuentoStock)
-                await axios.post(`${URL}movimiento`,movimientos);
+
+                venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock)
+                venta.tipo_venta !== "PP" && await axios.post(`${URL}movimiento`,movimientos);
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
                 venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
 
@@ -368,7 +383,11 @@ facturar.addEventListener('click',async e=>{
         
                 const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
 
-                await axios.post(`${URL}ventas`,venta);
+                if (venta.tipo_venta === "PP") {
+                    await axios.post(`${URL}Presupuesto`,venta);
+                }else{
+                    await axios.post(`${URL}ventas`,venta);
+                }
 
                 if (impresion.checked) {
                     ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
@@ -733,36 +752,3 @@ cantidad.addEventListener('keydown',e=>{
         codBarra.focus();
     }
 });
-
-
-//falta hacer con el total
-
-// tbody.addEventListener('dblclick',e=>{
-//     if (e.target.nodeName === "TD") {
-//         console.log(seleccionado)
-//         seleccionado && seleccionado.classList.remove('seleccionado');
-//         seleccionado = e.target.parentNode;
-//         seleccionado.classList.add('seleccionado');
-
-//         const tr = e.target.parentNode;
-//         sweet.fire({
-//             title:"Cambio De Precio",
-//             input:"number",
-//             showCancelButton:true,
-//             confirmButtonText:"Aceptar"
-//         }).then(({isConfirmed,value})=>{
-//             if (isConfirmed && value !== "") {
-//                 const totalViejo = parseFloat(tr.children[5].innerHTML);
-//                 tr.children[4].innerHTML = parseFloat(value).toFixed(2);
-//                 tr.children[5].innerHTML = redondear(parseFloat(value) * parseFloat(tr.children[0].innerHTML),2);
-//                 const producto = listaProductos.find(producto => producto._id === tr._id)
-//                 console.log(producto)
-//                 producto.producto.precio = parseFloat(value)
-                
-//                 total.value = redondear(parseFloat(total.value) - totalViejo + (parseFloat(value)*producto.cantidad),2)
-//             }
-//         })
-//     }
-// });
-
-///Guardamos el saldo del cliente

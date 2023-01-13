@@ -234,6 +234,29 @@ funciones.ultimaC = async()=>{
     }
 }
 
+funciones.ultimaAB = async()=>{
+    try {
+        const facturaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,1);
+        const notaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,3);
+        const facturaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,6);
+        const notaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,8);
+        return {
+            facturaA,
+            notaA,
+            facturaB,
+            notaB
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            facturaA:0,
+            notaA:0,
+            facturaB:0,
+            notaB:0,
+        }
+    }
+}
+
 funciones.ponerNumero = async()=>{
     sweet.fire({
         html:`

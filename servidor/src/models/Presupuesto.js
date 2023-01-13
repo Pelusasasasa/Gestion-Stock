@@ -1,26 +1,17 @@
-const mongoose = require('mongoose');
+const {Schema,model}= require('mongoose');
 
-const Venta = new mongoose.Schema({
+const Presupuesto = new Schema({
     fecha:{
         type:Date,
-        default: Date.now
-    }
-    ,
+        default:Date.now
+    },
     cliente:{
-        type:String,
+        type: String,
         default:"Consumidor Final"
     },
     idCliente:{
         type:String,
-        default: "0"
-    },
-    numero:{
-        type:Number,
-        required:true
-    },
-    listaProductos:{
-        type:[],
-        required:true
+        default:"0"
     },
     precio:{
         type:Number,
@@ -28,15 +19,19 @@ const Venta = new mongoose.Schema({
     },
     descuento:{
         type:Number,
-        default: 0
+        default:0
     },
     tipo_venta:{
-        type: String,
-        default: "CC"  
+        type:String,
+        required:true
     },
     tipo_comp:{
         type:String,
-        default:""
+        default:"Presupuesto"
+    },
+    numero:{
+        type:Number,
+        required:true,
     },
     caja:{
         type:String,
@@ -44,7 +39,7 @@ const Venta = new mongoose.Schema({
     },
     F:{
         type:Boolean,
-        default: false
+        default:false
     },
     afip:{
         type:Object,
@@ -88,7 +83,6 @@ const Venta = new mongoose.Schema({
         type:Number,
         default:0
     }
-
 });
 
-module.exports = mongoose.model('Venta',Venta);
+module.exports = model('Presupuesto',Presupuesto);
