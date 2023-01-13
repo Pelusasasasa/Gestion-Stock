@@ -236,25 +236,6 @@ funciones.ultimaC = async()=>{
 
 funciones.ultimaAB = async()=>{
     try {
-<<<<<<< HEAD
-        const facturaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,6); //Devuelve el número del último comprobante creado para el punto de venta 1 y el tipo de comprobante 6 (Factura B)
-        const notaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,8);
-        const facturaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,1);
-        const notaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,3);
-        return {
-            facturaB,
-            notaB,
-            facturaA,
-            notaA
-        }
-    } catch (error) {
-        console.log(error);
-        return {
-            facturaB:0,
-            notaB:0,
-            facturaA:0,
-            notaA:0
-=======
         const facturaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,1);
         const notaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,3);
         const facturaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,6);
@@ -272,7 +253,6 @@ funciones.ultimaAB = async()=>{
             notaA:0,
             facturaB:0,
             notaB:0,
->>>>>>> frontend
         }
     }
 }
