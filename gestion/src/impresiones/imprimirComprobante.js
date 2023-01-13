@@ -29,7 +29,7 @@ window.addEventListener('load',e=>{
         await ponerDatosClientes(datosClientes);
         await ponerDatosArticulos(movimientos);
 
-        ipcRenderer.send('imprimir-ventana')
+        ipcRenderer.send('imprimir-ventana',JSON.parse(args)[0]);
     });
 });
 

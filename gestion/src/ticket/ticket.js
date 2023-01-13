@@ -31,7 +31,7 @@ const pagado = document.querySelector('.pagado');
 const descripcion = document.querySelector('.descripcion');
 
 ipcRenderer.on('imprimir',(e,args)=>{
-    const [venta,cliente,listado] = JSON.parse(args);
+    const [situacion,venta,cliente,listado] = JSON.parse(args);
     listar(venta,cliente,listado);
 });
 
@@ -49,6 +49,7 @@ const listar = async(venta,clienteTraido,lista)=>{
     hour = hour <10 ? `0${hour}` : hour;
     minuts = minuts <10 ? `0${minuts}` : minuts;
     seconds = seconds <10 ? `0${seconds}` : seconds;
+    console.log(venta)
     numeroComp.innerHTML = venta.F ? (venta.afip.puntoVenta.toString()).padStart(4,'0') + "-" + venta.afip.numero.toString().padStart(8,'0') :(venta.numero.toString()).padStart(8,'0');
     tipoComp.innerHTML = venta.tipo_comp;
     fecha.innerHTML = `${day}/${month}/${year}`;
@@ -99,5 +100,5 @@ const listar = async(venta,clienteTraido,lista)=>{
         qr.src = venta.afip.QR;
 
     }
-    ipcRenderer.send('imprimir-ventana')
+    ipcRenderer.send('imprimir-ventana',situacion)
 }

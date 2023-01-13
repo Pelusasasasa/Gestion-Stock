@@ -399,7 +399,6 @@ facturar.addEventListener('click',async e=>{
                 }
 
                 if (impresion.checked) {
-                    console.log(venta.fecha)
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 

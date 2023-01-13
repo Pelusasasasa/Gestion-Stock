@@ -61,7 +61,6 @@ ipcMain.on('poner-cierre',e=>{
 
 ipcMain.on('abrir-ventana',(e,args)=>{
   abrirVentana(args.path,args.altura,args.ancho,args.reinicio);
-  console.log(args.reinicio)
   nuevaVentana.on('ready-to-show',async()=>{
     nuevaVentana.webContents.send('informacion',args)
   })
@@ -83,7 +82,10 @@ ipcMain.on('imprimir',(e,args)=>{
 });
 
 ipcMain.on('imprimir-ventana',(e,args)=>{
-  nuevaVentana.webContents.print({silent:false},(success,errorType)=>{
+  const option = {};
+  option.silent = false;
+  option.deviceName = situacion === "blanco" && "SAM4S GIANT-100";
+  nuevaVentana.webContents.print(option,(success,errorType)=>{
     if (success) {
       ventanaPrincipal.focus();
       nuevaVentana.close();
@@ -107,12 +109,11 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
       contextIsolation:false
     }
   });
-
   nuevaVentana.loadFile(path.join(__dirname, `${direccion}`));
   nuevaVentana.setMenuBarVisibility(false);
 
   nuevaVentana.on('ready-to-show',()=>{
-    if (direccion !== "ticket/ticket.html" /*&& direccion !== "impresiones/imprimirComprobante.html"*/) {
+    if (direccion !== "ticket/ticket.html" && direccion !== "impresiones/imprimirComprobante.html") {
       nuevaVentana.show();
     }
   })
