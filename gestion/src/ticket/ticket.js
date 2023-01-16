@@ -72,12 +72,11 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
             listado.innerHTML += `
                 <main>
                     <p>${elem.producto.slice(0,25)}</p>
-                    <p>${elem.impuesto}</p>
                     <p>${(elem.precio * elem.cantidad).toFixed(2)}</p>
                 </main>
                 <main class = "linea">
                     <p>${elem.cantidad.toFixed(2)}/${elem.precio.toFixed(2)}</p>
-                    <p></p>
+                    <p>${elem.impuesto}</p>
                 </main>
             `   
         }else{

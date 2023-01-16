@@ -31,9 +31,8 @@ const lista = document.querySelector('#lista');
 const cantidad = document.querySelector('#cantidad');
 const codBarra = document.querySelector('#cod-barra')
 const precioU = document.querySelector('#precio-U');
-const rubro = document.querySelector('#rubro');
+const iva = document.querySelector('#iva');
 const tbody = document.querySelector('.tbody');
-const select = document.querySelector('#rubro');
 
 //parte totales
 const total = document.querySelector('#total');
@@ -92,8 +91,6 @@ window.addEventListener('load',async e=>{
     }
     
     listarCliente(1);//listanos los clientes
-
-    listarRubros();//listamos los rubros que tengamos en la base de dato
     
     cambiarSituacion(situacion);//
 });
@@ -178,7 +175,6 @@ precioU.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
         if (precioU.value !== "") {
             crearProducto();
-            // rubro.focus();   
         }else{
             await sweet.fire({
                 title:"Poner un precio al Producto",
@@ -187,7 +183,7 @@ precioU.addEventListener('keypress',async e=>{
     }
 });
 
-rubro.addEventListener('keypress',e=>{
+iva.addEventListener('keypress',e=>{
     if (e.key === "Enter") {
         e.preventDefault();
         precioU.focus();
@@ -199,12 +195,11 @@ const crearProducto = ()=>{
     const producto = {
         descripcion:codBarra.value.toUpperCase(),
         precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
-        rubro:rubro.value,
+        rubro:"Cualquiera",
         idTabla:`${idProducto}`,
-        impuesto:0,
+        impuesto:parseFloat(iva.value),
         productoCreado:true
     };
-
     listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
         tbody.innerHTML += `
         <tr id=${idProducto}>
@@ -235,7 +230,7 @@ const crearProducto = ()=>{
     cantidad.value = "1.00";
     codBarra.value = "";
     precioU.value = "";
-    rubro.value = "";
+    iva.value = "21.00";
     codBarra.focus();
 };
 
@@ -470,6 +465,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.precio = lista.value === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
+    movimiento.impuesto = producto.impuesto;
     movimiento.tipo_comp = tipo_comp;
     movimiento.caja = caja,
     movimiento.series = series;
@@ -777,16 +773,6 @@ const verCodigoDocumento = async(cuit)=>{
 
     return 99
 };
-
-const listarRubros = async()=>{
-    const rubros = (await axios.get(`${URL}rubro`)).data;
-    for await(let {rubro,numero} of rubros){
-        const option = document.createElement('option');
-        option.text = numero + "-" + rubro;
-        option.value = rubro;
-        select.appendChild(option);
-    }
-}
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
