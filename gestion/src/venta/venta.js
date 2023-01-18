@@ -77,7 +77,6 @@ window.addEventListener('load',async e=>{
             confirmButtonText:"Aceptar",
             showCancelButton:true
         }).then(({isConfirmed,value})=>{
-            console.log(isConfirmed)
             if (isConfirmed) {
                 facturaAnterior = value.padStart(8,'0');
             }else{

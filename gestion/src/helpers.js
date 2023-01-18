@@ -15,15 +15,17 @@ let internetAvalible = require('internet-available');
 
 let puntoVenta = archivo.puntoVenta;
 
-funciones.verSiHayInternet = () => {
-    internetAvalible({
+funciones.verSiHayInternet = async() => {
+    let retorno;
+    await internetAvalible({
         timeout:1000,
         retries:5
     }).then(()=>{
-        return true
+        retorno =  true
     }).catch(()=>{
-        return false
+        retorno =  false
     })
+    return retorno
 }
 
 //cerramos la ventana al apretrar escape
@@ -69,10 +71,8 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(serverStatus) // mostramos el estado del servidor
 
     let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher(puntoVenta,venta.cod_comp);
-    console.log(ultimaElectronica);
-
-    console.log(parseFloat(venta.facturaAnterior));
-    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,venta.cod_comp);
+    
+    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,11);
     
     let data = {
         'cantReg':1,
