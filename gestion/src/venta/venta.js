@@ -231,7 +231,7 @@ const crearProducto = ()=>{
 
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
-})
+});
 
 ipcRenderer.on('recibir',(e,args)=>{
     const {tipo ,informacion} = JSON.parse(args);
@@ -424,7 +424,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
     cuenta.debe = venta.precio;
     cuenta.saldo = facturaAnterior ? saldo - venta.precio : venta.precio + saldo;
     (await axios.post(`${URL}historica`,cuenta)).data;
-}
+};
 
 //Cargamos el movimiento de producto a la BD
 const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_venta,tipo_comp,caja,vendedor="")=>{
@@ -454,7 +454,7 @@ const descontarStock = async({cantidad,producto})=>{
         producto.stock -= cantidad;
     }
     descuentoStock.push(producto)
-}
+};
 
 //Lo que hacemos es listar el producto traido
 const listarProducto =async(id)=>{
@@ -522,7 +522,8 @@ const listarProducto =async(id)=>{
     }
         
 
-}
+};
+
 let seleccionado;
 //Hacemos para que se seleccione un tr
 
@@ -552,7 +553,6 @@ tbody.addEventListener('click',async e=>{
         })
     }
 });
-
 
 const sumarSaldo = async(id,nuevoSaldo,venta)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -705,7 +705,7 @@ const listarRubros = async()=>{
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
-})
+});
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,telefono);
@@ -732,36 +732,3 @@ cantidad.addEventListener('keydown',e=>{
         codBarra.focus();
     }
 });
-
-
-//falta hacer con el total
-
-// tbody.addEventListener('dblclick',e=>{
-//     if (e.target.nodeName === "TD") {
-//         console.log(seleccionado)
-//         seleccionado && seleccionado.classList.remove('seleccionado');
-//         seleccionado = e.target.parentNode;
-//         seleccionado.classList.add('seleccionado');
-
-//         const tr = e.target.parentNode;
-//         sweet.fire({
-//             title:"Cambio De Precio",
-//             input:"number",
-//             showCancelButton:true,
-//             confirmButtonText:"Aceptar"
-//         }).then(({isConfirmed,value})=>{
-//             if (isConfirmed && value !== "") {
-//                 const totalViejo = parseFloat(tr.children[5].innerHTML);
-//                 tr.children[4].innerHTML = parseFloat(value).toFixed(2);
-//                 tr.children[5].innerHTML = redondear(parseFloat(value) * parseFloat(tr.children[0].innerHTML),2);
-//                 const producto = listaProductos.find(producto => producto._id === tr._id)
-//                 console.log(producto)
-//                 producto.producto.precio = parseFloat(value)
-                
-//                 total.value = redondear(parseFloat(total.value) - totalViejo + (parseFloat(value)*producto.cantidad),2)
-//             }
-//         })
-//     }
-// });
-
-///Guardamos el saldo del cliente

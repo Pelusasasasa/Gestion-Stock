@@ -50,6 +50,7 @@ window.addEventListener('load',async e=>{
         })
     }
 });
+
 //Al tocar el atajo de teclado, abrimos ventanas
 document.addEventListener('keyup',async e=>{
     if (e.keyCode === 112) {
@@ -85,7 +86,6 @@ document.addEventListener('keyup',async e=>{
     }
 });
 
-
 ventas.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
@@ -104,7 +104,6 @@ ventas.addEventListener('click',async e=>{
         ipcRenderer.send('sacar-cierre');
     }
 });
-
 
 clientes.addEventListener('click',async e=>{
     if (verVendedores) {
@@ -125,7 +124,6 @@ clientes.addEventListener('click',async e=>{
     
 });
 
-
 productos.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
@@ -143,8 +141,6 @@ productos.addEventListener('click',async e=>{
         ipcRenderer.send('sacar-cierre');
     }
 });
-
-
 
 caja.addEventListener('click',async e=>{
     if (verVendedores) {
@@ -176,7 +172,6 @@ caja.addEventListener('click',async e=>{
         })
     }
 });
-
 
 movimiento.addEventListener('click',e=>{
     location.href = "./movimiento/movimiento.html";
@@ -212,4 +207,4 @@ notaCredito.addEventListener('click',e=>{
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
-})
+});
