@@ -630,7 +630,8 @@ tbody.addEventListener('click',async e=>{
             tbody.removeChild(seleccionado);
             total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[5].innerHTML),2);
             totalGlobal = parseFloat(total.value);
-            listaProductos = listaProductos.filter(({producto,cantidad}) => {producto.idTabla === seleccionado.id});
+            const productoABorrar = listaProductos.findIndex(({producto,cantidad})=>seleccionado.id === producto.idTabla);
+            listaProductos.splice(productoABorrar,1);
         });
     }
 });
