@@ -109,6 +109,7 @@
 
 .parteProductos tbody .seleccionado:hover{
   background-color: gray;
+  cursor: pointer;
 }
 
 .parteProductos .listarProductos table thead .th-nombre{
@@ -139,7 +140,6 @@
 .condicionVenta .none{
   display: none;
 }
-
 
 .totales{
   display: flex;
@@ -211,4 +211,19 @@ footer .hijoFooter{
 
 footer main,footer button{
   margin: 0 1rem;
+}
+
+.cambio main{
+  margin: 2rem auto;
+}
+
+.cambio main label{
+  font-size: 1.5rem;
+  display: inline-block;
+  width: 7rem;
+}
+
+
+.cambio main input{
+  width: 50%;
 }

@@ -197,6 +197,7 @@ const crearProducto = ()=>{
         precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
         rubro:"Cualquiera",
         idTabla:`${idProducto}`,
+        impuesto:iva.value,
         impuesto:parseFloat(iva.value),
         productoCreado:true
     };
@@ -207,6 +208,7 @@ const crearProducto = ()=>{
             <td></td>
             <td>${codBarra.value.toUpperCase()}</td>
             <td></td>
+            <td>${producto.impuesto.toFixed(2)}</td>
             <td>${parseFloat(producto.precio).toFixed(2)}</td>
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
             <td class=acciones>
@@ -525,6 +527,7 @@ const listarProducto =async(id)=>{
                     <td>${codBarra.value}</td>
                     <td>${producto.descripcion.toUpperCase()}</td>
                     <td>${producto.marca}</td>
+                    <td>${producto.impuesto.toFixed(2)}</td>
                     <td>${parseFloat(precioU.value).toFixed(2)}</td>
                     <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
                     <td class=acciones>
@@ -635,7 +638,6 @@ tbody.addEventListener('click',async e=>{
         });
     }
 });
-
 
 const sumarSaldo = async(id,nuevoSaldo,venta)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -805,3 +807,42 @@ cantidad.addEventListener('keydown',e=>{
         codBarra.focus();
     }
 });
+
+tbody.addEventListener('dblclick',async se=>{
+    await sweet.fire({
+        title:"Cambio",
+        html:`
+            <section class=cambio>
+                <main>
+                    <label htmlFor="cantidadCambio">Cantidad</label>
+                    <input class=text-rigth type="text" name="cantidadCambio" value=${seleccionado.children[0].innerHTML} id="cantidadCambio"/>
+                </main>
+                <main>
+                    <label htmlFor="precioCambio">Precio</label>
+                    <input class=text-rigth type="text" name="precioCambio" value=${seleccionado.children[5].innerHTML} id="precioCambio"/>
+                </main>
+                <main>
+                    <label htmlFor="ivaCambio">Iva</label>
+                    <input class=text-rigth type="text" name="ivaCambio" value=${seleccionado.children[4].innerHTML} id="ivaCambio"/>
+                </main>
+            </section>
+        `,
+        confirmButtonText:"Aceptar",
+        showCancelButton:true
+    }).then(async({isConfirmed})=>{
+        if (isConfirmed) {
+            const producto = listaProductos.find(({producto})=>producto.idTabla === seleccionado.id);
+            totalGlobal = parseFloat(redondear(totalGlobal - (producto.producto.precio * producto.cantidad),2));
+            producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
+            producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
+            producto.producto.iva = parseFloat(document.getElementById('ivaCambio').value);
+            seleccionado.children[0].innerHTML = producto.cantidad.toFixed(2);
+            seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
+            seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
+            seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad,2);
+            console.log(totalGlobal)
+            totalGlobal = parseFloat(redondear(totalGlobal + (producto.producto.precio * producto.cantidad),2));
+            total.value = totalGlobal.toFixed(2);
+        }
+    })
+})
