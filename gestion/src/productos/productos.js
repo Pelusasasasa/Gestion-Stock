@@ -193,14 +193,13 @@ const body = document.querySelector('body');
 
 body.addEventListener('keypress',e=>{
     if (e.key === "Enter" && ventanaSecundaria){
-        if (seleccionado) {
+        console.log(document.activeElement.nodeName)
+        if (seleccionado && document.activeElement.nodeName !== "INPUT") {
             ipcRenderer.send('enviar',{
                         tipo:"producto",
                         informacion:seleccionado.id,
             });
             window.close();
-        }else{
-            sweet.fire({title:"Producto no seleccionado"});
         }
     }
 })
