@@ -12,6 +12,10 @@
         Arial, sans-serif;
         }
 
+        .none{
+            display: none;
+        }
+
         html {
         box-sizing: border-box;
         font-size: 62.5%;
@@ -36,6 +40,7 @@
         }
 
         .morel{
+            padding: 2rem;
             margin-top: 2rem;
             font-weight: bold;
             border: .3rem solid black;
@@ -155,8 +160,8 @@
                     <th>Cod. Barra</th>
                     <th>Producto</th>
                     <th>Cantidad</th>
-                    <th>Unidad</th>
                     <th>Precio</th>
+                    <th>Iva</th>
                     <th>% Bonif.</th>
                     <th>Imp. Bonif</th>
                     <th>Subtotal</th>
@@ -176,8 +181,10 @@
             <p>Fecha de Vto. de CAE: <span>{{fechaCae}}</span></p>
         </main>
         <main class="total">
+            <p class="iva21">{{iva21}}</p>
+            <p class="iva105">{{iva105}}</p>
             <p>Subtotal: $<span>{{subTotal}}</span></p>
-            <p>Importe Otros Atributos: $<span>0.00</span></p>
+            <p>Descuento: <span class="descuento">{{descuento}}</span></p>
             <p>Importe Total: $<span>{{total}}</span></p>
         </main>
     </section>
