@@ -31,11 +31,11 @@ const pagado = document.querySelector('.pagado');
 const descripcion = document.querySelector('.descripcion');
 
 ipcRenderer.on('imprimir',(e,args)=>{
-    const [venta,cliente,listado] = JSON.parse(args);
-    listar(venta,cliente,listado);
+    const [situacion,venta,cliente,listado] = JSON.parse(args);
+    listar(situacion,venta,cliente,listado);
 });
 
-const listar = async(venta,clienteTraido,lista)=>{
+const listar = async(situacion,venta,clienteTraido,lista)=>{
     let date = new Date(venta.fecha);
     let day = date.getDate();
     let month = date.getMonth() + 1;
@@ -49,6 +49,7 @@ const listar = async(venta,clienteTraido,lista)=>{
     hour = hour <10 ? `0${hour}` : hour;
     minuts = minuts <10 ? `0${minuts}` : minuts;
     seconds = seconds <10 ? `0${seconds}` : seconds;
+    console.log(venta)
     numeroComp.innerHTML = venta.F ? (venta.afip.puntoVenta.toString()).padStart(4,'0') + "-" + venta.afip.numero.toString().padStart(8,'0') :(venta.numero.toString()).padStart(8,'0');
     tipoComp.innerHTML = venta.tipo_comp;
     fecha.innerHTML = `${day}/${month}/${year}`;
@@ -70,12 +71,12 @@ const listar = async(venta,clienteTraido,lista)=>{
         if (venta.tipo_comp !== "Recibo") {
             listado.innerHTML += `
                 <main>
-                    <p>${elem.producto}</p>
+                    <p>${elem.producto.slice(0,25)}</p>
                     <p>${(elem.precio * elem.cantidad).toFixed(2)}</p>
                 </main>
                 <main class = "linea">
                     <p>${elem.cantidad.toFixed(2)}/${elem.precio.toFixed(2)}</p>
-                    <p></p>
+                    <p>${elem.impuesto}</p>
                 </main>
             `   
         }else{
@@ -99,5 +100,5 @@ const listar = async(venta,clienteTraido,lista)=>{
         qr.src = venta.afip.QR;
 
     }
-    ipcRenderer.send('imprimir-ventana')
+    ipcRenderer.send('imprimir-ventana',situacion)
 }

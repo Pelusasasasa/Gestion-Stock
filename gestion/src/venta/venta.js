@@ -31,9 +31,8 @@ const lista = document.querySelector('#lista');
 const cantidad = document.querySelector('#cantidad');
 const codBarra = document.querySelector('#cod-barra')
 const precioU = document.querySelector('#precio-U');
-const rubro = document.querySelector('#rubro');
+const iva = document.querySelector('#iva');
 const tbody = document.querySelector('.tbody');
-const select = document.querySelector('#rubro');
 
 //parte totales
 const total = document.querySelector('#total');
@@ -61,7 +60,7 @@ let movimientos = [];
 let descuentoStock = [];
 let totalGlobal = 0;
 let idProducto = 0;
-let situacion = "negro";
+let situacion = "blanco";
 let porcentajeH = 0;
 let descuento = 0;
 let dolar = 0;
@@ -92,8 +91,6 @@ window.addEventListener('load',async e=>{
     }
     
     listarCliente(1);//listanos los clientes
-
-    listarRubros();//listamos los rubros que tengamos en la base de dato
     
     cambiarSituacion(situacion);//
 });
@@ -102,7 +99,7 @@ document.addEventListener('keydown',e=>{
     if (e.keyCode === 18) {
         document.addEventListener('keydown',event=>{
             if (event.keyCode === 120) {
-                body.classList.toggle('rojo');
+                body.classList.toggle('negro');
                 situacion = situacion === "negro" ? "blanco" : "negro";
                 cambiarSituacion(situacion);
             }
@@ -178,7 +175,6 @@ precioU.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
         if (precioU.value !== "") {
             crearProducto();
-            // rubro.focus();   
         }else{
             await sweet.fire({
                 title:"Poner un precio al Producto",
@@ -187,7 +183,7 @@ precioU.addEventListener('keypress',async e=>{
     }
 });
 
-rubro.addEventListener('keypress',e=>{
+iva.addEventListener('keypress',e=>{
     if (e.key === "Enter") {
         e.preventDefault();
         precioU.focus();
@@ -199,12 +195,12 @@ const crearProducto = ()=>{
     const producto = {
         descripcion:codBarra.value.toUpperCase(),
         precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
-        rubro:rubro.value,
+        rubro:"Cualquiera",
         idTabla:`${idProducto}`,
-        impuesto:0,
+        impuesto:iva.value,
+        impuesto:parseFloat(iva.value),
         productoCreado:true
     };
-
     listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
         tbody.innerHTML += `
         <tr id=${idProducto}>
@@ -212,6 +208,7 @@ const crearProducto = ()=>{
             <td></td>
             <td>${codBarra.value.toUpperCase()}</td>
             <td></td>
+            <td>${producto.impuesto.toFixed(2)}</td>
             <td>${parseFloat(producto.precio).toFixed(2)}</td>
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
             <td class=acciones>
@@ -235,7 +232,7 @@ const crearProducto = ()=>{
     cantidad.value = "1.00";
     codBarra.value = "";
     precioU.value = "";
-    rubro.value = "";
+    iva.value = "21.00";
     codBarra.focus();
 };
 
@@ -320,8 +317,18 @@ facturar.addEventListener('click',async e=>{
         venta.listaProductos = listaProductos;
         
         //Ponemos propiedades para la factura electronica
+<<<<<<< HEAD
         venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
         venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
+=======
+        if(venta.tipo_venta !== "PP"){
+            venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
+            venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
+        }else{
+            venta.cod_comp = 0;
+            venta.tipo_comp === "Presupuesto"
+        }
+>>>>>>> e7decbe6ecb6a14e292c9d8dbc1713324d6a008a
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value;
@@ -394,11 +401,10 @@ facturar.addEventListener('click',async e=>{
                 }
 
                 if (impresion.checked) {
-                    console.log(venta.fecha)
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 
-                // location.reload();  
+                location.reload();  
             } catch (error) {
                 
                 await sweet.fire({
@@ -466,6 +472,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.precio = lista.value === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
+    movimiento.impuesto = producto.impuesto;
     movimiento.tipo_comp = tipo_comp;
     movimiento.caja = caja,
     movimiento.series = series;
@@ -525,6 +532,7 @@ const listarProducto =async(id)=>{
                     <td>${codBarra.value}</td>
                     <td>${producto.descripcion.toUpperCase()}</td>
                     <td>${producto.marca}</td>
+                    <td>${producto.impuesto.toFixed(2)}</td>
                     <td>${parseFloat(precioU.value).toFixed(2)}</td>
                     <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
                     <td class=acciones>
@@ -635,7 +643,6 @@ tbody.addEventListener('click',async e=>{
         });
     }
 });
-
 
 const sumarSaldo = async(id,nuevoSaldo,venta)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -775,16 +782,6 @@ const verCodigoDocumento = async(cuit)=>{
     return 99
 };
 
-const listarRubros = async()=>{
-    const rubros = (await axios.get(`${URL}rubro`)).data;
-    for await(let {rubro,numero} of rubros){
-        const option = document.createElement('option');
-        option.text = numero + "-" + rubro;
-        option.value = rubro;
-        select.appendChild(option);
-    }
-}
-
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
@@ -815,3 +812,42 @@ cantidad.addEventListener('keydown',e=>{
         codBarra.focus();
     }
 });
+
+tbody.addEventListener('dblclick',async se=>{
+    await sweet.fire({
+        title:"Cambio",
+        html:`
+            <section class=cambio>
+                <main>
+                    <label htmlFor="cantidadCambio">Cantidad</label>
+                    <input class=text-rigth type="text" name="cantidadCambio" value=${seleccionado.children[0].innerHTML} id="cantidadCambio"/>
+                </main>
+                <main>
+                    <label htmlFor="precioCambio">Precio</label>
+                    <input class=text-rigth type="text" name="precioCambio" value=${seleccionado.children[5].innerHTML} id="precioCambio"/>
+                </main>
+                <main>
+                    <label htmlFor="ivaCambio">Iva</label>
+                    <input class=text-rigth type="text" name="ivaCambio" value=${seleccionado.children[4].innerHTML} id="ivaCambio"/>
+                </main>
+            </section>
+        `,
+        confirmButtonText:"Aceptar",
+        showCancelButton:true
+    }).then(async({isConfirmed})=>{
+        if (isConfirmed) {
+            const producto = listaProductos.find(({producto})=>producto.idTabla === seleccionado.id);
+            totalGlobal = parseFloat(redondear(totalGlobal - (producto.producto.precio * producto.cantidad),2));
+            producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
+            producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
+            producto.producto.iva = parseFloat(document.getElementById('ivaCambio').value);
+            seleccionado.children[0].innerHTML = producto.cantidad.toFixed(2);
+            seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
+            seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
+            seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad,2);
+            console.log(totalGlobal)
+            totalGlobal = parseFloat(redondear(totalGlobal + (producto.producto.precio * producto.cantidad),2));
+            total.value = totalGlobal.toFixed(2);
+        }
+    })
+})
