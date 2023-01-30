@@ -13,6 +13,22 @@ const URL = process.env.URL;
 
 let puntoVenta = archivo.puntoVenta;
 
+let internetAvalible = require('internet-available');
+
+//Sirve para ver si hay internet o no
+funciones.verSiHayInternet = () => {
+    let retorno = true
+    internetAvalible({
+        timeout:1000,
+        retries:5
+    }).then(()=>{
+        retorno = true
+    }).catch(()=>{
+        retorno = false
+    });
+    return retorno
+}
+
 //cerramos la ventana al apretrar escape
 funciones.cerrarVentana = (e)=>{
         if (e.key === "Escape") {
@@ -72,9 +88,9 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'CbteFch': parseInt(fecha.replace(/-/g, '')),
         'ImpTotal':venta.precio,
         'ImpTotConc':0,
-        'ImpNeto': parseFloat(redondear(venta.gravado21 + venta.gravado0 + venta.gravado105,2)),
+        'ImpNeto': archivo.condIva === "Inscripto" ? parseFloat(redondear(venta.gravado21 + venta.gravado0 + venta.gravado105,2)) : venta.precio,
         'ImpOpEx': 0,
-        'ImpIVA': parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)),
+        'ImpIVA': archivo.condIva === "Inscripto" ? parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)) : 0,
         'ImpTrib': 0,
         'MonId': 'PES',
         'PtoVta': puntoVenta,
@@ -89,18 +105,26 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         }
     ]);
 
-    venta.iva105 !== 0 && (data.Iva.push({
-        'Id':4,
-        'BaseImp':venta.gravado105,
-        'Importe':venta.iva105
-    }));
+    if (archivo.condIva === "Inscripto") {
+        venta.iva105 !== 0 && (data.Iva.push({
+            'Id':4,
+            'BaseImp':venta.gravado105,
+            'Importe':venta.iva105
+        }));
+    
+        venta.iva21 !== 0 && (data.Iva.push({
+            'Id':5,
+            'BaseImp':venta.gravado21,
+            'Importe':venta.iva21
+        }));
 
-    venta.iva21 !== 0 && (data.Iva.push({
-        'Id':5,
-        'BaseImp':venta.gravado21,
-        'Importe':venta.iva21
-    }));
-
+        venta.gravado0 !== 0 && (data.Iva.push({
+            'Id':3,
+            'BaseImp':venta.gravado0,
+            'Importe':venta.iva0
+        }));
+    
+    }
     console.log(data)
     const res = await afip.ElectronicBilling.createVoucher(data); //creamos la factura electronica
     console.log(res)
@@ -206,6 +230,29 @@ funciones.ultimaC = async()=>{
         return {
             facturaC:0,
             notaC:0
+        }
+    }
+}
+
+funciones.ultimaAB = async()=>{
+    try {
+        const facturaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,1);
+        const notaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,3);
+        const facturaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,6);
+        const notaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,8);
+        return {
+            facturaA,
+            notaA,
+            facturaB,
+            notaB
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            facturaA:0,
+            notaA:0,
+            facturaB:0,
+            notaB:0,
         }
     }
 }

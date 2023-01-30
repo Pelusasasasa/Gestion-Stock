@@ -65,23 +65,36 @@ cuit.addEventListener('keypress',e=>{
 
 condicionIva.addEventListener('keypress',e=>{
     e.preventDefault();
+    apretarEnter(e,observaciones);
+});
+
+observaciones.addEventListener('keypress',e=>{
     apretarEnter(e,modificar);
 });
 
+
 nombre.addEventListener('focus',e=>{
-    selecciona_value(nombre.id);
+    nombre.select();
 });
 
 localidad.addEventListener('focus',e=>{
-    selecciona_value(localidad.id);
+    localidad.select();
 });
 
 telefono.addEventListener('focus',e=>{
-    selecciona_value(telefono.id);
+    telefono.select();
 });
 
 direccion.addEventListener('focus',e=>{
-    selecciona_value(direccion.id);
+    direccion.select();
+});
+
+cuit.addEventListener('focus',e=>{
+    cuit.select();
+});
+
+observaciones.addEventListener('focus',e=>{
+    observaciones.select();
 });
 
 

@@ -13,7 +13,7 @@ const URL = process.env.URL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -282,6 +282,10 @@ facturar.addEventListener('click',async e=>{
         sweet.fire({
             title:"Poner un codigo de cliente"
         });
+    }else if(!verSiHayInternet() && situacion === "blanco"){
+        await sweet.fire({
+            title:"No se puede hacer la factura porque no hay internet"
+        })
     }else if(cuit.value.length === 11 && condicionIva.value !== "Inscripto" && archivo.condIva === "Inscripto"){
         if (tipoFactura) {
             await sweet.fire({
@@ -309,13 +313,6 @@ facturar.addEventListener('click',async e=>{
 
         venta.cliente = nombre.value;
         venta.fecha = new Date();
-        // if (tipoFactura) {
-        //     venta.tipo_comp = "Nota Credito C";
-        // }else if(situacion === "blanco"){
-        //     venta.tipo_comp = "Factura C"
-        // }else{
-        //     venta.tipo_comp = "Comprobante"
-        // };
         venta.idCliente = codigo.value;
         venta.precio = parseFloat(total.value);
         venta.descuento = descuento;
@@ -324,7 +321,7 @@ facturar.addEventListener('click',async e=>{
         
         //Ponemos propiedades para la factura electronica
         venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
-        venta.tipo_comp = await verTipoComprobante(venta.cod_comp);
+        venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value;
@@ -342,10 +339,18 @@ facturar.addEventListener('click',async e=>{
         venta.vendedor = vendedor ? vendedor : "";
         
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
-        venta.numero = venta.tipo_venta === "CC" ? numeros["Cuenta Corriente"] + 1 :numeros["Contado"] + 1;
+        if (venta.tipo_venta === "CC") {
+            venta.numero = numeros["Cuenta Corriente"] + 1;
+        }else if(venta.tipo_venta === "PP"){
+            venta.numero = numeros["Presupuesto"] + 1;
+        }else if(venta.tipo_venta === "CD"){
+            venta.numero = numeros["Contado"] + 1;
+        };
 
         if (venta.tipo_venta === "CC") {
             await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
+        }else if(venta.tipo_venta === "PP"){
+            await axios.put(`${URL}numero/Presupuesto`,{"Presupuesto":venta.numero});
         }else{
             await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
         }
@@ -357,6 +362,7 @@ facturar.addEventListener('click',async e=>{
                 }else{
                     alerta.children[1].innerHTML = "Generando Venta";
                 }
+
                 for (let producto of listaProductos){
                     await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
                     if (!(producto.producto.productoCreado)) {
@@ -364,8 +370,9 @@ facturar.addEventListener('click',async e=>{
                     }
                     //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
                 }
-                await axios.put(`${URL}productos/descontarStock`,descuentoStock)
-                await axios.post(`${URL}movimiento`,movimientos);
+
+                venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock)
+                venta.tipo_venta !== "PP" && await axios.post(`${URL}movimiento`,movimientos);
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
                 venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
 
@@ -380,7 +387,11 @@ facturar.addEventListener('click',async e=>{
         
                 const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
 
-                await axios.post(`${URL}ventas`,venta);
+                if (venta.tipo_venta === "PP") {
+                    await axios.post(`${URL}Presupuesto`,venta);
+                }else{
+                    await axios.post(`${URL}ventas`,venta);
+                }
 
                 if (impresion.checked) {
                     console.log(venta.fecha)
@@ -619,7 +630,8 @@ tbody.addEventListener('click',async e=>{
             tbody.removeChild(seleccionado);
             total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[5].innerHTML),2);
             totalGlobal = parseFloat(total.value);
-            listaProductos = listaProductos.filter(({producto,cantidad}) => {producto.idTabla === seleccionado.id});
+            const productoABorrar = listaProductos.findIndex(({producto,cantidad})=>seleccionado.id === producto.idTabla);
+            listaProductos.splice(productoABorrar,1);
         });
     }
 });
@@ -651,10 +663,10 @@ const sacarIva = (lista) => {
             gravado105 += cantidad*producto.precio/1.105
             totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);
         }else{
-            gravado0 += parseFloat(cantidad)*(parseFloat(producto.precio/1));
-            totalIva0 += parseFloat(cantidad)*(parseFloat(producto.precio)-(parseFloat(producto.precio))/1);
+            gravado0 += cantidad*producto.precio/1;
+            totalIva0 += (cantidad*producto.precio)-(producto.precio/1);
         }
-    })
+    });
     let cantIva = 0
     if (gravado0 !== 0) {
         cantIva++;
@@ -665,7 +677,7 @@ const sacarIva = (lista) => {
     if (gravado105 !== 0) {
         cantIva++;
     }
-    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),totalIva105,gravado105,cantIva]
+    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
 };
 
 codigo.addEventListener('focus',e=>{
@@ -803,36 +815,3 @@ cantidad.addEventListener('keydown',e=>{
         codBarra.focus();
     }
 });
-
-
-//falta hacer con el total
-
-// tbody.addEventListener('dblclick',e=>{
-//     if (e.target.nodeName === "TD") {
-//         console.log(seleccionado)
-//         seleccionado && seleccionado.classList.remove('seleccionado');
-//         seleccionado = e.target.parentNode;
-//         seleccionado.classList.add('seleccionado');
-
-//         const tr = e.target.parentNode;
-//         sweet.fire({
-//             title:"Cambio De Precio",
-//             input:"number",
-//             showCancelButton:true,
-//             confirmButtonText:"Aceptar"
-//         }).then(({isConfirmed,value})=>{
-//             if (isConfirmed && value !== "") {
-//                 const totalViejo = parseFloat(tr.children[5].innerHTML);
-//                 tr.children[4].innerHTML = parseFloat(value).toFixed(2);
-//                 tr.children[5].innerHTML = redondear(parseFloat(value) * parseFloat(tr.children[0].innerHTML),2);
-//                 const producto = listaProductos.find(producto => producto._id === tr._id)
-//                 console.log(producto)
-//                 producto.producto.precio = parseFloat(value)
-                
-//                 total.value = redondear(parseFloat(total.value) - totalViejo + (parseFloat(value)*producto.cantidad),2)
-//             }
-//         })
-//     }
-// });
-
-///Guardamos el saldo del cliente
