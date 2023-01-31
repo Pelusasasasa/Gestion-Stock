@@ -21,14 +21,13 @@ productoCTRL.getsProductos = async(req,res)=>{
     }else{  
         let re;
         try {
-            re = new RegExp(`^${descripcion}`);
             if (descripcion[0] === "*") {
-                
-            re = new RegExp(`${descripcion.substr(1)}`);
+                re = new RegExp(`${descripcion.substr(1)}`);
+            }else{
+                re = new RegExp(`^${descripcion}`);
             }
             productos = await Producto.find({[condicion]:{$regex:re,$options:"i"}}).limit(50);
         } catch (error) {
-            
             re = descripcion;
             productos = await Producto.find().limit(50);
         }
