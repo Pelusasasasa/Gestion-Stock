@@ -39,8 +39,8 @@ const path = require('path');
                 <td>${producto._id ? producto._id : ""}</td>
                 <td>${producto.descripcion}</td>
                 <td class="text-end">${cantidad.toFixed(2)}</td>
-                <td class="text-end">${producto.unidad ? producto.unidad : ""}</td>
                 <td class="text-end">${producto.precio.toFixed(2)}</td>
+                <td class="text-end">${producto.impuesto ? producto.impuesto.toFixed(2) : ""}</td>
                 <td class="text-end">0.00</td>
                 <td class="text-end">0.00</td>
                 <td class="text-end">${(producto.precio*cantidad).toFixed(2)}</td>
@@ -59,6 +59,9 @@ const path = require('path');
 
     //total
     html = html.replace('{{subTotal}}',venta.precio.toFixed(2));
+    html = html.replace('{{iva21}}',venta.condicionIva === "Inscripto" ? `IVA 21%: ${venta.iva21.toFixed(2)} `: "");
+    html = html.replace('{{iva105}}',venta.condicionIva === "Inscripto" ? `IVA 10.5% ${venta.iva105.toFixed(2)} ` : "");
+    html = html.replace('{{descuento}}',venta.descuento.toFixed(2));
     html = html.replace('{{total}}',venta.precio.toFixed(2));
     
     const config = {
@@ -82,7 +85,11 @@ const path = require('path');
 const verTipoFactura = (codigo) =>{
     if (codigo === 11) {
         return "C";
+    }else if(codigo === 1 || codigo === 3){
+        return "A";
+    }else if(codigo === 6 || codigo === 8){
+        return "B"
     }
-    return "C"
+    return ""
 }
 module.exports = funcion
