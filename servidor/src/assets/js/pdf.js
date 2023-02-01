@@ -30,7 +30,7 @@ const path = require('path');
     html = html.replace('{{dni}}',venta.num_doc ? venta.num_doc : "00000000");
     html = html.replace('{{domicilio}}',venta.direccion ? venta.direccion : "Chajari" );
     html = html.replace('{{clienteIva}}',venta.condicionIva ? venta.condicionIva : "Consumidor Final");
-    html = html.replace('{{condicionVenta}}',venta.tipo_venta === "CD" ? "Contado" : "Cuenta Corriente");
+    html = html.replace('{{condicionVenta}}',venta.tipo_venta === "CC" ? "Cuenta Corriente" : "Contado");
 
     let tr = "";
     for await(let {cantidad,producto} of venta.listaProductos){

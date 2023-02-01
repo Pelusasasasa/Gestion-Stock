@@ -277,16 +277,6 @@ facturar.addEventListener('click',async e=>{
         await sweet.fire({
             title:"No se puede hacer la factura porque no hay internet"
         })
-    }else if(cuit.value.length === 11 && condicionIva.value !== "Inscripto" && archivo.condIva === "Inscripto"){
-        if (tipoFactura) {
-            await sweet.fire({
-                title:"No se puede hacer Nota Credito A a un no Inscripto"
-            });
-        }else{
-            await sweet.fire({
-                title:"No se puede hacer Factura A a un no Inscripto"
-            });
-        }
     }else if(cuit.value.length === 8 && condicionIva.value === "Inscripto" && archivo.condIva === "Inscripto"){
         if (tipoFactura) {
             await sweet.fire({
@@ -311,13 +301,8 @@ facturar.addEventListener('click',async e=>{
         venta.listaProductos = listaProductos;
         
         //Ponemos propiedades para la factura electronica
-        if(venta.tipo_venta !== "PP"){
-            venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
-            venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
-        }else{
-            venta.cod_comp = 0;
-            venta.tipo_comp === "Presupuesto"
-        }
+        venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
+        venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value;
