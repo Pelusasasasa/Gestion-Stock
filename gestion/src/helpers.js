@@ -75,7 +75,8 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(ultimaElectronica);
 
     console.log(parseFloat(venta.facturaAnterior));
-    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,venta.cod_comp);
+    let aux = venta.condicionIva === "Inscripo" ? 1 : 6
+    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,aux);
     
     let data = {
         'cantReg':1,
@@ -352,10 +353,7 @@ funciones.verCodigoComprobante = async(notaCredito,cuit = "00000000",condIva)=>{
             if (cuit.length === 11 && condIva === "Inscripto") {
                 return 3
             }else if(cuit.length === 11 && condIva !== "Inscripto"){
-                await sweet.fire({
-                    title:"No se puede hacer una Nota Credito A a un No Inscripto"
-                });
-                return 0
+                return 8
             }else if(cuit.length === 8 && condIva !== "Inscripto"){
                 return 8
             }else{
@@ -368,15 +366,12 @@ funciones.verCodigoComprobante = async(notaCredito,cuit = "00000000",condIva)=>{
             if (cuit.length === 11 && condIva === "Inscripto") {
                 return 1
             }else if(cuit.length === 11 && condIva !== "Inscripto"){
-                await sweet.fire({
-                    title:"No se puede hacer una Factura A a un No Inscripto"
-                });
-                return 0
+                return 6
             }else if(cuit.length === 8 && condIva !== "Inscripto"){
                 return 6
             }else{
                 await sweet.fire({
-                    title:"No se puede hacer una Nota Credito B a un Inscripto"
+                    title:"No se puede hacer una Factura B a un Inscripto"
                 });
                 return 0
             }
