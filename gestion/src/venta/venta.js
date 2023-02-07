@@ -277,16 +277,6 @@ facturar.addEventListener('click',async e=>{
         await sweet.fire({
             title:"No se puede hacer la factura porque no hay internet"
         })
-    }else if(cuit.value.length === 11 && condicionIva.value !== "Inscripto" && archivo.condIva === "Inscripto"){
-        if (tipoFactura) {
-            await sweet.fire({
-                title:"No se puede hacer Nota Credito A a un no Inscripto"
-            });
-        }else{
-            await sweet.fire({
-                title:"No se puede hacer Factura A a un no Inscripto"
-            });
-        }
     }else if(cuit.value.length === 8 && condicionIva.value === "Inscripto" && archivo.condIva === "Inscripto"){
         if (tipoFactura) {
             await sweet.fire({
