@@ -283,7 +283,7 @@ facturar.addEventListener('click',async e=>{
         await sweet.fire({
             title:"No se puede hacer la factura porque no hay internet"
         })
-    }else if(cuit.value.length === 8 && condicionIva.value === "Inscripto" && archivo.condIva === "Inscripto"){
+    }else if(cuit.value.length === 8 && condicionIva.value === "Responsable Inscripto" && archivo.condIva === "Inscripto"){
         if (tipoFactura) {
             await sweet.fire({
                 title:"No se puede hacer Nota Credito B a un Inscripto"
@@ -307,11 +307,11 @@ facturar.addEventListener('click',async e=>{
         venta.listaProductos = listaProductos;
         
         //Ponemos propiedades para la factura electronica
-        venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value) : 0;
+        venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
         venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
-        venta.condicionIva = condicionIva.value;
+        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto0" : condicionIva.value
         const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
@@ -407,7 +407,7 @@ const listarCliente = async(id)=>{
         telefono.value = cliente.telefono;
         localidad.value = cliente.localidad;
         cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
-        condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final"
+        condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
         codBarra.focus();
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')
     }else{
