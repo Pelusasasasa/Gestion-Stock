@@ -13,7 +13,7 @@ presupuestoCTRL.post = async(req,res)=>{
     if (req.body.F) {
         funcion.crearPDF(req.body);//creamos un pdf con la venta
     }
-    console.log(`Presupuesto ${req.body.nro_venta} cargado a las ${req.body.fecha}`);
+    console.log(`Presupuesto ${req.body.numero} cargado a las ${req.body.fecha}`);
     res.send();
 }
 
