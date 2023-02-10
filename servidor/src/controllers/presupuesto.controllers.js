@@ -59,10 +59,23 @@ presupuestoCTRL.getForMonth = async(req,res)=>{
     res.send(presupuestos);
 };
 
+presupuestoCTRL.getForYear = async(req,res)=>{
+    const {year} = req.params;
+    let now = new Date();
+    let inicioAño = new Date(year,0,1,-3,0,0);
+    let finAño = new Date(year,11,31,20,59,59);
+    const presupuestos = await Presupuesto.find({
+        $and:[
+            {fecha:{$gte:inicioAño}},
+            {fecha:{$lte:finAño}}
+        ]
+    });
+    res.send(presupuestos);
+};
+
 presupuestoCTRL.deleteForId = async(req,res)=>{
     const {day} = req.params;
 };
 
-//Falta año
 
 module.exports = presupuestoCTRL;

@@ -45,6 +45,7 @@ const pestaña = document.querySelector('.pestaña')
 let ventas = [];
 let recibos = [];
 let gastos = [];
+let presupuestos = [];
 let cuentasCorrientes = [];
 let tipoVenta = "CD";
 let filtro = "Ingresos";
@@ -233,6 +234,9 @@ botonAnio.addEventListener('click',async e=>{
         }else{
             listarVentas(cuentasCorrientes);
         }
+    }else if(filtro === "Presupuestos"){
+        presupuestos = (await axios.get(`${URL}presupuesto/forYear/${inputAnio.value}`)).data;
+        listarVentas(presupuestos);
     }else{
         gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
         listarGastos(gastos);
@@ -290,14 +294,16 @@ inputAnio.addEventListener('keypress',async e=>{
                 listarVentas([...ventas,...recibos]);
             }else{
                 listarVentas(cuentasCorrientes);
-            }
+            };
+        }else if(filtro === "Presupuestos"){
+            presupuestos = (await axios.get(`${URL}presupuesto/forYear/${inputAnio.value}`)).data;
+            listarVentas(presupuestos);
         }else{
             gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
             listarGastos(gastos)
         }
     }
 });
-
 
 tbody.addEventListener('click',async e=>{
     const id = e.target.nodeName === "TD" ? e.target.parentNode.id : e.target.id;
