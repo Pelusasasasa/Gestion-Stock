@@ -144,8 +144,6 @@ productos.addEventListener('click',async e=>{
     }
 });
 
-
-
 caja.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();

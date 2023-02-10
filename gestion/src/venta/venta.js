@@ -359,7 +359,7 @@ facturar.addEventListener('click',async e=>{
                 }
 
                 venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock)
-                venta.tipo_venta !== "PP" && await axios.post(`${URL}movimiento`,movimientos);
+                await axios.post(`${URL}movimiento`,movimientos);
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
                 venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
 

@@ -71,6 +71,7 @@ ipcMain.on('enviar-ventana-principal',(e,args)=>{
 });
 
 ipcMain.on('imprimir',(e,args)=>{
+  console.log(args)
   if (args[0] === "blanco") {
     abrirVentana("ticket/ticket.html",800,500);
   }else{

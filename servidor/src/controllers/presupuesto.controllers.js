@@ -21,9 +21,10 @@ presupuestoCTRL.get = async(req,res)=>{
 };//Poner en rutas
 
 presupuestoCTRL.getForNumber = async(req,res)=>{
-    const {numero} = req.params;
-    const presupuesto = await Presupuesto.find({number:numero});
-};//Poner en rutas
+    const {number} = req.params;
+    const presupuesto = await Presupuesto.findOne({numero:number});
+    res.send(presupuesto)
+};
 
 presupuestoCTRL.getForDay = async(req,res)=>{
     const {day} = req.params;
