@@ -2,7 +2,7 @@ const sweet = require('sweetalert2');
 const {cerrarVentana} = require('../helpers')
 const axios = require('axios');
 require('dotenv').config()
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const fecha = document.querySelector('.fecha');
 const tbody = document.querySelector('.tbody');

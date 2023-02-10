@@ -10,7 +10,7 @@ let permiso = getParameterByName('permiso');
 
 const axios  = require("axios");
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const { cerrarVentana, redondear, agregarMovimientoVendedores } = require("../helpers");
 const sweet = require('sweetalert2');

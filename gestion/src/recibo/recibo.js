@@ -11,7 +11,7 @@ const archivo = require('../configuracion.json');
 
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
 const {apretarEnter, cargarFactura, redondear} = require('../helpers');

@@ -9,7 +9,7 @@ const afip = new Afip({CUIT:archivo.cuit});
 const sweet = require('sweetalert2');
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 let puntoVenta = archivo.puntoVenta;
 

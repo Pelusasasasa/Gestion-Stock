@@ -4,7 +4,7 @@ const {cerrarVentana,apretarEnter,selecciona_value, agregarMovimientoVendedores}
 
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 let vendedor;
 

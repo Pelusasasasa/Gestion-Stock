@@ -3,7 +3,7 @@ const { ipcRenderer } = require('electron/renderer');
 
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
 
