@@ -78,6 +78,12 @@ pestaña.addEventListener('click',async e=>{
             contado.classList.remove('none');
             let retornar = await verQueTraer();
             tipoVenta = "CD";
+            listarVentas(retornar);
+        }else if(filtro === "Presupuestos"){
+            contado.classList.remove('none');
+            tarjeta.classList.add('none');
+            let retornar = await verQueTraer();
+            tipoVenta = "PP";
             listarVentas(retornar)
         }else{
             document.querySelector('.listado').classList.remove('none');
@@ -108,7 +114,10 @@ const verQueTraer = async()=>{
         if (filtro === "Ingresos") {
             ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
             recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-            return([...ventas,...recibos])
+            return([...ventas,...recibos]);
+        }else if(filtro === "Presupuestos"){
+            presupuestos = (await axios.get(`${URL}presupuesto/forDay/${fecha.value}`)).data;
+            return presupuestos
         }else{
             return ((await axios.get(`${URL}gastos/dia/${fecha.value}`)).data);
         }
@@ -168,11 +177,13 @@ botonMes.addEventListener('click',async e=>{
         recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
         cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
         if (filtro === "Ingresos") {
-            listarVentas([...ventas,...recibos]);    
+            listarVentas([...ventas,...recibos]);
         }else{
             listarVentas(cuentasCorrientes);
         }
-        
+    }else if(filtro === "Presupuestos"){
+        presupuestos = (await axios.get(`${URL}presupuesto/forMonth/${selectMes.value}`)).data;
+        listarVentas(presupuestos);
     }else{
         gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
         listarGastos(gastos);
@@ -196,6 +207,9 @@ botonDia.addEventListener('click',async e=>{
         }else{
             listarVentas(cuentasCorrientes);
         }
+    }else if(filtro === "Presupuestos"){
+        presupuestos = (await axios.get(`${URL}presupuesto/forDay/${fecha.value}`)).data;
+        listarVentas(presupuestos);
     }else{
         gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
         listarGastos(gastos);
@@ -236,6 +250,9 @@ fecha.addEventListener('keypress',async e=>{
             }else{
                 listarVentas(cuentasCorrientes);
             }
+        }else if(filtro === "Presupuestos"){
+            presupuestos = (await axios.get(`${URL}presupuesto/forDay/${fecha.value}`)).data;
+            listarVentas(presupuestos);
         }else{
             gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
             listarGastos(gastos);
@@ -254,6 +271,9 @@ selectMes.addEventListener('click',async e=>{
         }else{
             listarVentas(cuentasCorrientes)
         }
+    }else if(filtro === "Presupuestos"){
+        presupuestos = (await axios.get(`${URL}presupuesto/forMonth/${selectMes.value}`)).data;
+        listarVentas(presupuestos);
     }else{
         gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
         listarGastos(gastos);
@@ -333,6 +353,7 @@ tbodyGastos.addEventListener('click',e=>{
 
 const listarVentas = async (ventas)=>{
     tbody.innerHTML = ``;
+    console.log(ventas)
     let lista = [];
     //organizamos las ventas por fecha
     ventas.sort((a,b)=>{
@@ -343,17 +364,17 @@ const listarVentas = async (ventas)=>{
         }
         return 0;
     });
-
     //filtramos las ventas si son contadas o tarjeta
     if (tipoVenta === "CD") {
         lista = ventas.filter(venta=>(venta.tipo_venta === "CD"));
     }else if(tipoVenta === "CC"){
         lista = ventas;
-    }else{
+    }else if(tipoVenta === "T"){
         lista = ventas.filter(venta=>venta.tipo_venta === "T");
+    }else{
+        lista = ventas;
     }
     let totalVenta = 0;
-
     for await(let venta of lista){
         const fecha = venta.fecha.slice(11,18).split(':',3);
         let hora = fecha[0];
@@ -416,7 +437,6 @@ const listarVentas = async (ventas)=>{
         tbody.appendChild(tr);
 
         //aca listamos los productos de cada venta
-        console.log(venta)
         if (venta.listaProductos) {
            for await(let {cantidad,producto} of  venta.listaProductos){
                 if (producto.length !== 0) {
@@ -438,7 +458,6 @@ const listarVentas = async (ventas)=>{
                     tdClienteProducto.innerHTML = venta.cliente;
                     tdIdProducto.innerHTML = producto._id === undefined ? " " : producto._id;
                     tdDescripcion.innerHTML = producto.descripcion;
-                    console.log(producto)
                     tdCantidad.innerHTML = cantidad.toFixed(2);
                     tdPrecioProducto.innerHTML = producto.precio.toFixed(2);
                     tdTotalProducto.innerHTML = (cantidad*producto.precio).toFixed(2);

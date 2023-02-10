@@ -3,8 +3,6 @@ const presupuestoCTRL = {};
 const funcion = require('../assets/js/pdf');
 const Presupuesto = require('../models/Presupuesto');
 
-
-
 presupuestoCTRL.post = async(req,res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
@@ -15,6 +13,56 @@ presupuestoCTRL.post = async(req,res)=>{
     }
     console.log(`Presupuesto ${req.body.nro_venta} cargado a las ${req.body.fecha}`);
     res.send();
-}
+};
+
+presupuestoCTRL.get = async(req,res)=>{
+    const presupuestos = await Presupuesto.find();
+    res.send(presupuestos);
+};//Poner en rutas
+
+presupuestoCTRL.getForNumber = async(req,res)=>{
+    const {numero} = req.params;
+    const presupuesto = await Presupuesto.find({number:numero});
+};//Poner en rutas
+
+presupuestoCTRL.getForDay = async(req,res)=>{
+    const {day} = req.params;
+    let fecha = day.split('-',3);
+    let inicioDia = new Date(day + "T00:00:00.000Z");
+    let finDia = new Date(day + "T23:59:59.000Z");
+    const presupuestos = await Presupuesto.find({
+        $and:[
+            {fecha:{$gte:inicioDia}},
+            {fecha:{$lte:finDia}}
+        ]
+    });
+    res.send(presupuestos);
+};
+
+presupuestoCTRL.getForMonth = async(req,res)=>{
+    const {month} = req.params;
+    let now = new Date();
+    let inicioMes = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    let finMes = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+
+    inicioMes.setMonth(month - 1,1);
+    finMes.setMonth(month,1);
+    inicioMes.setHours(-3,0,0,0);
+    finMes.setHours(-3,0,0,0);
+
+    const presupuestos = await Presupuesto.find({
+        $and:[
+            {fecha:{$gte:inicioMes}},
+            {fecha:{$lt:finMes}}
+        ]
+    });
+    res.send(presupuestos);
+};
+
+presupuestoCTRL.deleteForId = async(req,res)=>{
+    const {day} = req.params;
+};
+
+//Falta año
 
 module.exports = presupuestoCTRL;
