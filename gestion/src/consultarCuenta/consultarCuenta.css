@@ -8,6 +8,12 @@
     gap: 2rem
 }
 
+@media (max-width: 1100px){
+    #buscar,#saldo{
+        width: 10rem;
+    }
+}
+
 .buscador .inputs main {
     display: flex;
     flex-direction: column;
