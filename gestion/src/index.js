@@ -177,6 +177,12 @@ const hacerMenu = () => {
           click(){
             ventanaPrincipal.webContents.send('poner-numero');
           }
+        },
+        {
+          label:"Libro Ventas",
+          click(){
+            ventanaPrincipal.webContents.send('libroIva')
+          }
         }
       ]
     },
