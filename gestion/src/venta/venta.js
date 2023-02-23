@@ -372,7 +372,13 @@ facturar.addEventListener('click',async e=>{
                     await hacerRecibo(numeros.Recibo);
                 }
         
-                const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
+                const cliente = {};
+                cliente.nombre = nombre.value;
+                cliente.localidad = localidad.value;
+                cliente.cuit = cuit.value;
+                cliente.condicionIva = condicionIva.value;
+                cliente.direccion = direccion.value;
+                cliente._id = codigo.value;
 
                 if (venta.tipo_venta === "PP") {
                     await axios.post(`${URL}Presupuesto`,venta);
