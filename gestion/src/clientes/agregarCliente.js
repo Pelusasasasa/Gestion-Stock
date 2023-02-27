@@ -5,7 +5,7 @@ const axios = require('axios');
 const {default:validarCuit} = require('cuit-validator')
 const { ipcRenderer } = require('electron');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');

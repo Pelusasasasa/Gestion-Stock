@@ -3,7 +3,7 @@ const sweet = require('sweetalert2');
 
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const archivo = require('./configuracion.json');
 
@@ -144,8 +144,6 @@ productos.addEventListener('click',async e=>{
     }
 });
 
-
-
 caja.addEventListener('click',async e=>{
     if (verVendedores) {
         const vendedor = await verificarUsuarios();
@@ -167,7 +165,6 @@ caja.addEventListener('click',async e=>{
         location.href = "./caja/caja.html";
     }
 });
-
 
 movimiento.addEventListener('click',e=>{
     location.href = "./movimiento/movimiento.html";
@@ -203,4 +200,8 @@ notaCredito.addEventListener('click',e=>{
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
-})
+});
+
+ipcRenderer.on('libroIva',async (e,args)=>{
+    location.href = "./libroIva/libroIva.html";
+});

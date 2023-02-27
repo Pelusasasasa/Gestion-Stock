@@ -15,7 +15,7 @@ const sweet = require('sweetalert2');
 const axios = require('axios');
 const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores } = require("../helpers");
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 let seleccionado;
 let subSeleccionado;

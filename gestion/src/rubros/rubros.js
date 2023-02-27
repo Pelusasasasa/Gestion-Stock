@@ -1,6 +1,6 @@
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const tbody = document.querySelector('tbody');
