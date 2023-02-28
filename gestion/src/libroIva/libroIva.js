@@ -60,156 +60,175 @@ const listar = async(ventas)=>{
     let totalGravado105Fact = 0;
     let totalIva105Fact = 0;
      
+    const cargarTotales = (venta)=>{
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        const td2 = document.createElement('td');
+        const td3 = document.createElement('td');
+        const td4 = document.createElement('td');
+        const td5 = document.createElement('td');
+        const tdTexto = document.createElement('td');
+        const tdTotalGravado21 = document.createElement('td');
+        const tdTotalGravado105 = document.createElement('td');
+        const tdTotalIva21 = document.createElement('td');
+        const tdTotalIva105 = document.createElement('td');
+        const tdTotal = document.createElement('td');
+
+        tdTexto.innerHTML = "Totales Diarios";
+        tdTotalGravado21.innerHTML = totalGravado21.toFixed(2);
+        tdTotalGravado105.innerHTML = totalGravado105.toFixed(2);
+        tdTotalIva21.innerHTML = totalIva21.toFixed(2);
+        tdTotalIva105.innerHTML = totalIva105.toFixed(2);
+        tdTotal.innerHTML = total.toFixed(2);
+
+        tdTotalGravado21.classList.add('text-rigth');
+        tdTotalGravado105.classList.add('text-rigth');
+        tdTotalIva21.classList.add('text-rigth');
+        tdTotalIva105.classList.add('text-rigth');
+        tdTotal.classList.add('text-rigth');
+
+        tdTexto.classList.add('text-bold');
+        tdTotalGravado21.classList.add('text-bold');
+        tdTotalGravado105.classList.add('text-bold');
+        tdTotalIva21.classList.add('text-bold');
+        tdTotalIva105.classList.add('text-bold');
+        tdTotal.classList.add('text-bold');
+
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+        tr.appendChild(tdTexto);
+        tr.appendChild(tdTotalGravado21);
+        tr.appendChild(tdTotalIva21);
+        tr.appendChild(tdTotalGravado105);
+        tr.appendChild(tdTotalIva105);
+        tr.appendChild(tdTotal);
+
+        tbody.appendChild(tr);
+
+        const trNotaCredito = document.createElement('tr');
+        const trFactura = document.createElement('tr');
+        
+        const td1Nota = document.createElement('td');
+        const td2Nota = document.createElement('td');
+        const td3Nota = document.createElement('td');
+        const td4Nota = document.createElement('td');
+        const td5Nota = document.createElement('td');
+        const textoNotaCredito = document.createElement('td');
+        const tdTotalNotaCredito = document.createElement('td');
+        const tdTotalGravado21Nota = document.createElement('td');
+        const tdTotalIva21Nota = document.createElement('td');
+        const tdTotalGravado105Nota = document.createElement('td');
+        const tdTotalIva105Nota = document.createElement('td');
+
+        textoNotaCredito.innerHTML = "Totales Nota Credito";
+        console.log(totalNotaCredito)
+        tdTotalNotaCredito.innerHTML = (totalNotaCredito * -1).toFixed(2);
+        tdTotalGravado21Nota.innerHTML = (totalGravado21Nota * -1).toFixed(2);
+        tdTotalIva21Nota.innerHTML = (totalIva21Nota * -1).toFixed(2);
+        tdTotalGravado105Nota.innerHTML = (totalGravado105Nota *-1).toFixed(2);
+        tdTotalIva105Nota.innerHTML = (totalIva105Nota * -1).toFixed(2);
+
+        textoNotaCredito.classList.add('text-bold');
+        tdTotalNotaCredito.classList.add('text-bold');
+        tdTotalGravado21Nota.classList.add('text-bold');
+        tdTotalIva21Nota.classList.add('text-bold');
+        tdTotalGravado105Nota.classList.add('text-bold');
+        tdTotalIva105Nota.classList.add('text-bold');
+        textoNotaCredito.classList.add('text-bold');
+
+        tdTotalNotaCredito.classList.add('text-rigth');
+        tdTotalGravado21Nota.classList.add('text-rigth');
+        tdTotalIva21Nota.classList.add('text-rigth');
+        tdTotalGravado105Nota.classList.add('text-rigth');
+        tdTotalIva105Nota.classList.add('text-rigth');
+
+        trNotaCredito.appendChild(td1Nota);
+        trNotaCredito.appendChild(td2Nota);
+        trNotaCredito.appendChild(td3Nota);
+        trNotaCredito.appendChild(td4Nota);
+        trNotaCredito.appendChild(td5Nota);
+        trNotaCredito.appendChild(textoNotaCredito);
+        trNotaCredito.appendChild(tdTotalGravado21Nota);
+        trNotaCredito.appendChild(tdTotalIva21Nota);
+        trNotaCredito.appendChild(tdTotalGravado105Nota);
+        trNotaCredito.appendChild(tdTotalIva105Nota);
+        trNotaCredito.appendChild(tdTotalNotaCredito);
+
+        const td1Fact = document.createElement('td');
+        const td2Fact = document.createElement('td');
+        const td3Fact = document.createElement('td');
+        const td4Fact = document.createElement('td');
+        const td5Fact = document.createElement('td');
+        const textoFactura = document.createElement('td');
+        const tdTotalGravado21Fact = document.createElement('td');
+        const tdTotalIva21Fact = document.createElement('td');
+        const tdTotalGravado105Fact = document.createElement('td');
+        const tdTotalIva105Fact = document.createElement('td');
+        const tdTotalFact = document.createElement('td');
+        
+        textoFactura.classList.add('text-bold');
+        tdTotalGravado21Fact.classList.add('text-bold');
+        tdTotalIva21Fact.classList.add('text-bold');
+        tdTotalGravado105Fact.classList.add('text-bold');
+        tdTotalIva105Fact.classList.add('text-bold');
+        tdTotalFact.classList.add('text-bold');
+        textoFactura.classList.add('text-bold');
+
+        tdTotalGravado21Fact.classList.add('text-rigth');
+        tdTotalIva21Fact.classList.add('text-rigth');
+        tdTotalGravado105Fact.classList.add('text-rigth');
+        tdTotalIva105Fact.classList.add('text-rigth');
+        tdTotalFact.classList.add('text-rigth');
+
+        textoFactura.innerHTML = "Totales Facturas";
+        tdTotalGravado21Fact.innerHTML = (totalGravado21Fact).toFixed(2);
+        tdTotalIva21Fact.innerHTML = (totalIva21Fact).toFixed(2);
+        tdTotalGravado105Fact.innerHTML = (totalGravado105Fact).toFixed(2);
+        tdTotalIva105Fact.innerHTML = (totalIva105Fact).toFixed(2);
+        tdTotalFact.innerHTML = (totalFacturas).toFixed(2);
+
+        trFactura.appendChild(td1Fact);
+        trFactura.appendChild(td2Fact);
+        trFactura.appendChild(td3Fact);
+        trFactura.appendChild(td4Fact);
+        trFactura.appendChild(td5Fact);
+        trFactura.appendChild(textoFactura);
+        trFactura.appendChild(tdTotalGravado21Fact);
+        trFactura.appendChild(tdTotalIva21Fact);
+        trFactura.appendChild(tdTotalGravado105Fact);
+        trFactura.appendChild(tdTotalIva105Fact);
+        trFactura.appendChild(tdTotalFact);
+
+        tbody.appendChild(trNotaCredito);
+        tbody.appendChild(trFactura);
+
+        totalGravado21 = 0;
+        totalGravado105 = 0;
+        totalIva21 = 0;
+        totalIva105 = 0;
+        total = 0;
+        totalGravado21Fact = 0;
+        totalIva21Fact = 0;
+        totalGravado105Fact = 0;
+        totalIva105Fact = 0;
+        totalFacturas = 0;
+        totalNotaCredito = 0;
+        totalGravado21Nota = 0;
+        totalIva21Nota = 0;
+        totalGravado105Nota = 0;
+        totalIva105Nota = 0;
+    };
 
     for await(let venta of ventas){
-        if (venta.fecha.slice(0,10).split('-',3)[2] !== dia ) {
-            const tr = document.createElement('tr');
+        if (venta.fecha.slice(0,10).split('-',3)[2] !== dia) {
+            cargarTotales(venta);
+        };
 
-            const td1 = document.createElement('td');
-            const td2 = document.createElement('td');
-            const td3 = document.createElement('td');
-            const td4 = document.createElement('td');
-            const td5 = document.createElement('td');
-            const tdTexto = document.createElement('td');
-            const tdTotalGravado21 = document.createElement('td');
-            const tdTotalGravado105 = document.createElement('td');
-            const tdTotalIva21 = document.createElement('td');
-            const tdTotalIva105 = document.createElement('td');
-            const tdTotal = document.createElement('td');
-
-            tdTexto.innerHTML = "Totales Diarios";
-            tdTotalGravado21.innerHTML = totalGravado21.toFixed(2);
-            tdTotalGravado105.innerHTML = totalGravado105.toFixed(2);
-            tdTotalIva21.innerHTML = totalIva21.toFixed(2);
-            tdTotalIva105.innerHTML = totalIva105.toFixed(2);
-            tdTotal.innerHTML = total.toFixed(2);
-
-            tdTotalGravado21.classList.add('text-rigth');
-            tdTotalGravado105.classList.add('text-rigth');
-            tdTotalIva21.classList.add('text-rigth');
-            tdTotalIva105.classList.add('text-rigth');
-            tdTotal.classList.add('text-rigth');
-
-            tdTexto.classList.add('text-bold');
-            tdTotalGravado21.classList.add('text-bold');
-            tdTotalGravado105.classList.add('text-bold');
-            tdTotalIva21.classList.add('text-bold');
-            tdTotalIva105.classList.add('text-bold');
-            tdTotal.classList.add('text-bold');
-
-
-            tr.appendChild(td1);
-            tr.appendChild(td2);
-            tr.appendChild(td3);
-            tr.appendChild(td4);
-            tr.appendChild(td5);
-            tr.appendChild(tdTexto);
-            tr.appendChild(tdTotalGravado21);
-            tr.appendChild(tdTotalIva21);
-            tr.appendChild(tdTotalGravado105);
-            tr.appendChild(tdTotalIva105);
-            tr.appendChild(tdTotal);
-
-            tbody.appendChild(tr);
-
-            const trNotaCredito = document.createElement('tr');
-            const trFactura = document.createElement('tr');
-            
-            const td1Nota = document.createElement('td');
-            const td2Nota = document.createElement('td');
-            const td3Nota = document.createElement('td');
-            const td4Nota = document.createElement('td');
-            const td5Nota = document.createElement('td');
-            const textoNotaCredito = document.createElement('td');
-            const tdTotalNotaCredito = document.createElement('td');
-            const tdTotalGravado21Nota = document.createElement('td');
-            const tdTotalIva21Nota = document.createElement('td');
-            const tdTotalGravado105Nota = document.createElement('td');
-            const tdTotalIva105Nota = document.createElement('td');
-
-            textoNotaCredito.innerHTML = "Totales Nota Credito";
-            console.log(totalNotaCredito)
-            tdTotalNotaCredito.innerHTML = (totalNotaCredito * -1).toFixed(2);
-            tdTotalGravado21Nota.innerHTML = (totalGravado21Nota * -1).toFixed(2);
-            tdTotalIva21Nota.innerHTML = (totalIva21Nota * -1).toFixed(2);
-            tdTotalGravado105Nota.innerHTML = (totalGravado105Nota *-1).toFixed(2);
-            tdTotalIva105Nota.innerHTML = (totalIva105Nota * -1).toFixed(2);
-
-            textoNotaCredito.classList.add('text-bold');
-            tdTotalNotaCredito.classList.add('text-bold');
-            tdTotalGravado21Nota.classList.add('text-bold');
-            tdTotalIva21Nota.classList.add('text-bold');
-            tdTotalGravado105Nota.classList.add('text-bold');
-            tdTotalIva105Nota.classList.add('text-bold');
-            textoNotaCredito.classList.add('text-bold');
-
-            tdTotalNotaCredito.classList.add('text-rigth');
-            tdTotalGravado21Nota.classList.add('text-rigth');
-            tdTotalIva21Nota.classList.add('text-rigth');
-            tdTotalGravado105Nota.classList.add('text-rigth');
-            tdTotalIva105Nota.classList.add('text-rigth');
-
-            trNotaCredito.appendChild(td1Nota);
-            trNotaCredito.appendChild(td2Nota);
-            trNotaCredito.appendChild(td3Nota);
-            trNotaCredito.appendChild(td4Nota);
-            trNotaCredito.appendChild(td5Nota);
-            trNotaCredito.appendChild(textoNotaCredito);
-            trNotaCredito.appendChild(tdTotalGravado21Nota);
-            trNotaCredito.appendChild(tdTotalIva21Nota);
-            trNotaCredito.appendChild(tdTotalGravado105Nota);
-            trNotaCredito.appendChild(tdTotalIva105Nota);
-            trNotaCredito.appendChild(tdTotalNotaCredito);
-
-            const td1Fact = document.createElement('td');
-            const td2Fact = document.createElement('td');
-            const td3Fact = document.createElement('td');
-            const td4Fact = document.createElement('td');
-            const td5Fact = document.createElement('td');
-            const textoFactura = document.createElement('td');
-            const tdTotalGravado21Fact = document.createElement('td');
-            const tdTotalIva21Fact = document.createElement('td');
-            const tdTotalGravado105Fact = document.createElement('td');
-            const tdTotalIva105Fact = document.createElement('td');
-            const tdTotalFact = document.createElement('td');
-            
-            textoFactura.classList.add('text-bold');
-            tdTotalGravado21Fact.classList.add('text-bold');
-            tdTotalIva21Fact.classList.add('text-bold');
-            tdTotalGravado105Fact.classList.add('text-bold');
-            tdTotalIva105Fact.classList.add('text-bold');
-            tdTotalFact.classList.add('text-bold');
-            textoFactura.classList.add('text-bold');
-
-            tdTotalGravado21Fact.classList.add('text-rigth');
-            tdTotalIva21Fact.classList.add('text-rigth');
-            tdTotalGravado105Fact.classList.add('text-rigth');
-            tdTotalIva105Fact.classList.add('text-rigth');
-            tdTotalFact.classList.add('text-rigth');
-
-            textoFactura.innerHTML = "Totales Facturas";
-            tdTotalGravado21Fact.innerHTML = (totalGravado21Fact).toFixed(2);
-            tdTotalIva21Fact.innerHTML = (totalIva21Fact).toFixed(2);
-            tdTotalGravado105Fact.innerHTML = (totalGravado105Fact).toFixed(2);
-            tdTotalIva105Fact.innerHTML = (totalIva105Fact).toFixed(2);
-            tdTotalFact.innerHTML = (totalFacturas).toFixed(2);
-
-            trFactura.appendChild(td1Fact);
-            trFactura.appendChild(td2Fact);
-            trFactura.appendChild(td3Fact);
-            trFactura.appendChild(td4Fact);
-            trFactura.appendChild(td5Fact);
-            trFactura.appendChild(textoFactura);
-            trFactura.appendChild(tdTotalGravado21Fact);
-            trFactura.appendChild(tdTotalIva21Fact);
-            trFactura.appendChild(tdTotalGravado105Fact);
-            trFactura.appendChild(tdTotalIva105Fact);
-            trFactura.appendChild(tdTotalFact);
-
-            tbody.appendChild(trNotaCredito);
-            tbody.appendChild(trFactura);
-
-        }
         const tr = document.createElement('tr');
 
         const tdFecha = document.createElement('td');
@@ -274,7 +293,9 @@ const listar = async(ventas)=>{
         tr.appendChild(tdTotal);
         
         tbody.appendChild(tr);
+
     };
+    cargarTotales(ventas.at(-1))
 };
 
 salir.addEventListener('click',e=>{
