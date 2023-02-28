@@ -2,8 +2,6 @@ const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
-const {caja} = require('../configuracion.json');
-
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 

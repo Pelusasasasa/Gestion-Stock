@@ -166,7 +166,6 @@ caja.addEventListener('click',async e=>{
     }
 });
 
-
 movimiento.addEventListener('click',e=>{
     location.href = "./movimiento/movimiento.html";
 });
@@ -201,4 +200,8 @@ notaCredito.addEventListener('click',e=>{
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
-})
+});
+
+ipcRenderer.on('libroIva',async (e,args)=>{
+    location.href = "./libroIva/libroIva.html";
+});

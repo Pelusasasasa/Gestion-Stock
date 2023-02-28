@@ -84,6 +84,18 @@ ventaCTRL.getForNumberAndType = async(req,res)=>{
     const {numero,tipo} = req.params;
     const venta = await Venta.findOne({numero:numero,tipo_venta:tipo});
     res.send(venta);
-}
+};
+
+ventaCTRL.getbetweenDate = async(req,res)=>{
+    const {desde,hasta} = req.params;
+    const aux = hasta.split('-',3);
+    let finDia = new Date(aux[0],aux[1] - 1,aux[2],20,59,59,0);
+    const ventas = await Venta.find({$and:[
+        {fecha:{$gte:desde}},
+        {fecha:{$lte:finDia}},
+        {tipo_comp:{$ne:"Comprobante"}}
+    ]});
+    res.send(ventas);
+};
 
 module.exports = ventaCTRL;

@@ -2,7 +2,7 @@ const {Router} = require('express');
 const router = Router();
 
 
-const {getForId,putForId,cargarVenta,VentasDia,ventasMes,ventaAnio, deleteForId, getForNumberAndType} = require('../controllers/venta.controllers');
+const {getForId,putForId,cargarVenta,VentasDia,ventasMes,ventaAnio, deleteForId, getForNumberAndType, getbetweenDate} = require('../controllers/venta.controllers');
 
 router.route('/')
     .post(cargarVenta)
@@ -18,5 +18,6 @@ router.route('/mes/:fecha')
     .get(ventasMes)
 router.route('/anio/:fecha')
     .get(ventaAnio)
-
+router.route('/porFecha/:desde/:hasta')
+    .get(getbetweenDate)
 module.exports = router;
