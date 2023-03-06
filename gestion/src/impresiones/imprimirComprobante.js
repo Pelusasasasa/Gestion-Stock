@@ -65,11 +65,13 @@ const ponerDatosArticulos = (datos)=>{
         const tdCodigo = document.createElement('td');
         const tdDescripcion = document.createElement('td');
         const tdPrecio = document.createElement('td');
+        const tdIva = document.createElement('td');
         const tdTotal = document.createElement('td');
 
         tdCantidad.innerHTML = movimiento.cantidad.toFixed(2);
         tdCodigo.innerHTML = movimiento.codProd ?  movimiento.codProd : "" ;
         tdDescripcion.innerHTML = movimiento.producto;
+        tdIva.innerHTML = movimiento.iva.toFixed(2);
         tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = redondear(movimiento.cantidad * movimiento.precio,2);
 
@@ -77,6 +79,7 @@ const ponerDatosArticulos = (datos)=>{
         tr.appendChild(tdCodigo);
         tr.appendChild(tdDescripcion);
         tr.appendChild(tdPrecio);
+        tr.appendChild(tdIva);
         tr.appendChild(tdTotal);
 
         tbody.appendChild(tr);

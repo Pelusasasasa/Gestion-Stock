@@ -360,6 +360,7 @@ facturar.addEventListener('click',async e=>{
 
                 venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock)
                 await axios.post(`${URL}movimiento`,movimientos);
+                
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
                 venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente,venta.precio,venta.numero);
 
@@ -390,7 +391,7 @@ facturar.addEventListener('click',async e=>{
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 
-                location.reload();  
+                // location.reload();  
             } catch (error) {
                 
                 await sweet.fire({
@@ -460,7 +461,8 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.nro_venta = numero;
     movimiento.impuesto = producto.impuesto;
     movimiento.tipo_comp = tipo_comp;
-    movimiento.caja = caja,
+    movimiento.caja = caja;
+    movimiento.iva = producto.impuesto;
     movimiento.series = series;
     movimiento.vendedor = vendedor;
     movimientos.push(movimiento);
