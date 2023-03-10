@@ -139,8 +139,8 @@ productoCTRL.putMarcas = async(req,res)=>{
         producto.costo =  (producto.costo + producto.costo*porcentaje/100).toFixed(2);
         const impuesto = producto.costo + producto.costo*producto.impuesto/100;
         const ganancia = impuesto*producto.ganancia/100;
-        producto.precio = (impuesto + ganancia).toFixed(2);http://fiestadelaplayaderio.com.ar/
-        await Producto.findOneAndUpdate({_id:producto._id},producto)
+        producto.precio = (impuesto + ganancia).toFixed(2);
+        await Producto.findOneAndUpdate({_id:producto._id},producto);
     }
     res.send(JSON.stringify({
         mensaje:"Producto Modificados",
@@ -170,6 +170,31 @@ productoCTRL.productosPorMarcas = async(req,res)=>{
         arreglo.push(...productos);
     };
     res.send(arreglo)
+};
+
+productoCTRL.traerProvedores = async(req,res)=>{
+    let provedores = [];
+    const productos = await Producto.find({},{_id:1,provedor:1});
+    productos.forEach(producto =>{
+        if (!provedores.includes(producto.provedor)) {
+            provedores.push(producto);
+        }
+    });
+    res.send(JSON.stringify(provedores));
+};
+
+productoCTRL.putForProvedor = async(req,res)=>{
+    const {provedor,porcentaje} = req.body;
+    const productos = await Producto.find({provedor:provedor});
+
+    productos.forEach(async producto => {
+        producto.costo = producto.costo + (producto.costo * porcentaje / 100);
+        const costoMasIva = parseFloat((producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2));
+        producto.precio = (costoMasIva + (costoMasIva * producto.ganancia / 100)).toFixed(2)
+        await Producto.findOneAndUpdate({_id:producto._id},producto);
+    });
+    console.log(`Productos de provedor ${provedor} Modificados`);
+    res.send("Productos modificados");
 }
 
 module.exports = productoCTRL

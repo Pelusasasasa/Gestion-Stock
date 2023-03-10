@@ -213,6 +213,12 @@ const hacerMenu = () => {
           }
         },
         {
+          label:"Aumento Por Provedores",
+          click(){
+            abrirVentana('productos/aumentoPorProvedor.html',300,500,true);
+          }
+        },
+        {
           label:"Lista de Precios",
           click(){
             abrirVentana('productos/listaPrecios.html',1000,1000)

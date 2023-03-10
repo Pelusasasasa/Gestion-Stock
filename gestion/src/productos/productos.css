@@ -136,7 +136,7 @@ h1{
     width: 100%;
 }
 
-.marcas .inputs{
+.marcas .inputs,.provedores .inputs{
     display: flex;
     justify-content: space-around;
     padding-bottom: 5rem;
@@ -149,7 +149,11 @@ h1{
     text-align: center;
 }
 
-.marcas .inputs main input{
+.provedores .inputs{
+    gap: 8rem;
+}
+
+.marcas .inputs main input,.provedores .inputs main input{
     padding: .5rem;
 }
 
@@ -162,11 +166,11 @@ h1{
 #modificarCodigo main{
     display: flex;
     flex-direction: column;
-    margin: 3rem auto;
+    margin: 3rem 0;
 }
 
 
-#modificarCodigo, #codigo #nuevoCodigo{
+.inputs main:nth-child(1),.inputs main:nth-child(3){
     width: 30%;
 }
 

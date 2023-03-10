@@ -54,6 +54,8 @@ codigo.addEventListener('keyup',async e=>{
             await sweet.fire({
                 title:"Cliente No Econtrado"
             });
+            codigo.value = "";
+            codigo.focus();
         }
     }
 });
