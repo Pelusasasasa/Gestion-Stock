@@ -57,14 +57,16 @@ window.addEventListener('load',async e=>{
     const numeros =(await axios.get(`${URL}numero`)).data;
 
     try {
-        let facturas = await ultimaC();
-        let facturasAB = await ultimaAB();
-        facturaA.value = facturasAB.facturaA;
-        facturaB.value = facturasAB.facturaB;
-        facturaC.value = facturas.facturaC;
-        notaA.value = facturasAB.notaA;
-        notaB.value = facturasAB.notaB;
-        notaC.value = facturas.notaC;
+        setTimeout(async()=>{
+            let facturas = await ultimaC();
+            let facturasAB = await ultimaAB();
+            facturaA.value = facturasAB.facturaA;
+            facturaB.value = facturasAB.facturaB;
+            facturaC.value = facturas.facturaC;
+            notaA.value = facturasAB.notaA;
+            notaB.value = facturasAB.notaB;
+            notaC.value = facturas.notaC;
+        },0)
     } catch (error) {
         console.log(error)
     }
@@ -87,7 +89,8 @@ cargar.addEventListener('click',async e=>{
         "Cuenta Corriente": 0,
         "Contado": 0,
         "Recibo": 0,
-        "Dolar":0
+        "Dolar":0,
+        "Presupuesto":0
     }
     await axios.post(`${URL}numero`,numero);
     location.reload();
@@ -98,9 +101,6 @@ modificar.addEventListener('click',e=>{
     modificar.classList.add('none');
     guardar.classList.remove('none');
     dolar.removeAttribute('disabled');
-    contado.removeAttribute('disabled');
-    cuentaCorriente.removeAttribute('disabled');
-    recibo.removeAttribute('disabled');
 });
 
 //Aca cuando modificamos los numeros despues los guardamos

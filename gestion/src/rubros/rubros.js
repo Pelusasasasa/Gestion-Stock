@@ -19,9 +19,9 @@ window.addEventListener('load',async e=>{
 
 //Funcion que lista todos los rubros pasados por parametros
 const listar = async(rubros)=>{
-    for await(let {numero,rubro} of rubros){
-        console.log(numero,rubro)
+    for await(let {_id,numero,rubro} of rubros){
         const tr = document.createElement('tr');
+        tr.id = _id;
 
         const tdNumero = document.createElement('td');
         const tdNombre = document.createElement('td');
@@ -76,11 +76,10 @@ tbody.addEventListener('click',async e=>{
     if (e.target.nodeName === "TD") {
         seleccionado = e.target.parentNode;
     }else if(e.target.nodeName === "SPAN"){
-        seleccionado = e.target.parentNode.parentNode;
-    }else if(e.target.nodeName === "DIV"){
         seleccionado = e.target.parentNode.parentNode.parentNode;
+    }else if(e.target.nodeName === "DIV"){
+        seleccionado = e.target.parentNode.parentNode;
     }
-
     seleccionado.classList.add('seleccionado');
 
     agregar.classList.add('none');
@@ -100,6 +99,9 @@ tbody.addEventListener('click',async e=>{
                 try {
                     await axios.delete(`${URL}rubro/codigo/${seleccionado.id}`);
                     tbody.removeChild(seleccionado);
+                    nombre.value = "";
+                    modificar.classList.add('none');
+                    agregar.classList.remove('none');
                 } catch (error) {
                     console.log(error);
                     sweet.fire({
