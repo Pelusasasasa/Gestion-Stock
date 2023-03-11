@@ -158,7 +158,7 @@ marca.addEventListener('focus',e=>{
 });
 
 provedor.addEventListener('focus',e=>{
-    stock.select()
+    provedor.select()
 });
 
 stock.addEventListener('focus',e=>{
