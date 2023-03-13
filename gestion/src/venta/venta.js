@@ -71,9 +71,7 @@ window.addEventListener('load',async e=>{
     dolar = (await axios.get(`${URL}numero/Dolar`)).data;
 
     if (tipoFactura === "notaCredito") {
-        
-        situacion = "blanco";//Pnemos la situacion en blanco
-        body.classList.toggle('rojo');
+        body.classList.toggle('negro');
 
         await sweet.fire({
             title:"Numero de Factura Anterior",
