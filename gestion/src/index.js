@@ -176,9 +176,9 @@ const hacerMenu = () => {
           label: condIva === "Inscripto" ? "Libro Ventas" :"Alicuotas",
           click(){
             if (condIva === "Inscripto") {
-              abrirVentana("alicuotas/alicuotas.html",400,500);
-            }else{
               ventanaPrincipal.webContents.send('libroIva');
+            }else{
+              abrirVentana("alicuotas/alicuotas.html",400,500);
             }
           }          
         },
