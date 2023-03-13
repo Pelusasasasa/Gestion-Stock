@@ -35,6 +35,10 @@ const movProducto = new mongoose.Schema({
         type:Number,
         required:true
     },
+    iva:{
+        type:Number,
+        required:true
+    },
     precio:{
         type:Number,
         required:true
