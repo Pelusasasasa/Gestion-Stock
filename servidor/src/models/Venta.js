@@ -32,7 +32,7 @@ const Venta = new mongoose.Schema({
     },
     tipo_venta:{
         type: String,
-        default: "CC"  
+        default: "CD"  
     },
     tipo_comp:{
         type:String,
