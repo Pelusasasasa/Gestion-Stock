@@ -1,5 +1,1 @@
-<<<<<<< HEAD
 {"caja":"Caja 1","vendedores":false,"stockNegativo":false,"puntoVenta":"5","cuit":"27340150231","dolar":true,"condIva":"Inscripto"}
-=======
-{"caja":"Caja 1","vendedores":false,"stockNegativo":false,"puntoVenta":"5","cuit":"27340150231","dolar":false,"condIva":"Inscripto"}
->>>>>>> frontend

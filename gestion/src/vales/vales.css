@@ -1,0 +1,33 @@
+h1{
+    text-align: center;
+}
+
+section{
+    background-color: white;
+    overflow: scroll;
+    height: 80vh;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table tr th,table tr td{
+    border: .1rem solid black;
+}
+
+main{
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+main input{
+    margin-left: 1rem;
+}
+
+main label{
+    font-weight: bold;
+    font-size: 2rem;
+}
