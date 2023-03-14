@@ -19,6 +19,7 @@ const path = require('path');
     html = html.replace('{{letra}}',letra);
     html = html.replace('{{codigo}}',"Cod. " + venta.cod_comp);
     html = html.replace('{{puntoVenta}}',puntoVenta);
+    html = html.replace('{{factura}}',venta.tipo_comp);
     html = html.replace('{{numero}}',numero);
     html = html.replace('{{day}}',fecha[2]);
     html = html.replace('{{month}}',fecha[1]);
