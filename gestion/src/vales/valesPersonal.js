@@ -13,12 +13,13 @@ window.addEventListener('load',async e=>{
 
 const listarVales = async(lista)=>{
     let total = 0;
-    for await (let {fecha,nro_comp,imp,rsoc} of lista){
+    for await (let {fecha,concepto,nro_comp,imp,rsoc} of lista){
         const tr = document.createElement('tr');
 
         const tdFecha = document.createElement('td');
         const tdNumero = document.createElement('td');
         const tdRazon = document.createElement('td');
+        const tdConcepto = document.createElement('td');
         const tdImporte = document.createElement('td');
 
         const date = fecha.slice(0,10).split('-',3);
@@ -26,6 +27,7 @@ const listarVales = async(lista)=>{
         tdFecha.innerHTML = `${date[2]}/${date[1]}/${date[0]}`;
         tdNumero.innerHTML = nro_comp;
         tdRazon.innerHTML = rsoc;
+        tdConcepto.innerHTML = concepto;
         tdImporte.innerHTML = imp.toFixed(2);
 
         tdImporte.classList.add("text-rigth");
@@ -33,6 +35,7 @@ const listarVales = async(lista)=>{
         tr.appendChild(tdFecha);
         tr.appendChild(tdNumero);
         tr.appendChild(tdRazon);
+        tr.appendChild(tdConcepto);
         tr.appendChild(tdImporte);
 
         tbody.appendChild(tr);
