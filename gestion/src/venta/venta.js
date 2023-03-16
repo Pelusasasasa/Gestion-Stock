@@ -153,7 +153,7 @@ let listaProductos = [];
 
 codBarra.addEventListener('keypress',async e=>{
     if(e.key === "Enter" && codBarra.value !== ""){
-        listarProducto(codBarra.value);
+        cantidad.focus();
     }else if(e.key === "Enter" && codBarra.value === ""){
         //Esto abre una ventana donde lista todos los productos
         const opciones = {
@@ -161,7 +161,6 @@ codBarra.addEventListener('keypress',async e=>{
             botones: false
         }
         ipcRenderer.send('abrir-ventana',opciones);
-        // precioU.focus();
     }
     if(e.keyCode === 37){
         cantidad.focus();
@@ -789,7 +788,7 @@ direccion.addEventListener('keypress',e=>{
 });
 
 cantidad.addEventListener('keypress',async e=>{
-    apretarEnter(e,codBarra)
+    listarProducto(codBarra.value);
 });
 
 cantidad.addEventListener('keydown',e=>{
