@@ -38,7 +38,7 @@ const path = require('path');
         tr = tr + `
             <tr>
                 <td>${producto._id ? producto._id : ""}</td>
-                <td>${producto.descripcion}</td>
+                <td class="text-left">${producto.descripcion}</td>
                 <td class="text-end">${cantidad.toFixed(2)}</td>
                 <td class="text-end">${producto.precio.toFixed(2)}</td>
                 <td class="text-end">${producto.impuesto ? producto.impuesto.toFixed(2) : ""}</td>

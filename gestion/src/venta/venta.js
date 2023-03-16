@@ -71,7 +71,6 @@ window.addEventListener('load',async e=>{
     dolar = (await axios.get(`${URL}numero/Dolar`)).data;
 
     if (tipoFactura === "notaCredito") {
-        body.classList.toggle('negro');
 
         await sweet.fire({
             title:"Numero de Factura Anterior",
@@ -309,7 +308,7 @@ facturar.addEventListener('click',async e=>{
         venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
-        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto0" : condicionIva.value
+        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
         const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
