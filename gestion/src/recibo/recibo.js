@@ -14,7 +14,7 @@ require("dotenv").config();
 const URL = process.env.URL;
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter, cargarFactura, redondear} = require('../helpers');
+const {apretarEnter, cargarFactura, redondear, verClienteValido} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
@@ -197,6 +197,13 @@ entregado.addEventListener('change',async e=>{
 })
 
 imprimir.addEventListener('click',async e=>{
+    if(!await verClienteValido(codigo.value)){
+        await sweet.fire({
+            title:"Cliente no valido para hacer recibo, revisar numero de cliente"
+        });
+        codigo.focus();
+        return;
+    };
     const recibo = {};
     recibo.fecha = new Date();
     recibo.cliente = nombre.value;
@@ -266,6 +273,7 @@ const modificarCuentaCompensadas = async()=>{
         }
     }
 };
+
 
 //Ponemos en historica el recibo
 const ponerEnCuentaHistorica = async(recibo)=>{

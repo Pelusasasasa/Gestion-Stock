@@ -13,7 +13,7 @@ const URL = process.env.URL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -272,6 +272,12 @@ facturar.addEventListener('click',async e=>{
         sweet.fire({
             title:"Poner un codigo de cliente"
         });
+    }else if(!await verClienteValido(codigo.value) && cuentaCorrientediv.children[0].checked){
+        await sweet.fire({
+            title:"Cliente no valido para hacer Cuenta Corriente, revisar numero de cliente"
+        });
+        codigo.focus();
+        return;    
     }else if(!verSiHayInternet() && situacion === "blanco"){
         await sweet.fire({
             title:"No se puede hacer la factura porque no hay internet"

@@ -377,4 +377,13 @@ funciones.verTipoComprobante = async(codigo)=>{
     return retorno
 }
 
+funciones.verClienteValido = async(codigo)=>{
+    const cliente = (await axios.get(`${URL}clientes/id/${codigo}`)).data;
+    if (cliente) {
+        return true
+    }else{
+        return false
+    };
+}
+
 module.exports = funciones;
