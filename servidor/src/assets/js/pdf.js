@@ -26,7 +26,7 @@ const path = require('path');
     html = html.replace('{{year}}',fecha[0]);
     
     //cliente
-    html = html.replace('{{cliente}}',venta.cliente);
+    html = html.replace('{{cliente}}',venta.cliente.slice(0,20));
     html = html.replace('{{cuit}}',venta.num_doc.length === 11 ? "CUIT" : "DNI");
     html = html.replace('{{dni}}',venta.num_doc ? venta.num_doc : "00000000");
     html = html.replace('{{domicilio}}',venta.direccion ? venta.direccion : "Chajari" );

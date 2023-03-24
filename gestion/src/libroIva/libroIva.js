@@ -101,7 +101,7 @@ const listar = async(ventas)=>{
         }
 
         tdFecha.innerHTML = venta.fecha.slice(0,10);
-        tdCliente.innerHTML = venta.cliente;
+        tdCliente.innerHTML = venta.cliente.slice(0,20);
         tdCondIva.innerHTML = venta.condicionIva;
         tdCuit.innerHTML = venta.num_doc;
         tdTipo.innerHTML = venta.tipo_comp;
