@@ -6,7 +6,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const {vendedores} = require('../configuracion.json');
-const { verificarUsuarios } = require('../helpers');
+const { verificarUsuarios, copiar } = require('../helpers');
 
 let pedidos;
 
@@ -22,6 +22,7 @@ let inputSeleccionado;
 let vendedor = "";
 
 window.addEventListener('load',async e=>{
+    copiar();
     if (vendedores) {
         vendedor = await verificarUsuarios();
         if (vendedor === "") {

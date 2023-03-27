@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const router = Router();
 
-const {traerProducto,descontarStock,traerPrecio,cargarProducto,eliminarProducto,getsProductos,modificarProducto,traerProductoPorNombre, traerMarcas, putMarcas, cambioPreciosPorDolar, productosPorMarcas} = require('../controllers/producto.controllers');
+const {traerProducto,descontarStock,traerPrecio,cargarProducto,eliminarProducto,getsProductos,modificarProducto,traerProductoPorNombre, traerMarcas, putMarcas, cambioPreciosPorDolar, productosPorMarcas, traerProvedores, putForProvedor} = require('../controllers/producto.controllers');
 
 router.route('/')
     .post(cargarProducto)
@@ -16,6 +16,9 @@ router.route('/traerPrecio/:id')
     .get(traerPrecio)
 router.route('/productosPorMarcas/:lista')
     .get(productosPorMarcas)
+router.route('/provedores')
+    .get(traerProvedores)
+    .put(putForProvedor)
 router.route('/:id')
     .get(traerProducto)
     .delete(eliminarProducto)
@@ -24,6 +27,5 @@ router.route('/:descripcion/:condicion')
     .get(getsProductos)
 router.route('/buscar/porNombre/:nombre')
     .get(traerProductoPorNombre)
-
 module.exports = router;
     

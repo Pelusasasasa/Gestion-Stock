@@ -4,25 +4,26 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aumentar procentaje por marca</title>
+    <title>Aumneto por provedor</title>
     <link rel="stylesheet" href="../assets/global.css">
     <link rel="stylesheet" href="./productos.css">
 </head>
-<body class="marcas">
+<body class="provedores">
     <section class="inputs">
         <main>
-            <label for="marcas">Marcas</label>
-            <select name="marcas" autofocus id="marcas"></select>
+            <label for="provedores">Provedores</label>
+            <select name="provedores" autofocus id="provedores"></select>
         </main>
+
         <main>
-            <label for="porcentaje">Porcentaje%</label>
+            <label for="porcentaje">Porcentaje %</label>
             <input type="number" name="porcentaje" id="porcentaje">
         </main>
     </section>
     <section class="botones">
-        <button class="aceptar">Aceptar</button>
-        <button class="salir">Salir</button>
+        <button id="aceptar">Aceptar</button>
+        <button id="salir">Salir</button>
     </section>
+    <script src="./aumentoPorProvedor.js"></script>
 </body>
-<script src="./marcas.js"></script>
 </html>

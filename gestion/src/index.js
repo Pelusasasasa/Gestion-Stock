@@ -1,6 +1,7 @@
 const { dialog, app, BrowserWindow,Menu } = require('electron');
 const { ipcMain } = require('electron/main');
 const path = require('path');
+const {condIva} = require('./configuracion.json')
 
 var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
 
@@ -172,21 +173,19 @@ const hacerMenu = () => {
           ]
         },
         {
-          label:"Alicuotas",
+          label: condIva === "Inscripto" ? "Libro Ventas" :"Alicuotas",
           click(){
-            abrirVentana("alicuotas/alicuotas.html",400,500);
-          }
+            if (condIva === "Inscripto") {
+              ventanaPrincipal.webContents.send('libroIva');
+            }else{
+              abrirVentana("alicuotas/alicuotas.html",400,500);
+            }
+          }          
         },
         {
           label:"Imprimir Venta",
           click(){
             ventanaPrincipal.webContents.send('poner-numero');
-          }
-        },
-        {
-          label:"Libro Ventas",
-          click(){
-            ventanaPrincipal.webContents.send('libroIva')
           }
         }
       ]
@@ -216,6 +215,12 @@ const hacerMenu = () => {
           label:"Aumento Por Marcas",
           click(){
             abrirVentana('productos/marcas.html',300,500,true);
+          }
+        },
+        {
+          label:"Aumento Por Provedores",
+          click(){
+            abrirVentana('productos/aumentoPorProvedor.html',300,500,true);
           }
         },
         {

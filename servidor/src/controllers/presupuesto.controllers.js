@@ -78,5 +78,16 @@ presupuestoCTRL.deleteForId = async(req,res)=>{
     const {day} = req.params;
 };
 
+presupuestoCTRL.getBetweenDate = async(req,res)=>{
+    const {desde,hasta} = req.params;
+    const inicioDia = new Date(desde + "T00:00:00.000Z");
+    const finDia = new Date(hasta + "T23:59:59.000Z");
+    const presupuestos = await Presupuesto.find({$and:[
+        {fecha:{$gte:inicioDia}},
+        {fecha:{$lte:finDia}},
+        {tipo_comp:{$ne:"Presupuesto"}}
+    ]});
+    res.send(presupuestos);
+}
 
 module.exports = presupuestoCTRL;

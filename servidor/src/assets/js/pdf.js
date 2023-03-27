@@ -19,13 +19,14 @@ const path = require('path');
     html = html.replace('{{letra}}',letra);
     html = html.replace('{{codigo}}',"Cod. " + venta.cod_comp);
     html = html.replace('{{puntoVenta}}',puntoVenta);
+    html = html.replace('{{factura}}',venta.tipo_comp);
     html = html.replace('{{numero}}',numero);
     html = html.replace('{{day}}',fecha[2]);
     html = html.replace('{{month}}',fecha[1]);
     html = html.replace('{{year}}',fecha[0]);
     
     //cliente
-    html = html.replace('{{cliente}}',venta.cliente);
+    html = html.replace('{{cliente}}',venta.cliente.slice(0,20));
     html = html.replace('{{cuit}}',venta.num_doc.length === 11 ? "CUIT" : "DNI");
     html = html.replace('{{dni}}',venta.num_doc ? venta.num_doc : "00000000");
     html = html.replace('{{domicilio}}',venta.direccion ? venta.direccion : "Chajari" );
@@ -37,7 +38,7 @@ const path = require('path');
         tr = tr + `
             <tr>
                 <td>${producto._id ? producto._id : ""}</td>
-                <td>${producto.descripcion}</td>
+                <td class="text-left">${producto.descripcion}</td>
                 <td class="text-end">${cantidad.toFixed(2)}</td>
                 <td class="text-end">${producto.precio.toFixed(2)}</td>
                 <td class="text-end">${producto.impuesto ? producto.impuesto.toFixed(2) : ""}</td>

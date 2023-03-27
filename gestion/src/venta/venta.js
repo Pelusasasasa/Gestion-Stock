@@ -71,9 +71,6 @@ window.addEventListener('load',async e=>{
     dolar = (await axios.get(`${URL}numero/Dolar`)).data;
 
     if (tipoFactura === "notaCredito") {
-        
-        situacion = "blanco";//Pnemos la situacion en blanco
-        body.classList.toggle('rojo');
 
         await sweet.fire({
             title:"Numero de Factura Anterior",
@@ -156,7 +153,7 @@ let listaProductos = [];
 
 codBarra.addEventListener('keypress',async e=>{
     if(e.key === "Enter" && codBarra.value !== ""){
-        listarProducto(codBarra.value);
+        cantidad.focus();
     }else if(e.key === "Enter" && codBarra.value === ""){
         //Esto abre una ventana donde lista todos los productos
         const opciones = {
@@ -311,7 +308,7 @@ facturar.addEventListener('click',async e=>{
         venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
-        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto0" : condicionIva.value
+        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
         const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
@@ -792,7 +789,7 @@ direccion.addEventListener('keypress',e=>{
 });
 
 cantidad.addEventListener('keypress',async e=>{
-    apretarEnter(e,codBarra)
+    listarProducto(codBarra.value);
 });
 
 cantidad.addEventListener('keydown',e=>{

@@ -47,12 +47,18 @@ codigo.addEventListener('keypress',async e=>{
 });
 
 provedor.addEventListener('keypress',e=>{
+    apretarEnter(e,descripcion);
+});
+
+descripcion.addEventListener('keypress',e=>{
     apretarEnter(e,stock);
 });
 
 stock.addEventListener('keypress',e=>{
     if (e.key === "Enter" && stock.value !== "") {
         stock.value = parseFloat(stock.value).toFixed(2);
+    }else if(e.keyCode === 13 && stock.value === ""){
+        stock.value = parseFloat(stockViejo.value).toFixed(2);
     }
     apretarEnter(e,nuevoCosto);
 });
@@ -98,7 +104,7 @@ guardar.addEventListener('click',async e=>{
     producto.ganancia = parseFloat(nuevaGanancia.value);
     producto.impuesto = nuevoIva.value !== "" ? parseFloat(nuevoIva.value) : producto.impuesto;
     producto.stock = stock.value !== "" ? parseFloat(stock.value) : producto.stock;
-    producto.descripcion = descripcion.value !== "" ? descripcion.value : producto.descripcion;
+    producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
     await sweet.fire({
         title:mensaje

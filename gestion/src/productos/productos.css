@@ -62,13 +62,6 @@ table tbody tr td{
     justify-content: space-around;
 }
 
-button{
-    border: none;
-    font-size: 1.4rem;
-    border-radius: 7.5rem;
-    padding: 1rem;
-}
-
 button:hover{
     transform: scale(1.2);
     cursor: pointer;
@@ -143,7 +136,7 @@ h1{
     width: 100%;
 }
 
-.marcas .inputs{
+.marcas .inputs,.provedores .inputs{
     display: flex;
     justify-content: space-around;
     padding-bottom: 5rem;
@@ -156,7 +149,11 @@ h1{
     text-align: center;
 }
 
-.marcas .inputs main input{
+.provedores .inputs{
+    gap: 8rem;
+}
+
+.marcas .inputs main input,.provedores .inputs main input{
     padding: .5rem;
 }
 
@@ -169,5 +166,23 @@ h1{
 #modificarCodigo main{
     display: flex;
     flex-direction: column;
-    margin: 3rem auto;
+    margin: 3rem 0;
+}
+
+
+.inputs main:nth-child(1),.inputs main:nth-child(3){
+    width: 30%;
+}
+
+.listaPrecios{
+    text-align: center;
+}
+
+.listaPrecios .listar{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+}
+
+.listaPrecios .listar input{
+    transform: scale(1.5);
 }

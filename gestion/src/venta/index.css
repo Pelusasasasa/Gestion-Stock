@@ -55,7 +55,7 @@
 
 .parteProductos .buscarProductos{
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr 1fr;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
 }
 
 .parteProductos .buscarProductos div,.parteProductos .buscarProductos main{
@@ -118,6 +118,7 @@
 
 .parteProductos tbody td{
   border: .1rem solid black;
+  word-break: break-all;
 }
 
 .condicionVenta{
