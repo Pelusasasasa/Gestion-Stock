@@ -99,8 +99,8 @@ const listar = async(ventas)=>{
             totalGravado105Fact += venta.gravado105;
             totalIva105Fact += venta.iva105;
         }
-
-        tdFecha.innerHTML = venta.fecha.slice(0,10);
+        const fecha = venta.fecha.slice(0,10).split('-',3);
+        tdFecha.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
         tdCliente.innerHTML = venta.cliente.slice(0,20);
         tdCondIva.innerHTML = venta.condicionIva;
         tdCuit.innerHTML = venta.num_doc;
