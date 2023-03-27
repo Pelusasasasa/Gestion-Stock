@@ -726,7 +726,9 @@ direccion.addEventListener('keypress',e=>{
 });
 
 cantidad.addEventListener('keypress',async e=>{
-    listarProducto(codBarra.value);
+    if (e.keyCode === 13) {
+        listarProducto(codBarra.value);
+    }
 });
 
 cantidad.addEventListener('keydown',e=>{
