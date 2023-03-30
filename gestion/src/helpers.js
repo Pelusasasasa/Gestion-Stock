@@ -75,9 +75,8 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(ultimaElectronica);
 
     console.log(parseFloat(venta.facturaAnterior));
-    let aux = venta.condicionIva === "Inscripo" ? 1 : 6
+    let aux = venta.condicionIva === "Inscripto" ? 1 : 6
     let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,aux);
-    
     let data = {
         'cantReg':1,
         'CbteTipo':venta.cod_comp,
