@@ -62,6 +62,7 @@ let idProducto = 0;
 let situacion = "blanco";
 let porcentajeH = 0;
 let descuento = 0;
+let listaProductos = [];
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
@@ -147,10 +148,8 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-let listaProductos = [];
-
 codBarra.addEventListener('keypress',async e=>{
-    if(e.key === "Enter" && codBarra.value !== ""){
+    if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
         cantidad.focus();
     }else if(e.key === "Enter" && codBarra.value === ""){
         //Esto abre una ventana donde lista todos los productos
@@ -159,8 +158,17 @@ codBarra.addEventListener('keypress',async e=>{
             botones: false
         }
         ipcRenderer.send('abrir-ventana',opciones);
+    }else if(codBarra.value === "999-999"){
+        descripcion.focus();
     }
+
     if(e.keyCode === 37){
+        cantidad.focus();
+    }
+});
+
+descripcion.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
         cantidad.focus();
     }
 });
@@ -225,10 +233,6 @@ const crearProducto = ()=>{
     rubro.value = "";
     codBarra.focus();
 };
-
-volver.addEventListener('click',()=>{
-    location.href = "../menu.html";
-})
 
 ipcRenderer.on('recibir',(e,args)=>{
     const {tipo ,informacion} = JSON.parse(args);
@@ -519,6 +523,7 @@ const listarProducto =async(id)=>{
         }
         cantidad.value = "1.00";
         codBarra.value = "";
+        descripcion.value = "";
         precioU.value = "";
         codBarra.focus();  
     }else{
@@ -526,7 +531,8 @@ const listarProducto =async(id)=>{
     }
         
 
-}
+};
+
 let seleccionado;
 //Hacemos para que se seleccione un tr
 
@@ -554,7 +560,6 @@ tbody.addEventListener('click',async e=>{
         });
     }
 });
-
 
 const sumarSaldo = async(id,nuevoSaldo,venta)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -736,3 +741,7 @@ cantidad.addEventListener('keydown',e=>{
         codBarra.focus();
     }
 });
+
+volver.addEventListener('click',()=>{
+    location.href = "../menu.html";
+})
