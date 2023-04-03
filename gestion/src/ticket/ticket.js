@@ -1,7 +1,10 @@
-const {ipcRenderer} = require('electron')
+const {ipcRenderer} = require('electron');
+
+const {cuit:cuitPro} = require('../configuracion.json')
 
 const tipoComp = document.querySelector('.tipoComp');
 const numeroComp = document.querySelector('.numeroComp');
+const cuitPropetiario = document.querySelector('.cuitPropetiario');
 const fecha = document.querySelector('.fecha');
 const hora = document.querySelector('.hora');
 
@@ -13,6 +16,12 @@ const notaCredito = document.querySelector('.notaCredito');
 
 //listado
 const listado = document.querySelector('.listado');
+
+//ivas
+const gravado21 = document.querySelector('.gravado21');
+const gravado105 = document.querySelector('.gravado105');
+const netoIva21 = document.querySelector('.netoIva21');
+const netoIva105 = document.querySelector('.netoIva105');
 
 //totales
 const descuento = document.querySelector('.descuento');
@@ -29,6 +38,15 @@ const cantidadPrecio = document.querySelector('.cantidadPrecio');
 const iva = document.querySelector('.iva');
 const pagado = document.querySelector('.pagado');
 const descripcion = document.querySelector('.descripcion');
+
+let neto21 = 0;
+let neto105 = 0;
+let iva21 = 0;
+let iva105 = 0;
+
+window.addEventListener('load',e=>{
+    cuitPropetiario.innerText = cuitPro; 
+});
 
 ipcRenderer.on('imprimir',(e,args)=>{
     const [situacion,venta,cliente,listado] = JSON.parse(args);
@@ -59,6 +77,23 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
     cuit.innerHTML = clienteTraido.cuit.length > 8 ? `CUIT:${clienteTraido.cuit}` : `DNI:${clienteTraido.cuit}`;
     notaCredito.innerHTML = venta.tipo_comp === "Nota Credito C" ? `Numero de Factura: 0003-${venta.facturaAnterior}` : "";
 
+    neto21 += venta.gravado21;
+    neto105 += venta.gravado105;
+    iva21 += venta.iva21;
+    iva105 += venta.iva105;
+
+    if (neto21 !== 0 && (venta.cod_comp === 1 || venta.cod_comp === 3)) {
+        gravado21.parentNode.parentNode.classList.remove('none')
+    };
+
+    if (neto105 !== 0 && (venta.cod_comp === 1 || venta.cod_comp === 3)) {
+        gravado105.parentNode.parentNode.classList.remove('none')
+    };
+    gravado21.innerHTML = neto21.toFixed(2);
+    gravado105.innerHTML = neto105.toFixed(2);
+    netoIva21.innerHTML = iva21.toFixed(2);
+    netoIva105.innerHTML = iva105.toFixed(2);
+
     if (venta.tipo_comp === "Recibo") {
         cantidadPrecio.innerHTML = "Fecha";
         iva.innerHTML = "Comprobante";
@@ -76,7 +111,7 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
                 </main>
                 <main class = "linea">
                     <p>${elem.cantidad.toFixed(2)}/${elem.precio.toFixed(2)}</p>
-                    <p>${elem.impuesto}</p>
+                    <p>${elem.impuesto.toFixed(2)}</p>
                 </main>
             `   
         }else{

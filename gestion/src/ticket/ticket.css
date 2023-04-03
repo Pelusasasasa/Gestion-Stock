@@ -86,8 +86,21 @@ img{
 }
 
 .none{
-    display: none;
+    display: none !important;
 }
+
+
+.ivas main{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+}
+
+.ivas main div{
+    display: flex;
+    justify-content: space-between;
+}
+
 
 .afip{
     display: flex;
