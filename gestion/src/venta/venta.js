@@ -63,7 +63,11 @@ let idProducto = 0;
 let situacion = "blanco";
 let porcentajeH = 0;
 let descuento = 0;
+<<<<<<< HEAD
 let dolar = 0;
+=======
+let listaProductos = [];
+>>>>>>> frontend
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
@@ -149,10 +153,8 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-let listaProductos = [];
-
 codBarra.addEventListener('keypress',async e=>{
-    if(e.key === "Enter" && codBarra.value !== ""){
+    if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
         cantidad.focus();
     }else if(e.key === "Enter" && codBarra.value === ""){
         //Esto abre una ventana donde lista todos los productos
@@ -161,10 +163,18 @@ codBarra.addEventListener('keypress',async e=>{
             botones: false
         }
         ipcRenderer.send('abrir-ventana',opciones);
-        // precioU.focus();
+    }else if(codBarra.value === "999-999"){
+        cantidad.focus();
     }
+
     if(e.keyCode === 37){
         cantidad.focus();
+    }
+});
+
+descripcion.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        precioU.focus();
     }
 });
 
@@ -190,7 +200,7 @@ iva.addEventListener('keypress',e=>{
 const crearProducto = ()=>{
     idProducto++;
     const producto = {
-        descripcion:codBarra.value.toUpperCase(),
+        descripcion:descripcion.value.toUpperCase(),
         precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
         rubro:"Cualquiera",
         idTabla:`${idProducto}`,
@@ -229,13 +239,14 @@ const crearProducto = ()=>{
     cantidad.value = "1.00";
     codBarra.value = "";
     precioU.value = "";
+<<<<<<< HEAD
     iva.value = "21.00";
+=======
+    rubro.value = "";
+    descripcion.value = "";
+>>>>>>> frontend
     codBarra.focus();
 };
-
-volver.addEventListener('click',()=>{
-    location.href = "../menu.html";
-})
 
 ipcRenderer.on('recibir',(e,args)=>{
     const {tipo ,informacion} = JSON.parse(args);
@@ -564,15 +575,17 @@ const listarProducto =async(id)=>{
 
         cantidad.value = "1.00";
         codBarra.value = "";
+        descripcion.value = "";
         precioU.value = "";
         codBarra.focus();  
 
     }else{
-        precioU.focus();
+        descripcion.focus();
     }
         
 
-}
+};
+
 let seleccionado;
 //Hacemos para que se seleccione un tr
 
@@ -789,7 +802,9 @@ direccion.addEventListener('keypress',e=>{
 });
 
 cantidad.addEventListener('keypress',async e=>{
-    listarProducto(codBarra.value);
+    if (e.keyCode === 13) {
+        listarProducto(codBarra.value);
+    }
 });
 
 cantidad.addEventListener('keydown',e=>{
@@ -798,6 +813,7 @@ cantidad.addEventListener('keydown',e=>{
     }
 });
 
+<<<<<<< HEAD
 tbody.addEventListener('dblclick',async se=>{
     await sweet.fire({
         title:"Cambio",
@@ -835,4 +851,8 @@ tbody.addEventListener('dblclick',async se=>{
             total.value = totalGlobal.toFixed(2);
         }
     })
+=======
+volver.addEventListener('click',()=>{
+    location.href = "../menu.html";
+>>>>>>> frontend
 })

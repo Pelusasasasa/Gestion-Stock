@@ -12,8 +12,7 @@
       <div class="parteCliente">
         
         <div>
-          <label for="codigo">Codigo</label>
-          <input placeholder="Codigo" type="text" id="codigo" name="codigo">
+          <input placeholder="Codigo" type="number" id="codigo" name="codigo">
         </div>
         <div>
           <label for="nombre">Nombre</label>
@@ -65,16 +64,24 @@
     </div>
 
     </header>
+
     <main class="parteProductos">
       <section class="buscarProductos">
-        <div>
-          <label for="cod-barra">Codigo/Descripcion</label>
+        <div class="cod-barra">
+          <label for="cod-barra">Codigo</label>
           <input class="w-50" type="text" name="cod-barra" autofocus id="cod-barra">
         </div>
+
         <div>
           <label for="cantidad">Cantidad</label>
           <input class="w-50" type="number" name="cantidad" value="1.00" id="cantidad">
         </div>
+
+        <div>
+          <label for="descripcion">Descripcion</label>
+          <input class="w-100" type="text" name="descripcion" autofocus id="descripcion">
+        </div>
+
         <div>
           <label for="iva">Iva</label>
           <input type="number" value="21.00" id="iva" name="iva">
@@ -84,6 +91,7 @@
           <input class="w-50" type="text" name="precio-U" id="precio-U">
         </div>
       </section>
+
       <section class="listarProductos">
         <table>
           <thead>
@@ -101,6 +109,7 @@
           <tbody class="tbody"></tbody>
         </table>
       </section>
+
     </main>
     <main class="totales">
 
@@ -136,10 +145,7 @@
         <input type="number" name="total" id="total" value="0.00">
       </div>
     </main>
-    <div class="alerta none">
-      <div class="spinner"></div>
-      <p class="texto">Generando certificado de AFIP</p>
-    </div>
+
     <footer class="botones">
         <main class="">
           <label for="impresion">Impresion (F6)</label>
@@ -151,9 +157,14 @@
 
         <div class="cobrado hijoFooter">
           <label for="porcentaje">Porcentaje</label>
-          <input type="text" name="porcentaje" id="porcentaje" value="0.00">
+          <input type="number" name="porcentaje" id="porcentaje" value="0.00">
         </div>
     </footer>
+
+    <div class="alerta none">
+      <div class="spinner"></div>
+      <p class="texto">Generando certificado de AFIP</p>
+    </div>
 
     <script src="./venta.js"></script>
   </body>  
