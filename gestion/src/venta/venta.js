@@ -63,11 +63,8 @@ let idProducto = 0;
 let situacion = "blanco";
 let porcentajeH = 0;
 let descuento = 0;
-<<<<<<< HEAD
 let dolar = 0;
-=======
 let listaProductos = [];
->>>>>>> frontend
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
@@ -213,7 +210,7 @@ const crearProducto = ()=>{
         <tr id=${idProducto}>
             <td>${cantidad.value}</td>
             <td></td>
-            <td>${codBarra.value.toUpperCase()}</td>
+            <td>${descripcion.value.toUpperCase()}</td>
             <td></td>
             <td>${producto.impuesto.toFixed(2)}</td>
             <td>${parseFloat(producto.precio).toFixed(2)}</td>
@@ -239,12 +236,10 @@ const crearProducto = ()=>{
     cantidad.value = "1.00";
     codBarra.value = "";
     precioU.value = "";
-<<<<<<< HEAD
     iva.value = "21.00";
-=======
-    rubro.value = "";
+    // rubro.value = "";
     descripcion.value = "";
->>>>>>> frontend
+    console.log(descripcion.value)
     codBarra.focus();
 };
 
@@ -813,7 +808,6 @@ cantidad.addEventListener('keydown',e=>{
     }
 });
 
-<<<<<<< HEAD
 tbody.addEventListener('dblclick',async se=>{
     await sweet.fire({
         title:"Cambio",
@@ -851,8 +845,8 @@ tbody.addEventListener('dblclick',async se=>{
             total.value = totalGlobal.toFixed(2);
         }
     })
-=======
+});
+
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
->>>>>>> frontend
-})
+});
