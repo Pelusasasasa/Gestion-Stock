@@ -159,7 +159,7 @@ codBarra.addEventListener('keypress',async e=>{
         }
         ipcRenderer.send('abrir-ventana',opciones);
     }else if(codBarra.value === "999-999"){
-        descripcion.focus();
+        cantidad.focus();
     }
 
     if(e.keyCode === 37){
@@ -169,7 +169,7 @@ codBarra.addEventListener('keypress',async e=>{
 
 descripcion.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
-        cantidad.focus();
+        precioU.focus();
     }
 });
 
@@ -196,7 +196,7 @@ rubro.addEventListener('keypress',e=>{
 const crearProducto = ()=>{
     idProducto++;
     const producto = {
-        descripcion:codBarra.value.toUpperCase(),
+        descripcion:descripcion.value.toUpperCase(),
         precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
         rubro:rubro.value,
         idTabla:`${idProducto}`,
@@ -231,6 +231,7 @@ const crearProducto = ()=>{
     codBarra.value = "";
     precioU.value = "";
     rubro.value = "";
+    descripcion.value = "";
     codBarra.focus();
 };
 
@@ -527,7 +528,7 @@ const listarProducto =async(id)=>{
         precioU.value = "";
         codBarra.focus();  
     }else{
-        precioU.focus();
+        descripcion.focus();
     }
         
 
