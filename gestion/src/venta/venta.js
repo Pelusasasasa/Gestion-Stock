@@ -611,6 +611,10 @@ nombre.addEventListener('focus',e=>{
     nombre.select()
 });
 
+cuit.addEventListener('focus',e=>{
+    cuit.select()
+});
+
 localidad.addEventListener('focus',e=>{
     localidad.select();
 });
@@ -714,6 +718,10 @@ ipcRenderer.on('poner-numero',async (e,args)=>{
 });
 
 nombre.addEventListener('keypress',e=>{
+    apretarEnter(e,cuit);
+});
+
+cuit.addEventListener('keypress',e=>{
     apretarEnter(e,telefono);
 });
 
@@ -726,12 +734,19 @@ localidad.addEventListener('keypress',e=>{
 });
 
 direccion.addEventListener('keypress',e=>{
-    apretarEnter(e,codBarra);
+    apretarEnter(e,condicionIva);
+});
+
+condicionIva.addEventListener('keypress',async e=>{
+    e.preventDefault();
+    apretarEnter(e,cantidad)
 });
 
 cantidad.addEventListener('keypress',async e=>{
     apretarEnter(e,codBarra)
 });
+
+
 
 cantidad.addEventListener('keydown',e=>{
     if(e.keyCode === 39){

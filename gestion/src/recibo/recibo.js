@@ -46,6 +46,7 @@ fecha.value = `${a}-${m}-${d}`
 ipcRenderer.on('recibir',(e,args)=>{
     const {informacion} = JSON.parse(args);
     ponerInputs(informacion);
+    codigo.setAttribute('disabled','')
 });
 
 
@@ -345,6 +346,7 @@ codigo.addEventListener('keypress', async e=>{
     if (e.key === "Enter") {
         if (codigo.value != "") {
             ponerInputs(codigo.value)
+            codigo.setAttribute('disabled',"")
         }else{
             const options = {
                 path:"./clientes/clientes.html",
@@ -352,5 +354,11 @@ codigo.addEventListener('keypress', async e=>{
             }
             ipcRenderer.send('abrir-ventana',options);
         }
+    }
+});
+
+document.addEventListener('keyup',e=>{
+    if (e.keyCode === 27) {
+        location.href = '../menu.html';
     }
 });
