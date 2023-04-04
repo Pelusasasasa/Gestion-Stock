@@ -208,8 +208,8 @@ const crearProducto = ()=>{
     listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
         tbody.innerHTML += `
         <tr id=${idProducto}>
-            <td>${cantidad.value}</td>
             <td></td>
+            <td>${cantidad.value}</td>
             <td>${descripcion.value.toUpperCase()}</td>
             <td></td>
             <td>${producto.impuesto.toFixed(2)}</td>
@@ -519,8 +519,8 @@ const listarProducto =async(id)=>{
 
                 tbody.innerHTML += `
                 <tr id=${producto.idTabla}>
-                    <td>${cantidad.value}</td>
                     <td>${codBarra.value}</td>
+                    <td>${cantidad.value}</td>
                     <td>${producto.descripcion.toUpperCase()}</td>
                     <td>${producto.marca}</td>
                     <td>${producto.impuesto.toFixed(2)}</td>
@@ -552,13 +552,13 @@ const listarProducto =async(id)=>{
             producto.idTabla = productoYaUsado.producto.idTabla;
 
             const tr = document.getElementById(producto.idTabla);
-            tr.children[0].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) + parseFloat(cantidad.value),2);
+            tr.children[1].innerHTML = redondear(parseFloat(tr.children[1].innerHTML) + parseFloat(cantidad.value),2);
             let precio = tr.children[5];
             
-            const cantidadNueva = parseFloat(tr.children[0].innerHTML);
+            const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
             //si lista es 1 entonces redondeamos para el precio comun simplemente
             if (lista.value === "1") {
-                precio.innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * producto.precio,2);
+                precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio,2);
                 total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
             }else{
             //Si la lista es 2 entonces redondeamos con el costo simplemente
@@ -688,6 +688,10 @@ nombre.addEventListener('focus',e=>{
     nombre.select()
 });
 
+cuit.addEventListener('focus',e=>{
+    cuit.select()
+});
+
 localidad.addEventListener('focus',e=>{
     localidad.select();
 });
@@ -781,6 +785,15 @@ ipcRenderer.on('poner-numero',async (e,args)=>{
 })
 
 nombre.addEventListener('keypress',e=>{
+    apretarEnter(e,cuit);
+});
+
+cuit.addEventListener('keypress',e=>{
+    apretarEnter(e,lista);
+});
+
+lista.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,telefono);
 });
 
@@ -793,6 +806,11 @@ localidad.addEventListener('keypress',e=>{
 });
 
 direccion.addEventListener('keypress',e=>{
+    apretarEnter(e,condicionIva);
+});
+
+condicionIva.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,codBarra);
 });
 
@@ -815,7 +833,7 @@ tbody.addEventListener('dblclick',async se=>{
             <section class=cambio>
                 <main>
                     <label htmlFor="cantidadCambio">Cantidad</label>
-                    <input class=text-rigth type="text" name="cantidadCambio" value=${seleccionado.children[0].innerHTML} id="cantidadCambio"/>
+                    <input class=text-rigth type="text" name="cantidadCambio" value=${seleccionado.children[1].innerHTML} id="cantidadCambio"/>
                 </main>
                 <main>
                     <label htmlFor="precioCambio">Precio</label>
@@ -836,7 +854,7 @@ tbody.addEventListener('dblclick',async se=>{
             producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
             producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
             producto.producto.iva = parseFloat(document.getElementById('ivaCambio').value);
-            seleccionado.children[0].innerHTML = producto.cantidad.toFixed(2);
+            seleccionado.children[1].innerHTML = producto.cantidad.toFixed(2);
             seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
             seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
             seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad,2);

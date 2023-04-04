@@ -40,11 +40,11 @@ const path = require('path');
                 <td>${producto._id ? producto._id : ""}</td>
                 <td class="text-left">${producto.descripcion}</td>
                 <td class="text-end">${cantidad.toFixed(2)}</td>
-                <td class="text-end">${producto.precio.toFixed(2)}</td>
+                <td class="text-end">${venta.condicionIva === "Inscripto" ? producto.precio * (producto.impuesto / 100 + 1) : producto.precio.toFixed(2)}</td>
                 <td class="text-end">${producto.impuesto ? producto.impuesto.toFixed(2) : ""}</td>
                 <td class="text-end">0.00</td>
                 <td class="text-end">0.00</td>
-                <td class="text-end">${(producto.precio*cantidad).toFixed(2)}</td>
+                <td class="text-end">${( venta.condicionIva === "Inscripto" ? (producto.precio * (producto.impuesto / 100 + 1))*cantidad.toFixed(2) : (producto.precio * cantidad).toFixed(2))}</td>
             </tr>
         `
     }
@@ -59,7 +59,7 @@ const path = require('path');
     html = html.replace('{{fechaCae}}',venta.afip.vencimiento);
 
     //total
-    html = html.replace('{{subTotal}}',venta.precio.toFixed(2));
+    html = html.replace('{{subTotal}}',venta.condicionIva === "Inscripto" ? (venta.precio - venta.iva21 - venta.iva105).toFixed(2) : venta.precio.toFixed(2)) ;
     html = html.replace('{{iva21}}',venta.condicionIva === "Inscripto" ? `IVA 21%: ${venta.iva21.toFixed(2)} `: "");
     html = html.replace('{{iva105}}',venta.condicionIva === "Inscripto" ? `IVA 10.5% ${venta.iva105.toFixed(2)} ` : "");
     html = html.replace('{{descuento}}',venta.descuento.toFixed(2));
