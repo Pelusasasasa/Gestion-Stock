@@ -40,11 +40,11 @@ const path = require('path');
                 <td>${producto._id ? producto._id : ""}</td>
                 <td class="text-left">${producto.descripcion}</td>
                 <td class="text-end">${cantidad.toFixed(2)}</td>
-                <td class="text-end">${venta.condicionIva === "Inscripto" ? producto.precio * (producto.impuesto / 100 + 1) : producto.precio.toFixed(2)}</td>
+                <td class="text-end">${venta.condicionIva === "Inscripto" ? (producto.precio / ((producto.impuesto / 100) + 1)).toFixed(2) : producto.precio.toFixed(2)}</td>
                 <td class="text-end">${producto.impuesto ? producto.impuesto.toFixed(2) : ""}</td>
                 <td class="text-end">0.00</td>
                 <td class="text-end">0.00</td>
-                <td class="text-end">${( venta.condicionIva === "Inscripto" ? (producto.precio * (producto.impuesto / 100 + 1))*cantidad.toFixed(2) : (producto.precio * cantidad).toFixed(2))}</td>
+                <td class="text-end">${( venta.condicionIva === "Inscripto" ? (producto.precio / (((producto.impuesto / 100) + 1))*cantidad).toFixed(2) : (producto.precio * cantidad).toFixed(2))}</td>
             </tr>
         `
     }

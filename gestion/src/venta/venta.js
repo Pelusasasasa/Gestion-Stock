@@ -394,7 +394,7 @@ facturar.addEventListener('click',async e=>{
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
                 }
 
-                // location.reload();  
+                location.reload();  
             } catch (error) {
                 
                 await sweet.fire({
