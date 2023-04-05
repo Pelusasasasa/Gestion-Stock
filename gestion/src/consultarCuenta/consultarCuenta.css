@@ -12,6 +12,13 @@
     display: flex;
     flex-direction: column;
 }
+
+@media (max-width:1050px){
+    .buscador #buscar,.buscador #saldo{
+        width: 5rem;
+    }
+}
+
 .listaVentas{
     margin-top: 2rem;
     height: 40vh;
