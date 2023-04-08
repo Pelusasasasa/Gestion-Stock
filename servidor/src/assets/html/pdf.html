@@ -127,7 +127,6 @@
             <p>Razon Social:<span> PACCOT CARLA</span></p>
             <p>Domicilio Comercial:<span> 9 De Julio 3380 - Chajari, Entre Rios</span></p>
             <p>Codicion frente al IVA:<span> Responsable Inscripto</span></p>
-            <p>{{factura}}</p>
         </main>
         <main  class="tipoFactura">
             <div>
@@ -137,6 +136,7 @@
         </main>
         <main>
             <p class="factura"><span></span></p>
+            <p>{{factura}}</p>
             <main class="d-flex">
                 <p>Punto de Venta:<span class="puntoVenta">{{puntoVenta}}</span></p>
                 <p>comp. Nro:<span class="numero">{{numero}}</span></p>
@@ -147,6 +147,7 @@
             <p>Fecha de inicio de actividades: <span> 12/07/2022</span></p>
         </main>
     </section>
+
     <section class="cliente">
         <main class="nombre">
             <p>Apellido y Nombre / Razon Social: <span>{{cliente}}</span></p>
@@ -160,6 +161,7 @@
             <p>Condicion de Venta: <span>{{condicionVenta}}</span></p>
         </main>
     </section>
+
     <section class="productos">
         <table>
             <thead>
@@ -179,6 +181,7 @@
             </tbody>
         </table>
     </section>
+    
     <section class="final d-flex">
         <main class="qr">
             <img src={{qr}} alt="">

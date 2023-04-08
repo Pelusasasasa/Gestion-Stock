@@ -29,7 +29,7 @@ const path = require('path');
     html = html.replace('{{cliente}}',venta.cliente.slice(0,20));
     html = html.replace('{{cuit}}',venta.num_doc.length === 11 ? "CUIT" : "DNI");
     html = html.replace('{{dni}}',venta.num_doc ? venta.num_doc : "00000000");
-    html = html.replace('{{domicilio}}',venta.direccion ? venta.direccion : "Chajari" );
+    html = html.replace('{{domicilio}}',venta.direccion ? venta.direccion + " - " + venta.localidad  : "Chajari" );
     html = html.replace('{{clienteIva}}',venta.condicionIva ? venta.condicionIva : "Consumidor Final");
     html = html.replace('{{condicionVenta}}',venta.tipo_venta === "CC" ? "Cuenta Corriente" : "Contado");
 
