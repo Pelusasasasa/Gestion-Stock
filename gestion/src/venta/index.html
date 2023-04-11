@@ -85,7 +85,11 @@
 
         <div>
           <label for="iva">Iva</label>
-          <input type="number" value="21.00" id="iva" name="iva">
+          <select name="iva" id="iva">
+            <option value="21.00">% 21.00</option>
+            <option value="10.50">% 10.50</option>
+            <option value="0.00">% 0.00</option>
+          </select>
         </div>
         <div>
           <label for="precio-U">Precio-U</label>
@@ -151,6 +155,10 @@
         <main class="">
           <label for="impresion">Impresion (F6)</label>
           <input type="checkbox" name="impresion" checked id="impresion">
+        </main>
+        <main>
+          <label for="dolar">Dolar</label>
+          <input type="checkbox" id="dolar" name="dolar">
         </main>
         <button class="volver hijoFooter">Volver</button>
         <button class="facturar hijoFooter">Facturar</button>

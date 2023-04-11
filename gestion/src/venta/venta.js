@@ -45,6 +45,7 @@ const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
 const facturar = document.querySelector('.facturar');
 const volver = document.querySelector('.volver');
 const impresion = document.querySelector("#impresion");
+const checkboxDolar = document.querySelector("#dolar");
 
 //alerta
 const alerta = document.querySelector('.alerta');
@@ -459,7 +460,11 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
-    movimiento.precio = lista.value === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
+    if (checkboxDolar.checked) {
+        movimiento.precio = producto.precio / dolar;
+    }else{
+        movimiento.precio = lista.value === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
+    }
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
     movimiento.impuesto = producto.impuesto;
@@ -511,9 +516,14 @@ const listarProducto =async(id)=>{
             listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
 
             codBarra.value = producto._id;
-            //ponemos en el input el precio de el producto ya se para consumidor final o para instalador
-            precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)
 
+            //ponemos en el input el precio de el producto ya se para consumidor final o para instalador
+            if (checkboxDolar.checked) {
+                precioU.value = redondear(producto.precio / dolar,2);
+            }else{
+                precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)
+            }
+            
             idProducto++;
             producto.idTabla = `${idProducto}`; 
 
@@ -543,8 +553,8 @@ const listarProducto =async(id)=>{
                 block:"end"
             });
 
-        total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
-        totalGlobal = parseFloat(total.value);
+            total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
+            totalGlobal = parseFloat(total.value);
 
         }else if(producto !== "" && productoYaUsado){
 
@@ -558,7 +568,11 @@ const listarProducto =async(id)=>{
             const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
             //si lista es 1 entonces redondeamos para el precio comun simplemente
             if (lista.value === "1") {
-                precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio,2);
+                if (checkboxDolar.checked) {
+                    precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio / dolar,2)
+                }else{
+                    precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio,2);
+                }
                 total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
             }else{
             //Si la lista es 2 entonces redondeamos con el costo simplemente
@@ -864,6 +878,23 @@ tbody.addEventListener('dblclick',async se=>{
         }
     })
 });
+
+//Cambiamos los precios si se habilita el dolar
+checkboxDolar.addEventListener('change',e=>{
+    for(let {cantidad,producto} of listaProductos){
+        if (checkboxDolar.checked) {
+            producto.precio = parseFloat(redondear(producto.precio / dolar,2));
+        }else{
+            producto.precio = parseFloat(redondear(producto.precio * dolar,2));
+        }
+
+        const tr = document.getElementById(producto.idTabla);
+        tr.children[5].innerText = producto.precio;
+        tr.children[6].innerText = redondear(producto.precio * cantidad,2);
+    }
+    console.log(listaProductos)
+});
+
 
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
