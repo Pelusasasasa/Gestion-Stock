@@ -882,6 +882,7 @@ tbody.addEventListener('dblclick',async se=>{
 //Cambiamos los precios si se habilita el dolar
 checkboxDolar.addEventListener('change',e=>{
     for(let {cantidad,producto} of listaProductos){
+        total.value = parseFloat(total.value) - (cantidad*producto.precio);
         if (checkboxDolar.checked) {
             producto.precio = parseFloat(redondear(producto.precio / dolar,2));
         }else{
@@ -891,8 +892,8 @@ checkboxDolar.addEventListener('change',e=>{
         const tr = document.getElementById(producto.idTabla);
         tr.children[5].innerText = producto.precio;
         tr.children[6].innerText = redondear(producto.precio * cantidad,2);
+        total.value = redondear(parseFloat(total.value) + (producto.precio * cantidad),2);
     }
-    console.log(listaProductos)
 });
 
 
