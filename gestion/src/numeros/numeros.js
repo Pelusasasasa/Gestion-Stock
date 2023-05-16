@@ -7,6 +7,7 @@ const sweet = require('sweetalert2');
 const {vendedores,condIva} = require('../configuracion.json')
 
 const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB} = require('../helpers');
+const { ipcRenderer } = require('electron');
 
 const dolar = document.querySelector('#dolar');
 const contado = document.querySelector('#contado');
@@ -118,6 +119,7 @@ guardar.addEventListener('click',async e=>{
 
     try {
         await axios.put(`${URL}numero`,numero);
+        ipcRenderer.send('send-ventanaPrincipal',parseFloat(dolar.value));
         window.close();
     } catch (error) {
         console.log(error);

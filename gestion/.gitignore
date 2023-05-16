@@ -90,3 +90,5 @@ out/
 
 #logo
 src/img/*.ico
+
+src/imgProductos

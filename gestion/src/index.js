@@ -60,6 +60,11 @@ ipcMain.on('poner-cierre',e=>{
   ventanaPrincipal.setClosable(true);
 });
 
+//Si necesitamos mandar informacion de una ventana secundaria a una principal usamos este metodo
+ipcMain.on('send-ventanaPrincipal',(e,args)=>{
+  ventanaPrincipal.webContents.send('informacion',args);
+});
+
 ipcMain.on('abrir-ventana',(e,args)=>{
   abrirVentana(args.path,args.altura,args.ancho,args.reinicio);
   nuevaVentana.on('ready-to-show',async()=>{

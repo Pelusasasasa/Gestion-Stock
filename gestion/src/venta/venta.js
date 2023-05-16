@@ -13,8 +13,9 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
+const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
 const archivo = require('../configuracion.json');
+
 
 //Parte Cliente
 const codigo = document.querySelector('#codigo');
@@ -24,7 +25,7 @@ const localidad = document.querySelector('#localidad');
 const direccion = document.querySelector('#direccion');
 const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
-const lista = document.querySelector('#lista');
+const lista = document.getElementById('lista');
 
 
 //Parte Producto
@@ -66,6 +67,10 @@ let porcentajeH = 0;
 let descuento = 0;
 let dolar = 0;
 let listaProductos = [];
+
+ipcRenderer.on('informacion',(e,args)=>{
+    dolar = args;
+});
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
@@ -169,6 +174,8 @@ codBarra.addEventListener('keypress',async e=>{
         cantidad.focus();
     }
 });
+
+lista.addEventListener('change',togglePrecios);
 
 descripcion.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
@@ -488,11 +495,13 @@ const descontarStock = async({cantidad,producto})=>{
 }
 
 //Lo que hacemos es listar el producto traido
-const listarProducto =async(id)=>{
+const listarProducto = async(id)=>{
         let producto = (await axios.get(`${URL}productos/${id}`)).data;//buscamos el producto por codigo
         producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;//buscamos el producto por descripcion
+    
         //ponemos el precio del producto con un descuento si es que hay
         producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
+
         //Buscamos si el produto ya esta cargado
         if (producto !== "") {
         const productoYaUsado = listaProductos.find(({producto: product})=>{
@@ -501,6 +510,7 @@ const listarProducto =async(id)=>{
            };
         });
 
+        //Esto sucede si el producto No esta cargado
         if(producto !== "" && !productoYaUsado){
             if (producto.stock === 0 && archivo.stockNegativo) {
                 await sweet.fire({
@@ -519,7 +529,15 @@ const listarProducto =async(id)=>{
 
             //ponemos en el input el precio de el producto ya se para consumidor final o para instalador
             if (checkboxDolar.checked) {
-                precioU.value = redondear(producto.precio / dolar,2);
+                if (lista.value === "1") {
+                    precioU.value = redondear(producto.precio / dolar,2);
+                }else{
+                    if (producto.costo !== 0) {
+                        precioU.value = redondear(producto.costo/dolar,2);
+                    }else{
+                        precioU.value = producto.costoDolar
+                    }
+                }
             }else{
                 precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)
             }
@@ -553,17 +571,17 @@ const listarProducto =async(id)=>{
                 block:"end"
             });
 
-            total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
+            await calcularTotal();
             totalGlobal = parseFloat(total.value);
 
         }else if(producto !== "" && productoYaUsado){
-
+            //Esto sucede si el producto ya esta cargado
             productoYaUsado.cantidad += parseFloat(cantidad.value);
             producto.idTabla = productoYaUsado.producto.idTabla;
 
             const tr = document.getElementById(producto.idTabla);
             tr.children[1].innerHTML = redondear(parseFloat(tr.children[1].innerHTML) + parseFloat(cantidad.value),2);
-            let precio = tr.children[5];
+            let precio = tr.children[6];
             
             const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
             //si lista es 1 entonces redondeamos para el precio comun simplemente
@@ -573,11 +591,23 @@ const listarProducto =async(id)=>{
                 }else{
                     precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio,2);
                 }
-                total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
+                calcularTotal();
             }else{
             //Si la lista es 2 entonces redondeamos con el costo simplemente
-                precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)),2);
-                total.value = redondear(parseFloat(total.value) + parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)),2);
+                console.log("Cantidad Nueva es: " + cantidadNueva);
+                if (checkboxDolar.checked) {
+                    if (producto.costo !== 0) {
+                        precio.innerHTML = redondear(cantidadNueva * (producto.costo/dolar),2);
+                        calcularTotal();
+                    }else{
+                        precio.innerHTML = redondear(cantidadNueva * producto.costoDolar,2);
+                        calcularTotal();
+                    }
+                }else{
+                    precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)),2);
+                    calcularTotal();
+                }
+                
             }
             totalGlobal = parseFloat(total.value);
         }
@@ -643,10 +673,9 @@ tbody.addEventListener('click',async e=>{
             showCancelButton:true
         }).then(({isConfirmed})=>{
             tbody.removeChild(seleccionado);
-            total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[5].innerHTML),2);
-            totalGlobal = parseFloat(total.value);
             const productoABorrar = listaProductos.findIndex(({producto,cantidad})=>seleccionado.id === producto.idTabla);
             listaProductos.splice(productoABorrar,1);
+            togglePrecios();
         });
     }
 });
@@ -880,23 +909,53 @@ tbody.addEventListener('dblclick',async se=>{
 });
 
 //Cambiamos los precios si se habilita el dolar
-checkboxDolar.addEventListener('change',e=>{
-    for(let {cantidad,producto} of listaProductos){
-        total.value = parseFloat(total.value) - (cantidad*producto.precio);
-        if (checkboxDolar.checked) {
-            producto.precio = parseFloat(redondear(producto.precio / dolar,2));
-        }else{
-            producto.precio = parseFloat(redondear(producto.precio * dolar,2));
-        }
-
-        const tr = document.getElementById(producto.idTabla);
-        tr.children[5].innerText = producto.precio;
-        tr.children[6].innerText = redondear(producto.precio * cantidad,2);
-        total.value = redondear(parseFloat(total.value) + (producto.precio * cantidad),2);
-    }
-});
+checkboxDolar.addEventListener('change',togglePrecios);
 
 
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
 });
+
+async function togglePrecios(e) { 
+    for await(let {cantidad,producto} of listaProductos){
+        const tr = document.getElementById(`${producto.idTabla}`);
+        if(lista.value === "1"){
+            if (checkboxDolar.checked) {
+                tr.children[5].innerText = redondear(producto.precio / dolar,2);
+                tr.children[6].innerText = redondear(producto.precio / dolar * parseFloat(tr.children[1].innerText),2);
+            }else{
+                tr.children[5].innerText = producto.precio.toFixed(2);
+                tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText),2);
+            }
+        }else{
+            if (checkboxDolar.checked) {
+                if (producto.costo !== 0) {
+                    tr.children[5].innerText = redondear(producto.costo / dolar , 2);
+                    tr.children[6].innerText = redondear(producto.costo / dolar * parseFloat(tr.children[1].innerText), 2);
+                }else{
+                    tr.children[5].innerText = redondear(producto.costoDolar, 2);
+                    tr.children[6].innerText = redondear(producto.costoDolar * parseFloat(tr.children[1].innerText), 2);
+                }
+            }else{
+                if (producto.costo !== 0) {
+                    tr.children[5].innerText = redondear(producto.costo,2);
+                    tr.children[6].innerText = redondear(producto.costo * parseFloat(tr.children[1].innerText), 2);
+                }else{
+                    tr.children[5].innerText = redondear(producto.costoDolar * dolar,2);
+                    tr.children[6].innerText = redondear(producto.costoDolar * dolar * parseFloat(tr.children[1].innerText), 2);
+                }
+            }
+        }
+    };
+    calcularTotal();
+}
+
+async function calcularTotal() {
+    const trs = document.querySelectorAll('tbody tr');
+    let aux = 0;
+    for await(let tr of trs){
+        aux += parseFloat(tr.children[6].innerText);
+    };
+
+    total.value = redondear(aux,2);
+}
