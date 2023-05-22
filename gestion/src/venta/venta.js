@@ -332,6 +332,7 @@ facturar.addEventListener('click',async e=>{
         venta.gravado105 = gravado105;
         venta.cantIva = cantIva;
         venta.direccion = direccion.value;
+        venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
 
         venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
         venta.vendedor = vendedor ? vendedor : "";
@@ -442,6 +443,7 @@ const ponerEnCuentaCompensada = async(venta)=>{
     cuenta.nro_venta = venta.numero;
     cuenta.importe = venta.precio;
     cuenta.pagado = inputRecibo.value;
+    cuenta.condicion = venta.condicion;
     cuenta.tipo_comp = venta.tipo_comp;
     cuenta.saldo = venta.precio - parseFloat(inputRecibo.value);
     await axios.post(`${URL}compensada`,cuenta);
@@ -454,6 +456,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
     cuenta.nro_venta = venta.numero;
     cuenta.tipo_comp = venta.tipo_comp;
     cuenta.debe = venta.precio;
+    cuenta.condicion = venta.condicion;
     cuenta.saldo = facturaAnterior ? saldo - venta.precio : venta.precio + saldo;
     (await axios.post(`${URL}historica`,cuenta)).data;
 }
@@ -470,7 +473,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     if (checkboxDolar.checked) {
         movimiento.precio = producto.precio / dolar;
     }else{
-        movimiento.precio = lista.value === "1" ? producto.precio : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
+        movimiento.precio = lista.value === "1" ? producto.precio : parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar));
     }
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;

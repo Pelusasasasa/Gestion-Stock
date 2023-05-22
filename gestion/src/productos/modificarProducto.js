@@ -198,7 +198,7 @@ impuesto.addEventListener('blur',e=>{
 });
 
 ganancia.addEventListener('blur',e=>{
-    total.value = ((parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100) + parseFloat(costoIva.value)).toFixed(2);
+    total.value = Math.round((parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100) + parseFloat(costoIva.value)).toFixed(2);
 })
 
 salir.addEventListener('click',e=>{

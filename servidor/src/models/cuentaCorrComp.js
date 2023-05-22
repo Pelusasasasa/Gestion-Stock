@@ -33,6 +33,10 @@ const CuentaCompensada = new mongoose.Schema({
         type:Date,
         default: Date.now
     },
+    condicion:{
+        type:String,
+        default:"Normal"
+    },
     saldo:{
         type: Number,
         required: true

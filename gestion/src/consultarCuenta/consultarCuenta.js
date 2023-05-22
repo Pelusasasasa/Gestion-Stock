@@ -101,6 +101,7 @@ const listarVentas = async(lista)=>{
         const tdImporte = document.createElement('td');
         const tdPagado = document.createElement('td');
         const tdSaldo = document.createElement('td');   
+        const tdCondicion = document.createElement('td');
 
         const date = new Date(venta.fecha);
         let day = date.getDate();
@@ -126,7 +127,9 @@ const listarVentas = async(lista)=>{
             tdSaldo.innerHTML = redondear(venta.saldo * -1,2) ;
         }else{
             tdSaldo.innerHTML = venta.saldo.toFixed(2); 
-        }
+        };
+        tdCondicion.innerText = venta.condicion;
+
         tr.appendChild(tdFecha);
         tr.appendChild(tdNumero);
         tr.appendChild(tdCliente);
@@ -134,6 +137,7 @@ const listarVentas = async(lista)=>{
         tr.appendChild(tdImporte);
         tr.appendChild(tdPagado);
         tr.appendChild(tdSaldo);
+        tr.appendChild(tdCondicion);
 
         tbodyVenta.appendChild(tr)
     })
@@ -240,13 +244,22 @@ actualizar.addEventListener('click',async e=>{
 
         let total = 0;
         for await(let movimiento of movimientos){
-            const precio = (await axios.get(`${URL}productos/traerPrecio/${movimiento.codProd}`)).data;
+            let precio;
+            if (cuentaCompensada.condicion === "Normal") {
+                precio = (await axios.get(`${URL}productos/traerPrecio/${movimiento.codProd}`)).data;
+            }else{
+                precio = (await axios.get(`${URL}productos/traerCosto/${movimiento.codProd}`)).data;
+            }
+            console.log(precio)
             movimiento.precio = precio !== "" ? precio : movimiento.precio;
             total += (movimiento.precio*movimiento.cantidad);
         };
-        console.log(total)
+
+        venta.precio = total
         
-        sweet.fire({
+        await ipcRenderer.send('imprimir',["negro",venta,cliente,movimientos]);
+
+        await sweet.fire({
             title:"Grabar Importe?",
             "showCancelButton":true,
             "confirmButtonText":"Aceptar"

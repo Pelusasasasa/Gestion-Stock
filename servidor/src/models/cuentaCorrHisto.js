@@ -21,6 +21,10 @@ const Historica = new mongoose.Schema({
         type:String,
         require:true,
     },
+    condicion:{
+        type:String,
+        default:"Normal"
+    },
     debe:{
         type:Number,
         default: 0

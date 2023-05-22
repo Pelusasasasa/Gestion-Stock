@@ -84,9 +84,23 @@ guardar.addEventListener('click',async ()=>{
     } 
 });
 
-codigo.addEventListener('keypress',e=>{
-    apretarEnter(e,descripcion);
-})
+codigo.addEventListener('keypress',async e=>{
+    if (e.keyCode === 13) {
+        if (codigo.value !== "") {
+            const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+            if (producto) {
+                await sweet.fire({
+                    title:"Codigo Ya utilizado por " + producto.descripcion
+                });
+                codigo.value = "";
+                codigo.focus();
+            }else{
+                apretarEnter(e,descripcion);
+            }
+        }
+    }
+});
+
 
 descripcion.addEventListener('keypress',e=>{
     apretarEnter(e,marca);
@@ -151,7 +165,7 @@ codigo.addEventListener('focus',e=>{
     codigo.select();
 });
 
-descripcion.addEventListener('focus',e=>{
+descripcion.addEventListener('focus',async e=>{
     descripcion.select();
 });
 

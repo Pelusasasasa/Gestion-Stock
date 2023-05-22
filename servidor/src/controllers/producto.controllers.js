@@ -1,6 +1,8 @@
 const productoCTRL = {};
 
 const Producto = require('../models/producto');
+const Numero = require('../models/Numero');
+
 
 productoCTRL.descontarStock = async(req,res)=>{
     const array = req.body;
@@ -194,6 +196,17 @@ productoCTRL.putForProvedor = async(req,res)=>{
     });
     console.log(`Productos de provedor ${provedor} Modificados`);
     res.send("Productos modificados");
+};
+
+productoCTRL.traerCosto = async(req,res)=>{
+    const {id} = req.params;
+    const producto = await Producto.findOne({_id:id});
+    if (producto.costo !== 0) {
+        res.send(`${producto.costo}`);
+    }else{
+        const dolar = (await Numero.findOne()).Dolar;
+        res.send(`${producto.costoDolar * dolar}`);
+    }
 }
 
 module.exports = productoCTRL

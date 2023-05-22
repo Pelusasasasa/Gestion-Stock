@@ -42,6 +42,10 @@ const Venta = new mongoose.Schema({
         type:String,
         default:""
     },
+    condicion:{
+        type:String,
+        default:"Normal"
+    },
     F:{
         type:Boolean,
         default: false
