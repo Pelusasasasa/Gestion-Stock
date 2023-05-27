@@ -17,6 +17,7 @@ const tbodyProducto = document.querySelector(".listaProductos tbody");
 const actualizar = document.querySelector('.actualizar');
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
+const actualizarTodo = document.getElementById('actualizarTodo');
 
 let trSeleccionado = "";
 let clienteTraido = {};
@@ -244,7 +245,6 @@ actualizar.addEventListener('click',async e=>{
             movimiento.precio = precio !== "" ? precio : movimiento.precio;
             total += (movimiento.precio*movimiento.cantidad);
         };
-        console.log(total)
         
         sweet.fire({
             title:"Grabar Importe?",
@@ -287,8 +287,7 @@ actualizar.addEventListener('click',async e=>{
         }
         })
     }
-})
-
+});
 
 volver.addEventListener('click',e=>{
     location.href = "../menu.html";
@@ -317,4 +316,64 @@ borrar.addEventListener('click', async e=>{
             title:"Ninguna venta seleccionado"
         })
     }
-})
+});
+
+
+actualizarTodo.addEventListener('click',actualizarTodosLosTrs);
+
+async function actualizarTodosLosTrs(e) {
+    const trs = document.querySelectorAll('.listaVentas tbody tr');
+    for await (let cuenta of listaCompensada){
+        if(cuenta.tipo_comp === "Comprobante"){
+            await actualizarCuenta(cuenta,cuenta.importe); 
+        }
+    }
+};
+
+async function actualizarCuenta(cuenta,importeViejo) {
+     //Traemos la historica que seleccionamos
+     const cuentaHistorica = (await axios.get(`${URL}historica/PorId/id/${cuenta.nro_venta}`)).data;
+     //traemos los movimientos de productos de esa cuenta compensada
+     const movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`)).data;
+     //Traemos la venta de lo seleccionado
+     const venta = (await axios.get(`${URL}ventas/numeroYtipo/${cuenta.nro_venta}/CC`)).data;
+     //Traemos el cliente
+     const  cliente = (await axios.get(`${URL}clientes/id/${cuenta.idCliente}`)).data;
+    let total = 0;
+
+    for await (let mov of movimientos){
+        const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`)).data;
+        mov.precio = precio
+        total += precio;
+    }
+
+
+    cuenta.importe = total;
+    cuenta.saldo = total - cuenta.pagado;
+    
+    venta.precio = total; //Cambiamos el precio de venta
+
+    //Modificamos el saldo y debe de la cuenta historica
+    cuentaHistorica.saldo = parseFloat((cuentaHistorica.saldo - cuentaHistorica.debe+total).toFixed(2));
+    cuentaHistorica.debe = parseFloat(total.toFixed(2));
+
+
+    let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${cuentaHistorica.idCliente}`)).data;
+    cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.nro_venta>cuentaHistorica.nro_venta && cuenta.fecha >= cuentaHistorica.fecha));
+
+    cliente.saldo = redondear(cliente.saldo + total - importeViejo,20)//Nuvo saldo del cliente
+
+    await axios.put(`${URL}movimiento`,movimientos);
+    await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
+    await axios.put(`${URL}ventas/id/${venta.numero}/CC`,venta);
+    await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta);
+    await axios.put(`${URL}historica/PorId/id/${cuentaHistorica.nro_venta}`,cuentaHistorica);
+
+    let saldoAnterior = cuentaHistorica.saldo;
+    
+    for await(let elem of cuentasHistoricasRestantes){
+        elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
+        saldoAnterior = elem.saldo;
+        await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`,elem);
+    }
+};
