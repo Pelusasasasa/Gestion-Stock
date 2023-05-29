@@ -318,7 +318,6 @@ borrar.addEventListener('click', async e=>{
     }
 });
 
-
 actualizarTodo.addEventListener('click',actualizarTodosLosTrs);
 
 async function actualizarTodosLosTrs(e) {
@@ -327,7 +326,8 @@ async function actualizarTodosLosTrs(e) {
         if(cuenta.tipo_comp === "Comprobante"){
             await actualizarCuenta(cuenta,cuenta.importe); 
         }
-    }
+    };
+    location.reload();
 };
 
 async function actualizarCuenta(cuenta,importeViejo) {
@@ -343,8 +343,8 @@ async function actualizarCuenta(cuenta,importeViejo) {
 
     for await (let mov of movimientos){
         const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`)).data;
-        mov.precio = precio
-        total += precio;
+        mov.precio = precio ? precio : mov.precio;
+        total += precio ? precio : mov.precio;
     }
 
 
