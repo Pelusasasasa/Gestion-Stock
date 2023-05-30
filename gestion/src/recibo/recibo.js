@@ -14,7 +14,7 @@ require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter, cargarFactura, redondear, verClienteValido} = require('../helpers');
+const {apretarEnter, cargarFactura, redondear, verClienteValido, configAxios} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
@@ -24,13 +24,15 @@ const localidad = document.querySelector('#localidad');
 const direccion = document.querySelector('#direccion');
 const fecha = document.querySelector('#fecha');
 const cancelar = document.querySelector('.cancelar');
+const actualizar = document.querySelector('.actualizar');
 const tbody = document.querySelector('tbody');
 const total = document.querySelector('#total');
 const imprimir = document.querySelector('.imprimir');
 const entregado = document.querySelector('#entregado');
 const tarjeta = document.querySelector('#tarjeta');
 
-let cuentaAFavor
+let cuentaAFavor;
+let compensadas = [];
 
 const hoy = new Date();
 let d = hoy.getDate();
@@ -60,7 +62,7 @@ const ponerInputs = async(id)=>{
         saldo.value = (cliente.saldo).toFixed(2);
         localidad.value = cliente.localidad;
         direccion.value = cliente.direccion;
-        const compensadas = (await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`)).data;
+        compensadas = (await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`)).data;
         tbody.innerHTML = "";
         compensadas.forEach(compensada => {
             ponerVenta(compensada);
@@ -362,3 +364,42 @@ document.addEventListener('keyup',e=>{
         location.href = '../menu.html';
     }
 });
+
+
+actualizar.addEventListener('click',actualizarTodo);
+
+async function actualizarTodo(e) {
+    tbody.innerText = "";
+    let saldo = 0;
+    for await(let cuenta of compensadas){
+        cuenta.importe = await actualizarMovimientos(cuenta);
+        cuenta.saldo = cuenta.importe - cuenta.pagado;
+        saldo += cuenta.importe;
+        ponerVenta(cuenta);
+        await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta,configAxios);
+
+        //Historicas
+    }
+
+    actualizarSaldo(saldo);
+}
+
+
+async function actualizarMovimientos(cuenta){
+        let total = 0;
+        let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
+        for(let mov of movimientos){
+            const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
+            mov.precio = precio;
+            total += precio
+        };
+        await axios.put(`${URL}movimiento`,movimientos,configAxios);
+        return total;
+};
+
+async function actualizarSaldo(numero) {
+    let cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`,configAxios)).data;
+    cliente.saldo = numero.toFixed(2);
+    saldo.value = numero.toFixed(2);
+    (await axios.put(`${URL}clientes/id/${codigo.value}`,cliente,configAxios))
+}

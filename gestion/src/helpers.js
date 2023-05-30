@@ -407,4 +407,8 @@ funciones.verClienteValido = async(codigo)=>{
     };
 }
 
+funciones.configAxios = {
+    
+}
+
 module.exports = funciones;

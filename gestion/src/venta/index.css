@@ -7,12 +7,12 @@
 }
 
 .negro{
-  background-color: rgb(0, 0, 0);
+  background-color: red;
   color: white;
 }
 
 .negro th,.negro td{
-  color: black;
+  /* color: red; */
 } 
 
 .parteCliente{
