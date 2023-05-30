@@ -374,11 +374,29 @@ async function actualizarTodo(e) {
     for await(let cuenta of compensadas){
         cuenta.importe = await actualizarMovimientos(cuenta);
         cuenta.saldo = cuenta.importe - cuenta.pagado;
-        saldo += cuenta.importe;
+        saldo += cuenta.importe - cuenta.pagado;
         ponerVenta(cuenta);
         await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta,configAxios);
 
         //Historicas
+        //Traemos lahistorica correspondiente y la actualizamos
+        const historica = (await axios.get(`${URL}historica/porId/id/${cuenta.nro_venta}`)).data;
+        historica.saldo = historica.saldo - historica.debe + cuenta.importe;
+        historica.debe = cuenta.importe;
+        await axios.put(`${URL}historica/PorId/id/${historica.nro_venta}`,historica,configAxios);
+
+        //Traemos las cuentas historicas que siguen despues de la principal
+        let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${historica.idCliente}`,configAxios)).data;
+        cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(elem=>(elem.nro_venta>historica.nro_venta && elem.fecha >= historica.fecha));
+        
+        let saldoAnterior = historica.saldo;
+        //Modificamos las cuentas historicas qrestantes
+        for(let elem of cuentasHistoricasRestantes){
+            elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
+            saldoAnterior = elem.saldo;
+            await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`,elem,configAxios);
+        };
+
     }
 
     actualizarSaldo(saldo);

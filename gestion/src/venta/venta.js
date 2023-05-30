@@ -151,12 +151,7 @@ codBarra.addEventListener('keypress',async e=>{
     if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
         cantidad.focus();
     }else if(e.key === "Enter" && codBarra.value === ""){
-        //Esto abre una ventana donde lista todos los productos
-        const opciones = {
-            path: "./productos/productos.html",
-            botones: false
-        }
-        ipcRenderer.send('abrir-ventana',opciones);
+        descripcion.focus();
     }else if(codBarra.value === "999-999"){
         cantidad.focus();
     }
@@ -176,7 +171,6 @@ precioU.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
         if (precioU.value !== "") {
             crearProducto();
-            // rubro.focus();   
         }else{
             await sweet.fire({
                 title:"Poner un precio al Producto",
@@ -208,7 +202,7 @@ const crearProducto = ()=>{
         <tr id=${idProducto}>
             <td>${cantidad.value}</td>
             <td></td>
-            <td>${codBarra.value.toUpperCase()}</td>
+            <td>${descripcion.value.toUpperCase()}</td>
             <td></td>
             <td>${parseFloat(producto.precio).toFixed(2)}</td>
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
