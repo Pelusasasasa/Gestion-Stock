@@ -6,7 +6,7 @@ const sweet = require('sweetalert2');
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const {vendedores} = require('../configuracion.json')
 
@@ -54,6 +54,8 @@ codigo.addEventListener('keyup',async e=>{
             await sweet.fire({
                 title:"Cliente No Econtrado"
             });
+            codigo.value = "";
+            codigo.focus();
         }
     }
 });

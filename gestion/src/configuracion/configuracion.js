@@ -5,7 +5,7 @@ const path = require('path');
 
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -74,7 +74,9 @@ modificar.addEventListener('click',async e=>{
     fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
         console.log("Informacion Recibida");
-    })
+    });
+
+    window.close();
 })
 
 

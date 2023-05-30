@@ -9,22 +9,23 @@ const afip = new Afip({CUIT:archivo.cuit});
 const sweet = require('sweetalert2');
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.URL;
-
-let internetAvalible = require('internet-available');
+const URL = process.env.GESTIONURL;
 
 let puntoVenta = archivo.puntoVenta;
 
-funciones.verSiHayInternet = async() => {
-    let retorno;
-    await internetAvalible({
+let internetAvalible = require('internet-available');
+
+//Sirve para ver si hay internet o no
+funciones.verSiHayInternet = () => {
+    let retorno = true
+    internetAvalible({
         timeout:1000,
         retries:5
     }).then(()=>{
-        retorno =  true
+        retorno = true
     }).catch(()=>{
-        retorno =  false
-    })
+        retorno = false
+    });
     return retorno
 }
 
@@ -71,8 +72,11 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(serverStatus) // mostramos el estado del servidor
 
     let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher(puntoVenta,venta.cod_comp);
-    
-    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,11);
+    console.log(ultimaElectronica);
+
+    console.log(parseFloat(venta.facturaAnterior));
+    let aux = venta.condicionIva === "Inscripo" ? 1 : 6
+    let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,aux);
     
     let data = {
         'cantReg':1,
@@ -232,6 +236,29 @@ funciones.ultimaC = async()=>{
     }
 }
 
+funciones.ultimaAB = async()=>{
+    try {
+        const facturaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,1);
+        const notaA = await afip.ElectronicBilling.getLastVoucher(puntoVenta,3);
+        const facturaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,6);
+        const notaB = await afip.ElectronicBilling.getLastVoucher(puntoVenta,8);
+        return {
+            facturaA,
+            notaA,
+            facturaB,
+            notaB
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            facturaA:0,
+            notaA:0,
+            facturaB:0,
+            notaB:0,
+        }
+    }
+}
+
 funciones.ponerNumero = async()=>{
     sweet.fire({
         html:`
@@ -327,10 +354,7 @@ funciones.verCodigoComprobante = async(notaCredito,cuit = "00000000",condIva)=>{
             if (cuit.length === 11 && condIva === "Inscripto") {
                 return 3
             }else if(cuit.length === 11 && condIva !== "Inscripto"){
-                await sweet.fire({
-                    title:"No se puede hacer una Nota Credito A a un No Inscripto"
-                });
-                return 0
+                return 8
             }else if(cuit.length === 8 && condIva !== "Inscripto"){
                 return 8
             }else{
@@ -343,15 +367,12 @@ funciones.verCodigoComprobante = async(notaCredito,cuit = "00000000",condIva)=>{
             if (cuit.length === 11 && condIva === "Inscripto") {
                 return 1
             }else if(cuit.length === 11 && condIva !== "Inscripto"){
-                await sweet.fire({
-                    title:"No se puede hacer una Factura A a un No Inscripto"
-                });
-                return 0
+                return 6
             }else if(cuit.length === 8 && condIva !== "Inscripto"){
                 return 6
             }else{
                 await sweet.fire({
-                    title:"No se puede hacer una Nota Credito B a un Inscripto"
+                    title:"No se puede hacer una Factura B a un Inscripto"
                 });
                 return 0
             }

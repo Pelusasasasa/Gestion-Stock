@@ -3,7 +3,7 @@ const sweet = require('sweetalert2');
 
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const archivo = require('./configuracion.json');
 
@@ -23,6 +23,7 @@ const notaCredito = document.querySelector('.notaCredito');
 let verVendedores;
 
 window.addEventListener('load',async e=>{
+    await cargarPrimerCliente();
     verVendedores = archivo.vendedores;
     const vendedores = (await axios.get(`${URL}vendedores`)).data;
     if (!vendedores.find(vendedor => vendedor.permiso === 0) && verVendedores) {
@@ -208,3 +209,30 @@ notaCredito.addEventListener('click',e=>{
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
 });
+
+ipcRenderer.on('libroIva',async (e,args)=>{
+    location.href = "./libroIva/libroIva.html";
+});
+
+const cargarPrimerCliente = async()=>{
+    const id = (await axios.get(`${URL}clientes`)).data;
+    if (id === 1) {
+        const cliente = {};
+        cliente._id = 1;
+        cliente.nombre = "Consumidor Final";
+        cliente.telefono = "";
+        cliente.direccion = "CHAJARI";
+        cliente.localidad = "CHAJARI";
+        cliente.cuit = "00000000";
+        cliente.condicionFacturacion = 2;
+
+        try {
+            await axios.post(`${URL}clientes`,cliente);
+        } catch (error) {
+            console.log(error);
+            await sweet.fire({
+                title:"No se pudo cargar el primer cliene, cargarlo normal"
+            })
+        }
+    }
+}

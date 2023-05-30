@@ -6,12 +6,12 @@
 
 }
 
-.rojo{
-  background-color: rgb(182, 6, 6);
+.negro{
+  background-color: rgb(0, 0, 0);
   color: white;
 }
 
-.rojo th,.rojo td{
+.negro th,.negro td{
   color: black;
 } 
 
@@ -55,7 +55,7 @@
 
 .parteProductos .buscarProductos{
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 3fr 1fr 1fr;
 }
 
 .parteProductos .buscarProductos div{
@@ -74,11 +74,16 @@
   font-size: 1.5rem;
 }
 
-.w-100{
-  width: 108%;
+.parteProductos .cod-barra{
+  width: 15rem;
 }
-.w-50{
+
+.parteProductos .buscarProductos div .w-100{
   width: 100%;
+}
+
+.parteProductos .buscarProductos div .w-50{
+  width: 50%;
 }
 
 .parteProductos .listarProductos{
@@ -117,6 +122,7 @@
 
 .parteProductos tbody td{
   border: .1rem solid black;
+  word-break: break-all;
 }
 
 .condicionVenta{
@@ -166,8 +172,8 @@
   left: 0;
   bottom: 0;
   right: 0;
-  width: 200vh;
-  height: 100vh;
+  width: 100%;
+  height: 110%;
   background-color: rgba(0,0,0,.5);
 }
 
@@ -201,7 +207,7 @@ animation: spin 1s linear infinite
 }
 }
 
-.totales input[type=number]{
+.totales input[type=number],.botones input[type=number]{
   width: 15rem;
 }
 

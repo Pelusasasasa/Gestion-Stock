@@ -2,9 +2,10 @@ const {cerrarVentana,apretarEnter, agregarMovimientoVendedores} = require('../he
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
+const {default:validarCuit} = require('cuit-validator')
 const { ipcRenderer } = require('electron');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');
@@ -67,6 +68,18 @@ observaciones.addEventListener('keypress',e=>{
 
 document.addEventListener('keydown',e=>{
     cerrarVentana(e)
+});
+
+cuit.addEventListener('blur',async e=>{
+    if (cuit.value.length === 11) {
+        if (!validarCuit(cuit.value)) {
+            await sweet.fire({
+                title:"El cuit no es correcto"
+            });
+            cuit.value = "";
+            cuit.focus();
+        }
+    }
 });
 
 agregar.addEventListener('click',async e=>{

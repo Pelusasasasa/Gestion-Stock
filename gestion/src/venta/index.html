@@ -24,6 +24,7 @@
           <input type="number" name="cuit" id="cuit">
         </div>
         <div>
+          <label for="saldo">Saldo</label>
           <input type="text" disabled  id="saldo" name="saldo">
         </div>
       </div>
@@ -49,7 +50,7 @@
         <select name="condicion" id="condicion">
           <option value="Consumidor Final">Consumidor Final</option>
           <option value="Monotributo">Monotributo</option>
-          <option value="Inscripto">Inscripto</option>
+          <option value="Responsable Inscripto">Inscripto</option>
           <option value="Exento">Exento</option>
         </select>
       </main>
@@ -57,19 +58,27 @@
     </div>
 
     </header>
+
     <main class="parteProductos">
       <section class="buscarProductos">
+        <div class="cod-barra">
+          <label for="cod-barra">Codigo</label>
+          <input class="w-50" type="text" name="cod-barra" autofocus id="cod-barra">
+        </div>
+
         <div>
           <label for="cantidad">Cantidad</label>
           <input class="w-50" type="number" name="cantidad" value="1.00" id="cantidad">
         </div>
+
         <div>
-          <label for="cod-barra">Codigo/Descripcion</label>
-          <input class="w-50" type="text" name="cod-barra" autofocus id="cod-barra">
+          <label for="descripcion">Descripcion</label>
+          <input class="w-100" type="text" name="descripcion" autofocus id="descripcion">
         </div>
+
         <div>
           <label for="precio-U">Precio-U</label>
-          <input class="w-50" type="text" name="precio-U" id="precio-U">
+          <input class="w-50" type="number" name="precio-U" id="precio-U">
         </div>
         <div>
           <label for="rubro">Rubro</label>
@@ -78,6 +87,7 @@
           </select>
         </div>
       </section>
+
       <section class="listarProductos">
         <table>
           <thead>
@@ -94,6 +104,7 @@
           <tbody class="tbody"></tbody>
         </table>
       </section>
+
     </main>
     <main class="totales">
 
@@ -103,6 +114,11 @@
       </main>
 
       <div class="condicionVenta">
+        <div class="contado">
+          <input type="radio" name="condicion" value="PP" id="presupuesto">
+          <label for="presupuesto">Presupuesto</label>
+        </div>
+
         <div class="contado">
           <input type="radio" name="condicion" checked value="CD" id="contado">
           <label for="contado">Contado</label>
@@ -124,10 +140,7 @@
         <input type="number" name="total" id="total" value="0.00">
       </div>
     </main>
-    <div class="alerta none">
-      <div class="spinner"></div>
-      <p class="texto">Generando certificado de AFIP</p>
-    </div>
+
     <footer class="botones">
         <main class="">
           <label for="impresion">Impresion (F6)</label>
@@ -139,11 +152,15 @@
 
         <div class="cobrado hijoFooter">
           <label for="porcentaje">Porcentaje</label>
-          <input type="text" name="porcentaje" id="porcentaje" value="0.00">
+          <input type="number" name="porcentaje" id="porcentaje" value="0.00">
         </div>
     </footer>
 
-    <audio src="../img/tono.mp3" id="audio"></audio>
+    <div class="alerta none">
+      <div class="spinner"></div>
+      <p class="texto">Generando certificado de AFIP</p>
+    </div>
+
     <script src="./venta.js"></script>
   </body>  
 </html>

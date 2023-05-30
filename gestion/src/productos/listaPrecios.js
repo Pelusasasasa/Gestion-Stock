@@ -1,7 +1,8 @@
 let XLSX = require('xlsx');
 const axios = require('axios');
 require('dotenv').process;
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
+console.log(URL)
 
 const {dialog} = require('electron')
 

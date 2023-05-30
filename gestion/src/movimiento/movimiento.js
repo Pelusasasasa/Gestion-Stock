@@ -1,7 +1,7 @@
 //Controlado 8/09/2022
 const axios = require('axios');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const select = document.querySelector('#rubro');
 const tbody = document.querySelector('tbody');

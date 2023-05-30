@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config()
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -37,6 +37,18 @@ aceptar.addEventListener('click',async e=>{
     }
 });
 
+select.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        e.preventDefault()
+        porcentaje.focus();
+    }
+})
+
+porcentaje.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        aceptar.focus();
+    }
+});
 
 document.addEventListener('keyup',e=>{
     if(e.key === "Escape"){

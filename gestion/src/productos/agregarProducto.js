@@ -22,7 +22,7 @@ const archivo = require('../configuracion.json');
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require('dotenv').config()
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 let vendedor;
 

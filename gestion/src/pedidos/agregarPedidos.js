@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require("dotenv").config();
-const URL = process.env.URL;
+const URL = process.env.GESTIONURL;
 
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -72,7 +72,11 @@ stock.addEventListener('keypress',e=>{
 
 observaciones.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
-        agregar.focus();
+        if (agregar.classList.contains('none')) {
+            modificar.focus();
+        }else{
+            agregar.focus();
+        }
     }
 });
 
