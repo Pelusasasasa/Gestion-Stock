@@ -6,10 +6,10 @@ clienteCTRL.getsClientes = async(req,res)=>{
     const {nombre} = req.params;
     let clientes
     if (nombre === "NADA" ) {
-        clientes = await Clientes.find().sort({nombre:1}).limit(50);
+        clientes = await Clientes.find().sort({nombre:1});
     }else{
         const re = new RegExp(`^${nombre}`);
-        clientes = await Clientes.find({nombre:{$regex: re,$options: "i"}}).sort({nombre:1}).limit(50);
+        clientes = await Clientes.find({nombre:{$regex: re,$options: "i"}}).sort({nombre:1});
     }
     res.send(clientes);
 }

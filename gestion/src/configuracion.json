@@ -1,10 +1,1 @@
-{
-  "caja": "Caja 1",
-  "vendedores": false,
-  "stockNegativo": false,
-  "puntoVenta": "2",
-  "cuit": "20416104655",
-  "dolar": false,
-  "condIva": "Monotributo"
-}
-
+{"caja":"Caja 1","vendedores":false,"stockNegativo":false,"puntoVenta":"3","cuit":"20416104655","dolar":false,"condIva":"Monotributo"}

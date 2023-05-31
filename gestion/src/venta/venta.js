@@ -149,7 +149,7 @@ codigo.addEventListener('keypress',async e=>{
 
 codBarra.addEventListener('keypress',async e=>{
     if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
-        listarProducto(codBarra.value);
+        listarProducto(descripcion.value);
     }else if(e.key === "Enter" && codBarra.value === ""){
         descripcion.focus();
     }else if(codBarra.value === "999-999"){
@@ -162,7 +162,9 @@ codBarra.addEventListener('keypress',async e=>{
 });
 
 descripcion.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 && descripcion.value !== "") {
+        listarProducto(descripcion.value);
+    }else if(e.keyCode === 13 && descripcion.value === ""){
         precioU.focus();
     }
 });
@@ -225,7 +227,7 @@ const crearProducto = ()=>{
     precioU.value = "";
     rubro.value = "";
     descripcion.value = "";
-    codBarra.focus();
+    descripcion.focus();
 };
 
 ipcRenderer.on('recibir',(e,args)=>{
@@ -400,7 +402,7 @@ const listarCliente = async(id)=>{
         localidad.value = cliente.localidad;
         cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
-        codBarra.focus();
+        descripcion.focus();
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')
     }else{
         codigo.value = "";
@@ -467,18 +469,19 @@ const listarProducto =async(id)=>{
         let producto = (await axios.get(`${URL}productos/${id}`)).data;
         producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
         producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
-        if (producto !== "") {
-       const productoYaUsado = listaProductos.find(({producto: product})=>{
+    if (producto !== "") {
+        const productoYaUsado = listaProductos.find(({producto: product})=>{
            if (product._id === producto._id) {
                return product
            };
         });
+
         if(producto !== "" && !productoYaUsado){
-        if (producto.stock === 0 && archivo.stockNegativo) {
-            await sweet.fire({
-                title:"Producto con Stock en 0"
-            });
-        };
+            if (producto.stock === 0 && archivo.stockNegativo) {
+                await sweet.fire({
+                    title:"Producto con Stock en 0"
+                });
+            };
         if (producto.stock - (parseFloat(cantidad.value)) < 0 && archivo.stockNegativo) {
             await sweet.fire({
                 title:"Producto con Stock menor a 0",
@@ -504,10 +507,10 @@ const listarProducto =async(id)=>{
                 </div>
             </td>
         </tr>
-    `;
-    tbody.scrollIntoView({
-        block:"end"
-    });
+        `;
+        tbody.scrollIntoView({
+            block:"end"
+        });
         total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
         totalGlobal = parseFloat(total.value);
         }else if(producto !== "" && productoYaUsado){
@@ -523,12 +526,10 @@ const listarProducto =async(id)=>{
         codBarra.value = "";
         descripcion.value = "";
         precioU.value = "";
-        codBarra.focus();  
+        descripcion.focus();  
     }else{
-        descripcion.focus();
+        precioU.focus();
     }
-        
-
 };
 
 let seleccionado;
@@ -751,7 +752,7 @@ cantidad.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keydown',e=>{
     if(e.keyCode === 39){
-        codBarra.focus();
+        descripcion.focus();
     }
 });
 
