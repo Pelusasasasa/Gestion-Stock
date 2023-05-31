@@ -179,7 +179,6 @@ const listarProductos = async(movimientos)=>{
         const tdSeries = document.createElement('td');
 
         tdSeries.classList.add('acciones');
-
         tdFecha.innerHTML = `${day}/${month}/${year}`;
         tdCodigo.innerHTML = movimiento.codProd;
         tdProducto.innerHTML = movimiento.producto;
@@ -300,7 +299,11 @@ async function actualizarTodosLosTrs(e) {
             await actualizarCuenta(cuenta,cuenta.importe); 
         }
     };
-    location.reload();
+
+    compensada.classList.add('none');
+    historica.classList.remove('none');
+    tipoLista = "compensada";
+    listarVentas(listaCompensada);
 };
 
 async function actualizarCuenta(cuenta,importeViejo) {
@@ -317,12 +320,10 @@ async function actualizarCuenta(cuenta,importeViejo) {
     for await (let mov of movimientos){
         const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`)).data;
         mov.precio = precio ? precio : mov.precio;
-        total += precio ? precio : mov.precio;
+        total += mov.precio * mov.cantidad;
     }
-
-
-    cuenta.importe = total;
-    cuenta.saldo = total - cuenta.pagado;
+    cuenta.importe = parseFloat(total.toFixed(2));
+    cuenta.saldo = parseFloat(redondear(total - cuenta.pagado,2));
     
     venta.precio = total; //Cambiamos el precio de venta
 
@@ -332,9 +333,18 @@ async function actualizarCuenta(cuenta,importeViejo) {
 
 
     let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${cuentaHistorica.idCliente}`)).data;
-    cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.nro_venta>cuentaHistorica.nro_venta && cuenta.fecha >= cuentaHistorica.fecha));
+    cuentasHistoricasRestantes.sort((a,b)=>{
+        if (a.fecha>b.fecha) {
+            return 1
+        }else if(a.fecha<b.fecha){
+            return -1
+        };
+        return 0
+    })
+    cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.fecha > cuentaHistorica.fecha));
 
-    cliente.saldo = redondear(cliente.saldo + total - importeViejo,20)//Nuvo saldo del cliente
+    cliente.saldo = redondear(cliente.saldo + total - importeViejo,2)//Nuvo saldo del cliente
+    saldo.value = cliente.saldo;
 
     await axios.put(`${URL}movimiento`,movimientos);
     await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
@@ -345,7 +355,7 @@ async function actualizarCuenta(cuenta,importeViejo) {
     let saldoAnterior = cuentaHistorica.saldo;
     
     for await(let elem of cuentasHistoricasRestantes){
-        elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
+        elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber,2)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
         saldoAnterior = elem.saldo;
         await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`,elem);
     }

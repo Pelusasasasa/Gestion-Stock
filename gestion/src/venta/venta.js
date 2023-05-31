@@ -149,7 +149,7 @@ codigo.addEventListener('keypress',async e=>{
 
 codBarra.addEventListener('keypress',async e=>{
     if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
-        cantidad.focus();
+        listarProducto(codBarra.value);
     }else if(e.key === "Enter" && codBarra.value === ""){
         descripcion.focus();
     }else if(codBarra.value === "999-999"){
@@ -745,7 +745,7 @@ condicionIva.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
-        listarProducto(codBarra.value);
+        
     }
 });
 

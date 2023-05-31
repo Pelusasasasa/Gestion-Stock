@@ -381,22 +381,29 @@ async function actualizarTodo(e) {
         //Historicas
         //Traemos lahistorica correspondiente y la actualizamos
         const historica = (await axios.get(`${URL}historica/porId/id/${cuenta.nro_venta}`)).data;
-        historica.saldo = historica.saldo - historica.debe + cuenta.importe;
-        historica.debe = cuenta.importe;
+        historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
+        historica.debe = parseFloat(cuenta.importe.toFixed(2));
         await axios.put(`${URL}historica/PorId/id/${historica.nro_venta}`,historica,configAxios);
 
         //Traemos las cuentas historicas que siguen despues de la principal
         let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${historica.idCliente}`,configAxios)).data;
-        cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(elem=>(elem.nro_venta>historica.nro_venta && elem.fecha >= historica.fecha));
-        
+        cuentasHistoricasRestantes.sort((a,b)=>{
+            if (a.fecha>b.fecha) {
+                return 1
+            }else if(a.fecha<b.fecha){
+                return -1
+            };
+            return 0
+        })
+        cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(elem=>(elem.fecha > historica.fecha));
+
         let saldoAnterior = historica.saldo;
         //Modificamos las cuentas historicas qrestantes
         for(let elem of cuentasHistoricasRestantes){
-            elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
+            elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber,2)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
             saldoAnterior = elem.saldo;
             await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`,elem,configAxios);
         };
-
     }
 
     actualizarSaldo(saldo);
@@ -408,8 +415,8 @@ async function actualizarMovimientos(cuenta){
         let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
         for(let mov of movimientos){
             const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
-            mov.precio = precio;
-            total += precio
+            mov.precio = precio ? precio*mov.cantidad : mov.precio * mov.cantidad;
+            total += mov.precio;
         };
         await axios.put(`${URL}movimiento`,movimientos,configAxios);
         return total;
