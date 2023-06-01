@@ -325,10 +325,9 @@ facturar.addEventListener('click',async e=>{
             venta.numero = numeros["Cuenta Corriente"] + 1;
         }else if(venta.tipo_venta === "PP"){
             venta.numero = numeros["Presupuesto"] + 1;
-        }else if(venta.tipo_venta === "CD"){
+        }else if(venta.tipo_venta === "CD" || venta.tipo_venta === "T"){
             venta.numero = numeros["Contado"] + 1;
         };
-
         if (venta.tipo_venta === "CC") {
             await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
         }else if(venta.tipo_venta === "PP"){
@@ -352,7 +351,6 @@ facturar.addEventListener('click',async e=>{
                     }
                     //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
                 }
-
                 venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock)
                 venta.tipo_venta !== "PP" && await axios.post(`${URL}movimiento`,movimientos);
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
