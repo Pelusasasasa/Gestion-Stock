@@ -31,6 +31,8 @@ const imprimir = document.querySelector('.imprimir');
 const entregado = document.querySelector('#entregado');
 const tarjeta = document.querySelector('#tarjeta');
 
+const alerta = document.querySelector('.alerta');
+
 let cuentaAFavor;
 let compensadas = [];
 
@@ -371,6 +373,7 @@ actualizar.addEventListener('click',actualizarTodo);
 async function actualizarTodo(e) {
     tbody.innerText = "";
     let saldo = 0;
+    alerta.classList.remove('none');
     for await(let cuenta of compensadas){
         cuenta.importe = await actualizarMovimientos(cuenta);
         cuenta.saldo = cuenta.importe - cuenta.pagado;
@@ -383,7 +386,7 @@ async function actualizarTodo(e) {
         const historica = (await axios.get(`${URL}historica/porId/id/${cuenta.nro_venta}`)).data;
         historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
         historica.debe = parseFloat(cuenta.importe.toFixed(2));
-        await axios.put(`${URL}historica/PorId/id/${historica.nro_venta}`,historica,configAxios);
+        await axios.put(`${URL}historica/PorId/id/${historica._id}`,historica,configAxios);
 
         //Traemos las cuentas historicas que siguen despues de la principal
         let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${historica.idCliente}`,configAxios)).data;
@@ -402,10 +405,10 @@ async function actualizarTodo(e) {
         for(let elem of cuentasHistoricasRestantes){
             elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber,2)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
             saldoAnterior = elem.saldo;
-            await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`,elem,configAxios);
+            await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
         };
     }
-
+    alerta.classList.add('none');
     actualizarSaldo(saldo);
 }
 

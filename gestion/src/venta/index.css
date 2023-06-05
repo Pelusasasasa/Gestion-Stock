@@ -123,6 +123,7 @@
 .parteProductos tbody td{
   border: .1rem solid black;
   word-break: break-all;
+  color: black;
 }
 
 .condicionVenta{
@@ -162,49 +163,12 @@
   padding: 1rem;
 }
 
-.alerta{
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  width: 100%;
-  height: 110%;
-  background-color: rgba(0,0,0,.5);
-}
-
 .texto{
   color: white;
 }
 
 .texto p{
   font-size: 2rem;
-}
-
-.spinner{
-margin-left: 5rem;
-border: .4rem solid rgba(0,0,0,1);
-width: 3.6rem;
-height: 3.6rem;
-border-radius: 50%;
-border-left-color: transparent;
-
-animation: spin 1s linear infinite
-
-}
-
-@keyframes spin{
-0%{
-  transform: rotate(0deg);
-}
-
-100%{
-  transform: rotate(360deg);
-}
 }
 
 .totales input[type=number],.botones input[type=number]{

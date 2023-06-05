@@ -5,7 +5,7 @@ const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
-const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, configAxios} = require('../helpers');
 
 const buscar = document.querySelector('#buscar');
 const compensada = document.querySelector('.compensada');
@@ -15,6 +15,7 @@ const borrar = document.querySelector('.borrar');
 const tbodyVenta = document.querySelector(".listaVentas tbody");
 const tbodyProducto = document.querySelector(".listaProductos tbody");
 const actualizar = document.querySelector('.actualizar');
+const alerta = document.querySelector('.alerta');
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
 const actualizarTodo = document.getElementById('actualizarTodo');
@@ -243,14 +244,14 @@ actualizar.addEventListener('click',async e=>{
             for await(let cuenta of cuentasHistoricasRestantes){
                 cuenta.saldo = cuenta.tipo_comp === "Recibo" ? parseFloat((saldoAnterior - cuenta.haber).toFixed(2)) : parseFloat((saldoAnterior + cuenta.debe).toFixed(2));
                 saldoAnterior = cuenta.saldo;
-                await axios.put(`${URL}historica/PorId/id/${cuenta.nro_venta}`,cuenta);
+                await axios.put(`${URL}historica/PorId/id/${cuenta._id}`,cuenta);
             };
             
             await axios.put(`${URL}movimiento`,movimientos);
             await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
             await axios.put(`${URL}ventas/id/${venta.numero}/CC`,venta);
             await axios.put(`${URL}compensada/traerCompensada/id/${cuentaCompensada.nro_venta}`,cuentaCompensada);
-            await axios.put(`${URL}historica/PorId/id/${cuentaHistorica.nro_venta}`,cuentaHistorica);
+            await axios.put(`${URL}historica/PorId/id/${cuentaHistorica._id}`,cuentaHistorica);
             const cuentaModificada = (await axios.get(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`)).data;
             listarProductos(movimientos)
             trSeleccionado.children[4].innerHTML = cuentaModificada.importe;
@@ -294,11 +295,13 @@ actualizarTodo.addEventListener('click',actualizarTodosLosTrs);
 
 async function actualizarTodosLosTrs(e) {
     const trs = document.querySelectorAll('.listaVentas tbody tr');
+    alerta.classList.remove('none');
     for await (let cuenta of listaCompensada){
         if(cuenta.tipo_comp === "Comprobante"){
             await actualizarCuenta(cuenta,cuenta.importe); 
         }
     };
+    alerta.classList.add('none');
 
     compensada.classList.add('none');
     historica.classList.remove('none');
@@ -350,13 +353,13 @@ async function actualizarCuenta(cuenta,importeViejo) {
     await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
     await axios.put(`${URL}ventas/id/${venta.numero}/CC`,venta);
     await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta);
-    await axios.put(`${URL}historica/PorId/id/${cuentaHistorica.nro_venta}`,cuentaHistorica);
+    await axios.put(`${URL}historica/PorId/id/${cuentaHistorica._id}`,cuentaHistorica,configAxios);
 
     let saldoAnterior = cuentaHistorica.saldo;
     
     for await(let elem of cuentasHistoricasRestantes){
         elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber,2)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
         saldoAnterior = elem.saldo;
-        await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`,elem);
+        await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
     }
 };
