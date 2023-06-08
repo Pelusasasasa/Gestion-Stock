@@ -678,7 +678,7 @@ const hacerHistoricaRecibo = async(numero,haber,tipo)=>{
     cuenta.cliente = nombre.value;
     cuenta.idCliente = codigo.value;
     cuenta.nro_venta = numero + 1;
-    cuenta.tipo = tipo;
+    cuenta.tipo_comp = tipo;
     cuenta.haber = haber;
     cuenta.saldo = parseFloat(total.value) - parseFloat(haber)  + parseFloat(saldo.value);
     (await axios.post(`${URL}historica`,cuenta)).data;

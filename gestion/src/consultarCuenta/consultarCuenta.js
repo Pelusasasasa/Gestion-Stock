@@ -358,7 +358,7 @@ async function actualizarCuenta(cuenta,importeViejo) {
     let saldoAnterior = cuentaHistorica.saldo;
     
     for await(let elem of cuentasHistoricasRestantes){
-        elem.saldo = elem.tipo_comp === "Recibo" ? parseFloat(redondear(saldoAnterior - elem.haber,2)) : parseFloat(redondear(elem.debe + saldoAnterior,2))
+        elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
         saldoAnterior = elem.saldo;
         await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
     }
