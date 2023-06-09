@@ -402,10 +402,15 @@ async function actualizarTodo(e) {
 
         let saldoAnterior = historica.saldo;
         //Modificamos las cuentas historicas qrestantes
+        let aux = -1;
         for(let elem of cuentasHistoricasRestantes){
-            elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
+            if (!(aux === elem.nro_venta)) {
+                elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
             saldoAnterior = elem.saldo;
             await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
+            }
+
+            aux = elem.nro_venta;
         };
     }
     alerta.classList.add('none');
