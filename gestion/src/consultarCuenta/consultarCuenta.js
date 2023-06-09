@@ -83,6 +83,7 @@ ipcRenderer.on('recibir',async (e,args)=>{
         listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${informacion}`)).data;
         const cliente = (await axios.get(`${URL}clientes/id/${informacion}`)).data;
         saldo.value = cliente.saldo;
+        buscar.value = cliente._id;
         clienteInput.value = cliente.nombre;
         
         listarVentas(listaCompensada)
@@ -345,7 +346,6 @@ async function actualizarCuenta(cuenta,importeViejo) {
         return 0
     })
     cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.fecha > cuentaHistorica.fecha));
-
     cliente.saldo = redondear(cliente.saldo + total - importeViejo,2)//Nuvo saldo del cliente
     saldo.value = cliente.saldo;
 
@@ -356,10 +356,13 @@ async function actualizarCuenta(cuenta,importeViejo) {
     await axios.put(`${URL}historica/PorId/id/${cuentaHistorica._id}`,cuentaHistorica,configAxios);
 
     let saldoAnterior = cuentaHistorica.saldo;
-    
+    let aux = -1;
     for await(let elem of cuentasHistoricasRestantes){
-        elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
-        saldoAnterior = elem.saldo;
-        await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
+        if (!(aux === elem.nro_venta)) {
+            elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
+            saldoAnterior = elem.saldo;
+            await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
+        }
+        aux = elem.nro_venta;
     }
 };
