@@ -68,7 +68,9 @@ let listaProductos = [];
 window.addEventListener('load',async e=>{
 
     if (tipoFactura === "notaCredito") {
-
+        situacion = "blanco";
+        body.classList.toggle('negro');
+        cambiarSituacion(situacion)
         await sweet.fire({
             title:"Numero de Factura Anterior",
             input:"text",
@@ -744,7 +746,7 @@ condicionIva.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
-        
+        descripcion.focus();
     }
 });
 

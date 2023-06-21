@@ -12,6 +12,7 @@ require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 let puntoVenta = archivo.puntoVenta;
+let condIva = archivo.condIva;
 
 let internetAvalible = require('internet-available');
 
@@ -75,7 +76,12 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(ultimaElectronica);
 
     console.log(parseFloat(venta.facturaAnterior));
-    let aux = venta.condicionIva === "Inscripo" ? 1 : 6
+    let aux
+    if (condIva === "Monotributo") {
+        aux = 11;
+    }else{
+        aux = venta.condicionIva === "Inscripto" ? 1 : 6;
+    }
     let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,aux);
     
     let data = {

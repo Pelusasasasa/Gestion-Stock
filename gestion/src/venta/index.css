@@ -11,10 +11,6 @@
   color: white;
 }
 
-.negro th,.negro td{
-  /* color: red; */
-} 
-
 .parteCliente{
   width: 100%;
   border: .1rem solid black;
@@ -56,6 +52,7 @@
 .parteProductos .buscarProductos{
   display: grid;
   grid-template-columns: 1fr 1fr 3fr 1fr 1fr;
+  gap: 2rem;
 }
 
 .parteProductos .buscarProductos div{
@@ -65,7 +62,7 @@
 }
 
 .parteProductos .buscarProductos div input{
-  width: 70%;
+  width: 100%;
   font-size: 1.7rem;
 }
 
