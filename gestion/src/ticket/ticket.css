@@ -87,15 +87,13 @@ img{
 
 .ticketPrecio{
     display: flex;
-    width: 50%;
+    width: 100%;
 }
 
 .ticketPrecio .titulo{
-    /* padding-right: 2rem; */
     padding-top: 2rem;
     padding-bottom: 2rem;
     width: 30px;
-    /* width: min-content; */
     background-color: black;
     display: flex;
     flex-direction: column;
@@ -115,7 +113,7 @@ img{
     flex-direction: column;
     justify-content: space-between;
     background-color: lightgray;
-    padding-right: 8rem;
+    width: 100%;
 }
 
 .ticketPrecio .descripcion p{
@@ -128,6 +126,7 @@ img{
 
 @media print{
     .ticketPrecio{
+        -webkit-print-color-adjust:exact;
         print-color-adjust: exact;
     }
 }
