@@ -106,11 +106,11 @@ img{
 .ticketPrecio .titulo p{
     color: white;
     margin: 0;
-    rotate: 270deg;
-
+    transform: rotate(270deg);
 }
 
 .ticketPrecio .descripcion{
+    border: .1rem solid black;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -124,4 +124,10 @@ img{
 
 .ticketPrecio .descripcion p,.ticketPrecio .descripcion h2{
     padding-left: 1rem;
+}
+
+@media print{
+    .ticketPrecio{
+        print-color-adjust: exact;
+    }
 }
