@@ -78,6 +78,13 @@ ipcMain.on('imprimir',(e,args)=>{
   });
 });
 
+ipcMain.on('imprimir-TicketPrecio',(e,args)=>{
+  abrirVentana('ticket/ticketPrecio.html',500,700);
+  nuevaVentana.webContents.on('did-finish-load',function() {
+    nuevaVentana.webContents.send('imprimir',args);
+  })
+})
+
 ipcMain.on('imprimir-ventana',(e,args)=>{
   nuevaVentana.webContents.print({silent:true},(success,errorType)=>{
     if (success) {

@@ -186,3 +186,12 @@ h1{
 .listaPrecios .listar input{
     transform: scale(1.5);
 }
+
+.botones .labelBotones{
+    display: flex;
+    align-items: center;
+}
+
+.botones .labelBotones label{
+    width: 100%;
+}

@@ -84,3 +84,44 @@ img{
     justify-content: center;
     align-items: center;
 }
+
+.ticketPrecio{
+    display: flex;
+    width: 50%;
+}
+
+.ticketPrecio .titulo{
+    /* padding-right: 2rem; */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    width: 30px;
+    /* width: min-content; */
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ticketPrecio .titulo p{
+    color: white;
+    margin: 0;
+    rotate: 270deg;
+
+}
+
+.ticketPrecio .descripcion{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: lightgray;
+    padding-right: 8rem;
+}
+
+.ticketPrecio .descripcion p{
+    margin-top: 1rem;
+}
+
+.ticketPrecio .descripcion p,.ticketPrecio .descripcion h2{
+    padding-left: 1rem;
+}

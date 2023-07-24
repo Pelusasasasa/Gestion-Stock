@@ -3,7 +3,8 @@ require('dotenv').config()
 const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
-const {apretarEnter} = require('../helpers')
+const {apretarEnter} = require('../helpers');
+const { ipcRenderer } = require('electron');
 
 const codigo = document.querySelector('#codigo');
 const marca = document.querySelector('#marca');
@@ -19,6 +20,7 @@ const nuevoCosto = document.querySelector('#nuevoCosto');
 const nuevoIva = document.querySelector('#nuevoIva')
 const nuevaGanancia = document.querySelector('#nuevaGanancia')
 const nuevoPrecio = document.querySelector('#nuevoPrecio');
+const ticketPrecio = document.querySelector('#ticketPrecio');
 const guardar = document.querySelector('.guardar');
 const salir = document.querySelector('.salir');
 
@@ -96,7 +98,8 @@ nuevoPrecio.addEventListener('focus',e =>{
 
 nuevoPrecio.addEventListener('keypress',e=>{
     apretarEnter(e,guardar);
-})
+});
+
 guardar.addEventListener('click',async e=>{
     producto.provedor = provedor.value.trim().toUpperCase();
     producto.costo = nuevoCosto.value !== "" ? parseFloat(nuevoCosto.value) : producto.costo;
@@ -106,9 +109,18 @@ guardar.addEventListener('click',async e=>{
     producto.stock = stock.value !== "" ? parseFloat(stock.value) : producto.stock;
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+
     await sweet.fire({
         title:mensaje
-    })
+    });
+
+    if (ticketPrecio.checked) {
+        ipcRenderer.send('imprimir-TicketPrecio',JSON.stringify({
+            descripcion:producto.descripcion,
+            precio:producto.precio
+        }));
+    }
+
     if (estado) {
         window.close();
     }
@@ -119,7 +131,10 @@ salir.addEventListener('click',e=>{
 });
 
 document.addEventListener('keyup',e=>{
+    console.log(e.keyCode)
     if (e.keyCode === 27) {
         window.close();
+    }else if(e.keyCode === 117){
+        ticketPrecio.checked = !ticketPrecio.checked;
     }
 });
