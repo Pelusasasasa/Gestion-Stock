@@ -121,6 +121,7 @@ img{
 
 .ticketPrecio .descripcion p{
     margin-top: 1rem;
+    font-size: 2rem;
 }
 
 .ticketPrecio .descripcion p,.ticketPrecio .descripcion h2{
@@ -130,6 +131,7 @@ img{
 .ticketPrecio .descripcion h2{
     font-size: 2.5rem;
     margin: 0;
+    margin-bottom: 1rem;
 }
 
 @media print{
