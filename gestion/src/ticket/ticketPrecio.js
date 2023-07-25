@@ -12,5 +12,5 @@ ipcRenderer.on('imprimir',(e,producto)=>{
     descripcion.innerText = elem.descripcion;
     precio.innerText = "$" + elem.precio.toFixed(2);
 
-    // ipcRenderer.send('imprimir-ventana');
+    ipcRenderer.send('imprimir-ventana');
 });
