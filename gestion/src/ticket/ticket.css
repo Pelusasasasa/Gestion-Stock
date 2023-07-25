@@ -88,6 +88,7 @@ img{
 .ticketPrecio{
     display: flex;
     width: 100%;
+    height: 110px;
 }
 
 .ticketPrecio .titulo{
@@ -104,6 +105,8 @@ img{
 .ticketPrecio .titulo p{
     color: white;
     margin: 0;
+    font-weight: bold;
+    font-size: 1.8rem;
     transform: rotate(270deg);
 }
 
@@ -122,6 +125,10 @@ img{
 
 .ticketPrecio .descripcion p,.ticketPrecio .descripcion h2{
     padding-left: 1rem;
+}
+
+.ticketPrecio .descripcion h2{
+    font-size: 2.5rem;
 }
 
 @media print{

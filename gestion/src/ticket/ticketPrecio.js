@@ -10,7 +10,7 @@ const precio = document.getElementById('precio');
 ipcRenderer.on('imprimir',(e,producto)=>{
     const elem = JSON.parse(producto);
     descripcion.innerText = elem.descripcion;
-    precio.innerText = "$" + elem.precio;
+    precio.innerText = "$" + elem.precio.toFixed(2);
 
-    ipcRenderer.send('imprimir-ventana');
+    // ipcRenderer.send('imprimir-ventana');
 });
