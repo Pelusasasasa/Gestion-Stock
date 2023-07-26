@@ -13,6 +13,7 @@ const costoIva = document.querySelector('#costoIva');
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
 const guardar = document.querySelector('.guardar');
+const ticketPrecio = document.querySelector('#ticketPrecio');
 
 const sweet  = require('sweetalert2');
 const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
@@ -75,8 +76,12 @@ guardar.addEventListener('click',async ()=>{
     producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
     producto.ganancia = ganancia.value;
     producto.precio = total.value;
-    const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data
+
+    const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data;
     vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+
+    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
+
     await sweet.fire({
         title:mensaje
     })
@@ -157,6 +162,12 @@ salir.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
     cerrarVentana(e)
 });
+
+document.addEventListener('keyup',e=>{
+    if (e.keyCode === 117) {
+        ticketPrecio.checked = !ticketPrecio.checked
+    }
+})
 
 codigo.addEventListener('focus',e=>{
     codigo.select();

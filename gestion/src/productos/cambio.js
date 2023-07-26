@@ -114,12 +114,7 @@ guardar.addEventListener('click',async e=>{
         title:mensaje
     });
 
-    if (ticketPrecio.checked) {
-        ipcRenderer.send('imprimir-TicketPrecio',JSON.stringify({
-            descripcion:producto.descripcion,
-            precio:producto.precio
-        }));
-    }
+    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
 
     if (estado) {
         window.close();

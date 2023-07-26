@@ -195,3 +195,23 @@ h1{
 .botones .labelBotones label{
     width: 100%;
 }
+
+.agregarProducto .accesorios,.modificarProducto .accesorios{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.agregarProducto .accesorios main,.modificarProducto .accesorios main{
+    display: flex;
+}
+
+.agregarProducto .accesorios label,.modificarProducto .accesorios label{
+    font-size: 1.5rem;   
+}
+
+.agregarProducto .accesorios input,.modificarProducto .accesorios input{
+    transform: scale(1.5);
+    margin-left: 2rem;
+}

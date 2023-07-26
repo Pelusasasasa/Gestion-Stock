@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -24,6 +24,7 @@ const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
+const ticketPrecio = document.querySelector('#ticketPrecio');
 
 let vendedor;
 
@@ -84,8 +85,12 @@ modificar.addEventListener('click',async e=>{
     producto.ganancia = parseFloat(ganancia.value).toFixed(2);
     producto.precio = parseFloat(total.value).toFixed(2);
     const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+
     await ipcRenderer.send('informacion-a-ventana',producto);
     vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+    
+    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
+
     await sweet.fire({
         title:mensaje
     })
@@ -207,4 +212,12 @@ salir.addEventListener('click',e=>{
 
 document.addEventListener('keydown',e=>{
     cerrarVentana(e);
-})
+});
+
+document.addEventListener('keyup',e=>{
+    if (e.keyCode === 117) {
+        ticketPrecio.checked = !ticketPrecio.checked;
+    }
+});
+
+

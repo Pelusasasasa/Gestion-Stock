@@ -413,8 +413,17 @@ funciones.verClienteValido = async(codigo)=>{
     };
 }
 
+funciones.imprimirTicketPrecio =(descripcion,precio,condicion)=>{
+    if (condicion) {
+        ipcRenderer.send('imprimir-TicketPrecio',JSON.stringify({
+            descripcion,
+            precio
+        }));
+    };
+};
+
 funciones.configAxios = {
-    
+   
 }
 
 module.exports = funciones;
