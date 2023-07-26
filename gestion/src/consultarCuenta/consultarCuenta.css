@@ -75,3 +75,8 @@ table tbody td{
     margin: 0 2rem;
 }
 
+@media (max-height: 720px){
+    .listaProductos{
+        height: 35vh;
+    }
+}

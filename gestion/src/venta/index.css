@@ -45,8 +45,12 @@
   font-size: 1.8rem;
 }
 
-.parteCliente div #saldo,.parteCliente div #codigo{
+.parteCliente div #codigo{
   width: 50%;
+}
+
+.parteCliente div #saldo{
+  margin-right: 1rem;
 }
 
 .parteProductos .buscarProductos{
@@ -178,4 +182,10 @@ footer .hijoFooter{
 
 footer main,footer button{
   margin: 0 1rem;
+}
+
+@media (max-height:720px){
+    .parteCliente{
+      padding: 0;
+    }
 }

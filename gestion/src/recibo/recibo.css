@@ -5,6 +5,10 @@
    margin-bottom: 2rem;
 }
 
+.cliente .nombre .input input:disabled{
+    font-weight: normal;
+}
+
 .nombre,.fecha{
     display: flex;
     justify-content: space-around;
@@ -61,3 +65,8 @@ footer{
     transform: scale(2);
 }
 
+@media (max-height:720px){
+    .tabla{
+        height: 60vh;
+    }
+}
