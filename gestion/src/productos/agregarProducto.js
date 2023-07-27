@@ -16,7 +16,7 @@ const guardar = document.querySelector('.guardar');
 const ticketPrecio = document.querySelector('#ticketPrecio');
 
 const sweet  = require('sweetalert2');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio} = require('../helpers');
 
 const archivo = require('../configuracion.json');
 

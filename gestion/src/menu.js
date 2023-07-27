@@ -214,6 +214,10 @@ ipcRenderer.on('libroIva',async (e,args)=>{
     location.href = "./libroIva/libroIva.html";
 });
 
+ipcRenderer.on('ticketsPrecio',e=>{
+    location.href = 'productos/ticketsPrecios.html';
+});
+
 const cargarPrimerCliente = async()=>{
     const id = (await axios.get(`${URL}clientes`)).data;
     if (id === 1) {
@@ -235,4 +239,4 @@ const cargarPrimerCliente = async()=>{
             })
         }
     }
-}
+};

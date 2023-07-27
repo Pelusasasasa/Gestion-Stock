@@ -3,7 +3,7 @@ require('dotenv').config()
 const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
-const {apretarEnter} = require('../helpers');
+const {apretarEnter, imprimirTicketPrecio} = require('../helpers');
 const { ipcRenderer } = require('electron');
 
 const codigo = document.querySelector('#codigo');

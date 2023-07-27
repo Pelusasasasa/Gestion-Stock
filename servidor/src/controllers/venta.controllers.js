@@ -19,7 +19,6 @@ ventaCTRL.putForId = async(req,res)=>{
 ventaCTRL.cargarVenta = async(req,res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    console.log(req.body.caja)
     const venta = new Venta(req.body);
     await venta.save();
     if (req.body.F) {

@@ -224,6 +224,12 @@ const hacerMenu = () => {
           click(){
             abrirVentana('productos/listaPrecios.html',1000,1000)
           }
+        },
+        {
+          label:"Tickets Precios",
+          click(){
+            ventanaPrincipal.webContents.send('ticketsPrecio');
+          }
         }
       ]
     },
