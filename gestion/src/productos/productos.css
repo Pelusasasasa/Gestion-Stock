@@ -215,3 +215,77 @@ h1{
     transform: scale(1.5);
     margin-left: 2rem;
 }
+
+.ticketsPrecio .fechas{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.ticketsPrecio .tarjetas{
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: white;
+    height: 75vh;
+    overflow-y: scroll;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+}
+
+.ticketPrecio{
+    display: flex;
+    width: 100%;
+    height: 110px;
+}
+
+.ticketPrecio .titulo{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    width: 30px;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.ticketPrecio .titulo span{
+    color: white;
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.6rem;
+    transform: rotate(270deg);
+}
+
+.ticketPrecio .descripcion{
+    border: .1rem solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: lightgray;
+    width: 100%;
+}
+
+.ticketPrecio .descripcion p{
+    margin-top: 1rem;
+    font-size: 2rem;
+}
+
+.ticketPrecio .descripcion p,.ticketPrecio .descripcion h2{
+    padding-left: 1rem;
+}
+
+.ticketPrecio .descripcion h2{
+    font-size: 2.5rem;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+@media print{
+    .ticketPrecio{
+        -webkit-print-color-adjust:exact;
+        print-color-adjust: exact;
+    }
+}

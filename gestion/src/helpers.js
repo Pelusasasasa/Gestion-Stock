@@ -422,6 +422,12 @@ funciones.imprimirTicketPrecio =(descripcion,precio,condicion)=>{
     };
 };
 
+funciones.fechaHoy = ()=>{
+    const now = new Date()
+    let fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+    return fecha
+}
+
 funciones.configAxios = {
    
 }
