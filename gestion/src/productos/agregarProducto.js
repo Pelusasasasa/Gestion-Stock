@@ -16,7 +16,7 @@ const guardar = document.querySelector('.guardar');
 const ticketPrecio = document.querySelector('#ticketPrecio');
 
 const sweet  = require('sweetalert2');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio, agregarProductoModificadoParaTicket} = require('../helpers');
 
 const archivo = require('../configuracion.json');
 
@@ -81,6 +81,8 @@ guardar.addEventListener('click',async ()=>{
     vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
 
     imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
+
+    await agregarProductoModificadoParaTicket(prodcuto);
 
     await sweet.fire({
         title:mensaje

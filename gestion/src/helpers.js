@@ -426,7 +426,17 @@ funciones.fechaHoy = ()=>{
     const now = new Date()
     let fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     return fecha
-}
+};
+
+funciones.agregarProductoModificadoParaTicket = async (producto)=>{
+    const productoModificado = {
+        codigo:producto._id,
+        descripcion: producto.descripcion,
+        precio: producto.precio
+    };
+
+    await axios.post(`${URL}productosModificados`,productoModificado);
+};
 
 funciones.configAxios = {
    

@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio, agregarProductoModificadoParaTicket} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -90,6 +90,8 @@ modificar.addEventListener('click',async e=>{
     vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
     
     imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
+
+    await agregarProductoModificadoParaTicket(producto);
 
     await sweet.fire({
         title:mensaje

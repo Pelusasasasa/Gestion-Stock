@@ -6,8 +6,18 @@ const Producto = require('../models/ProductosModificados');
 productosModificadosCTRL.post = async(req,res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    const modificado = new Producto(req.body);
-    await modificado.save();
+
+    const yaCreado = await Producto.findOne({codigo:req.body.codigo});
+
+    if (!yaCreado) {
+        const modificado = new Producto(req.body);
+        await modificado.save();
+        console.log(`Se modifico el producto ${req.body.descripcion} con la fecha y hora ${(new Date()).toLocaleString()}`)
+    }else{
+        yaCreado.precio = req.body.precio;
+        yaCreado.fecha = req.body.fecha;
+        await Producto.findOneAndUpdate({codigo:yaCreado.codigo},yaCreado);
+    };
     res.end();
 };
 

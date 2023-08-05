@@ -9,6 +9,7 @@ let lista = [];
 
 const desde = document.getElementById('desde');
 const hasta = document.getElementById('hasta');
+const fechas = document.querySelector('.fechas');
 const imprimir = document.getElementById('imprimir');
 const tarjetas = document.querySelector('.tarjetas');
 
@@ -66,5 +67,6 @@ async function traerProductos(desde,hasta) {
 };
 
 async function imprimirTickets(){
-    //Completar
+    fechas.classList.add('none');
+    window.print();
 }

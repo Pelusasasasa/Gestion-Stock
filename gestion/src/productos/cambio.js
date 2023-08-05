@@ -3,7 +3,7 @@ require('dotenv').config()
 const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
-const {apretarEnter, imprimirTicketPrecio} = require('../helpers');
+const {apretarEnter, imprimirTicketPrecio, agregarProductoModificadoParaTicket} = require('../helpers');
 const { ipcRenderer } = require('electron');
 
 const codigo = document.querySelector('#codigo');
@@ -115,6 +115,8 @@ guardar.addEventListener('click',async e=>{
     });
 
     imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
+
+    await agregarProductoModificadoParaTicket(producto);
 
     if (estado) {
         window.close();

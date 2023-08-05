@@ -227,7 +227,6 @@ h1{
     padding: 1rem;
     background-color: white;
     height: 75vh;
-    overflow-y: scroll;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2rem;
@@ -287,5 +286,9 @@ h1{
     .ticketPrecio{
         -webkit-print-color-adjust:exact;
         print-color-adjust: exact;
+    }
+
+    .tarjetas{
+        overflow: hidden;
     }
 }
