@@ -149,12 +149,6 @@ const hacerMenu = () => {
       label: "Datos",
       submenu:[
         {
-          label:"Vales Personal",
-          click(){
-            abrirVentana("vales/valesPersonal.html",1000,1000);
-          }
-        },
-        {
           label:"Numeros",
           click(){
             abrirVentana("numeros/numeros.html",750,700)

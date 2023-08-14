@@ -22,6 +22,7 @@ let subSeleccionado;
 let ventanaSecundaria = false;
 
 const seleccion = document.querySelector('#seleccion');
+const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
 const agregar = document.querySelector('.agregar');
 const salir = document.querySelector('.salir');
@@ -93,14 +94,6 @@ const listar = (productos)=>{
         tr.appendChild(tdAcciones)
         
         tbody.appendChild(tr);
-
-        seleccionado && seleccionado.classList.remove('seleccionado');
-        seleccionado = tbody.firstElementChild;
-        seleccionado.classList.add('seleccionado');
-
-        subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-        subSeleccionado = seleccionado.children[0];
-        subSeleccionado.classList.add('subSeleccionado');
     }
 }
 
@@ -188,12 +181,8 @@ agregar.addEventListener('click',e=>{
     ipcRenderer.send('abrir-ventana',opciones);
 })
 
-
-const body = document.querySelector('body');
-
 body.addEventListener('keypress',e=>{
-    if (e.key === "Enter" && ventanaSecundaria){
-        console.log(document.activeElement.nodeName)
+    if (e.key === "Enter" && ventanaSecundaria){    
         if (seleccionado && document.activeElement.nodeName !== "INPUT") {
             ipcRenderer.send('enviar',{
                         tipo:"producto",
