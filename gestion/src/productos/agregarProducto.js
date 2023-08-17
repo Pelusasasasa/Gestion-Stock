@@ -24,7 +24,7 @@ require('dotenv').config()
 const URL = process.env.GESTIONURL;
 
 let vendedor;
-
+//Funciones
 const traerRubros = async()=>{
     const rubros =  (await axios.get(`${URL}rubro`)).data;
     for await(let {numero,rubro} of rubros){
@@ -34,6 +34,8 @@ const traerRubros = async()=>{
         select.appendChild(option)
     }
 }
+
+
 
 traerRubros();
 
@@ -61,27 +63,38 @@ total.addEventListener('focus',e=>{
     total.value = (parseFloat(costoIva.value) + (parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100)).toFixed(2);
 });
 
-guardar.addEventListener('click',async ()=>{
-    const producto = {}
-    producto._id = codigo.value;
-    producto.descripcion = descripcion.value.trim().toUpperCase();
-    producto.marca = marca.value.trim().toUpperCase();
-    producto.rubro = rubro.value.trim();
-    producto.provedor = provedor.value.toUpperCase().trim();
-    producto.stock = stock.value;
-    producto.costo = costo.value;
-    producto.costoDolar = costoDolar.value;
-    producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
-    producto.ganancia = ganancia.value;
-    producto.precio = total.value;
-    const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data
-    vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
-    await sweet.fire({
-        title:mensaje
-    })
-    if (estado) {
-        window.close();
-    } 
+guardar.addEventListener('click',async e=>{
+    const producto = {};
+    e.preventDefault();
+    const verificacion = await verificarDatos();
+
+    if (verificacion) {
+        producto._id = codigo.value;
+        producto.descripcion = descripcion.value.trim().toUpperCase();
+        producto.marca = marca.value.trim().toUpperCase();
+        producto.rubro = rubro.value.trim();
+        producto.provedor = provedor.value.toUpperCase().trim();
+        producto.stock = stock.value;
+        producto.costo = costo.value;
+        producto.costoDolar = costoDolar.value;
+        producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
+        producto.ganancia = ganancia.value;
+        producto.precio = total.value;
+
+        const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data;
+
+        vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+        await sweet.fire({
+            title:mensaje,
+            icon: "success",
+            confirmButtonText:"Aceptar"
+        })
+        
+        //Si el estado es true de que se guardo el producto salimos de la pagina
+        if (estado) {
+            window.close();
+        };
+    }
 });
 
 codigo.addEventListener('keypress',async e=>{
@@ -204,3 +217,51 @@ ganancia.addEventListener('focus',e=>{
 total.addEventListener('focus',e=>{
     total.select();
 });
+
+
+async function verificarDatos(){
+
+    if (codigo.value === "") {
+        await sweet.fire({title:"Poner un codigo al Proucto"});
+        codigo.focus();
+        return false;
+    };
+
+    if(descripcion.value === ""){
+        await sweet.fire({title:"Poner una Descripcion al Producto"});
+        descripcion.focus();
+        return false;
+    };
+
+    if (stock.value === "") {
+        await sweet.fire({title: "Poner un stock al producto"});
+        stock.focus();
+        return false;
+    };
+
+    if (costo.value === "") {
+        await sweet.fire({title: "Poner un costo en pesos al Producto"});
+        costo.focus();
+        return false;
+    };
+
+    if (costoDolar.value === "") {
+        await sweet.fire({title: "Poner un costo en Dolar al Producto"});
+        costoDolar.focus();
+        return false;
+    };
+
+    if (ganancia.value === "") {
+        await sweet.fire({title: "Poner una Ganancia al Producto"});
+        ganancia.focus();
+        return false;
+    };
+
+    if (total.value === "") {
+        await sweet.fire({title: "Poner un Total al Producto"});
+        ganancia.focus();
+        return false;
+    };
+
+    return true;
+};

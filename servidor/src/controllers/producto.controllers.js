@@ -87,28 +87,18 @@ productoCTRL.cargarProducto = async(req,res)=>{
     let producto;
     let mensaje;
     let estado;
-    req.body.descripcion = req.body.descripcion.toUpperCase();
-    req.body.marca !== "" && (req.body.marca = req.body.marca.toUpperCase());
-    req.body.rubro !== "" ? (req.body.rubro = req.body.rubro.toUpperCase()) : "";
+    
     try {
         producto = new Producto(req.body);
         await producto.save();
         mensaje = `Producto ${producto.descripcion} cargado`;
         estado = true;
     } catch (error) {
-        estado = false;
         console.log(error)
-        if(producto.descripcion === ""){
-            mensaje = `Producto no cargado, Falta la descripcion`
-        }else if(!producto.stock){
-            mensaje = `Producto no cargado, Falta el stock`
-        }else if(!producto.costo){
-            mensaje = `Producto no cargado, Falta el costo`
-        }else{
-            mensaje = `Producto ${producto.descripcion} No cargado`;
-        }
-    }
-    console.log(mensaje)
+    };
+
+    console.log(mensaje);
+
     res.send(JSON.stringify({
         mensaje,
         estado

@@ -11,6 +11,7 @@ const Producto = new mongoose.Schema({
     },
     marca:{
         type: String,
+        default: ""
     },
     rubro:{
         type:String,
