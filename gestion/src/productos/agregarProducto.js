@@ -14,7 +14,7 @@ const total = document.querySelector('#total');
 const guardar = document.querySelector('.guardar');
 
 const sweet  = require('sweetalert2');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, verificarDatos} = require('../helpers');
 
 const archivo = require('../configuracion.json');
 
@@ -33,9 +33,7 @@ const traerRubros = async()=>{
         option.value = rubro;
         select.appendChild(option)
     }
-}
-
-
+};
 
 traerRubros();
 
@@ -83,15 +81,16 @@ guardar.addEventListener('click',async e=>{
 
         const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data;
 
-        vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
         await sweet.fire({
             title:mensaje,
             icon: "success",
             confirmButtonText:"Aceptar"
-        })
+        });
         
-        //Si el estado es true de que se guardo el producto salimos de la pagina
+        //Si el estado es true de que se guardo el producto salimos de la pagina Y guaradmos el movimineto del vendeor si esta activado
         if (estado) {
+            await ipcRenderer.send('informacion-a-ventana-principal',producto);
+            vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
             window.close();
         };
     }
@@ -114,14 +113,13 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-
 descripcion.addEventListener('keypress',e=>{
     apretarEnter(e,marca);
 })
 
 marca.addEventListener('keypress',e=>{
     apretarEnter(e,rubro);
-})
+});
 
 rubro.addEventListener('keypress',e=>{
     if (e.key === "Enter") {
@@ -217,51 +215,3 @@ ganancia.addEventListener('focus',e=>{
 total.addEventListener('focus',e=>{
     total.select();
 });
-
-
-async function verificarDatos(){
-
-    if (codigo.value === "") {
-        await sweet.fire({title:"Poner un codigo al Proucto"});
-        codigo.focus();
-        return false;
-    };
-
-    if(descripcion.value === ""){
-        await sweet.fire({title:"Poner una Descripcion al Producto"});
-        descripcion.focus();
-        return false;
-    };
-
-    if (stock.value === "") {
-        await sweet.fire({title: "Poner un stock al producto"});
-        stock.focus();
-        return false;
-    };
-
-    if (costo.value === "") {
-        await sweet.fire({title: "Poner un costo en pesos al Producto"});
-        costo.focus();
-        return false;
-    };
-
-    if (costoDolar.value === "") {
-        await sweet.fire({title: "Poner un costo en Dolar al Producto"});
-        costoDolar.focus();
-        return false;
-    };
-
-    if (ganancia.value === "") {
-        await sweet.fire({title: "Poner una Ganancia al Producto"});
-        ganancia.focus();
-        return false;
-    };
-
-    if (total.value === "") {
-        await sweet.fire({title: "Poner un Total al Producto"});
-        ganancia.focus();
-        return false;
-    };
-
-    return true;
-};

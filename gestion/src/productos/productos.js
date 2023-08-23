@@ -47,15 +47,15 @@ ipcRenderer.on('informacion',(e,args)=>{
 ipcRenderer.on('informacion-a-ventana',(e,args)=>{
     const producto = JSON.parse(args);
     const trModificado = document.getElementById(producto._id);
-    trModificado.children[1].innerHTML = producto.descripcion;
-    trModificado.children[2].innerHTML = producto.precio;
-    trModificado.children[3].innerHTML = producto.stock;
-    trModificado.children[4].innerHTML = producto.marca;
+    trModificado.children[1].innerText = producto.descripcion;
+    trModificado.children[2].innerText = producto.precio;
+    trModificado.children[3].innerText = producto.stock;
+    trModificado.children[4].innerText = producto.marca;
 });
 
 const listar = (productos)=>{
     tbody.innerHTML = "";
-    for(let {_id,descripcion,marca,stock,precio} of productos){
+    for(let {_id,descripcion,marca,rubro,stock,precio} of productos){
         const tr = document.createElement('tr');
         tr.id = _id;
 
@@ -63,6 +63,7 @@ const listar = (productos)=>{
         const tdDescripcion = document.createElement('td');
         const tdPrecio = document.createElement('td');
         const tdStock = document.createElement('td');
+        const tdRubro = document.createElement('td');
         const tdMarca = document.createElement('td');
         const tdAcciones = document.createElement('td');
         
@@ -75,6 +76,7 @@ const listar = (productos)=>{
         tdPrecio.innerHTML = redondear(precio,2);
         tdStock.innerHTML = redondear(stock,2);
         tdMarca.innerHTML = marca;
+        tdRubro.innerText = rubro;
         tdAcciones.innerHTML = `
             <div id=edit class=tool>
                 <span id=edit class=material-icons>edit</span>
@@ -91,6 +93,7 @@ const listar = (productos)=>{
         tr.appendChild(tdPrecio);
         tr.appendChild(tdStock);
         tr.appendChild(tdMarca);
+        tr.appendChild(tdRubro);
         tr.appendChild(tdAcciones)
         
         tbody.appendChild(tr);

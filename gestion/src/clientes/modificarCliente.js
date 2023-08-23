@@ -109,16 +109,15 @@ modificar.addEventListener('click',async e=>{
     cliente.cuit = cuit.value;
     cliente.condicionIva = condicionIva.value;
     cliente.observaciones = observaciones.value.toUpperCase();
-    try {
-        const mensaje = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
-        vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
-        await sweet.fire({title:mensaje});
-        ipcRenderer.send('enviar-ventana-principal',cliente);
-        window.close();
-    } catch (error) {
-        sweet.fire({title:"No se pudo modificar el cliente"});
-        console.log(error)
-    }
+    
+    const {mensaje,estado} = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
+    console.log(mensaje)
+        if (estado) {
+            vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
+            await sweet.fire({title:mensaje});
+            ipcRenderer.send('enviar-ventana-principal',cliente);
+            window.close();
+        }
 })
 
 document.addEventListener('keydown',e=>{

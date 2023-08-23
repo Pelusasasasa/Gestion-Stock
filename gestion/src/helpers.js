@@ -422,4 +422,50 @@ funciones.sacarCosto = (costo,costoDolar,impuesto=0,dolar)=>{
     }
 }
 
+funciones.verificarDatos = async ()=>{
+    if (codigo.value === "") {
+        await sweet.fire({title:"Poner un codigo al Proucto"});
+        codigo.focus();
+        return false;
+    };
+
+    if(descripcion.value === ""){
+        await sweet.fire({title:"Poner una Descripcion al Producto"});
+        descripcion.focus();
+        return false;
+    };
+
+    if (stock.value === "") {
+        await sweet.fire({title: "Poner un stock al producto"});
+        stock.focus();
+        return false;
+    };
+
+    if (costo.value === "") {
+        await sweet.fire({title: "Poner un costo en pesos al Producto"});
+        costo.focus();
+        return false;
+    };
+
+    if (costoDolar.value === "") {
+        await sweet.fire({title: "Poner un costo en Dolar al Producto"});
+        costoDolar.focus();
+        return false;
+    };
+
+    if (ganancia.value === "") {
+        await sweet.fire({title: "Poner una Ganancia al Producto"});
+        ganancia.focus();
+        return false;
+    };
+
+    if (total.value === "") {
+        await sweet.fire({title: "Poner un Total al Producto"});
+        ganancia.focus();
+        return false;
+    };
+
+    return true;
+};
+
 module.exports = funciones;

@@ -60,6 +60,8 @@ ipcRenderer.on('informacion',(e,args)=>{
     } 
 });
 
+ipcRenderer.on('informacion-a-ventana-principal',listarclienteNuevo);
+
 
 //abrimos una ventana para agregar cliente
 agregar.addEventListener('click',e=>{
@@ -69,7 +71,7 @@ agregar.addEventListener('click',e=>{
 
 //listamos los clientes, con sus datos
 const listarClientes = async(clientes)=>{
-    for await(let {_id,nombre,telefono,direccion,cuit,condicionIva,saldo} of clientes){
+    for await(let {_id,nombre,telefono,direccion,localidad,cuit,condicionIva,saldo} of clientes){
         const tr = document.createElement('tr');
         tr.id = _id;
 
@@ -84,13 +86,13 @@ const listarClientes = async(clientes)=>{
 
         tdAcciones.classList.add('acciones');
 
-        tdId.innerHTML = _id;
-        tdNombre.innerHTML = nombre;
-        tdDireccion.innerHTML = direccion;
-        tdTelefono.innerHTML = telefono;
-        tdCuit.innerHTML = cuit ? cuit : ""
-        tdCondicionIva.innerHTML = condicionIva ? condicionIva : ""
-        tdSaldo.innerHTML = saldo.toFixed(2);
+        tdId.innerText = _id;
+        tdNombre.innerText = nombre;
+        tdDireccion.innerText = direccion + " - " + localidad;
+        tdTelefono.innerText = telefono;
+        tdCuit.innerText = cuit ? cuit : ""
+        tdCondicionIva.innerText = condicionIva ? condicionIva : ""
+        tdSaldo.innerText = saldo.toFixed(2);
         tdAcciones.innerHTML = `
             <div class=tool>
                 <span class=material-icons>edit</span>
@@ -216,3 +218,50 @@ ipcRenderer.on('recibir-ventana-secundaria',(e,args)=>{
 salir.addEventListener('click',e=>{
     location.href = "../menu.html";
 });
+
+function listarclienteNuevo(e,cliente){
+    const {_id,nombre,direccion,telefono,localidad,cuit,condicionIva} = JSON.parse(cliente);
+    const tr = document.createElement('tr');
+
+    tr.id = _id;
+
+    const tdId = document.createElement('td');
+    const tdNombre = document.createElement('td');
+    const tdDireccion = document.createElement('td');
+    const tdTelefono = document.createElement('td');
+    const tdCuit = document.createElement('td');
+    const tdCondicionIva = document.createElement('td');
+    const tdSaldo = document.createElement('td');
+    const tdAcciones = document.createElement('td');
+
+    tdAcciones.classList.add('acciones');
+
+    tdId.innerText = _id;
+    tdNombre.innerText = nombre;
+    tdDireccion.innerText = direccion + "-" + localidad; 
+    tdTelefono.innerText = telefono;
+    tdCuit.innerText = cuit;
+    tdCondicionIva.innerText = condicionIva;
+    tdSaldo.innerText = "0.00";
+    tdAcciones.innerHTML = `
+    <div class=tool>
+        <span class=material-icons>edit</span>
+        <p class=tooltip>Modificar</p>
+    </div>
+    <div class="tool ${permiso !== 0 && "none"}">
+        <span class=material-icons>delete</span>
+        <p class=tooltip>Eliminar</p>
+    </div>
+`
+
+    tr.appendChild(tdId);
+    tr.appendChild(tdNombre);
+    tr.appendChild(tdDireccion);
+    tr.appendChild(tdTelefono);
+    tr.appendChild(tdCuit);
+    tr.appendChild(tdCondicionIva);
+    tr.appendChild(tdSaldo);
+    tr.appendChild(tdAcciones);
+
+    tbody.appendChild(tr);
+}

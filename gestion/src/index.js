@@ -125,7 +125,7 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   })
 
   nuevaVentana.on('close',async()=>{
-    if (direccion === "./clientes/agregarCliente.html" || direccion === "./productos/agregarProducto.html" || reinicio) {
+    if (reinicio) {
       ventanaPrincipal.reload()
     }
   })
@@ -134,7 +134,11 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
 
 ipcMain.on('informacion-a-ventana',(e,args)=>{
   ventanaPrincipal.webContents.send('informacion-a-ventana',JSON.stringify(args));
-})
+});
+
+ipcMain.on('informacion-a-ventana-principal',(e,args)=>{
+  ventanaPrincipal.webContents.send('informacion-a-ventana-principal',JSON.stringify(args));
+});
 
 ipcMain.handle('saveDialog',async(e,args)=>{
   const path = (await dialog.showSaveDialog()).filePath;

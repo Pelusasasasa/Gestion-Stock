@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores} = require('../helpers');
+const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, verificarDatos} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -71,26 +71,35 @@ const llenarInputs = async(codigoProducto)=>{
 
 //al hacer click modificamos los productos con el valor de los inputs
 modificar.addEventListener('click',async e=>{
-    const producto = {};
-    producto._id = codigo.value;
-    producto.descripcion = descripcion.value.trim().toUpperCase();
-    producto.marca = marca.value.trim().toUpperCase();
-    producto.rubro = rubro.value.trim().toUpperCase();
-    producto.provedor = provedor.value.trim().toUpperCase();
-    producto.stock = parseFloat(stock.value).toFixed(2);
-    producto.costo = parseFloat(costo.value).toFixed(2);
-    producto.costoDolar = parseFloat(costoDolar.value).toFixed(2);
-    producto.impuesto = parseFloat(impuesto.value).toFixed(2);
-    producto.ganancia = parseFloat(ganancia.value).toFixed(2);
-    producto.precio = parseFloat(total.value).toFixed(2);
-    const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
-    await ipcRenderer.send('informacion-a-ventana',producto);
-    vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
-    await sweet.fire({
-        title:mensaje
-    })
-    if (estado) {
-        window.close();
+    const verificacion = await verificarDatos();
+
+    if(verificacion){
+        const producto = {};
+        producto._id = codigo.value;
+        producto.descripcion = descripcion.value.trim().toUpperCase();
+        producto.marca = marca.value.trim().toUpperCase();
+        producto.rubro = rubro.value;
+        producto.provedor = provedor.value.trim().toUpperCase();
+        producto.stock = parseFloat(stock.value).toFixed(2);
+        producto.costo = parseFloat(costo.value).toFixed(2);
+        producto.costoDolar = parseFloat(costoDolar.value).toFixed(2);
+        producto.impuesto = parseFloat(impuesto.value).toFixed(2);
+        producto.ganancia = parseFloat(ganancia.value).toFixed(2);
+        producto.precio = parseFloat(total.value).toFixed(2);
+        
+        const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+
+        await ipcRenderer.send('informacion-a-ventana',producto);
+
+        vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+        
+        await sweet.fire({
+            title:mensaje
+        });
+
+        if (estado) {
+            window.close();
+        };
     }
 })
 
@@ -207,4 +216,4 @@ salir.addEventListener('click',e=>{
 
 document.addEventListener('keydown',e=>{
     cerrarVentana(e);
-})
+});

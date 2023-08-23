@@ -20,12 +20,12 @@
             <legend>Identificador</legend>
             <section class="identificador">
                 <div class="input">
-                    <label for="codigo">Codigo</label>
+                    <label for="codigo">Codigo *</label>
                     <input type="text" autofocus name="codigo" id="codigo">
                 </div>
         
                 <div class="input descripcion">
-                    <label for="descripcion">Descripcion</label>
+                    <label for="descripcion">Descripcion *</label>
                     <input type="text" name="descripcion" id="descripcion">
                 </div>
             </section>
@@ -48,7 +48,7 @@
                     <input type="text" name="provedor" id="provedor">
                 </div>
                 <div class="input">
-                    <label for="stock">Stock</label>
+                    <label for="stock">Stock *</label>
                     <input type="number" value="0.00" name="stock" id="stock">
                 </div>
             </section>
@@ -59,11 +59,11 @@
 
             <section class="precios">
                 <div class="input">
-                    <label for="costo">costo</label>
+                    <label for="costo">costo *</label>
                     <input type="number" value="0.00" name="costo" id="costo"> 
                 </div>
                 <div class="input">
-                    <label for="costoDolar">Costo Dolar</label>
+                    <label for="costoDolar">Costo Dolar *</label>
                     <input type="number" value="0.00" name="costoDolar" id="costoDolar"> 
                 </div>
                 <div class="input">
@@ -81,11 +81,11 @@
             <legend>Total</legend>
             <section class="total">
                 <div class="input">
-                    <label for="ganancia">Ganancia</label>
+                    <label for="ganancia">Ganancia *</label>
                     <input type="number" value="0.00" name="ganancia" id="ganancia"> 
                 </div>
                 <div class="input">
-                    <label for="total">Total</label>
+                    <label for="total">Total *</label>
                     <input type="number" value="0.00" name="total" id="total"> 
                 </div>
             </section>
@@ -95,6 +95,7 @@
             <button class="guardar">Guardar Producto</button>
             <button class="salir">Salir</button>
         </main>
+        <section class="aclaracion">Los Campos que tengan el * tienen que se obligatorios, los costos pueden contener el valor 0</section>
 </body>
 <script src="./agregarProducto.js"></script>
 </html>

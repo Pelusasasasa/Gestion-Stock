@@ -34,9 +34,7 @@ clienteCTRL.cargarCliente = async(req,res)=>{
     let cliente;
     let mensaje;
     let estado;
-    req.body.nombre = req.body.nombre.toUpperCase();
-    req.body.localidad !== "" && (req.body.localidad = req.body.localidad.toUpperCase());
-    req.body.localidad !== "" && (req.body.direccion = req.body.direccion.toUpperCase());
+
     try {
         cliente = new Clientes(req.body);
         await  cliente.save();
@@ -44,12 +42,10 @@ clienteCTRL.cargarCliente = async(req,res)=>{
         estado = true;
     } catch (error) {
         estado = false;
-        if (cliente.nombre === "") {
-            mensaje = (`Cliente No Cargado, Falta el nombre`)
-        }else{
-            mensaje = (`Cliente ${cliente.nombre} No Fue Cargado`)
-        }
-    }
+        mensaje = (`Cliente ${cliente.nombre} No Fue Cargado`)
+        console.log(error)
+    };
+    
     console.log(mensaje)
     res.send(JSON.stringify({
         mensaje,
@@ -59,9 +55,22 @@ clienteCTRL.cargarCliente = async(req,res)=>{
 
 clienteCTRL.modificarCliente = async(req,res)=>{
     const {id} = req.params;
-    const cliente = await Clientes.findOneAndUpdate({_id:id},req.body);
-    console.log(`Cliente ${cliente.nombre} Modificado`);
-    res.send(`Cliente ${cliente.nombre} Modificado`);
+    let mensaje;
+    let estado;
+    try {
+        const cliente = await Clientes.findOneAndUpdate({_id:id},req.body);
+        estado = true;
+        console.log(`Cliente ${cliente.nombre} Modificado`);
+        mensaje = `Cliente ${cliente.nombre} Modificado`;
+    } catch (error) {
+        estado = false;
+        mensaje = `Cliente ${cliente.nombre} No fue Modificado`;
+        console.log(error);
+    };
+
+    res.send(JSON.stringify({
+        mensaje,estado
+    }));
 }
 
 clienteCTRL.eliminarCliente = async(req,res) =>{

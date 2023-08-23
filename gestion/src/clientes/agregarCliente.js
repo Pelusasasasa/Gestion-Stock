@@ -83,6 +83,14 @@ cuit.addEventListener('blur',async e=>{
 });
 
 agregar.addEventListener('click',async e=>{
+    if (nombre.value === "") {
+        await sweet.fire({
+            title:"Agregar descripcion al cliente"
+        });
+        nombre.focus();
+        return;
+    }
+
     const cliente = {};
     cliente._id = codigo.value;
     cliente.nombre = nombre.value.trim().toUpperCase();
@@ -93,22 +101,18 @@ agregar.addEventListener('click',async e=>{
     cliente.condicionIva = condicionIva.value;
     cliente.condicionFacturacion = condicionFacturacion.value;
     cliente.observaciones = observaciones.value.trim().toUpperCase();
-    try {
-        const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
-        vendedor && await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
-        await sweet.fire({
-            title:mensaje
-        });
-        if (estado) {
-            window.close();
-        }
-    } catch (error) {
-        console.log(error)
-        sweet.fire({
-            title:"No se pudo agregar un cliente"
-        })
-    }
 
+    const {mensaje,estado} = (await axios.post(`${URL}clientes`,cliente)).data;
+    vendedor && await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
+    
+    await sweet.fire({
+        title:mensaje
+    });
+
+    if (estado) {
+        await ipcRenderer.send('informacion-a-ventana-principal',cliente);
+        window.close();
+    };
 });
 
 salir.addEventListener('click',e=>{

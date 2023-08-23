@@ -99,6 +99,11 @@ select{
   border: .1rem solid black;
 }
 
+.aclaracion{
+  margin-top: 2rem;
+ text-align: center;
+}
+
 table tbody{
   white-space: nowrap;
 }
