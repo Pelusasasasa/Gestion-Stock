@@ -389,15 +389,8 @@ const listarVentas = async (ventas)=>{
     }
     let totalVenta = 0;
     for await(let venta of lista){
-        const fecha = venta.fecha.slice(11,18).split(':',3);
-        let hora = fecha[0];
-        let minutos = fecha[1];
-        let segundos = fecha[2];
-
-        // hora = hora < 10 ? `0${hora}` : hora;
-        // minutos = minutos < 10 ? `0${minutos}` : minutos;
-        segundos = segundos < 10 ? `0${segundos}` : segundos;
-
+        const fecha = venta.fecha.slice(0,10).split('-',3).reverse().join('/');
+        const hora = venta.fecha.slice(11,19).split(':',3).join(':');
         const tr = document.createElement('tr');
         tr.id = venta._id;
         tr.classList.add('bold')
@@ -417,7 +410,7 @@ const listarVentas = async (ventas)=>{
         tdAcciones.classList.add('acciones')
 
         tdNumero.innerHTML = venta.numero;
-        tdFecha.innerHTML = `${hora}:${minutos}:${segundos}`;
+        tdFecha.innerHTML = fecha + " - " + hora;
         tdCliente.innerHTML = venta.cliente;
         tdCodProducto.innerHTML = venta.tipo_comp;
         tdProducto.innerHTML = "";

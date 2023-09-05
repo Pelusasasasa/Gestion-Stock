@@ -67,6 +67,7 @@ let porcentajeH = 0;
 let descuento = 0;
 let dolar = 0;
 let listaProductos = [];
+let seleccionado;
 
 ipcRenderer.on('informacion',(e,args)=>{
     dolar = args;
@@ -97,109 +98,6 @@ window.addEventListener('load',async e=>{
     listarCliente(1);//listanos los clientes
     
     cambiarSituacion(situacion);//
-});
-
-document.addEventListener('keydown',e=>{
-    if (e.keyCode === 18) {
-        document.addEventListener('keydown',event=>{
-            if (event.keyCode === 120) {
-                body.classList.toggle('negro');
-                situacion = situacion === "negro" ? "blanco" : "negro";
-                cambiarSituacion(situacion);
-            }
-        },{once:true})
-    }else if(e.keyCode === 113){
-        const opciones = {
-            path:"clientes/agregarCliente.html",
-            ancho: 900,
-            altura: 600
-        }
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else if(e.keyCode === 114){
-        const opciones = {
-            path:"productos/agregarProducto.html",
-            ancho:900,
-            altura:650
-        };
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else if(e.keyCode === 115){
-        const opciones = {
-            path: "productos/cambio.html",
-            ancho:1000,
-            altura:550,
-        }
-        ipcRenderer.send('abrir-ventana',opciones); 
-    }else if(e.keyCode === 116){
-        const opciones = {
-            path:"gastos/gastos.html",
-            ancho:500,
-            altura:400
-        }
-        ipcRenderer.send('abrir-ventana',opciones);   
-    }else if(e.keyCode === 117){
-        impresion.checked = !impresion.checked;
-    }
-});
-
-//Buscamos un cliente, si sabemos el codigo directamente apretamos enter
-codigo.addEventListener('keypress',async e=>{
-    if (e.key === "Enter") {
-        if (codigo.value === "") {
-            const opciones = {
-                path: './clientes/clientes.html',
-                botones:false,
-            }
-            ipcRenderer.send('abrir-ventana',opciones)
-        }else{
-            listarCliente(codigo.value)
-        }
-    }
-});
-
-codBarra.addEventListener('keypress',async e=>{
-    if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
-        cantidad.focus();
-    }else if(e.key === "Enter" && codBarra.value === ""){
-        //Esto abre una ventana donde lista todos los productos
-        const opciones = {
-            path: "./productos/productos.html",
-            botones: false
-        }
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else if(codBarra.value === "999-999"){
-        cantidad.focus();
-    }
-
-    if(e.keyCode === 37){
-        cantidad.focus();
-    }
-});
-
-lista.addEventListener('change',togglePrecios);
-
-descripcion.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        precioU.focus();
-    }
-});
-
-precioU.addEventListener('keypress',async e=>{
-    if ((e.key === "Enter")) {
-        if (precioU.value !== "") {
-            crearProducto();
-        }else{
-            await sweet.fire({
-                title:"Poner un precio al Producto",
-            });
-        }
-    }
-});
-
-iva.addEventListener('keypress',e=>{
-    if (e.key === "Enter") {
-        e.preventDefault();
-        precioU.focus();
-    }
 });
 
 const crearProducto = ()=>{
@@ -256,22 +154,6 @@ ipcRenderer.on('recibir',(e,args)=>{
     tipo === "cliente" && listarCliente(informacion);
     tipo === "producto" && listarProducto(informacion);
     tipo === "Ningun cliente" && nombre.focus();
-});
-
-porcentaje.addEventListener('change',async e=>{
-        porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value;
-        descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100,2);
-        for await(let {cantidad,producto} of listaProductos){       
-            totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2))
-            producto.precio = parseFloat(redondear(producto.precio / (porcentajeH/100 + 1),2));
-            producto.precio = parseFloat(redondear(producto.precio + producto.precio*parseFloat(porcentaje.value)/100,2));
-            const tr = document.getElementById(producto.idTabla)
-            tr.children[4].innerHTML = producto.precio.toFixed(2);
-            tr.children[5].innerHTML = redondear(producto.precio*cantidad,2);
-            totalGlobal = parseFloat(redondear(totalGlobal + producto.precio*cantidad,2));
-            total.value = totalGlobal.toFixed(2);
-        }
-        porcentajeH = parseFloat(porcentaje.value);
 });
 
 //Vemos que input tipo radio esta seleccionado
@@ -628,9 +510,7 @@ const listarProducto = async(id)=>{
 
 };
 
-let seleccionado;
 //Hacemos para que se seleccione un tr
-
 tbody.addEventListener('click',async e=>{
     seleccionado && seleccionado.classList.remove('seleccionado');
     if (e.target.nodeName === "TD") {
@@ -726,6 +606,33 @@ const sacarIva = (lista) => {
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
 };
 
+//Esta funcion genera un recibo cuando ponemos un valor distinto de 0 en el input de recibo
+async function hacerRecibo(numero){
+    const recibo = {};
+    recibo.fecha = new Date();
+    recibo.cliente = nombre.value;
+    recibo.idCliente = codigo.value;
+    recibo.numero = numero + 1;
+    recibo.precio = inputRecibo.value;
+    recibo.tipo_comp = "Recibo";
+    recibo.tipo_venta = "CD";
+    await hacerHistoricaRecibo(recibo.numero,recibo.precio,recibo.tipo_comp);
+    await axios.post(`${URL}recibo`,recibo);
+    await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
+};
+
+//Esta funcion genera una cuenta historica cuando ponemos un valor distinto de 0 en el input de recibo
+async function hacerHistoricaRecibo (numero,haber,tipo){
+    const cuenta = {};
+    cuenta.cliente = nombre.value;
+    cuenta.idCliente = codigo.value;
+    cuenta.nro_venta = numero + 1;
+    cuenta.tipo = tipo;
+    cuenta.haber = haber;
+    cuenta.saldo = parseFloat(total.value) - parseFloat(haber)  + parseFloat(saldo.value);
+    (await axios.post(`${URL}historica`,cuenta)).data;
+};
+
 codigo.addEventListener('focus',e=>{
     codigo.select();
 });
@@ -768,7 +675,6 @@ inputRecibo.addEventListener('focus',e=>{
 
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {
-        
         sweet.fire({
             title: "Cancelar Venta?",
             "showCancelButton": true,
@@ -780,32 +686,50 @@ document.addEventListener('keydown',e=>{
             }
         });
     };
+
+    if (e.keyCode === 18) {
+        document.addEventListener('keydown',event=>{
+            if (event.keyCode === 120) {
+                body.classList.toggle('negro');
+                situacion = situacion === "negro" ? "blanco" : "negro";
+                cambiarSituacion(situacion);
+            }
+        },{once:true})
+    }else if(e.keyCode === 113){
+        const opciones = {
+            path:"clientes/agregarCliente.html",
+            ancho: 900,
+            altura: 600
+        };
+        ipcRenderer.send('abrir-ventana',opciones);
+    }else if(e.keyCode === 114){
+        const opciones = {
+            path:"productos/agregarProducto.html",
+            ancho:900,
+            altura:650
+        };
+        ipcRenderer.send('abrir-ventana',opciones);
+    }else if(e.keyCode === 115){
+        const opciones = {
+            path: "productos/cambio.html",
+            ancho:1000,
+            altura:550,
+        }
+        ipcRenderer.send('abrir-ventana',opciones); 
+    }else if(e.keyCode === 116){
+        const opciones = {
+            path:"gastos/gastos.html",
+            ancho:500,
+            altura:400
+        }
+        ipcRenderer.send('abrir-ventana',opciones);   
+    }else if(e.keyCode === 117){
+        impresion.checked = !impresion.checked;
+    }else if(e.keyCode === 118){
+        checkboxDolar.checked = !checkboxDolar.checked;
+        togglePrecios();
+    };
 });
-
-const hacerRecibo = async(numero)=>{
-    const recibo = {};
-    recibo.fecha = new Date();
-    recibo.cliente = nombre.value;
-    recibo.idCliente = codigo.value;
-    recibo.numero = numero + 1;
-    recibo.precio = inputRecibo.value;
-    recibo.tipo_comp = "Recibo";
-    recibo.tipo_venta = "CD";
-    await hacerHistoricaRecibo(recibo.numero,recibo.precio,recibo.tipo_comp);
-    await axios.post(`${URL}recibo`,recibo);
-    await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
-};
-
-const hacerHistoricaRecibo = async(numero,haber,tipo)=>{
-    const cuenta = {};
-    cuenta.cliente = nombre.value;
-    cuenta.idCliente = codigo.value;
-    cuenta.nro_venta = numero + 1;
-    cuenta.tipo = tipo;
-    cuenta.haber = haber;
-    cuenta.saldo = parseFloat(total.value) - parseFloat(haber)  + parseFloat(saldo.value);
-    (await axios.post(`${URL}historica`,cuenta)).data;
-};
 
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
 const cambiarSituacion = (situacion) =>{
@@ -914,6 +838,82 @@ tbody.addEventListener('dblclick',async se=>{
 //Cambiamos los precios si se habilita el dolar
 checkboxDolar.addEventListener('change',togglePrecios);
 
+//Buscamos un cliente, si sabemos el codigo directamente apretamos enter
+codigo.addEventListener('keypress',async e=>{
+    if (e.key === "Enter") {
+        if (codigo.value === "") {
+            const opciones = {
+                path: './clientes/clientes.html',
+                botones:false,
+            }
+            ipcRenderer.send('abrir-ventana',opciones)
+        }else{
+            listarCliente(codigo.value)
+        }
+    }
+});
+
+codBarra.addEventListener('keypress',async e=>{
+    if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
+        cantidad.focus();
+    }else if(e.key === "Enter" && codBarra.value === ""){
+        //Esto abre una ventana donde lista todos los productos
+        const opciones = {
+            path: "./productos/productos.html",
+            botones: false
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
+    }else if(codBarra.value === "999-999"){
+        cantidad.focus();
+    }
+
+    if(e.keyCode === 37){
+        cantidad.focus();
+    }
+});
+
+lista.addEventListener('change',togglePrecios);
+
+descripcion.addEventListener('keypress',e=>{
+    if (e.keyCode === 13) {
+        precioU.focus();
+    }
+});
+
+precioU.addEventListener('keypress',async e=>{
+    if ((e.key === "Enter")) {
+        if (precioU.value !== "") {
+            crearProducto();
+        }else{
+            await sweet.fire({
+                title:"Poner un precio al Producto",
+            });
+        }
+    }
+});
+
+iva.addEventListener('keypress',e=>{
+    if (e.key === "Enter") {
+        e.preventDefault();
+        precioU.focus();
+    }
+});
+
+porcentaje.addEventListener('change',async e=>{
+    porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value;
+    descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100,2);
+    for await(let {cantidad,producto} of listaProductos){       
+        totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2))
+        producto.precio = parseFloat(redondear(producto.precio / (porcentajeH/100 + 1),2));
+        producto.precio = parseFloat(redondear(producto.precio + producto.precio*parseFloat(porcentaje.value)/100,2));
+        const tr = document.getElementById(producto.idTabla)
+        tr.children[4].innerHTML = producto.precio.toFixed(2);
+        tr.children[5].innerHTML = redondear(producto.precio*cantidad,2);
+        totalGlobal = parseFloat(redondear(totalGlobal + producto.precio*cantidad,2));
+        total.value = totalGlobal.toFixed(2);
+    }
+    porcentajeH = parseFloat(porcentaje.value);
+});
 
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
@@ -951,7 +951,7 @@ async function togglePrecios(e) {
         }
     };
     calcularTotal();
-}
+};
 
 async function calcularTotal() {
     const trs = document.querySelectorAll('tbody tr');
@@ -961,4 +961,4 @@ async function calcularTotal() {
     };
 
     total.value = redondear(aux,2);
-}
+};
