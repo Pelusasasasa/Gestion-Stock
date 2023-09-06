@@ -788,7 +788,11 @@ condicionIva.addEventListener('keypress',e=>{
 
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
-        listarProducto(codBarra.value);
+        if (eval(e.target.value)) {
+            listarProducto(codBarra.value);
+        }else{
+            cantidad.value = "";
+        };
     }
 });
 
