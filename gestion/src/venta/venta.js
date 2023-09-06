@@ -214,6 +214,7 @@ facturar.addEventListener('click',async e=>{
         venta.gravado105 = gravado105;
         venta.cantIva = cantIva;
         venta.direccion = direccion.value;
+        venta.localidad = localidad.value;
         venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
 
         venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
@@ -299,7 +300,7 @@ facturar.addEventListener('click',async e=>{
 })
 
 //Lo que hacemos es listar el cliente traido
-const listarCliente = async(id)=>{
+async function listarCliente(id){
     codigo.value = id;
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
     if (cliente !== "") {
@@ -307,6 +308,7 @@ const listarCliente = async(id)=>{
         saldo.value = cliente.saldo;
         telefono.value = cliente.telefono;
         localidad.value = cliente.localidad;
+        direccion.value = cliente.direccion;
         cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
         codBarra.focus();

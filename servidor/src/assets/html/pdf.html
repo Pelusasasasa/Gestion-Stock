@@ -50,6 +50,10 @@
             font-weight: 400;
         }
 
+        .dueño main main p{
+            margin: 0;
+        }
+
         .tipoFactura div{
             border: .5rem solid black;
             text-align: center;
@@ -69,6 +73,10 @@
         .cliente{
             border: .3rem solid black;
             padding: 0 2rem;
+        }
+
+        .cliente .nombre p,.cliente .domicilio p{
+            width: 550px;
         }
 
         .cliente main{
@@ -102,8 +110,14 @@
 
         table td{
             text-align: end;
-            word-break: break-all;
+            vertical-align: top;
         }
+        table .tdDescripcion{
+            width: 500px;
+            word-wrap: break-word;
+        }
+
+
         img{
             width: 15rem;
         }
@@ -171,8 +185,6 @@
                     <th>Cantidad</th>
                     <th>Precio</th>
                     <th>Iva</th>
-                    <th>% Bonif.</th>
-                    <th>Imp. Bonif</th>
                     <th>Subtotal</th>
                 </tr>
             </thead>
