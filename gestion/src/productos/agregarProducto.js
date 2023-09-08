@@ -1,17 +1,23 @@
-const salir = document.querySelector('.salir');
+//Identificador
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
+//Informacion
+const unidad = document.querySelector('#unidad');
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const provedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
+//Precio
 const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
+//Total
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
+//Botones
 const guardar = document.querySelector('.guardar');
+const salir = document.querySelector('.salir');
 
 const sweet  = require('sweetalert2');
 const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, verificarDatos} = require('../helpers');
@@ -48,19 +54,6 @@ window.addEventListener('load',async e=>{
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
 });
 
-impuesto.addEventListener('blur',e=>{
-    impuesto.value = impuesto.value === "" ? 0 : impuesto.value;
-    if (parseFloat(costoDolar.value) !== 0) {
-        costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoDolar.value)/100) + parseFloat(costoDolar.value)) * parseFloat(dolar.value),2)
-    }else{
-        costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costo.value)/100) + parseFloat(costo.value)).toFixed(2);
-    }
-});
-
-total.addEventListener('focus',e=>{
-    total.value = (parseFloat(costoIva.value) + (parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100)).toFixed(2);
-});
-
 guardar.addEventListener('click',async e=>{
     const producto = {};
     e.preventDefault();
@@ -78,6 +71,7 @@ guardar.addEventListener('click',async e=>{
         producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
         producto.ganancia = ganancia.value;
         producto.precio = total.value;
+        producto.unidad = unidad.value;
 
         const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data;
 
@@ -114,8 +108,13 @@ codigo.addEventListener('keypress',async e=>{
 });
 
 descripcion.addEventListener('keypress',e=>{
+    apretarEnter(e,unidad);
+});
+
+unidad.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,marca);
-})
+});
 
 marca.addEventListener('keypress',e=>{
     apretarEnter(e,rubro);
@@ -214,4 +213,17 @@ ganancia.addEventListener('focus',e=>{
 
 total.addEventListener('focus',e=>{
     total.select();
+});
+
+impuesto.addEventListener('blur',e=>{
+    impuesto.value = impuesto.value === "" ? 0 : impuesto.value;
+    if (parseFloat(costoDolar.value) !== 0) {
+        costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoDolar.value)/100) + parseFloat(costoDolar.value)) * parseFloat(dolar.value),2)
+    }else{
+        costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costo.value)/100) + parseFloat(costo.value)).toFixed(2);
+    }
+});
+
+total.addEventListener('focus',e=>{
+    total.value = (parseFloat(costoIva.value) + (parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100)).toFixed(2);
 });

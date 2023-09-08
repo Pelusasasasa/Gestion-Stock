@@ -44,6 +44,14 @@ const Producto = new mongoose.Schema({
     precio:{
         type:Number,
         required:true
+    },
+    unidad:{
+        type:String,
+        default:""
+    },
+    ultimaModificacion:{
+        type: Date,
+        default: Date.now
     }
 
 

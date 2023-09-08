@@ -384,6 +384,21 @@ const descontarStock = async({cantidad,producto})=>{
 //Lo que hacemos es listar el producto traido
 const listarProducto = async(id)=>{
         let producto = (await axios.get(`${URL}productos/${id}`)).data;//buscamos el producto por codigo
+
+        if(!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad'){
+            descripcion.value = producto.descripcion;
+
+            await sweet.fire({
+                title:"No se puede poner una cantidad con decimal a un producto que se venda por unidad",
+                returnFocus:false
+            });
+            cantidad.value = "1.00";
+            descripcion.value = "";
+            codBarra.value = "";
+            codBarra.focus();
+            return;
+        }
+
         producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;//buscamos el producto por descripcion
     
         //ponemos el precio del producto con un descuento si es que hay
@@ -874,6 +889,7 @@ codBarra.addEventListener('keypress',async e=>{
     }
 
     if(e.keyCode === 37){
+        console.log("a")
         cantidad.focus();
     }
 });

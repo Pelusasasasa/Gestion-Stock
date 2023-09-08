@@ -8,20 +8,26 @@ const URL = process.env.GESTIONURL;
 
 const archivo = require('../configuracion.json')
 
-const dolar = document.getElementById('dolar');
 
+//Identificador
+const dolar = document.getElementById('dolar');
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
+//Informacion
+const unidad = document.querySelector('#unidad');
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const provedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
+//Precio
 const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
+//Total
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
+//Botones
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
@@ -52,6 +58,7 @@ ipcRenderer.on('informacion',async (e,args)=>{
 const llenarInputs = async(codigoProducto)=>{
     codigo.value = codigoProducto;
     const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+    unidad.value = producto.unidad;
     descripcion.value = producto.descripcion;
     marca.value = producto.marca;
     provedor.value = producto.provedor;
@@ -77,6 +84,7 @@ modificar.addEventListener('click',async e=>{
         const producto = {};
         producto._id = codigo.value;
         producto.descripcion = descripcion.value.trim().toUpperCase();
+        producto.unidad = unidad.value;
         producto.marca = marca.value.trim().toUpperCase();
         producto.rubro = rubro.value;
         producto.provedor = provedor.value.trim().toUpperCase();
@@ -108,6 +116,11 @@ codigo.addEventListener('keypress',e=>{
 });
 
 descripcion.addEventListener('keypress',e=>{
+    apretarEnter(e,unidad);
+});
+
+unidad.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,marca);
 });
 

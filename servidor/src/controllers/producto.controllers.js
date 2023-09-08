@@ -12,9 +12,8 @@ productoCTRL.descontarStock = async(req,res)=>{
         console.log(`Producto ${producto.descripcion} modificado el stock a: ${producto.stock}`)
     };
     res.send("Stock Modificado")
-}
+};
 
-//traemos los productos
 productoCTRL.getsProductos = async(req,res)=>{
     const {descripcion,condicion} = req.params;
     let productos;
@@ -41,7 +40,7 @@ productoCTRL.traerPrecio = async(req,res)=>{
     const {id} = req.params
     const producto = (await Producto.find({_id:id},{precio:1,_id:0}))[0];
     res.send(`${producto.precio}`);
-}
+};
 
 productoCTRL.traerProducto = async(req,res)=>{
     const {id} = req.params;
@@ -55,19 +54,23 @@ productoCTRL.traerProducto = async(req,res)=>{
         producto = (await Producto.findOne({_id:id}));
     }
     res.send(producto);
-}
+};
 
 productoCTRL.traerProductoPorNombre = async(req,res)=>{
     const {nombre} = req.params;
     const producto = await Producto.findOne({descripcion:nombre});
     res.send(producto);
-}
+};
 
 productoCTRL.modificarProducto = async(req,res)=>{
     const {id} = req.params;
     let producto;
     let mensaje;
     let estado;
+
+    const now = new Date();
+    req.body.ultimaModificacion = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+
     try {
         producto = await Producto.findOneAndUpdate({_id:id},req.body);
         mensaje = `Producto ${producto.descripcion} Modificado`;
@@ -81,7 +84,7 @@ productoCTRL.modificarProducto = async(req,res)=>{
         mensaje
     }));    
     
-}
+};
 
 productoCTRL.cargarProducto = async(req,res)=>{
     let producto;
@@ -103,14 +106,13 @@ productoCTRL.cargarProducto = async(req,res)=>{
         mensaje,
         estado
     }));
-}
+};
 
 productoCTRL.eliminarProducto = async(req,res)=>{
     const {id} = req.params;
     const producto = await Producto.findOneAndRemove({_id:id});
     res.send(`Producto ${producto.descripcion} eliminado`);
-}
-
+};
 
 productoCTRL.traerMarcas = async(req,res)=>{
     const productos = await Producto.find({},{_id:0,marca:1});
@@ -121,7 +123,7 @@ productoCTRL.traerMarcas = async(req,res)=>{
         }
     })
     res.send(marcas);
-}
+};
 
 productoCTRL.putMarcas = async(req,res)=>{
     const {porcentaje, marca} = req.body;
@@ -150,7 +152,7 @@ productoCTRL.cambioPreciosPorDolar = async(req,res)=>{
     }
     console.log("Cambios el precio de los productos con dolares");
     res.end();
-}
+};
 
 productoCTRL.productosPorMarcas = async(req,res)=>{
     let {lista} = req.params;
@@ -197,6 +199,20 @@ productoCTRL.traerCosto = async(req,res)=>{
         const dolar = (await Numero.findOne()).Dolar;
         res.send(`${producto.costoDolar * dolar}`);
     }
+};
+
+productoCTRL.traerModificados = async(req,res)=>{
+    const {fecha} = req.params;
+    const desde = new Date(fecha + 'T00:00:00.000Z');
+    const hasta = new Date(fecha + 'T23:59:59.000Z');
+    const productos = await Producto.find({
+        $and:
+        [
+            {ultimaModificacion:{$gte:desde}},
+            {ultimaModificacion:{$lte:hasta}}
+        ]
+    });
+    res.send(productos);
 }
 
 module.exports = productoCTRL
