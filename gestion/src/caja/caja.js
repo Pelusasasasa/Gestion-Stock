@@ -413,7 +413,7 @@ const listarVentas = async (ventas)=>{
         tdFecha.innerHTML = fecha + " - " + hora;
         tdCliente.innerHTML = venta.cliente;
         tdCodProducto.innerHTML = venta.tipo_comp;
-        tdProducto.innerHTML = "";
+        tdProducto.innerHTML = venta.tipo_comp = 'Recibo' ? venta.valorRecibido : '';
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
         tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
         tdCaja.innerHTML = venta.caja;

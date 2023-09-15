@@ -32,7 +32,12 @@ const Recibo = new mongoose.Schema({
     tipo_venta:{
         type:String,
         default:"CD"
+    },
+    valorRecibido:{
+        type:String,
+        required:true
     }
+
 });
 
 module.exports = mongoose.model("Recibo",Recibo);

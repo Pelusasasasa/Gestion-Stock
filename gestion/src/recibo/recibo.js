@@ -22,15 +22,21 @@ const nombre = document.querySelector('#nombre');
 const saldo = document.querySelector('#saldo');
 const localidad = document.querySelector('#localidad');
 const direccion = document.querySelector('#direccion');
+
 const fecha = document.querySelector('#fecha');
-const cancelar = document.querySelector('.cancelar');
+
+
 const tbody = document.querySelector('tbody');
 const total = document.querySelector('#total');
 const imprimir = document.querySelector('.imprimir');
 const entregado = document.querySelector('#entregado');
+const cheque = document.querySelector('#cheque');
+const cancelar = document.querySelector('.cancelar');
+
 const tarjeta = document.querySelector('#tarjeta');
 
-let cuentaAFavor
+let cuentaAFavor;
+let nroCheque = "";
 
 const hoy = new Date();
 let d = hoy.getDate();
@@ -49,6 +55,24 @@ ipcRenderer.on('recibir',(e,args)=>{
 });
 
 
+cheque.addEventListener('click',async ()=>{
+    let {isConfirmed,value, isDismissed, dismiss} = await sweet.fire({
+        title:"Numero Cheque",
+        input:"number",
+        confirmButtonText:"Guardar",
+        showCancelButton:true,
+        inputValue:nroCheque
+    });
+    if (isConfirmed) {
+        nroCheque = value;
+    };
+
+    if (isDismissed && dismiss === 'cancel'){
+        nroCheque = "";
+        cheque.checked = false;
+    }
+
+})
 
 //Pnemos los valores del cliente traido
 const ponerInputs = async(id)=>{
@@ -204,6 +228,7 @@ imprimir.addEventListener('click',async e=>{
     recibo.numero = (await axios.get(`${URL}numero`)).data["Recibo"] + 1; //ponemos el numero traido mas 1|
     recibo.tipo_comp = "Recibo";
     recibo.descuento = 0;
+    recibo.valorRecibido = nroCheque ? `CHEQUE ${nroCheque}` : "EFECTIVO";
     recibo.precio = parseFloat(total.value);
     recibo.vendedor = vendedor ? vendedor : "";
     recibo.caja = archivo.caja;
