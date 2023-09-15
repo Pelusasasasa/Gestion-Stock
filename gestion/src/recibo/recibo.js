@@ -58,7 +58,7 @@ ipcRenderer.on('recibir',(e,args)=>{
 cheque.addEventListener('click',async ()=>{
     let {isConfirmed,value, isDismissed, dismiss} = await sweet.fire({
         title:"Numero Cheque",
-        input:"number",
+        input:"text",
         confirmButtonText:"Guardar",
         showCancelButton:true,
         inputValue:nroCheque
@@ -228,7 +228,7 @@ imprimir.addEventListener('click',async e=>{
     recibo.numero = (await axios.get(`${URL}numero`)).data["Recibo"] + 1; //ponemos el numero traido mas 1|
     recibo.tipo_comp = "Recibo";
     recibo.descuento = 0;
-    recibo.valorRecibido = nroCheque ? `CHEQUE ${nroCheque}` : "EFECTIVO";
+    recibo.valorRecibido = nroCheque ? `CHEQUE ${nroCheque.toUpperCase()}` : "EFECTIVO";
     recibo.precio = parseFloat(total.value);
     recibo.vendedor = vendedor ? vendedor : "";
     recibo.caja = archivo.caja;
@@ -300,6 +300,7 @@ const ponerEnCuentaHistorica = async(recibo)=>{
     cuenta.nro_venta = recibo.numero;
     cuenta.haber = recibo.precio;
     cuenta.tipo_comp = "Recibo";
+    cuenta.condicion = `CHEQUE ${nroCheque.toUpperCase()}`;
     const cliente = (await axios.get(`${URL}clientes/id/${recibo.idCliente}`)).data;
     cuenta.saldo = (cliente.saldo - recibo.precio).toFixed(2);
     await axios.post(`${URL}historica`,cuenta);
