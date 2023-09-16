@@ -650,45 +650,6 @@ async function hacerHistoricaRecibo (numero,haber,tipo){
     (await axios.post(`${URL}historica`,cuenta)).data;
 };
 
-codigo.addEventListener('focus',e=>{
-    codigo.select();
-});
-
-nombre.addEventListener('focus',e=>{
-    nombre.select()
-});
-
-cuit.addEventListener('focus',e=>{
-    cuit.select()
-});
-
-localidad.addEventListener('focus',e=>{
-    localidad.select();
-});
-
-telefono.addEventListener('focus',e=>{
-    telefono.select();
-});
-
-direccion.addEventListener('focus',e=>{
-    direccion.select();
-});
-
-total.addEventListener('focus',e=>{
-    total.select();
-});
-
-cantidad.addEventListener('focus',e=>{
-    cantidad.select();
-});
-
-porcentaje.addEventListener('focus',e=>{
-    porcentaje.select();
-});
-
-inputRecibo.addEventListener('focus',e=>{
-    inputRecibo.select();
-});
 
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {
@@ -770,52 +731,6 @@ const verCodigoDocumento = async(cuit)=>{
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
 })
-
-nombre.addEventListener('keypress',e=>{
-    apretarEnter(e,cuit);
-});
-
-cuit.addEventListener('keypress',e=>{
-    apretarEnter(e,lista);
-});
-
-lista.addEventListener('keypress',e=>{
-    e.preventDefault();
-    apretarEnter(e,telefono);
-});
-
-telefono.addEventListener('keypress',e=>{
-    apretarEnter(e,localidad);
-});
-
-localidad.addEventListener('keypress',e=>{
-    apretarEnter(e,direccion);
-});
-
-direccion.addEventListener('keypress',e=>{
-    apretarEnter(e,condicionIva);
-});
-
-condicionIva.addEventListener('keypress',e=>{
-    e.preventDefault();
-    apretarEnter(e,codBarra);
-});
-
-cantidad.addEventListener('keypress',async e=>{
-    if (e.keyCode === 13) {
-        if (eval(e.target.value)) {
-            listarProducto(codBarra.value);
-        }else{
-            cantidad.value = "";
-        };
-    }
-});
-
-cantidad.addEventListener('keydown',e=>{
-    if(e.keyCode === 39){
-        codBarra.focus();
-    }
-});
 
 tbody.addEventListener('dblclick',async se=>{
     await sweet.fire({
@@ -944,6 +859,7 @@ volver.addEventListener('click',()=>{
 async function togglePrecios(e) { 
     for await(let {cantidad,producto} of listaProductos){
         const tr = document.getElementById(`${producto.idTabla}`);
+        console.log(producto)
         if(lista.value === "1"){
             if (checkboxDolar.checked) {
                 tr.children[5].innerText = redondear(producto.precio / dolar,2);
@@ -955,19 +871,19 @@ async function togglePrecios(e) {
         }else{
             if (checkboxDolar.checked) {
                 if (producto.costo !== 0) {
-                    tr.children[5].innerText = redondear(producto.costo / dolar , 2);
-                    tr.children[6].innerText = redondear(producto.costo / dolar * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costo * 1.21 / dolar , 2);
+                    tr.children[6].innerText = redondear(producto.costo * 1.21 / dolar * parseFloat(tr.children[1].innerText), 2);
                 }else{
-                    tr.children[5].innerText = redondear(producto.costoDolar, 2);
-                    tr.children[6].innerText = redondear(producto.costoDolar * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costoDolar * 1.21, 2);
+                    tr.children[6].innerText = redondear(producto.costoDolar * 1.21 * parseFloat(tr.children[1].innerText), 2);
                 }
             }else{
                 if (producto.costo !== 0) {
-                    tr.children[5].innerText = redondear(producto.costo,2);
-                    tr.children[6].innerText = redondear(producto.costo * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costo * 1.21,2);
+                    tr.children[6].innerText = redondear(producto.costo * 1.21 * parseFloat(tr.children[1].innerText), 2);
                 }else{
-                    tr.children[5].innerText = redondear(producto.costoDolar * dolar,2);
-                    tr.children[6].innerText = redondear(producto.costoDolar * dolar * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costoDolar * 1.21 * dolar,2);
+                    tr.children[6].innerText = redondear(producto.costoDolar * 1.21 * dolar * parseFloat(tr.children[1].innerText), 2);
                 }
             }
         }
@@ -984,3 +900,91 @@ async function calcularTotal() {
 
     total.value = redondear(aux,2);
 };
+
+
+
+nombre.addEventListener('keypress',e=>{
+    apretarEnter(e,cuit);
+});
+
+cuit.addEventListener('keypress',e=>{
+    apretarEnter(e,lista);
+});
+
+lista.addEventListener('keypress',e=>{
+    e.preventDefault();
+    apretarEnter(e,telefono);
+});
+
+telefono.addEventListener('keypress',e=>{
+    apretarEnter(e,localidad);
+});
+
+localidad.addEventListener('keypress',e=>{
+    apretarEnter(e,direccion);
+});
+
+direccion.addEventListener('keypress',e=>{
+    apretarEnter(e,condicionIva);
+});
+
+condicionIva.addEventListener('keypress',e=>{
+    e.preventDefault();
+    apretarEnter(e,codBarra);
+});
+
+cantidad.addEventListener('keypress',async e=>{
+    if (e.keyCode === 13) {
+        if (eval(e.target.value)) {
+            listarProducto(codBarra.value);
+        }else{
+            cantidad.value = "";
+        };
+    }
+});
+
+cantidad.addEventListener('keydown',e=>{
+    if(e.keyCode === 39){
+        codBarra.focus();
+    }
+});
+
+codigo.addEventListener('focus',e=>{
+    codigo.select();
+});
+
+nombre.addEventListener('focus',e=>{
+    nombre.select()
+});
+
+cuit.addEventListener('focus',e=>{
+    cuit.select()
+});
+
+localidad.addEventListener('focus',e=>{
+    localidad.select();
+});
+
+telefono.addEventListener('focus',e=>{
+    telefono.select();
+});
+
+direccion.addEventListener('focus',e=>{
+    direccion.select();
+});
+
+total.addEventListener('focus',e=>{
+    total.select();
+});
+
+cantidad.addEventListener('focus',e=>{
+    cantidad.select();
+});
+
+porcentaje.addEventListener('focus',e=>{
+    porcentaje.select();
+});
+
+inputRecibo.addEventListener('focus',e=>{
+    inputRecibo.select();
+});
