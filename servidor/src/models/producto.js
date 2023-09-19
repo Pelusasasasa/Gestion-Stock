@@ -7,19 +7,23 @@ const Producto = new mongoose.Schema({
     },
     descripcion:{
         type: String,
-        required:true
+        required:true,
+        trim:true
     },
     marca:{
         type: String,
-        default: ""
+        default: "",
+        trim:true
     },
     rubro:{
         type:String,
-        default:""
+        default:"",
+        trim:true
     },
     provedor:{
         type:String,
-        default:""
+        default:"",
+        trim:true
     },
     stock:{
         type: Number,
@@ -48,13 +52,9 @@ const Producto = new mongoose.Schema({
     unidad:{
         type:String,
         default:""
-    },
-    ultimaModificacion:{
-        type: Date,
-        default: Date.now
     }
-
-
+},{
+    timestamps:true
 });
 
 module.exports = mongoose.model('Producto',Producto);

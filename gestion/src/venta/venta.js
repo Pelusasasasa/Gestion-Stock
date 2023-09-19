@@ -435,13 +435,13 @@ const listarProducto = async(id)=>{
                     precioU.value = redondear(producto.precio / dolar,2);
                 }else{
                     if (producto.costo !== 0) {
-                        precioU.value = redondear(producto.costo/dolar,2);
+                        precioU.value = redondear((producto.costo + producto.costo * producto.impuesto / 100) / dolar,2);
                     }else{
-                        precioU.value = producto.costoDolar
+                        precioU.value = redondear(producto.costoDolar + producto.costoDolar * producto.impuesto / 100,2);
                     }
                 }
             }else{
-                precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar)
+                precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
             }
             
             idProducto++;
@@ -859,7 +859,6 @@ volver.addEventListener('click',()=>{
 async function togglePrecios(e) { 
     for await(let {cantidad,producto} of listaProductos){
         const tr = document.getElementById(`${producto.idTabla}`);
-        console.log(producto)
         if(lista.value === "1"){
             if (checkboxDolar.checked) {
                 tr.children[5].innerText = redondear(producto.precio / dolar,2);
@@ -871,19 +870,19 @@ async function togglePrecios(e) {
         }else{
             if (checkboxDolar.checked) {
                 if (producto.costo !== 0) {
-                    tr.children[5].innerText = redondear(producto.costo * 1.21 / dolar , 2);
-                    tr.children[6].innerText = redondear(producto.costo * 1.21 / dolar * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear((producto.costo + (producto.costo * producto.impuesto / 100))  / dolar , 2);
+                    tr.children[6].innerText = redondear((producto.costo + (producto.costo * producto.impuesto / 100)) / dolar * parseFloat(tr.children[1].innerText), 2);
                 }else{
-                    tr.children[5].innerText = redondear(producto.costoDolar * 1.21, 2);
-                    tr.children[6].innerText = redondear(producto.costoDolar * 1.21 * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100), 2);
+                    tr.children[6].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100) * parseFloat(tr.children[1].innerText), 2);
                 }
             }else{
                 if (producto.costo !== 0) {
-                    tr.children[5].innerText = redondear(producto.costo * 1.21,2);
-                    tr.children[6].innerText = redondear(producto.costo * 1.21 * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100),2);
+                    tr.children[6].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100) * parseFloat(tr.children[1].innerText), 2);
                 }else{
-                    tr.children[5].innerText = redondear(producto.costoDolar * 1.21 * dolar,2);
-                    tr.children[6].innerText = redondear(producto.costoDolar * 1.21 * dolar * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[5].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100) * dolar,2);
+                    tr.children[6].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100) * dolar * parseFloat(tr.children[1].innerText), 2);
                 }
             }
         }
@@ -900,8 +899,6 @@ async function calcularTotal() {
 
     total.value = redondear(aux,2);
 };
-
-
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,cuit);
