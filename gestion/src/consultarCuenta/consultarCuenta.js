@@ -143,20 +143,6 @@ const listarVentas = async(lista)=>{
     })
 };
 
-
-tbodyVenta.addEventListener('click',async e=>{
-    if ((e.target.nodeName === "TD")) {
-        const id = e.target.parentNode.id;
-        trSeleccionado && trSeleccionado.classList.remove('seleccionado')
-        trSeleccionado = e.target.parentNode;
-        trSeleccionado.classList.add('seleccionado');
-
-        movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
-        tbodyProducto.innerHTML = "";
-        listarProductos(movimientos)
-    }
-});
-
 //Listamos los productos cuando tocamos un  en una cuenta compensada o historica
 const listarProductos = async(movimientos)=>{
     tbodyProducto.innerHTML = "";
@@ -207,6 +193,21 @@ const listarProductos = async(movimientos)=>{
         tbodyProducto.appendChild(tr);
     })
 };
+
+tbodyVenta.addEventListener('click',async e=>{
+    if ((e.target.nodeName === "TD")) {
+        const id = e.target.parentNode.id;
+        trSeleccionado && trSeleccionado.classList.remove('seleccionado')
+        trSeleccionado = e.target.parentNode;
+        trSeleccionado.classList.add('seleccionado');
+
+        if (trSeleccionado.children[3].innerText !== "Recibo") {
+            movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
+            tbodyProducto.innerHTML = "";
+            listarProductos(movimientos);
+        }
+    }
+});
 
 tbodyProducto.addEventListener('click',e=>{
     if (e.target.innerHTML === "post_add") {
@@ -300,8 +301,7 @@ actualizar.addEventListener('click',async e=>{
         }
         })
     }
-})
-
+});
 
 volver.addEventListener('click',e=>{
     location.href = "../menu.html";
@@ -330,4 +330,4 @@ borrar.addEventListener('click', async e=>{
             title:"Ninguna venta seleccionado"
         })
     }
-})
+});

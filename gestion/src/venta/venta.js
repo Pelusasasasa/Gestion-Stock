@@ -367,6 +367,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.iva = producto.impuesto;
     movimiento.series = series;
     movimiento.vendedor = vendedor;
+    movimiento.unidad = producto.unidad;
     movimientos.push(movimiento);
 };
 
@@ -451,7 +452,7 @@ const listarProducto = async(id)=>{
                 <tr id=${producto.idTabla}>
                     <td>${codBarra.value}</td>
                     <td>${cantidad.value}</td>
-                    <td>${producto.descripcion.toUpperCase()}</td>
+                    <td>${producto.descripcion.toUpperCase()}${producto.unidad === "horas" ? " - POR HORA" : ""}</td>
                     <td>${producto.marca}</td>
                     <td>${producto.impuesto.toFixed(2)}</td>
                     <td>${parseFloat(precioU.value).toFixed(2)}</td>

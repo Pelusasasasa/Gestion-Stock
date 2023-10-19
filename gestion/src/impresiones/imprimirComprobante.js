@@ -67,9 +67,9 @@ const ponerDatosArticulos = (datos)=>{
         const tdIva = document.createElement('td');
         const tdTotal = document.createElement('td');
 
-        tdCantidad.innerHTML = movimiento.cantidad.toFixed(2);
+        tdCantidad.innerHTML = movimiento.unidad === "horas" ? "" : movimiento.cantidad.toFixed(2);
         tdCodigo.innerHTML = movimiento.codProd ?  movimiento.codProd : "" ;
-        tdDescripcion.innerHTML = movimiento.producto;
+        tdDescripcion.innerHTML = movimiento.unidad === "horas" ? movimiento.producto + " - POR HORA" : movimiento.producto;
         tdIva.innerHTML = movimiento.iva.toFixed(2);
         tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = redondear(movimiento.cantidad * movimiento.precio,2);
