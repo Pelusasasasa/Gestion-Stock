@@ -12,6 +12,7 @@ const dolar = document.getElementById('dolar');
 
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
+const codigoManual = document.querySelector('#codigoManual');
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const provedor = document.querySelector('#provedor');
@@ -54,6 +55,7 @@ const llenarInputs = async(codigoProducto)=>{
     codigo.value = codigoProducto;
     const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
     descripcion.value = producto.descripcion;
+    codigoManual.value = producto.codigoManual === true ? 'true' : 'false';
     marca.value = producto.marca;
     provedor.value = producto.provedor;
     stock.value = producto.stock;
@@ -106,6 +108,11 @@ codigo.addEventListener('keypress',e=>{
 });
 
 descripcion.addEventListener('keypress',e=>{
+    apretarEnter(e,codigoManual);
+});
+
+codigoManual.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,marca);
 });
 

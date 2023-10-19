@@ -2,6 +2,7 @@ const salir = document.querySelector('.salir');
 
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
+const codigoManual = document.querySelector('#codigoManual');
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const provedor = document.querySelector('#provedor');
@@ -67,6 +68,7 @@ guardar.addEventListener('click',async ()=>{
     const producto = {}
     producto._id = codigo.value;
     producto.descripcion = descripcion.value.trim().toUpperCase();
+    producto.codigoManual = codigoManual.value === "false" ? false : true;
     producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim();
     producto.provedor = provedor.value.toUpperCase().trim();
@@ -82,7 +84,7 @@ guardar.addEventListener('click',async ()=>{
 
     imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
 
-    await agregarProductoModificadoParaTicket(prodcuto);
+    await agregarProductoModificadoParaTicket(producto);
 
     await sweet.fire({
         title:mensaje
@@ -107,8 +109,13 @@ if (e.keyCode === 13) {
 })
 
 descripcion.addEventListener('keypress',e=>{
+    apretarEnter(e,codigoManual);
+});
+
+codigoManual.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,marca);
-})
+});
 
 marca.addEventListener('keypress',e=>{
     apretarEnter(e,rubro);

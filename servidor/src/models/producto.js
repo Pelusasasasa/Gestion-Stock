@@ -5,6 +5,10 @@ const Producto = new mongoose.Schema({
         type: String,
         required:true
     },
+    codigoManual:{
+        type: Boolean,
+        default: false
+    },
     descripcion:{
         type: String,
         required:true
