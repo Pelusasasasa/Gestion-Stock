@@ -26,6 +26,7 @@ app.use('/gestion/pedidos',require('./routes/pedido'));
 app.use('/gestion/servicios',require('./routes/servicio'));
 app.use('/gestion/vendedores',require('./routes/vendedor'));
 app.use('/gestion/movVendedores',require('./routes/movVendedores'));
+app.use('/gestion/movRecibo',require('./routes/movRecibo'));
 
 
 module.exports = app;

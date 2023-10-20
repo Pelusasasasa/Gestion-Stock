@@ -69,7 +69,7 @@ const ponerDatosArticulos = (datos)=>{
 
         tdCantidad.innerHTML = movimiento.unidad === "horas" ? "" : movimiento.cantidad.toFixed(2);
         tdCodigo.innerHTML = movimiento.codProd ?  movimiento.codProd : "" ;
-        tdDescripcion.innerHTML = movimiento.unidad === "horas" ? movimiento.producto + " - POR HORA" : movimiento.producto;
+        tdDescripcion.innerHTML = movimiento.producto;
         tdIva.innerHTML = movimiento.iva.toFixed(2);
         tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = redondear(movimiento.cantidad * movimiento.precio,2);

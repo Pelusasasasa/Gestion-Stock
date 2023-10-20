@@ -221,6 +221,7 @@ entregado.addEventListener('change',async e=>{
 })
 
 imprimir.addEventListener('click',async e=>{
+    //ponemos los valores en el recibo
     const recibo = {};
     recibo.fecha = new Date();
     recibo.cliente = nombre.value;
@@ -232,16 +233,19 @@ imprimir.addEventListener('click',async e=>{
     recibo.precio = parseFloat(total.value);
     recibo.vendedor = vendedor ? vendedor : "";
     recibo.caja = archivo.caja;
+
     try{
+        //Vemos si es tarjeta para hacerla factura
         if (tarjeta.checked) {
             recibo.cod_comp = 11;
-            recibo.num_doc = 00000000;
+            recibo.num_doc = "00000000";
             recibo.cod_doc = 99;
             recibo.tipo_venta = "T";
             await cargarFactura(recibo)
         }
         cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
         await modificarCuentaCompensadas();
+        await ponerMovimientosRecibo(recibo.numero);
         await ponerEnCuentaHistorica(recibo);
         await descontarSaldoCliente(recibo.idCliente,recibo.precio);
         await axios.post(`${URL}recibo`,recibo);
@@ -290,6 +294,21 @@ const modificarCuentaCompensadas = async()=>{
             await axios.put(`${URL}compensada/traerCompensada/id/${compensada.nro_venta}`,compensada);
         }
     }
+};
+
+const ponerMovimientosRecibo = async(numero)=>{
+    const trs = document.querySelectorAll('tbody tr');
+    for await(let tr of trs){
+        const mov = {};
+        mov.fecha = new Date();
+        mov.idCliente = codigo.value;
+        mov.cliente = nombre.value;
+        mov.numero = tr.children[1].innerText;
+        mov.precio = parseFloat(tr.children[5].children[0].value);
+        mov.numeroRecibo = numero;
+        
+        await axios.post(`${URL}movRecibo`,mov);
+    };
 };
 
 //Ponemos en historica el recibo

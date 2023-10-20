@@ -452,7 +452,7 @@ const listarProducto = async(id)=>{
                 <tr id=${producto.idTabla}>
                     <td>${codBarra.value}</td>
                     <td>${cantidad.value}</td>
-                    <td>${producto.descripcion.toUpperCase()}${producto.unidad === "horas" ? " - POR HORA" : ""}</td>
+                    <td>${producto.descripcion.toUpperCase()}</td>
                     <td>${producto.marca}</td>
                     <td>${producto.impuesto.toFixed(2)}</td>
                     <td>${parseFloat(precioU.value).toFixed(2)}</td>
