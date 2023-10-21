@@ -71,7 +71,7 @@ const ponerDatosArticulos = (datos)=>{
         tdCodigo.innerHTML = movimiento.codProd ?  movimiento.codProd : "" ;
         tdDescripcion.innerHTML = movimiento.producto;
         tdIva.innerHTML = movimiento.iva.toFixed(2);
-        tdPrecio.innerHTML = movimiento.precio.toFixed(2);
+        tdPrecio.innerHTML = movimiento.unidad === "horas" ? "" : movimiento.precio.toFixed(2);
         tdTotal.innerHTML = redondear(movimiento.cantidad * movimiento.precio,2);
 
         tr.appendChild(tdCantidad);

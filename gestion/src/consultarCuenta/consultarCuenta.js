@@ -14,6 +14,7 @@ const volver = document.querySelector('.volver');
 const borrar = document.querySelector('.borrar');
 const tbodyVenta = document.querySelector(".listaVentas tbody");
 const tbodyProducto = document.querySelector(".listaProductos tbody");
+const tbodyMovRecibo = document.querySelector(".listaMovRecibo tbody");
 const actualizar = document.querySelector('.actualizar');
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
@@ -145,6 +146,8 @@ const listarVentas = async(lista)=>{
 
 //Listamos los productos cuando tocamos un  en una cuenta compensada o historica
 const listarProductos = async(movimientos)=>{
+    tbodyMovRecibo.parentNode.parentNode.classList.add('none');
+    tbodyProducto.parentNode.parentNode.classList.remove('none');
     tbodyProducto.innerHTML = "";
     movimientos.forEach(movimiento=>{
         const date = new Date(movimiento.fecha);
@@ -205,6 +208,10 @@ tbodyVenta.addEventListener('click',async e=>{
             movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
             tbodyProducto.innerHTML = "";
             listarProductos(movimientos);
+        }else{
+            movimientos = (await axios.get(`${URL}movRecibo/forNumber/${trSeleccionado.children[1].innerText}`)).data;
+            tbodyProducto.innerHTML = "";
+            listarMovientosRecibos(movimientos)
         }
     }
 });
@@ -235,7 +242,7 @@ actualizar.addEventListener('click',async e=>{
         //traemos las compensa que seleccionamos
         const cuentaCompensada = (await axios.get(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`)).data;
         //Traemos la historica que seleccionamos
-        const cuentaHistorica = (await axios.get(`${URL}historica/PorId/id/${trSeleccionado.id}`)).data;
+        const cuentaHistorica = (await axios.get(`${URL}historica/porNumberAndType/${trSeleccionado.id}/${trSeleccionado.children[3].innerText}`)).data;
         //traemos los movimientos de productos de esa cuenta compensada
         const movimientos = (await axios.get(`${URL}movimiento/${trSeleccionado.id}/CC`)).data;
         //Traemos la venta de lo seleccionado
@@ -251,7 +258,6 @@ actualizar.addEventListener('click',async e=>{
             }else{
                 precio = (await axios.get(`${URL}productos/traerCosto/${movimiento.codProd}`)).data;
             }
-            console.log(precio)
             movimiento.precio = precio !== "" ? precio : movimiento.precio;
             total += (movimiento.precio*movimiento.cantidad);
         };
@@ -275,13 +281,12 @@ actualizar.addEventListener('click',async e=>{
             cuentaCompensada.importe = total;
             cuentaCompensada.saldo = parseFloat((total - cuentaCompensada.pagado).toFixed(2));
             //Modificamos el saldo y debe de la cuenta historica
-            cuentaHistorica.saldo = parseFloat((cuentaHistorica.saldo - cuentaHistorica.debe+total).toFixed(2));
+            cuentaHistorica.saldo = parseFloat((cuentaHistorica.saldo - cuentaHistorica.debe + total).toFixed(2));
             cuentaHistorica.debe = parseFloat(total.toFixed(2));
             //Le ponemos al cliente el saldo del importe nuevo
             cliente.saldo = (cliente.saldo + cuentaCompensada.importe).toFixed(2);
             //esto sirve para poner en las nuevas cuentas historicas el saldo
             let saldoAnterior = cuentaHistorica.saldo;
-
             for await(let cuenta of cuentasHistoricasRestantes){
                 cuenta.saldo = cuenta.tipo_comp === "Recibo" ? parseFloat((saldoAnterior - cuenta.haber).toFixed(2)) : parseFloat((saldoAnterior + cuenta.debe).toFixed(2));
                 saldoAnterior = cuenta.saldo;
@@ -307,7 +312,6 @@ volver.addEventListener('click',e=>{
     location.href = "../menu.html";
 });
 
-
 borrar.addEventListener('click', async e=>{
     if (trSeleccionado) {
         await sweet.fire({
@@ -331,3 +335,32 @@ borrar.addEventListener('click', async e=>{
         })
     }
 });
+
+async function listarMovientosRecibos(movimientos) {
+    tbodyMovRecibo.parentNode.parentNode.classList.remove('none');
+    tbodyProducto.parentNode.parentNode.classList.add('none');
+    tbodyMovRecibo.innerHTML = "";
+    for await(let mov of movimientos){
+        const tr = document.createElement('tr');
+
+        const tdFecha = document.createElement('td');
+        const tdNumero = document.createElement('td');
+        const tdImporte = document.createElement('td');
+        const tdPrecio = document.createElement('td');
+        const tdSaldo = document.createElement('td');
+    
+        tdFecha.innerText = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
+        tdNumero.innerText = mov.numero;
+        tdImporte.innerText = mov.importe.toFixed(2);
+        tdPrecio.innerText = mov.precio.toFixed(2);
+        tdSaldo.innerText = mov.saldo.toFixed(2);
+    
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdNumero);
+        tr.appendChild(tdImporte);
+        tr.appendChild(tdPrecio);
+        tr.appendChild(tdSaldo);
+    
+        tbodyMovRecibo.appendChild(tr);
+    }
+};

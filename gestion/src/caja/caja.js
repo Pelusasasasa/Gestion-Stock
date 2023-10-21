@@ -366,7 +366,6 @@ tbodyGastos.addEventListener('click',e=>{
 
 const listarVentas = async (ventas)=>{
     tbody.innerHTML = ``;
-    console.log(ventas)
     let lista = [];
     //organizamos las ventas por fecha
     ventas.sort((a,b)=>{
@@ -413,7 +412,7 @@ const listarVentas = async (ventas)=>{
         tdFecha.innerHTML = fecha + " - " + hora;
         tdCliente.innerHTML = venta.cliente;
         tdCodProducto.innerHTML = venta.tipo_comp;
-        tdProducto.innerHTML = venta.tipo_comp = 'Recibo' ? venta.valorRecibido : '';
+        tdProducto.innerHTML = venta.tipo_comp === 'Recibo' ? venta.valorRecibido : '';
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
         tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
         tdCaja.innerHTML = venta.caja;
@@ -443,46 +442,15 @@ const listarVentas = async (ventas)=>{
         tbody.appendChild(tr);
 
         //aca listamos los productos de cada venta traidos desde el movimiento
-        const movimientos = (await axios.get(`${URL}movimiento/${tdNumero.innerHTML}/${venta.tipo_venta}`)).data;
-        if (movimientos) {
-           for await(let {cantidad,precio,fecha,cliente,codProd,producto,nro_venta,descripcion} of  movimientos){
-                    const trProducto = document.createElement('tr');
-                    trProducto.classList.add('none');
-                    trProducto.classList.add(`venta${venta._id}`);
+        let movimientos;
+        if (venta.tipo_comp !== "Recibo") {
+            movimientos = (await axios.get(`${URL}movimiento/${tdNumero.innerHTML}/${venta.tipo_venta}`)).data;
+            listarMovimientoComprobante(movimientos,venta._id);
+        }else{
+            movimientos = (await axios.get(`${URL}movRecibo/forNumber/${venta.numero}`)).data;
+            listarMovimientoRecibo(movimientos,venta.numero);
+        };
 
-                    const date = fecha.slice(0,10).split('-',3);
-                    const hora = fecha.slice(11,19).split(':',3);
-
-                    const tdNumeroProducto = document.createElement('td');
-                    const tdFechaProducto = document.createElement('td');
-                    const tdClienteProducto = document.createElement('td');
-                    const tdIdProducto = document.createElement('td');
-                    const tdDescripcion = document.createElement('td');
-                    const tdCantidad = document.createElement('td');
-                    const tdPrecioProducto = document.createElement('td');
-                    const tdTotalProducto = document.createElement('td');
-
-                    tdNumeroProducto.innerHTML = nro_venta;
-                    tdFechaProducto.innerHTML = `${date[2]}/${date[1]}/${date[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
-                    tdClienteProducto.innerHTML = cliente;
-                    tdIdProducto.innerHTML = codProd === undefined ? " " : codProd;
-                    tdDescripcion.innerHTML = producto;
-                    tdCantidad.innerHTML = cantidad.toFixed(2);
-                    tdPrecioProducto.innerHTML = precio.toFixed(2);
-                    tdTotalProducto.innerHTML = (cantidad*precio).toFixed(2);
-
-                    trProducto.appendChild(tdNumeroProducto);
-                    trProducto.appendChild(tdFechaProducto);
-                    trProducto.appendChild(tdClienteProducto);
-                    trProducto.appendChild(tdIdProducto);
-                    trProducto.appendChild(tdDescripcion);
-                    trProducto.appendChild(tdCantidad);
-                    trProducto.appendChild(tdPrecioProducto);
-                    trProducto.appendChild(tdTotalProducto);
-
-                    tbody.appendChild(trProducto);
-            };
-        }
         totalVenta += venta.tipo_comp === "Nota Credito C" ? venta.precio * -1 : venta.precio;
     };
     total.value = totalVenta.toFixed(2);
@@ -506,6 +474,79 @@ const listarGastos = (gastos)=>{
     totalVenta -= gasto.importe;
     }
     total.value = redondear(totalVenta,2);
+};
+
+const listarMovimientoComprobante = async(movimientos,codigo)=>{
+        for await(let {cantidad,precio,fecha,cliente,codProd,producto,nro_venta,descripcion} of  movimientos){
+            const trProducto = document.createElement('tr');
+            trProducto.classList.add('none');
+            trProducto.classList.add(`venta${codigo}`);
+
+            const date = fecha.slice(0,10).split('-',3);
+            const hora = fecha.slice(11,19).split(':',3);
+
+            const tdNumeroProducto = document.createElement('td');
+            const tdFechaProducto = document.createElement('td');
+            const tdClienteProducto = document.createElement('td');
+            const tdIdProducto = document.createElement('td');
+            const tdDescripcion = document.createElement('td');
+            const tdCantidad = document.createElement('td');
+            const tdPrecioProducto = document.createElement('td');
+            const tdTotalProducto = document.createElement('td');
+
+            tdNumeroProducto.innerHTML = nro_venta;
+            tdFechaProducto.innerHTML = `${date[2]}/${date[1]}/${date[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
+            tdClienteProducto.innerHTML = cliente;
+            tdIdProducto.innerHTML = codProd === undefined ? " " : codProd;
+            tdDescripcion.innerHTML = producto;
+            tdCantidad.innerHTML = cantidad.toFixed(2);
+            tdPrecioProducto.innerHTML = precio.toFixed(2);
+            tdTotalProducto.innerHTML = (cantidad*precio).toFixed(2);
+
+            trProducto.appendChild(tdNumeroProducto);
+            trProducto.appendChild(tdFechaProducto);
+            trProducto.appendChild(tdClienteProducto);
+            trProducto.appendChild(tdIdProducto);
+            trProducto.appendChild(tdDescripcion);
+            trProducto.appendChild(tdCantidad);
+            trProducto.appendChild(tdPrecioProducto);
+            trProducto.appendChild(tdTotalProducto);
+
+            tbody.appendChild(trProducto);
+    };
+};
+
+const listarMovimientoRecibo = async(movimientos,codigo) =>{
+    for await(let mov of movimientos){
+        const trProducto = document.createElement('tr');
+        trProducto.classList.add(`recibo${codigo}`);
+
+        const tdNumeroProducto = document.createElement('td');
+        const tdFechaProducto = document.createElement('td');
+        const tdClienteProducto = document.createElement('td');
+        const tdIdProducto = document.createElement('td');
+        const tdDescripcion = document.createElement('td');
+        const tdCantidad = document.createElement('td');
+        const tdPrecioProducto = document.createElement('td');
+        const tdTotalProducto = document.createElement('td');
+
+        tdFechaProducto.innerText = mov.fecha.slice(0,10).split('-',3).reverse().join('/') + " - " + mov.fecha.slice(11,19).split(':',3).join(':');
+        tdClienteProducto.innerText = mov.cliente;
+        tdIdProducto.innerText = mov.numero;
+
+
+        trProducto.appendChild(tdNumeroProducto);
+        trProducto.appendChild(tdFechaProducto);
+        trProducto.appendChild(tdClienteProducto);
+        trProducto.appendChild(tdIdProducto);
+        trProducto.appendChild(tdDescripcion);
+        trProducto.appendChild(tdCantidad);
+        trProducto.appendChild(tdPrecioProducto);
+        trProducto.appendChild(tdTotalProducto);
+
+        tbody.appendChild(trProducto);
+
+    };
 };
 
 volver.addEventListener('click',e=>{

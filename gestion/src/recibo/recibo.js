@@ -299,15 +299,19 @@ const modificarCuentaCompensadas = async()=>{
 const ponerMovimientosRecibo = async(numero)=>{
     const trs = document.querySelectorAll('tbody tr');
     for await(let tr of trs){
-        const mov = {};
-        mov.fecha = new Date();
-        mov.idCliente = codigo.value;
-        mov.cliente = nombre.value;
-        mov.numero = tr.children[1].innerText;
-        mov.precio = parseFloat(tr.children[5].children[0].value);
-        mov.numeroRecibo = numero;
-        
-        await axios.post(`${URL}movRecibo`,mov);
+        if (parseFloat(tr.children[5].children[0].value) !== 0) {
+            const mov = {};
+            mov.fecha = new Date();
+            mov.idCliente = codigo.value;
+            mov.cliente = nombre.value;
+            mov.numero = tr.children[1].innerText;
+            mov.precio = parseFloat(tr.children[5].children[0].value);
+            mov.numeroRecibo = numero;
+            mov.importe = parseFloat(tr.children[3].innerText);
+            mov.saldo = parseFloat(tr.children[6].innerText);
+            
+            await axios.post(`${URL}movRecibo`,mov);
+        }
     };
 };
 

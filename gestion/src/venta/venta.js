@@ -374,12 +374,14 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
 //Descontamos el stock
 const descontarStock = async({cantidad,producto})=>{
     delete producto.idTabla;
-    if (facturaAnterior) {
-        producto.stock += cantidad;
-    }else{
-        producto.stock -= cantidad;
+    if (producto.unidad !== "Horas") {
+        if (facturaAnterior) {
+            producto.stock += cantidad;
+        }else{
+            producto.stock -= cantidad;
+        }
+        descuentoStock.push(producto)   
     }
-    descuentoStock.push(producto)
 }
 
 //Lo que hacemos es listar el producto traido
