@@ -39,8 +39,8 @@ const path = require('path');
             <tr>
                 <td>${producto._id ? producto._id : ""}</td>
                 <td class="text-left">${producto.descripcion}</td>
-                <td class="text-end">${cantidad.toFixed(2)}</td>
-                <td class="text-end">${venta.condicionIva === "Inscripto" ? (producto.precio / ((producto.impuesto / 100) + 1)).toFixed(2) : producto.precio.toFixed(2)}</td>
+                <td class="text-end">${producto.unidad === "horas" ? "" : cantidad.toFixed(2)}</td>
+                <td class="text-end">${producto.unidad === "horas" ? "" : (venta.condicionIva === "Inscripto" ? (producto.precio / ((producto.impuesto / 100) + 1)).toFixed(2) : producto.precio.toFixed(2))}</td>
                 <td class="text-end">${producto.impuesto ? producto.impuesto.toFixed(2) : ""}</td>
                 <td class="text-end">${( venta.condicionIva === "Inscripto" ? (producto.precio / (((producto.impuesto / 100) + 1))*cantidad).toFixed(2) : (producto.precio * cantidad).toFixed(2))}</td>
             </tr>

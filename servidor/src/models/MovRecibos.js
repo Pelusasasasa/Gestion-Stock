@@ -30,7 +30,15 @@ const MovRecibo = new Schema({
         type:String,
         default:"Recibo",
     },
+    importe:{
+        type:Number,
+        required:true,
+    },
     precio:{
+        type:Number,
+        required:true
+    },
+    saldo:{
         type:Number,
         required:true
     },

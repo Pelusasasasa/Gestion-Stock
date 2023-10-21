@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const router = Router();
 
-const {cargarHistorica,traerHistoricaPorCliente,traerHistorica,modificarHistorica} = require('../controllers/cuentaCorrHistorica.controllers');
+const {cargarHistorica,traerHistoricaPorCliente,traerHistorica,modificarHistorica, porNumberAndType, putForNumberAndType} = require('../controllers/cuentaCorrHistorica.controllers');
 
 
 router.route('/')
@@ -11,5 +11,8 @@ router.route('/traerPorCliente/:id')
 router.route('/PorId/id/:id')
     .get(traerHistorica)
     .put(modificarHistorica)
+router.route('/porNumberAndType/:number/:type')
+    .get(porNumberAndType)
+    .put(putForNumberAndType)
 
 module.exports = router;

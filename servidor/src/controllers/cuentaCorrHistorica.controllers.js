@@ -2,7 +2,6 @@ const historicaCTRL = {};
 
 const Historica = require('../models/cuentaCorrHisto');
 
-
 historicaCTRL.cargarHistorica = async(req,res)=>{
     const ultimaHistorica = (await Historica.find({},{_id:1}));
     let arreglo  = ultimaHistorica.map((e)=>{
@@ -38,5 +37,18 @@ historicaCTRL.modificarHistorica = async(req,res)=>{
     console.log(`Ceunta Historica numero: ${req.body.nro_venta} Modificado al cliente ${req.body.cliente}` )
     res.send(`historica ${id} modificada`);
 };
+
+historicaCTRL.porNumberAndType = async(req,res)=>{
+    const {number,type} = req.params;
+    const historica = await Historica.findOne({nro_venta:number,tipo_comp:type});
+    res.send(historica);
+};
+
+historicaCTRL.putForNumberAndType = async(req,res)=>{
+    const {number,type} = req.params;
+    await Historica.findOneAndUpdate({nro_venta:number,tipo_comp:type},req.body);
+    res.end();
+};
+
 
 module.exports = historicaCTRL;

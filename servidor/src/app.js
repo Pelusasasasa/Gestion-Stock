@@ -4,7 +4,7 @@ const app = express();
 const path = require('path');
 
 //settings
-app.set('port',4000);
+app.set('port',3000);
 
 //middlewears
 app.use(cors());
