@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./imprimirRecibo.css">
+    <title>Recibo</title>
+</head>
+<body>
+    <header>
+        <main class="d-3">
+            <h1>Electro Avenida</h1>
+            <p>RECIBO</p>
+            <p>N°: <span id="numeroRecibo"></span></p>
+        </main>
+        <main class="d-3">
+            <p>De Paccot, Carla</p>
+            <p></p>
+            <p>CUIT: 27-34015023-1</p>
+        </main>
+        <main class="d-3">
+            <p>Av. Alem 2196 Tel: 3456-593374</p>
+            <p></p>
+            <p>Fecha: <span id="fecha">25/10/2023</span></p>
+        </main>
+        <main>
+            <p>(3228)-CHAJARI (Entre Rios)</p>
+            <p></p>
+            <p></p>
+        </main>
+        <main>
+            <p>IVA: Responsable Inscripto</p>
+        </main>
+    </header>
+    <section class="cliente">
+        <main>
+            <h2>Señor(es): <span id="nombre"></span></h2>
+            <p id="codigo">A200</p>
+            <p class="bold">CUIT: <span class="text-normal" id="cuit"></span></p>
+            <p class="bold">DNI: <span class="text-normal" id="dni"></span></p>
+        </main>
+        <main>
+            <p>DOMICILIO: <span id="direccion"></span></p>
+            <p>LOCALIDAD: <span id="localidad"></span></p>
+            <p>Cond IVA: <span id="iva"></span></p>
+        </main>
+    </section>
+    <section id="texto">
+        <p>Acreditamos en su cuenta corriente la cantidad de pesos</p>
+        <p>En concepto de: Pago Facturas segun detalle</p>
+    </section>
+    <section id="lista">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Comprobante</th>
+                    <th>Numero</th>
+                    <th>Pagado</th>
+                    <th>Saldo</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </section>
+    <section class="total">
+        <main>
+            <p>Valores Recibidos: <span id="valores">EFECTIVO</span></p>
+            <p>Total Cobrado: $ <span id="total">5000</span></p>
+        </main>
+    </section>
+</body>
+<script src="./imprimirRecibo.js"></script>
+</html>

@@ -26,6 +26,10 @@ const MovRecibo = new Schema({
         required:true,
         trim:true
     },
+    tipo:{
+        type:String,
+        required:true
+    },
     tipo_comp:{
         type:String,
         default:"Recibo",

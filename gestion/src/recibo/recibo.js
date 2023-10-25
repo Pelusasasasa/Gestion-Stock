@@ -245,26 +245,14 @@ imprimir.addEventListener('click',async e=>{
         }
         cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
         await modificarCuentaCompensadas();
-        await ponerMovimientosRecibo(recibo.numero);
+        let lista = await ponerMovimientosRecibo(recibo.numero);
         await ponerEnCuentaHistorica(recibo);
         await descontarSaldoCliente(recibo.idCliente,recibo.precio);
         await axios.post(`${URL}recibo`,recibo);
-        //Lo usamos paara imprimir
-        const lista = [];
-        const trs = document.querySelectorAll('tbody tr');
-        for await(let tr of trs){
-            if (parseFloat(tr.children[5].children[0].value) !== 0 && tr.children[5].children[0].value !== "") {
-                const venta = {};
-                venta.fecha = tr.children[0].innerHTML;
-                venta.comprobante = tr.children[1].innerHTML;
-                venta.pagado = parseFloat(tr.children[4].innerHTML) + parseFloat(tr.children[5].children[0].value)
-                lista.push(venta);   
-            }
-        };
 
         await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
         const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
-        ipcRenderer.send('imprimir',[recibo,cliente,lista])
+        ipcRenderer.send('imprimir-recibo',[recibo,cliente,lista])
         location.href = "../menu.html";
     }catch(error){
         console.log(error)
@@ -296,14 +284,16 @@ const modificarCuentaCompensadas = async()=>{
     }
 };
 
-const ponerMovimientosRecibo = async(numero)=>{
+const ponerMovimientosRecibo = async(numero,tipo)=>{
     const trs = document.querySelectorAll('tbody tr');
+    let lista = [];
     for await(let tr of trs){
         if (parseFloat(tr.children[5].children[0].value) !== 0) {
             const mov = {};
             mov.fecha = new Date();
             mov.idCliente = codigo.value;
             mov.cliente = nombre.value;
+            mov.tipo = tr.children[2].innerText;
             mov.numero = tr.children[1].innerText;
             mov.precio = parseFloat(tr.children[5].children[0].value);
             mov.numeroRecibo = numero;
@@ -311,8 +301,10 @@ const ponerMovimientosRecibo = async(numero)=>{
             mov.saldo = parseFloat(tr.children[6].innerText);
             
             await axios.post(`${URL}movRecibo`,mov);
+            lista.push(mov);
         }
     };
+    return lista;
 };
 
 //Ponemos en historica el recibo
@@ -323,12 +315,11 @@ const ponerEnCuentaHistorica = async(recibo)=>{
     cuenta.nro_venta = recibo.numero;
     cuenta.haber = recibo.precio;
     cuenta.tipo_comp = "Recibo";
-    cuenta.condicion = `CHEQUE ${nroCheque.toUpperCase()}`;
+    cuenta.condicion = recibo.valorRecibido;
     const cliente = (await axios.get(`${URL}clientes/id/${recibo.idCliente}`)).data;
     cuenta.saldo = (cliente.saldo - recibo.precio).toFixed(2);
     await axios.post(`${URL}historica`,cuenta);
 };
-
 
 const crearCompensadaAFavor = async (saldo)=>{
     const compensada = {};

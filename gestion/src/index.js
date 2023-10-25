@@ -87,6 +87,14 @@ ipcMain.on('imprimir',(e,args)=>{
   });
 });
 
+ipcMain.on('imprimir-recibo',(e,args)=>{
+
+  abrirVentana("impresiones/imprimirRecibo.html",800,500);
+  nuevaVentana.webContents.on('did-finish-load',function() {
+    nuevaVentana.webContents.send('imprimir-recibo',JSON.stringify(args));
+  })
+})
+
 ipcMain.on('imprimir-ventana',(e,args)=>{
   const option = {};
   option.silent = false;
