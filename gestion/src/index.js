@@ -88,8 +88,8 @@ ipcMain.on('imprimir',(e,args)=>{
 });
 
 ipcMain.on('imprimir-recibo',(e,args)=>{
-
-  abrirVentana("impresiones/imprimirRecibo.html",800,500);
+  const [,,,show] = args;
+  abrirVentana("impresiones/imprimirRecibo.html",800,500,false,show);
   nuevaVentana.webContents.on('did-finish-load',function() {
     nuevaVentana.webContents.send('imprimir-recibo',JSON.stringify(args));
   })
@@ -111,13 +111,13 @@ ipcMain.on('imprimir-ventana',(e,args)=>{
 });
 
 let nuevaVentana;
-const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
+const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false,show = true)=>{
   nuevaVentana = new BrowserWindow({
     height: altura,
     width: ancho,
     modal:true,
     parent:ventanaPrincipal,
-    show:false,
+    show:show,
     webPreferences:{
       nodeIntegration: true,
       contextIsolation:false
@@ -125,12 +125,6 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
   });
   nuevaVentana.loadFile(path.join(__dirname, `${direccion}`));
   nuevaVentana.setMenuBarVisibility(false);
-
-  nuevaVentana.on('ready-to-show',()=>{
-    // if (direccion !== "ticket/ticket.html" && direccion !== "impresiones/imprimirComprobante.html") {
-      nuevaVentana.show();
-    // }
-  })
 
   nuevaVentana.on('close',async()=>{
     if (reinicio) {

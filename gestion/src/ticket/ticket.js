@@ -102,7 +102,6 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
         notaCredito.innerHTML = `SALDO ACTUAL: ${clienteTraido.saldo}`;
     }
     for await(const elem of lista){
-
         if (venta.tipo_comp !== "Recibo") {
             listado.innerHTML += `
                 <main>
@@ -111,7 +110,7 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
                 </main>
                 <main class = "linea">
                     <p>${elem.cantidad.toFixed(2)}/${elem.precio.toFixed(2)}</p>
-                    <p>${elem.impuesto.toFixed(2)}</p>
+                    <p>${elem.iva.toFixed(2)}</p>
                 </main>
             `   
         }else{

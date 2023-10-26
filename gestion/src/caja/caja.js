@@ -351,11 +351,15 @@ tbody.addEventListener('click',async e=>{
         
     }
 
-    const trs = document.querySelectorAll("tbody .venta" + id)
+    const trs = document.querySelectorAll("tbody .venta" + id);
+    const trsRecibos = document.querySelectorAll("tbody .recibo" + id);
 
     for await(let tr of trs){
         tr.classList.toggle('none');
     }
+    for await(let tr of trsRecibos){
+        tr.classList.toggle('none');
+    };
 });
 
 tbodyGastos.addEventListener('click',e=>{
@@ -415,7 +419,7 @@ const listarVentas = async (ventas)=>{
         tdProducto.innerHTML = venta.tipo_comp === 'Recibo' ? venta.valorRecibido : '';
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
         tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
-        tdCaja.innerHTML = venta.caja;
+        tdCaja.innerHTML = venta.caja ? venta.caja : "Caja 1";
         tdAcciones.innerHTML = `
             <div class=tool>
                     <span class=material-icons>edit</span>
@@ -448,7 +452,7 @@ const listarVentas = async (ventas)=>{
             listarMovimientoComprobante(movimientos,venta._id);
         }else{
             movimientos = (await axios.get(`${URL}movRecibo/forNumber/${venta.numero}`)).data;
-            listarMovimientoRecibo(movimientos,venta.numero);
+            listarMovimientoRecibo(movimientos,venta._id);
         };
 
         totalVenta += venta.tipo_comp === "Nota Credito C" ? venta.precio * -1 : venta.precio;
@@ -520,6 +524,7 @@ const listarMovimientoRecibo = async(movimientos,codigo) =>{
     for await(let mov of movimientos){
         const trProducto = document.createElement('tr');
         trProducto.classList.add(`recibo${codigo}`);
+        trProducto.classList.add('none');
 
         const tdNumeroProducto = document.createElement('td');
         const tdFechaProducto = document.createElement('td');

@@ -304,7 +304,7 @@ funciones.ponerNumero = async()=>{
             }else{
                 situacion = "negro"
             }
-
+            
             ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
         }
     })
