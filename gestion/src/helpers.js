@@ -438,6 +438,20 @@ funciones.agregarProductoModificadoParaTicket = async (producto)=>{
     await axios.post(`${URL}productosModificados`,productoModificado);
 };
 
+funciones.movimientosRecibos = async(tr,codigo,cliente,numero) => {
+    const mov = {};
+    mov.codigo = codigo;
+    mov.cliente = cliente;
+    mov.tipo = tr.children[2].innerText;
+    mov.nro_comp = tr.children[1].innerText;
+    mov.numero = numero;
+    mov.importe = tr.children[3].innerText;
+    mov.pagado = tr.children[5].children[0].value;
+    mov.saldo = tr.children[6].innerText;
+
+    await axios.post(`${URL}movRecibo`,mov);
+};
+
 funciones.configAxios = {
    
 }

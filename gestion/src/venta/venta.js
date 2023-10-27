@@ -13,7 +13,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -364,7 +364,7 @@ facturar.addEventListener('click',async e=>{
                 venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta,parseFloat(saldo.value));
 
                 if (venta.tipo_venta === "CC" &&  parseFloat(inputRecibo.value) !== 0) {
-                    await hacerRecibo(numeros.Recibo);
+                    await hacerRecibo(numeros.Recibo,venta.numero,venta.tipo_comp);
                 }
         
                 const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
@@ -661,7 +661,7 @@ document.addEventListener('keydown',e=>{
     };
 });
 
-const hacerRecibo = async(numero)=>{
+const hacerRecibo = async(numero,nro_comp,tipo)=>{
     const recibo = {};
     recibo.fecha = new Date();
     recibo.cliente = nombre.value;
@@ -671,6 +671,7 @@ const hacerRecibo = async(numero)=>{
     recibo.tipo_comp = "Recibo";
     recibo.tipo_venta = "CD";
     await hacerHistoricaRecibo(recibo.numero,recibo.precio,recibo.tipo_comp);
+    await movimientoRecibo(recibo.idCliente,recibo.cliente,recibo.numero,recibo.precio,nro_comp,tipo);
     await axios.post(`${URL}recibo`,recibo);
     await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
 };
@@ -684,6 +685,19 @@ const hacerHistoricaRecibo = async(numero,haber,tipo)=>{
     cuenta.haber = haber;
     cuenta.saldo = parseFloat(total.value) - parseFloat(haber)  + parseFloat(saldo.value);
     (await axios.post(`${URL}historica`,cuenta)).data;
+};
+
+const movimientoRecibo = async(codigo,nombre,numero,precio,nro_comp,tipo)=>{
+    const mov = {};
+    mov.codigo = codigo;
+    mov.cliente = nombre;
+    mov.tipo = tipo
+    mov.numero = numero;
+    mov.nro_comp = nro_comp;
+    mov.importe = parseFloat(total.value);
+    mov.pagado = parseFloat(precio);
+    mov.saldo = redondear(mov.importe - mov.pagado,2);
+    await axios.post(`${URL}movRecibo`,mov);
 };
 
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas

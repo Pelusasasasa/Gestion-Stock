@@ -167,7 +167,7 @@ caja.addEventListener('click',async e=>{
             confirmButtonText:"Aceptar",
             showCancelButton:true
         }).then(({isConfirmed,value})=>{
-            if (isConfirmed && value === "41610465") {
+            if (isConfirmed && (value === "210" || value === "41610465")) {
                 location.href = "./caja/caja.html";
             }
         })

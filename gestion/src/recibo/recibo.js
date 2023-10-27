@@ -14,7 +14,7 @@ require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter, cargarFactura, redondear, verClienteValido, configAxios} = require('../helpers');
+const {apretarEnter, cargarFactura, redondear, verClienteValido, configAxios, movimientosRecibos} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
@@ -202,6 +202,7 @@ entregado.addEventListener('change',async e=>{
 })
 
 imprimir.addEventListener('click',async e=>{
+
     if(!await verClienteValido(codigo.value)){
         await sweet.fire({
             title:"Cliente no valido para hacer recibo, revisar numero de cliente"
@@ -222,7 +223,7 @@ imprimir.addEventListener('click',async e=>{
     try{
         if (tarjeta.checked) {
             recibo.cod_comp = 11;
-            recibo.num_doc = 00000000;
+            recibo.num_doc = "00000000";
             recibo.cod_doc = 99;
             recibo.tipo_venta = "T";
             await cargarFactura(recibo)
@@ -241,7 +242,8 @@ imprimir.addEventListener('click',async e=>{
                 venta.fecha = tr.children[0].innerHTML;
                 venta.comprobante = tr.children[1].innerHTML;
                 venta.pagado = parseFloat(tr.children[4].innerHTML) + parseFloat(tr.children[5].children[0].value)
-                lista.push(venta);   
+                lista.push(venta); 
+                movimientosRecibos(tr,codigo.value,nombre.value,recibo.numero)  
             }
         };
 
@@ -279,7 +281,6 @@ const modificarCuentaCompensadas = async()=>{
     }
 };
 
-
 //Ponemos en historica el recibo
 const ponerEnCuentaHistorica = async(recibo)=>{
     const cuenta = {};
@@ -293,7 +294,6 @@ const ponerEnCuentaHistorica = async(recibo)=>{
     await axios.post(`${URL}historica`,cuenta);
 };
 
-
 const crearCompensadaAFavor = async (saldo)=>{
     const compensada = {};
     compensada.idCliente = codigo.value;
@@ -303,7 +303,8 @@ const crearCompensadaAFavor = async (saldo)=>{
     compensada.pagado = 0;
     compensada.saldo = -1*saldo;
     return compensada;
-}
+};
+
 //creamos una compensda para cuando se haga el recibo y quede saldo a favor
 const crearCuentaCompensada = async(cuenta)=>{
     const numero = (await axios.get(`${URL}numero`)).data["Cuenta Corriente"];

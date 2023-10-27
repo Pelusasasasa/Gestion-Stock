@@ -14,6 +14,8 @@ app.use('/morel/productos',require('./routes/producto'));
 app.use('/morel/clientes',require('./routes/cliente'));
 app.use('/morel/ventas',require('./routes/venta'));
 app.use('/morel/recibo',require('./routes/recibo'));
+app.use('/morel/movRecibo',require('./routes/movRecibo'));
+
 app.use('/morel/movimiento',require('./routes/movProducto'));
 app.use('/morel/compensada',require('./routes/compensada'));
 app.use('/morel/historica',require('./routes/historica'));
