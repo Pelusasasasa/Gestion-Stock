@@ -40,19 +40,19 @@
     border: .1rem solid black;
 }
 
-.listaProductos{
+.listaProductos,.listaMovRecibos{
     margin-top: 2rem;
     height: 40vh;
     background-color: white;
     overflow: scroll;
 }
 
-.listaProductos table{
+.listaProductos table,.listaMovRecibos table{
     width: 100%;
     border-collapse: collapse;
 }
 
-.listaProductos table thead td{
+.listaProductos table thead td,.listaMovRecibos table thead th{
     border: .1rem solid black;
     text-align: center;
 }

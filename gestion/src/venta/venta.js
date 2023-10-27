@@ -680,7 +680,7 @@ const hacerHistoricaRecibo = async(numero,haber,tipo)=>{
     const cuenta = {};
     cuenta.cliente = nombre.value;
     cuenta.idCliente = codigo.value;
-    cuenta.nro_venta = numero + 1;
+    cuenta.nro_venta = numero;
     cuenta.tipo_comp = tipo;
     cuenta.haber = haber;
     cuenta.saldo = parseFloat(total.value) - parseFloat(haber)  + parseFloat(saldo.value);

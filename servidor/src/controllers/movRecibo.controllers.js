@@ -17,5 +17,11 @@ movReciboCTRL.post = async(req,res) => {
 };
 
 
+movReciboCTRL.getforNumberAndClient = async(req,res) => {
+    const {numero,codigo} = req.params;
+    const movRecibo = await MovRecibo.find({numero,codigo});
+    res.send(movRecibo);
+};
+
 
 module.exports = movReciboCTRL;

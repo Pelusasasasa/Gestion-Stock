@@ -14,6 +14,7 @@ const volver = document.querySelector('.volver');
 const borrar = document.querySelector('.borrar');
 const tbodyVenta = document.querySelector(".listaVentas tbody");
 const tbodyProducto = document.querySelector(".listaProductos tbody");
+const tbodyMovRecibo = document.querySelector(".listaMovRecibos tbody");
 const actualizar = document.querySelector('.actualizar');
 const alerta = document.querySelector('.alerta');
 const clienteInput = document.querySelector('#cliente');
@@ -93,10 +94,9 @@ ipcRenderer.on('recibir',async (e,args)=>{
 
 const listarVentas = async(lista)=>{
     tbodyVenta.innerHTML = "";
-
     lista.forEach(venta=>{
         const tr = document.createElement('tr');
-        tr.id=venta.nro_venta;
+        tr.id = venta.nro_venta;
         const tdNumero = document.createElement('td');
         const tdFecha = document.createElement('td');
         const tdCliente = document.createElement('td');
@@ -150,9 +150,19 @@ tbodyVenta.addEventListener('click',async e=>{
         trSeleccionado = e.target.parentNode;
         trSeleccionado.classList.add('seleccionado');
 
-        movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
         tbodyProducto.innerHTML = "";
-        listarProductos(movimientos)
+        tbodyMovRecibo.innerHTML = "";
+        if (trSeleccionado.children[3].innerText === "Recibo") {
+            tbodyMovRecibo.parentElement.parentElement.classList.remove('none');
+            tbodyProducto.parentElement.parentElement.classList.add('none');
+            movimientos = (await axios.get(`${URL}movRecibo/forNumberAndClient/${id}/${clienteTraido._id}`)).data;
+            listarMovRecibo(movimientos);
+        }else{
+            tbodyMovRecibo.parentElement.parentElement.classList.add('none');
+            tbodyProducto.parentElement.parentElement.classList.remove('none');
+            movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
+            listarProductos(movimientos)
+        }
     }
 });
 
@@ -184,7 +194,7 @@ const listarProductos = async(movimientos)=>{
         tdFecha.innerHTML = `${day}/${month}/${year}`;
         tdCodigo.innerHTML = movimiento.codProd;
         tdProducto.innerHTML = movimiento.producto;
-        tdCantidad.innerHTML = movimiento.cantidad;
+        tdCantidad.innerHTML = movimiento.cantidad.toFixed(2);
         tdPrecio.innerHTML = movimiento.precio.toFixed(2);
         tdTotal.innerHTML = (movimiento.precio * movimiento.cantidad).toFixed(2);
 
@@ -197,6 +207,36 @@ const listarProductos = async(movimientos)=>{
 
         tbodyProducto.appendChild(tr);
     })
+};
+
+const listarMovRecibo = async(lista) => {
+    for await(let elem of lista){
+        console.log(elem)
+        const tr = document.createElement('tr');
+
+        const tdFecha = document.createElement('td');
+        const tdTipo = document.createElement('td');
+        const tdNumero = document.createElement('td');
+        const tdImporte = document.createElement('td');
+        const tdPagado = document.createElement('td');
+        const tdSaldo = document.createElement('td');
+
+        tdFecha.innerText = elem.fecha.slice(0,10).split('-',3).reverse().join('/');
+        tdTipo.innerText = elem.tipo;
+        tdNumero.innerText = elem.nro_comp;
+        tdImporte.innerText = elem.importe.toFixed(2);
+        tdPagado.innerText = elem.pagado.toFixed(2);
+        tdSaldo.innerText = elem.saldo.toFixed(2);
+
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdTipo);
+        tr.appendChild(tdNumero);
+        tr.appendChild(tdImporte);
+        tr.appendChild(tdPagado);
+        tr.appendChild(tdSaldo);
+
+        tbodyMovRecibo.appendChild(tr);
+    }
 };
 
 //cuando tocamos actualizar una venta, actualizamos con los precios de hoy en dia
