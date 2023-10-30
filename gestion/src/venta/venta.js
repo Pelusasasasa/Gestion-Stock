@@ -491,7 +491,6 @@ if (producto !== "") {
 }
 };
 
-
 //creamos la cuenta compensada cuedo la venta se hace en cuenta corriente
 const ponerEnCuentaCompensada = async(venta)=>{
     const cuenta = {};

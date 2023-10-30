@@ -87,9 +87,13 @@ ipcMain.on('imprimir-TicketPrecio',(e,args)=>{
 
 ipcMain.on('imprimir-ventana',(e,args)=>{
   nuevaVentana.webContents.print({silent:true},(success,errorType)=>{
-    
+    ventanaPrincipal.focus();
+    nuevaVentana && nuevaVentana.close();
+    nuevaVentana = null;
   });
 });
+
+
 
 let nuevaVentana;
 const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{

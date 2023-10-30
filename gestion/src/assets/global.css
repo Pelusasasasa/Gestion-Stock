@@ -132,7 +132,10 @@ select{
 
 .tooltip{
   display: none;
+  min-width: 59px;
   position: absolute;
+  top: 10px;
+  left: -10px;
   z-index: 1;
   background-color: gray;
   color: white;
