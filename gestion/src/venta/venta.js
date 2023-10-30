@@ -410,6 +410,88 @@ const listarCliente = async(id)=>{
     }
 };
 
+//Lo que hacemos es listar el producto traido
+const listarProducto =async(id)=>{
+    let producto;
+    if (id.slice(0,2) === "20") {
+        console.log(id)
+        const aux = id.slice(2,6);
+        const cantEnt = id.slice(6,9);
+        const cantDec = id.slice(9,12);
+        console.log(cantEnt)
+        console.log(cantDec)
+        producto = (await axios.get(`${URL}productos/${aux}`)).data;
+        cantidad.value = parseFloat(cantEnt + "." + cantDec);
+    }else{
+        producto = (await axios.get(`${URL}productos/${id}`)).data;
+    };
+    
+    producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
+    producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
+if (producto !== "") {
+    const productoYaUsado = listaProductos.find(({producto: product})=>{
+       if (product._id === producto._id) {
+           return product
+       };
+    });
+
+    if(producto !== "" && !productoYaUsado){
+        if (producto.stock === 0 && archivo.stockNegativo) {
+            await sweet.fire({
+                title:"Producto con Stock en 0"
+            });
+        };
+    if (producto.stock - (parseFloat(cantidad.value)) < 0 && archivo.stockNegativo) {
+        await sweet.fire({
+            title:"Producto con Stock menor a 0",
+        });
+    }
+    listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
+    codBarra.value = producto._id;
+    precioU.value = redondear(producto.precio,2);
+    idProducto++;
+    producto.idTabla = `${idProducto}`;
+    tbody.innerHTML += `
+    <tr id=${producto.idTabla}>
+        <td>${cantidad.value}</td>
+        <td>${codBarra.value}</td>
+        <td>${producto.descripcion.toUpperCase()}</td>
+        <td>${producto.marca}</td>
+        <td>${parseFloat(precioU.value).toFixed(2)}</td>
+        <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
+        <td class=acciones>
+            <div class=tool>
+                <span class=material-icons>delete</span>
+                <p class=tooltip>Eliminar</p>
+            </div>
+        </td>
+    </tr>
+    `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
+    total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
+    totalGlobal = parseFloat(total.value);
+    }else if(producto !== "" && productoYaUsado){
+        productoYaUsado.cantidad += parseFloat(cantidad.value)
+        producto.idTabla = productoYaUsado.producto.idTabla;
+        const tr = document.getElementById(producto.idTabla);
+        tr.children[0].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) + parseFloat(cantidad.value),2);
+        tr.children[5].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * producto.precio,2);
+        total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
+        totalGlobal = parseFloat(total.value);
+    }
+    cantidad.value = "1.00";
+    codBarra.value = "";
+    descripcion.value = "";
+    precioU.value = "";
+    descripcion.focus();  
+}else{
+    precioU.focus();
+}
+};
+
+
 //creamos la cuenta compensada cuedo la venta se hace en cuenta corriente
 const ponerEnCuentaCompensada = async(venta)=>{
     const cuenta = {};
@@ -462,74 +544,6 @@ const descontarStock = async({cantidad,producto})=>{
         producto.stock -= cantidad;
     }
     descuentoStock.push(producto)
-};
-
-//Lo que hacemos es listar el producto traido
-const listarProducto =async(id)=>{
-        let producto = (await axios.get(`${URL}productos/${id}`)).data;
-        producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
-        producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
-    if (producto !== "") {
-        const productoYaUsado = listaProductos.find(({producto: product})=>{
-           if (product._id === producto._id) {
-               return product
-           };
-        });
-
-        if(producto !== "" && !productoYaUsado){
-            if (producto.stock === 0 && archivo.stockNegativo) {
-                await sweet.fire({
-                    title:"Producto con Stock en 0"
-                });
-            };
-        if (producto.stock - (parseFloat(cantidad.value)) < 0 && archivo.stockNegativo) {
-            await sweet.fire({
-                title:"Producto con Stock menor a 0",
-            });
-        }
-        listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
-        codBarra.value = producto._id;
-        precioU.value = redondear(producto.precio,2);
-        idProducto++;
-        producto.idTabla = `${idProducto}`;
-        tbody.innerHTML += `
-        <tr id=${producto.idTabla}>
-            <td>${cantidad.value}</td>
-            <td>${codBarra.value}</td>
-            <td>${producto.descripcion.toUpperCase()}</td>
-            <td>${producto.marca}</td>
-            <td>${parseFloat(precioU.value).toFixed(2)}</td>
-            <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
-            <td class=acciones>
-                <div class=tool>
-                    <span class=material-icons>delete</span>
-                    <p class=tooltip>Eliminar</p>
-                </div>
-            </td>
-        </tr>
-        `;
-        tbody.scrollIntoView({
-            block:"end"
-        });
-        total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
-        totalGlobal = parseFloat(total.value);
-        }else if(producto !== "" && productoYaUsado){
-            productoYaUsado.cantidad += parseFloat(cantidad.value)
-            producto.idTabla = productoYaUsado.producto.idTabla;
-            const tr = document.getElementById(producto.idTabla);
-            tr.children[0].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) + parseFloat(cantidad.value),2);
-            tr.children[5].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * producto.precio,2);
-            total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
-            totalGlobal = parseFloat(total.value);
-        }
-        cantidad.value = "1.00";
-        codBarra.value = "";
-        descripcion.value = "";
-        precioU.value = "";
-        descripcion.focus();  
-    }else{
-        precioU.focus();
-    }
 };
 
 let seleccionado;
@@ -605,45 +619,6 @@ const sacarIva = (lista) => {
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
 };
 
-codigo.addEventListener('focus',e=>{
-    codigo.select();
-});
-
-nombre.addEventListener('focus',e=>{
-    nombre.select()
-});
-
-cuit.addEventListener('focus',e=>{
-    cuit.select()
-});
-
-localidad.addEventListener('focus',e=>{
-    localidad.select();
-});
-
-telefono.addEventListener('focus',e=>{
-    telefono.select();
-});
-
-direccion.addEventListener('focus',e=>{
-    direccion.select();
-});
-
-total.addEventListener('focus',e=>{
-    total.select();
-});
-
-cantidad.addEventListener('focus',e=>{
-    cantidad.select();
-});
-
-porcentaje.addEventListener('focus',e=>{
-    porcentaje.select();
-});
-
-inputRecibo.addEventListener('focus',e=>{
-    inputRecibo.select();
-});
 
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {
@@ -772,4 +747,45 @@ cantidad.addEventListener('keydown',e=>{
 
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
+});
+
+
+codigo.addEventListener('focus',e=>{
+    codigo.select();
+});
+
+nombre.addEventListener('focus',e=>{
+    nombre.select()
+});
+
+cuit.addEventListener('focus',e=>{
+    cuit.select()
+});
+
+localidad.addEventListener('focus',e=>{
+    localidad.select();
+});
+
+telefono.addEventListener('focus',e=>{
+    telefono.select();
+});
+
+direccion.addEventListener('focus',e=>{
+    direccion.select();
+});
+
+total.addEventListener('focus',e=>{
+    total.select();
+});
+
+cantidad.addEventListener('focus',e=>{
+    cantidad.select();
+});
+
+porcentaje.addEventListener('focus',e=>{
+    porcentaje.select();
+});
+
+inputRecibo.addEventListener('focus',e=>{
+    inputRecibo.select();
 });
