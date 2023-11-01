@@ -10,6 +10,8 @@ const hasta = document.querySelector('#hasta');
 const esteMes = document.querySelector('.mes');
 const total = document.querySelector('#total');
 
+const volver = document.querySelector('.volver');
+
 const hoy = new Date();
 let dia = hoy.getDate();
 let mes = hoy.getMonth() + 1;
@@ -34,8 +36,6 @@ window.addEventListener('load',async e => {
 });
 
 
-const volver = document.querySelector('.volver');
-
 const traerProductos = async(rubro,mes)=>{
     tbody.innerHTML = ""; //LIMPIAMOS EL TBODY
 
@@ -55,7 +55,17 @@ const traerProductos = async(rubro,mes)=>{
         movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${fechaDesde}/${fechaHasta}`)).data;
     }else{
         movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${desde.value}/${a}-${m}-${d}`)).data;
-    } 
+    };
+
+    movimiento.sort((a,b)=>{
+        if (a.fecha > b.fecha) {
+            return 1;
+        }else if(b.fecha < a.fecha){
+            return -1
+        }
+        return 0;
+    });
+
     for(let mov of movimiento){
         const fecha = new Date(mov.fecha);
         let dia = fecha.getDate();
@@ -121,7 +131,7 @@ hasta.addEventListener('keypress',e=>{
 
 desde.addEventListener('keypress',e=>{
     if (e.key==="Enter") {
-        traerProductos(select.value);
+        hasta.focus();
     };
 })
 
