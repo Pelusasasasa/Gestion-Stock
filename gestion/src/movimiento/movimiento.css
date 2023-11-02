@@ -37,6 +37,16 @@ select{
     font-size: 2rem;
 }
 
+.mes button{
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.mes button.active{
+    background-color: #577b92;
+    color: white;
+}
 
 .tabla{
     background-color: white;

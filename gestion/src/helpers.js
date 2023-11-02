@@ -83,7 +83,6 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         aux = venta.condicionIva === "Inscripto" ? 1 : 6;
     }
     let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,aux);
-    
     let data = {
         'cantReg':1,
         'CbteTipo':venta.cod_comp,
@@ -111,14 +110,13 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
             "Nro":ventaAnterior.CbteHasta
         }
     ]);
-
     if (archivo.condIva === "Inscripto") {
         venta.iva105 !== 0 && (data.Iva.push({
             'Id':4,
             'BaseImp':venta.gravado105,
             'Importe':venta.iva105
         }));
-    
+        
         venta.iva21 !== 0 && (data.Iva.push({
             'Id':5,
             'BaseImp':venta.gravado21,

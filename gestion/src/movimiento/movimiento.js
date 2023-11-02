@@ -32,29 +32,34 @@ window.addEventListener('load',async e => {
         option.value = rubro.rubro;
         select.appendChild(option);
     };
-    traerProductos(select.value,mes);
+    traerProductos(select.value);
 });
 
-
-const traerProductos = async(rubro,mes)=>{
+const traerProductos = async(rubro,mesBandera)=>{
     tbody.innerHTML = ""; //LIMPIAMOS EL TBODY
-
     let totalMovimientos = 0; //ES UN TOTAL PARA  MOSTRAR EN LA PANTALLA
-
-    let [a,m,d] = hasta.value.split('-');
-
-    d=parseFloat(d)+1;
-    d = d<10 ? `0${d}` : d;
-
     let movimiento;
-    if (mes) {
-        const mMasUno = parseInt(m)<10 ? `0${parseInt(m)}` : parseInt(m);
-        const mMasDos = parseInt(mMasUno)<10 ? `0${parseInt(mMasUno) + 1}` :parseInt(mMasUno) + 1;
-        const fechaDesde = `${a}-${mMasUno}-01`;
-        const fechaHasta = `${mMasDos === 13 ? parseFloat(a)+1 : a}-${mMasDos === 13 ? "01" : mMasDos}-01`;
+    console.log(mesBandera)
+    if (mesBandera) {
+        const primerDiaMes = new Date();
+        primerDiaMes.setDate(1);
+
+        let dia = primerDiaMes.getDate();
+        let mes = primerDiaMes.getMonth() + 1;
+
+        dia = dia < 10 ? `0${dia}` : dia;
+        mes = mes < 10 ? `0${mes}` : mes;
+        mes = mes === 13 ? 1 : mes;
+
+        const fechaActual = new Date();
+        const ultimoDiaDelMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1,0);
+
+        const fechaDesde = `${primerDiaMes.getFullYear()}-${mes}-${dia}`;
+        const fechaHasta = ultimoDiaDelMes.toISOString().slice(0,10).split('/',3).join('-');
+
         movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${fechaDesde}/${fechaHasta}`)).data;
     }else{
-        movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${desde.value}/${a}-${m}-${d}`)).data;
+        movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${desde.value}/${hasta.value}`)).data;
     };
 
     movimiento.sort((a,b)=>{
@@ -127,21 +132,27 @@ hasta.addEventListener('keypress',e=>{
     if (e.key==="Enter") {
         traerProductos(select.value);
     };
+    esteMes.children[0].classList.remove('active');
 });
 
 desde.addEventListener('keypress',e=>{
     if (e.key==="Enter") {
         hasta.focus();
     };
-})
+});
 
 esteMes.addEventListener('click',e=>{
-    traerProductos(select.value,"Mes")
-})
+    traerProductos(select.value,true);
+    esteMes.children[0].classList.add('active');
+});
 
 select.addEventListener('click',e=>{
-    traerProductos(select.value)
-})
+    if (esteMes.children[0].classList.contains('active')) {
+        traerProductos(select.value,true);
+    }else{
+        traerProductos(select.value);
+    };
+});
 
 document.addEventListener('keyup',e=>{
     if (e.keyCode === 27) {

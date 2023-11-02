@@ -42,7 +42,7 @@ movimientoCTRL.porRubro = async(req,res)=>{
         $and:[
             {rubro:rubro},
             {fecha:{$gte:new Date(desde)}},
-            {fecha:{$lte:new Date(hasta)}}
+            {fecha:{$lte:new Date(hasta + "T23:59:59")}}
         ]
     });
     res.send(productos);
