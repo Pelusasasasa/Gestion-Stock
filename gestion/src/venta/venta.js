@@ -602,7 +602,7 @@ const sacarIva = (lista) => {
             totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);
         }else{
             gravado0 += cantidad*producto.precio/1;
-            totalIva0 += (cantidad*producto.precio) - (producto.precio/1);
+            totalIva0 += 0;
         }
     });
     let cantIva = 0

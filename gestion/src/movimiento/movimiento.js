@@ -1,5 +1,7 @@
 //Controlado 8/09/2022
 const axios = require('axios');
+const { ipcRenderer } = require('electron');
+const { clickderecho } = require('../helpers');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
@@ -11,6 +13,10 @@ const esteMes = document.querySelector('.mes');
 const total = document.querySelector('#total');
 
 const volver = document.querySelector('.volver');
+
+
+let seleccionado;
+let subSeleccionado;
 
 const hoy = new Date();
 let dia = hoy.getDate();
@@ -164,4 +170,55 @@ volver.addEventListener('click',e=>{
     location.href = "../menu.html";
 });
 
+tbody.addEventListener('click',async e =>{
+    console.log(e.target)
+    if(e.target.nodeName === "TD"){
+        seleccionado && seleccionado.classList.remove('seleccionado');
+        subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+        
+        seleccionado = e.target.parentNode;
+        subSeleccionado = e.target;
 
+        seleccionado.classList.add('seleccionado');
+        subSeleccionado.classList.add('subSeleccionado');
+    };
+
+});
+
+tbody.addEventListener('contextmenu',async e =>{
+
+    if(e.target.nodeName === "TD"){
+        seleccionado && seleccionado.classList.remove('seleccionado');
+        subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+        
+        seleccionado = e.target.parentNode;
+        subSeleccionado = e.target;
+
+        seleccionado.classList.add('seleccionado');
+        subSeleccionado.classList.add('subSeleccionado');
+    };
+
+    clickderecho(e,'movimientos');
+});
+
+ipcRenderer.on('sumarMovimiento',sumarMovimientos);
+
+async function sumarMovimientos(e) {
+    const sweet = require('sweetalert2');
+    const trs = document.querySelectorAll('tbody tr');
+    const tr = seleccionado;
+    const texto = tr.children[4].innerText;
+    
+    let total = 0;
+    let cantidad = 0;
+    for(let elem of trs){
+        if (elem.children[4].innerText === texto) {
+            total += parseFloat(elem.children[7].innerText);
+            cantidad += parseFloat(elem.children[5].innerText);
+        }
+    }
+
+    await sweet.fire({
+        title: `Se vendio la cantidad de ${cantidad} del producto ${texto} con un total de $${total}`
+    })
+};

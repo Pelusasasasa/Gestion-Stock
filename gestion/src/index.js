@@ -1,7 +1,11 @@
+global.ventanaPrincipal = null;
+
 const { dialog, app, BrowserWindow,Menu } = require('electron');
 const { ipcMain } = require('electron/main');
 const path = require('path');
-const {condIva} = require('./configuracion.json')
+const {condIva} = require('./configuracion.json');
+
+const {mostrarMenu} = require('./menuSecundario');
 
 var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
 
@@ -17,7 +21,6 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-let ventanaPrincipal;
 const createWindow = () => {
   // Create the browser window.
    ventanaPrincipal = new BrowserWindow({
@@ -134,6 +137,11 @@ ipcMain.on('informacion-a-ventana',(e,args)=>{
 ipcMain.handle('saveDialog',async(e,args)=>{
   const path = (await dialog.showSaveDialog()).filePath;
   return path
+});
+
+ipcMain.on('mostrar-menu',(e,args)=>{
+  const {ventana,x,y} = args;
+  mostrarMenu(ventana,x,y,ventanaPrincipal);
 });
 
 const hacerMenu = () => {
@@ -284,4 +292,4 @@ const hacerMenu = () => {
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
-}
+};

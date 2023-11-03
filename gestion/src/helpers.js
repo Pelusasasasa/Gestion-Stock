@@ -35,7 +35,17 @@ funciones.cerrarVentana = (e)=>{
         if (e.key === "Escape") {
             window.close();
         }
-}
+};
+
+funciones.clickderecho = (e,texto) =>{
+    const cordenadas = {
+        x: e.clientX,
+        y: e.clientY,
+        ventana: texto
+    }
+
+    ipcRenderer.send('mostrar-menu',cordenadas);
+};
 
 funciones.apretarEnter = async (e,input)=>{
     if(e.key === "Enter"){
