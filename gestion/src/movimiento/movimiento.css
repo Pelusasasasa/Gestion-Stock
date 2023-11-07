@@ -1,6 +1,30 @@
-.buscador{
-    margin: 2rem 0;
+.pestañas{
+    display: flex;
+    justify-content: center;
+    background-color: lightgray;
 }
+
+.pestañas main{
+    width: 100%;
+    border: .1rem solid black;
+    cursor: pointer;
+}
+
+.pestañas .active{
+    background-color: gray;
+}
+
+.pestañas .active p{
+    color: white;
+}
+
+.pestañas main p{
+    font-size: 1.8rem;
+    color: black;
+    text-align: center;
+    margin: 0;
+}
+
 
 .buscador{
     display: flex;

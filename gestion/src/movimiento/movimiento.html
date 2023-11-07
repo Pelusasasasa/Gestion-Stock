@@ -9,6 +9,14 @@
     <link rel="stylesheet" href="./movimiento.css">
 </head>
 <body>
+    <section class="pestañas">
+        <main id="contado" class="active">
+            <p>Contado</p>
+        </main>
+        <main id="cuentaCorriente">
+            <p>Cuenta Corriente</p>
+        </main>
+    </section>
     <main class="buscador">
         <div class="select">
             <label for="rubro">Rubro</label>
@@ -51,8 +59,12 @@
     <section class="footer">
         <button class="volver">Volver</button>
         <div class="total">
-            <label for="total">Total</label>
-            <input type="text" name="total" id="total">
+            <label for="total">Total Contado</label>
+            <input type="number" name="total" id="total">
+        </div>
+        <div class="totalCuentaCorriente">
+            <label for="totalCuentaCorriente">Total Cuenta Corriente</label>
+            <input type="number" name="totalCuentaCorriente" id="totalCuentaCorriente">
         </div>
     </section>
 </body>
