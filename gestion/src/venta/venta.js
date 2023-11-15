@@ -13,7 +13,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -330,6 +330,7 @@ facturar.addEventListener('click',async e=>{
         }else if(venta.tipo_venta === "CD" || venta.tipo_venta === "T"){
             venta.numero = numeros["Contado"] + 1;
         };
+
         if (venta.tipo_venta === "CC") {
             await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
         }else if(venta.tipo_venta === "PP"){
@@ -372,8 +373,9 @@ facturar.addEventListener('click',async e=>{
                 if (venta.tipo_venta === "PP") {
                     await axios.post(`${URL}Presupuesto`,venta);
                 }else{
-                    await axios.post(`${URL}ventas`,venta);
-                }
+                    const resVenta = (await axios.post(`${URL}ventas`,venta)).data;
+                    mostrarVentaRespues(resVenta);
+                };
 
                 if (impresion.checked) {
                     ipcRenderer.send('imprimir',[venta,cliente,movimientos]);

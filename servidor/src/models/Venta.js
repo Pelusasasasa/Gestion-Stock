@@ -4,19 +4,18 @@ const Venta = new mongoose.Schema({
     fecha:{
         type:Date,
         default: Date.now
-    }
-    ,
+    },
     cliente:{
         type:String,
-        default:"Consumidor Final"
+        required:[true,"Cliente es Obligatorio en Venta"]
     },
     idCliente:{
         type:String,
-        default: "0"
+        required:[true,"IdCliente es Obligatorio en Venta"]
     },
     numero:{
         type:Number,
-        required:true
+        required:[true,"Numero de vneta Obligatorio en Venta"]
     },
     listaProductos:{
         type:[],
@@ -24,7 +23,7 @@ const Venta = new mongoose.Schema({
     },
     precio:{
         type:Number,
-        required:true
+        required:[true,"Precio es Obligatorio en Venta"]
     },
     descuento:{
         type:Number,
@@ -36,7 +35,7 @@ const Venta = new mongoose.Schema({
     },
     tipo_comp:{
         type:String,
-        default:""
+        required: [true,"Tipo Comprobante es Obligatorio"]
     },
     F:{
         type:Boolean,

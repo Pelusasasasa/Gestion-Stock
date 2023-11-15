@@ -19,14 +19,18 @@ ventaCTRL.putForId = async(req,res)=>{
 ventaCTRL.cargarVenta = async(req,res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    const venta = new Venta(req.body);
-    await venta.save();
-    if (req.body.F) {
-        funcion.crearPDF(req.body);//creamos un pdf con la venta
-    }
+    try {
+        const venta = new Venta(req.body);
+        await venta.save();
+        if (req.body.F) {
+            funcion.crearPDF(req.body);//creamos un pdf con la venta
+        }
 
-    console.log(`Venta con el numero: ${venta.numero} Cargada`);
-    res.send("Venta Guardada");
+        console.log(`Venta con el numero: ${venta.numero} Cargada`);
+        res.send(res);
+    } catch (error) {
+        res.send(error.errors);
+    }
 };
 
 ventaCTRL.VentasDia = async(req,res)=>{

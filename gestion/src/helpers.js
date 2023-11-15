@@ -483,6 +483,24 @@ funciones.mostrarHistoricaRespuesta = async(res) =>{
     if (res.saldo) {
         await sweet.fire({title:res.saldo.message});
     }
+};
+
+funciones.mostrarVentaRespues = async(res) =>{
+    if (res.cliente) {
+        await sweet.fire({title:res.cliente.message});
+    };
+    if (res.idCliente) {
+        await sweet.fire({title:res.idCliente.message});
+    };
+    if (res.numero) {
+        await sweet.fire({title:res.numero.message});
+    };
+        if (res.precio) {
+        await sweet.fire({title:res.precio.message});
+    };
+    if (res.tipo_comp) {
+        await sweet.fire({title:res.tipo_comp.message});
+    };
 }
 
 funciones.configAxios = {
