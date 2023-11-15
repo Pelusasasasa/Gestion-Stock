@@ -7,19 +7,19 @@ const Recibo = new mongoose.Schema({
     },
     cliente:{
         type:String,
-        required:true
+        required:[true,"Cliente obligatorio en el Recibo"]
     },
     idCliente:{
         type:String,
-        required:true
+        required:[true,"idCliente obligatorio en el Recibo"]
     },
     numero:{
         type:Number,
-        required:true
+        required:[true,"numero obligatorio en el Recibo"]
     },
     precio:{
         type: Number,
-        required:true
+        required:[true,"Precio obligatorio en el Recibo"]
     },
     descuento:{
         type:Number,
@@ -27,11 +27,11 @@ const Recibo = new mongoose.Schema({
     },
     tipo_comp:{
         type:String,
-        default:""
+        required:[true,"Tipo Comprobante es Obligatorio"]
     },
     tipo_venta:{
         type:String,
-        default:"CD"
+            required:[true,"Tipo Venta es Obligatorio"]
     },
     vendedor:{
         type:String,

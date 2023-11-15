@@ -3,18 +3,16 @@ const compensadaCTRL = {};
 const CuentaCompensada = require('../models/cuentaCorrComp');
 
 compensadaCTRL.crearCompensda = async(req,res)=>{
-    const ultimaCompensada = (await CuentaCompensada.find({},{_id:1}));
-    let arreglo = ultimaCompensada.map((e)=>{
-        return e._id
-    });
-    let id = arreglo.length !== 0 ?  Math.max(...arreglo) : 0;
-    req.body._id = id + 1; 
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    const nuevaCompensada = new CuentaCompensada(req.body);
-    await nuevaCompensada.save();
-    console.log(`Compensdad ${req.body.nro_venta} creada al cliente ${req.body.cliente}`)
-    res.send(`Compensdad ${req.body._id} creada`);
+    try {
+        const nuevaCompensada = new CuentaCompensada(req.body);
+        await nuevaCompensada.save();
+        console.log(`Compensdad ${req.body.nro_venta} creada al cliente ${req.body.cliente}`)
+        res.send(`Compensdad ${req.body._id} creada`);
+    } catch (error) {
+        res.send(error.errors);
+    }
 }
 
 compensadaCTRL.traerPorCliente = async(req,res)=>{

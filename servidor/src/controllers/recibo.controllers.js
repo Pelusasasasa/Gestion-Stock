@@ -6,9 +6,14 @@ const Recibo = require('../models/Recibo');
 reciboCTRL.cargarRecibo = async(req,res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    const nuevoRecibo = new Recibo(req.body);
-    await nuevoRecibo.save();
-    res.send(`Recibo ${req.body.numero} cargado`)
+    try {
+        const nuevoRecibo = new Recibo(req.body);
+        await nuevoRecibo.save();
+        console.log(`Recibo ${req.body.numero} cargado`)
+        res.send(`Recibo ${req.body.numero} cargado`);
+    } catch (error) {
+        res.send(error.errors);
+    }
 }
 
 reciboCTRL.recibosDia = async(req,res)=>{

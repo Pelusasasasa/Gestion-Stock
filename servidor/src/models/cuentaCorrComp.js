@@ -1,41 +1,37 @@
 const mongoose = require('mongoose');
 
 const CuentaCompensada = new mongoose.Schema({
-    _id:{
-        type:Number,
-        required:true
+    fecha:{
+        type:Date,
+        default: Date.now
     },
     idCliente:{
         type:String,
-        required:true
+        required:[true,"El IdCliente es obligatorio en Compensada"]
     },
     cliente:{
         type:String,
-        required:true
+        required:[true,'El Cliente es obligatorio en Compensada']
     },
     nro_venta:{
         type:Number,
-        required:true
+        required:[true,'El nro_venta es obligatorio en Compensada']
     },
     tipo_comp:{
         type:String,
-        require:true,
+        require:[true,'El tipo de Comprobante es obligatorio en Compensada'],
     },
     importe:{
         type:Number,
-        required:true
+        required:[true,'El importe es obligatorio en Compensada']
     },
     pagado:{
         type:Number,
         default:0
     },
-    fecha:{
-        type:Date,
-        default: Date.now
-    },
     saldo:{
         type: Number,
-        required: true
+        required: [true,'El saldo es obligatorio en Compensada']
     },
 });
 
