@@ -88,6 +88,14 @@ const Venta = new mongoose.Schema({
         type:Number,
         default:0
     },
+    gravado0:{
+        type:Number,
+        default:0
+    },
+    iva0:{
+        type:Number,
+        default:0
+    },
     cantIva:{
         type:Number,
         default:0

@@ -1,9 +1,12 @@
 const axios = require('axios');
+const { ipcRenderer } = require('electron');
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 const desde = document.getElementById('desde');
 const hasta = document.getElementById('hasta');
+const exportar = document.getElementById('exportar');
+
 
 const tbody = document.querySelector('tbody');
 
@@ -22,21 +25,20 @@ desde.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
         hasta.focus()
         ventas = (await axios.get(`${URL}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
-        presupuestos = (await axios.get(`${URL}presupuesto/betweenDate/${desde.value}/${hasta.value}`)).data;
-        listar([...ventas,...presupuestos]);
+        listar([...ventas]);
     }
 });
 
 hasta.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
         ventas = (await axios.get(`${URL}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
-        presupuestos = (await axios.get(`${URL}presupuesto/betweenDate/${desde.value}/${hasta.value}`)).data;
-        listar([...ventas,...presupuestos]);
+        listar([...ventas]);
     }
 });
 
+exportar.addEventListener('click',exportarFacturas);
+
 const listar = async(ventas)=>{
-    console.log(ventas)
     ventas.sort((a,b)=>{
         if (a.fecha > b.fecha) {
             return 1;
@@ -285,4 +287,41 @@ document.addEventListener('keyup',e=>{
     if(e.keyCode === 27){
         location.href = '../menu.html';
     }
-})
+});
+
+
+async function exportarFacturas(e){
+    const XLSX = require('xlsx');
+    let ventasAux = [];
+
+    const path = await ipcRenderer.invoke('saveDialog');
+
+    const workbook = XLSX.utils.book_new();
+
+    ventas.forEach(venta => {
+        delete venta._id;
+        delete venta.__v;
+        delete venta.F;
+        delete venta.idCliente;
+        delete venta.listaProductos;
+        delete venta.descuento;
+        delete venta.tipo_venta;
+        delete venta.caja;
+        delete venta.afip;
+        
+        const {cliente:Cliente,tipo_comp:Comprobante,condicionIva:condIva,num_doc:NumDoc,cod_doc:CodDoc,fecha:fechaAux,precio:Total,gravado21,iva21,gravado105,iva105,gravado0,iva0} = venta;
+        const Fecha = fechaAux.slice(0,10).split('-',3).reverse().join('/');
+
+        const ventaaux = {Fecha,Cliente,CodDoc,NumDoc,condIva,Comprobante,Total,gravado21,iva21,gravado105,iva105,gravado0,iva0};
+        ventasAux.push(ventaaux);
+    });
+
+    workbook.props = {
+        Title:"Facturacion"
+    };
+
+    let newWs = XLSX.utils.json_to_sheet(ventasAux);
+
+    XLSX.utils.book_append_sheet(workbook,newWs,'Facturacion');
+    XLSX.writeFile(workbook,path + '.xlsx');
+}

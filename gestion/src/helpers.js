@@ -460,6 +460,31 @@ funciones.movimientosRecibos = async(tr,codigo,cliente,numero) => {
     await axios.post(`${URL}movRecibo`,mov);
 };
 
+funciones.mostrarHistoricaRespuesta = async(res) =>{
+    if (res.cliente) {
+        await sweet.fire({title:res.cliente.message});
+    };
+    
+    if (res.idCliente) {
+        await sweet.fire({title:res.idCliente.message});
+    };
+    if (res.nro_venta) {
+        await sweet.fire({title:res.nro_venta.message});
+    };
+    if (res.tipo_comp) {
+        await sweet.fire({title:res.tipo_comp.message});
+    };
+    if (res.debe) {
+        await sweet.fire({title:res.debe.message});
+    };
+    if (res.haber) {
+        await sweet.fire({title:res.haber.message});
+    };
+    if (res.saldo) {
+        await sweet.fire({title:res.saldo.message});
+    }
+}
+
 funciones.configAxios = {
    
 }

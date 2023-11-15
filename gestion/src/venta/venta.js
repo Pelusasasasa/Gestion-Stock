@@ -13,7 +13,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -511,8 +511,13 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
     cuenta.nro_venta = venta.numero;
     cuenta.tipo_comp = venta.tipo_comp;
     cuenta.debe = venta.precio;
+    cuenta.haber = 0;
     cuenta.saldo = facturaAnterior ? saldo - venta.precio : venta.precio + saldo;
-    (await axios.post(`${URL}historica`,cuenta)).data;
+    const res = (await axios.post(`${URL}historica`,cuenta)).data;
+    console.log(res)
+    if (res) {
+        await mostrarHistoricaRespuesta(res)
+    }
 };
 
 //Cargamos el movimiento de producto a la BD
@@ -657,6 +662,7 @@ const hacerHistoricaRecibo = async(numero,haber,tipo)=>{
     cuenta.nro_venta = numero;
     cuenta.tipo_comp = tipo;
     cuenta.haber = haber;
+    cuenta.debe = 0;
     cuenta.saldo = parseFloat(total.value) - parseFloat(haber)  + parseFloat(saldo.value);
     (await axios.post(`${URL}historica`,cuenta)).data;
 };

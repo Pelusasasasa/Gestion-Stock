@@ -14,7 +14,7 @@ require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter, cargarFactura, redondear, verClienteValido, configAxios, movimientosRecibos} = require('../helpers');
+const {apretarEnter, cargarFactura, redondear, verClienteValido, configAxios, movimientosRecibos, mostrarHistoricaRespuesta} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
@@ -220,7 +220,7 @@ imprimir.addEventListener('click',async e=>{
     recibo.precio = parseFloat(total.value);
     recibo.vendedor = vendedor ? vendedor : "";
     recibo.caja = archivo.caja;
-    try{
+
         if (tarjeta.checked) {
             recibo.cod_comp = 11;
             recibo.num_doc = "00000000";
@@ -228,9 +228,10 @@ imprimir.addEventListener('click',async e=>{
             recibo.tipo_venta = "T";
             await cargarFactura(recibo)
         }
+        await ponerEnCuentaHistorica(recibo);
         cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
         await modificarCuentaCompensadas();
-        await ponerEnCuentaHistorica(recibo);
+        
         await descontarSaldoCliente(recibo.idCliente,recibo.precio);
         await axios.post(`${URL}recibo`,recibo);
         //Lo usamos paara imprimir
@@ -251,12 +252,6 @@ imprimir.addEventListener('click',async e=>{
         const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
         ipcRenderer.send('imprimir',[recibo,cliente,lista])
         location.href = "../menu.html";
-    }catch(error){
-        console.log(error)
-        await sweet.fire({
-            title:"No se pudo generar la venta"
-        })
-    }
 });
 
 //Le descontamos un saldo al cliente
@@ -272,7 +267,6 @@ const modificarCuentaCompensadas = async()=>{
     for await(let tr of trs){
         const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : "";
         const compensada =  numero !== "" ? (await axios.get(`${URL}compensada/traerCompensada/id/${numero}`)).data : "";
-        console.log(compensada)
         if (compensada !== "") {
             compensada.pagado = parseFloat((compensada.pagado + parseFloat(tr.children[5].children[0].value)).toFixed(2));
             compensada.saldo = parseFloat(tr.children[6].innerHTML).toFixed(2);
@@ -287,11 +281,16 @@ const ponerEnCuentaHistorica = async(recibo)=>{
     cuenta.idCliente = recibo.idCliente;
     cuenta.cliente = recibo.cliente;
     cuenta.nro_venta = recibo.numero;
+    cuenta.debe = 0;
     cuenta.haber = recibo.precio;
     cuenta.tipo_comp = "Recibo";
     const cliente = (await axios.get(`${URL}clientes/id/${recibo.idCliente}`)).data;
     cuenta.saldo = (cliente.saldo - recibo.precio).toFixed(2);
-    await axios.post(`${URL}historica`,cuenta);
+    const res = (await axios.post(`${URL}historica`,cuenta)).data;
+
+    if (res) {
+        mostrarHistoricaRespuesta(res)
+    }
 };
 
 const crearCompensadaAFavor = async (saldo)=>{
@@ -383,11 +382,13 @@ async function actualizarTodo(e) {
         await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta,configAxios);
 
         //Historicas
-        //Traemos lahistorica correspondiente y la actualizamos
+        //Traemos la historica correspondiente y la actualizamos
         const historica = (await axios.get(`${URL}historica/porId/id/${cuenta.nro_venta}`)).data;
-        historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
-        historica.debe = parseFloat(cuenta.importe.toFixed(2));
-        await axios.put(`${URL}historica/PorId/id/${historica._id}`,historica,configAxios);
+        if (historica) {
+            historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
+            historica.debe = parseFloat(cuenta.importe.toFixed(2));
+            await axios.put(`${URL}historica/PorId/id/${historica._id}`,historica,configAxios);
+        };
 
         //Traemos las cuentas historicas que siguen despues de la principal
         let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${historica.idCliente}`,configAxios)).data;
@@ -402,7 +403,7 @@ async function actualizarTodo(e) {
         cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(elem=>(elem.fecha > historica.fecha));
 
         let saldoAnterior = historica.saldo;
-        //Modificamos las cuentas historicas qrestantes
+        //Modificamos las cuentas historicas restantes
         let aux = -1;
         for(let elem of cuentasHistoricasRestantes){
             if (!(aux === elem.nro_venta)) {

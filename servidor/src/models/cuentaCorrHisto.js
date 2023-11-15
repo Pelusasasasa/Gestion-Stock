@@ -1,37 +1,34 @@
 const mongoose = require('mongoose');
 
 const Historica = new mongoose.Schema({
-    _id:{
-        type: Number,
-        required:true
-    },
     idCliente:{
         type:String,
-        required:true
+        required:[true,"El id de Cliente es Obligatorio"]
     },
     cliente:{
         type:String,
-        required: true
+        required: [true,"El cliente es Obligatorio"],
+        set:(value) => value.toUpperCase()
     },
     nro_venta:{
         type:Number,
-        required:true,
+        required:[true,"El numero de comprobante es Obligatorio"],
     },
     tipo_comp:{
         type:String,
-        require:true,
+        require:[true,"El tipo de comprobante es Obligatorio"],
     },
     debe:{
         type:Number,
-        default: 0
+        required:[true,"Atributo debe es obligatorio"]
     },
     haber:{
         type:Number,
-        default: 0
+        required:[true,"Atributo haber es obligatorio"]
     },
     saldo:{
         type:Number,
-        required:true
+        required:[true,"Atributo saldo es obligatorio"]
     },
     fecha:{
         type:Date,
