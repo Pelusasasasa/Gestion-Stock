@@ -601,7 +601,7 @@ const sacarIva = (lista) => {
     let totalIva105= 0;
     let gravado105 = 0;
     lista.forEach(({producto,cantidad}) =>{
-        if (producto.impuesto === 21) {
+        if (producto.impuesto === 21 || producto.impuesto === 0) {
             gravado21 += cantidad*producto.precio/1.21;
             totalIva21 += cantidad*producto.precio - producto.precio/1.21;
         }else if(producto.impuesto === 10.5){
