@@ -23,8 +23,8 @@ historicaCTRL.traerHistoricaPorCliente = async(req,res)=>{
 
 historicaCTRL.traerHistorica = async(req,res)=>{
     const {id} = req.params;
-    const historica = await Historica.find({nro_venta:id});
-    res.send(historica[0]);
+    const historica = await Historica.findOne({nro_venta:id},{_id:0});
+    res.send(historica);
 }
 
 historicaCTRL.modificarHistorica = async(req,res)=>{
@@ -33,6 +33,12 @@ historicaCTRL.modificarHistorica = async(req,res)=>{
     const historica = await Historica.findOneAndUpdate({_id:id},req.body);
     console.log(`Cuenta Historica numero: ${req.body.nro_venta} Modificado al cliente ${req.body.cliente}` )
     res.send(`historica ${id} modificada`);
+};
+
+historicaCTRL.putForClientAndNumber = async(req,res) => {
+    const {idCliente,numero} = req.params;
+    const modificar = await Historica.findOneAndUpdate({idCliente,numero},req.body);
+    res.send(modificar)
 };
 
 module.exports = historicaCTRL;

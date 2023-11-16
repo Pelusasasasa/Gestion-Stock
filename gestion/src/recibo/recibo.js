@@ -387,7 +387,7 @@ async function actualizarTodo(e) {
         if (historica) {
             historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
             historica.debe = parseFloat(cuenta.importe.toFixed(2));
-            await axios.put(`${URL}historica/PorId/id/${historica._id}`,historica,configAxios);
+            await axios.put(`${URL}historica/PorNumeroAndCliente/${historica.nro_venta}/${historica.idCliente}`,historica,configAxios);
         };
 
         //Traemos las cuentas historicas que siguen despues de la principal
@@ -409,7 +409,7 @@ async function actualizarTodo(e) {
             if (!(aux === elem.nro_venta)) {
                 elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
             saldoAnterior = elem.saldo;
-            await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
+            await axios.put(`${URL}historica/PorNumeroAndCliente/${elem.nro_venta}/${elem.idCliente}`,elem,configAxios);
             }
 
             aux = elem.nro_venta;
