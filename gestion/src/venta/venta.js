@@ -13,7 +13,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -591,38 +591,6 @@ const sumarSaldo = async(id,nuevoSaldo,venta)=>{
         cliente.saldo = (cliente.saldo + nuevoSaldo - parseFloat(inputRecibo.value)).toFixed(2);
     }
     await axios.put(`${URL}clientes/id/${id}`,cliente);
-};
-
-const sacarIva = (lista) => {
-    let totalIva0 = 0;
-    let totalIva21= 0;
-    let gravado21 = 0; 
-    let gravado0 = 0;
-    let totalIva105= 0;
-    let gravado105 = 0;
-    lista.forEach(({producto,cantidad}) =>{
-        if (producto.impuesto === 21 || producto.impuesto === 0) {
-            gravado21 += cantidad*producto.precio/1.21;
-            totalIva21 += cantidad*producto.precio - producto.precio/1.21;
-        }else if(producto.impuesto === 10.5){
-            gravado105 += cantidad*producto.precio/1.105
-            totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);
-        }else{
-            gravado0 += cantidad*producto.precio/1;
-            totalIva0 += 0;
-        }
-    });
-    let cantIva = 0
-    if (gravado0 !== 0) {
-        cantIva++;
-    }
-    if (gravado21 !== 0) {
-        cantIva++;
-    }
-    if (gravado105 !== 0) {
-        cantIva++;
-    }
-    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
 };
 
 

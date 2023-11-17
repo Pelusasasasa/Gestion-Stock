@@ -20,7 +20,8 @@ const sweet = require('sweetalert2');
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');
 const saldo = document.querySelector('#saldo');
-const localidad = document.querySelector('#localidad');
+const condicionIva = document.querySelector('#condicionIva');
+const dni = document.querySelector('#dni');
 const direccion = document.querySelector('#direccion');
 const fecha = document.querySelector('#fecha');
 const cancelar = document.querySelector('.cancelar');
@@ -54,7 +55,6 @@ ipcRenderer.on('recibir',(e,args)=>{
 });
 
 
-
 //Pnemos los valores del cliente traido
 const ponerInputs = async(id)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
@@ -62,8 +62,9 @@ const ponerInputs = async(id)=>{
         codigo.value = cliente._id;
         nombre.value = cliente.nombre;
         saldo.value = (cliente.saldo).toFixed(2);
-        localidad.value = cliente.localidad;
-        direccion.value = cliente.direccion;
+        dni.value = cliente.cuit;
+        condicionIva.value = cliente.condicionIva;
+        direccion.value = cliente.direccion + " - " + cliente.localidad ;
         compensadas = (await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`)).data;
         tbody.innerHTML = "";
         compensadas.forEach(compensada => {
@@ -222,9 +223,23 @@ imprimir.addEventListener('click',async e=>{
     recibo.caja = archivo.caja;
 
         if (tarjeta.checked) {
-            recibo.cod_comp = 11;
-            recibo.num_doc = "00000000";
-            recibo.cod_doc = 99;
+            recibo.cod_comp = condicionIva === "Inscripto" ? 1 : 6;
+            recibo.num_doc = dni.value !== "" ? dni.value : "00000000";
+
+            if (recibo.num_doc === "00000000") {
+                recibo.cod_doc = 99;
+            }else{
+                recibo.cod_doc = dni.value.length === 8 ? 96 : 80;
+            };
+
+            recibo.gravado21 = parseFloat(redondear(recibo.precio / 1.21,2));
+            recibo.gravado0 = 0;
+            recibo.gravado105 = 0;
+
+            recibo.iva21 = parseFloat(redondear(recibo.precio - recibo.gravado21,2));
+            recibo.iva0 = 0;
+            recibo.iva105 = 0;
+
             recibo.tipo_venta = "T";
             await cargarFactura(recibo)
         }
@@ -326,10 +341,14 @@ entregado.addEventListener('focus',e=>{
 
 
 nombre.addEventListener('keypress',e=>{
-    apretarEnter(e,localidad)
+    apretarEnter(e,dni)
 });
 
-localidad.addEventListener('keypress',e=>{
+dni.addEventListener('keypress',e=>{
+    apretarEnter(e,condicionIva)
+});
+
+condicionIva.addEventListener('keypress',e=>{
     apretarEnter(e,direccion)
 });
 
@@ -337,9 +356,6 @@ direccion.addEventListener('keypress',e=>{
     apretarEnter(e,fecha);
 });
 
-fecha.addEventListener('keypress',e=>{
-    apretarEnter(e,localidad)
-});
 
 cancelar.addEventListener('click',e=>{
     location.href = "../menu.html";
@@ -437,4 +453,4 @@ async function actualizarSaldo(numero) {
     cliente.saldo = numero.toFixed(2);
     saldo.value = numero.toFixed(2);
     (await axios.put(`${URL}clientes/id/${codigo.value}`,cliente,configAxios))
-}
+};

@@ -46,6 +46,17 @@ movimientoCTRL.porRubro = async(req,res)=>{
         ]
     });
     res.send(productos);
+};
+
+movimientoCTRL.getforNumberAndCliente = async(req,res)=>{
+    const {number,cliente} = req.params;
+    const movimientos = await movProducto.find({
+        $and:[
+            {nro_venta:number},
+            {cliente:cliente}
+        ]
+    });
+    res.send(movimientos)
 }
 
 module.exports = movimientoCTRL;
