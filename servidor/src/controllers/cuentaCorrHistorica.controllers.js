@@ -37,7 +37,8 @@ historicaCTRL.modificarHistorica = async(req,res)=>{
 
 historicaCTRL.putForClientAndNumber = async(req,res) => {
     const {idCliente,numero} = req.params;
-    const modificar = await Historica.findOneAndUpdate({idCliente,numero},req.body);
+    const modificar = await Historica.findOneAndUpdate({idCliente,nro_venta:numero},req.body);
+    console.log(`Se modifico la cuenta historica ${numero} del cliente ${modificar.cliente}`);
     res.send(modificar)
 };
 

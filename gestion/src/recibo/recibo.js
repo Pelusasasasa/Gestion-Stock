@@ -403,7 +403,7 @@ async function actualizarTodo(e) {
         if (historica) {
             historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
             historica.debe = parseFloat(cuenta.importe.toFixed(2));
-            await axios.put(`${URL}historica/PorNumeroAndCliente/${historica.nro_venta}/${historica.idCliente}`,historica,configAxios);
+            (await axios.put(`${URL}historica/PorNumeroAndCliente/${historica.nro_venta}/${historica.idCliente}`,historica,configAxios)).data;
         };
 
         //Traemos las cuentas historicas que siguen despues de la principal
@@ -443,8 +443,9 @@ async function actualizarMovimientos(cuenta){
             const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
             mov.precio = precio ? precio*mov.cantidad : mov.precio * mov.cantidad;
             total += mov.precio;
+            console.log(mov)
+            await axios.put(`${URL}movimiento/${mov.nro_venta}/${mov.tipo_venta}`,mov,configAxios);
         };
-        await axios.put(`${URL}movimiento`,movimientos,configAxios);
         return total;
 };
 

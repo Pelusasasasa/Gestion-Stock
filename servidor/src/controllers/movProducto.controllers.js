@@ -12,15 +12,7 @@ movimientoCTRL.modificarVarios = async(req,res)=>{
 }
 
 movimientoCTRL.cargar = async(req,res)=>{
-    let ultimoID = (await movProducto.find({},{_id:1}));
-    let arreglo = ultimoID.map((e)=>{
-        return e._id;
-    });
-    let id = arreglo.length !== 0 ? Math.max(...arreglo) : 0;
-    console.log(`ID inicial del movimiento es: ${id}`);
     for await(let movimiento of req.body){
-        id++;
-        movimiento._id = id;
         const now = new Date();
         movimiento.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
         const movimientoAGuardar = new movProducto(movimiento);
@@ -28,13 +20,7 @@ movimientoCTRL.cargar = async(req,res)=>{
         console.log(`Movimiento con el id: ${movimiento._id} --- ${movimiento.producto} Cargado`);
     }
     res.send(`Movimientos cargados`);
-}
-
-movimientoCTRL.porId = async(req,res)=>{
-    const {id,tipoVenta} = req.params;
-    const movimientos = await movProducto.find({nro_venta:id,tipo_venta:tipoVenta});
-    res.send(movimientos)
-}
+};
 
 movimientoCTRL.porRubro = async(req,res)=>{
     const {rubro,desde,hasta} = req.params;
@@ -57,6 +43,19 @@ movimientoCTRL.getforNumberAndCliente = async(req,res)=>{
         ]
     });
     res.send(movimientos)
-}
+};
+
+movimientoCTRL.porId = async(req,res)=>{
+    const {id,tipoVenta} = req.params;
+    const movimientos = await movProducto.find({nro_venta:id,tipo_venta:tipoVenta},{_id:1,precio:0});
+    res.send(movimientos)
+};
+
+
+movimientoCTRL.putForIdAndTipoVenta = async(req,res) => {
+    const {id,tipoVenta} = req.params;
+    const movimiento = await movProducto.findOneAndUpdate({nro_venta:id,tipo_venta:tipoVenta},req.body);
+    res.send(movimiento);
+};
 
 module.exports = movimientoCTRL;
