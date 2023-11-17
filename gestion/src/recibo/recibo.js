@@ -441,10 +441,10 @@ async function actualizarMovimientos(cuenta){
         let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
         for(let mov of movimientos){
             const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
-            mov.precio = precio ? precio*mov.cantidad : mov.precio * mov.cantidad;
+            mov.precio = precio ? precio * mov.cantidad : mov.precio * mov.cantidad;
             total += mov.precio;
-            console.log(mov)
-            await axios.put(`${URL}movimiento/${mov.nro_venta}/${mov.tipo_venta}`,mov,configAxios);
+            delete mov._id;
+            //await axios.put(`${URL}movimiento/${mov.nro_venta}/${mov.tipo_venta}`,mov,configAxios);
         };
         return total;
 };

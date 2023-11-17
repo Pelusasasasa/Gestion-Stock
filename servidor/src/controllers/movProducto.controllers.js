@@ -47,7 +47,7 @@ movimientoCTRL.getforNumberAndCliente = async(req,res)=>{
 
 movimientoCTRL.porId = async(req,res)=>{
     const {id,tipoVenta} = req.params;
-    const movimientos = await movProducto.find({nro_venta:id,tipo_venta:tipoVenta},{_id:1,precio:0});
+    const movimientos = await movProducto.find({nro_venta:id,tipo_venta:tipoVenta});
     res.send(movimientos)
 };
 
