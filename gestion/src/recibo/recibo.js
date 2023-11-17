@@ -439,12 +439,13 @@ async function actualizarTodo(e) {
 async function actualizarMovimientos(cuenta){
         let total = 0;
         let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
+        console.log(movimientos)
         for(let mov of movimientos){
             const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
             mov.precio = precio ? precio * mov.cantidad : mov.precio * mov.cantidad;
             total += mov.precio;
             delete mov._id;
-            //await axios.put(`${URL}movimiento/${mov.nro_venta}/${mov.tipo_venta}`,mov,configAxios);
+            await axios.put(`${URL}movimiento/${mov.nro_venta}/${mov.tipo_venta}`,mov,configAxios);
         };
         return total;
 };

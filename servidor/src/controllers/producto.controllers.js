@@ -37,8 +37,13 @@ productoCTRL.getsProductos = async(req,res)=>{
 
 productoCTRL.traerPrecio = async(req,res)=>{
     const {id} = req.params
-    const producto = (await Producto.find({_id:id},{precio:1,_id:0}))[0];
-    res.send(`${producto.precio}`);
+    const producto = (await Producto.findOne({_id:id},{precio:1,_id:0}));
+    if (producto) {
+        res.send(`${producto.precio}`);
+    }else{
+        res.send('0');
+    }
+    
 }
 
 productoCTRL.traerProducto = async(req,res)=>{
