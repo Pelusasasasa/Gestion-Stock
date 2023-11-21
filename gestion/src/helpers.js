@@ -241,11 +241,11 @@ funciones.sacarIva = (lista) => {
     let gravado105 = 0;
     lista.forEach(({producto,cantidad}) =>{
         if (producto.impuesto === 21 || producto.impuesto === 0) {
-            gravado21 += cantidad*producto.precio/1.21;
-            totalIva21 += (cantidad*producto.precio) - (producto.precio/1.21);
-        }else if(producto.impuesto === 10.5){
-            gravado105 += cantidad*producto.precio/1.105
-            totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);
+            gravado21 += cantidad * producto.precio / 1.21;
+            totalIva21 += (cantidad * (producto.precio / 1.21)) * 21 / 100;
+        }else if(producto.impuesto === 10.5){ 
+            gravado105 += cantidad * producto.precio / 1.105
+            totalIva105 += (cantidad * (producto.precio / 1.105)) * 10.5 / 100;
         }else{
             gravado0 += cantidad*producto.precio/1;
             totalIva0 += 0;
@@ -260,7 +260,7 @@ funciones.sacarIva = (lista) => {
     }
     if (gravado105 !== 0) {
         cantIva++;
-    }
+    };
     return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
 };
 
