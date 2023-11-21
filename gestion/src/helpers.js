@@ -242,7 +242,7 @@ funciones.sacarIva = (lista) => {
     lista.forEach(({producto,cantidad}) =>{
         if (producto.impuesto === 21 || producto.impuesto === 0) {
             gravado21 += cantidad*producto.precio/1.21;
-            totalIva21 += cantidad*producto.precio - producto.precio/1.21;
+            totalIva21 += (cantidad*producto.precio) - (producto.precio/1.21);
         }else if(producto.impuesto === 10.5){
             gravado105 += cantidad*producto.precio/1.105
             totalIva105 += (cantidad*producto.precio) - (producto.precio/1.105);

@@ -149,19 +149,6 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-codBarra.addEventListener('keypress',async e=>{
-    if(e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999"){
-        listarProducto(descripcion.value);
-    }else if(e.key === "Enter" && codBarra.value === ""){
-        descripcion.focus();
-    }else if(codBarra.value === "999-999"){
-        cantidad.focus();
-    }
-
-    if(e.keyCode === 37){
-        cantidad.focus();
-    }
-});
 
 descripcion.addEventListener('keypress',e=>{
     if (e.keyCode === 13 && descripcion.value !== "") {
@@ -449,14 +436,13 @@ if (producto !== "") {
         });
     }
     listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
-    codBarra.value = producto._id;
     precioU.value = redondear(producto.precio,2);
     idProducto++;
     producto.idTabla = `${idProducto}`;
     tbody.innerHTML += `
     <tr id=${producto.idTabla}>
         <td>${cantidad.value}</td>
-        <td>${codBarra.value}</td>
+        <td>${producto._id}</td>
         <td>${producto.descripcion.toUpperCase()}</td>
         <td>${producto.marca}</td>
         <td>${parseFloat(precioU.value).toFixed(2)}</td>
@@ -484,7 +470,6 @@ if (producto !== "") {
         totalGlobal = parseFloat(total.value);
     }
     cantidad.value = "1.00";
-    codBarra.value = "";
     descripcion.value = "";
     precioU.value = "";
     descripcion.focus();  
@@ -710,7 +695,7 @@ condicionIva.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
-        descripcion.focus();
+        listarProducto(descripcion.value);
     }
 });
 
