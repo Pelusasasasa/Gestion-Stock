@@ -212,7 +212,6 @@ const crearProducto = ()=>{
     total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)),2);
     totalGlobal = parseFloat(total.value);
     cantidad.value = "1.00";
-    codBarra.value = "";
     precioU.value = "";
     rubro.value = "";
     descripcion.value = "";
