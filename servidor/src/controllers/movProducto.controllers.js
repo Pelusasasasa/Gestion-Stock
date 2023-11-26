@@ -12,12 +12,17 @@ movimientoCTRL.modificarVarios = async(req,res)=>{
 }
 
 movimientoCTRL.cargar = async(req,res)=>{
+    let ultimoMovimiento = await movProducto.findOne().sort({$natural:-1});
+    let codigo = ultimoMovimiento.codigo + 1;
+    console.log("EL codigo inicial es: " + codigo);
     for await(let movimiento of req.body){
+        movimiento.codigo = codigo;
+        codigo++;
         const now = new Date();
         movimiento.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
         const movimientoAGuardar = new movProducto(movimiento);
         await movimientoAGuardar.save();
-        console.log(`Movimiento con el id: ${movimiento._id} --- ${movimiento.producto} Cargado`);
+        console.log(`Movimiento con el codigo: ${movimiento.codigo} --- ${movimiento.producto} Cargado`);
     }
     res.send(`Movimientos cargados`);
 };
@@ -45,17 +50,29 @@ movimientoCTRL.getforNumberAndCliente = async(req,res)=>{
     res.send(movimientos)
 };
 
-movimientoCTRL.porId = async(req,res)=>{
-    const {id,tipoVenta} = req.params;
-    const movimientos = await movProducto.find({nro_venta:id,tipo_venta:tipoVenta});
+movimientoCTRL.getForNroVentaAndTipoVenta = async(req,res)=>{
+    const {nro_venta,tipoVenta} = req.params;
+    const movimientos = await movProducto.find({nro_venta:nro_venta,tipo_venta:tipoVenta});
     res.send(movimientos)
 };
 
-
-movimientoCTRL.putForIdAndTipoVenta = async(req,res) => {
+movimientoCTRL.putForCodigoAndTipoVenta = async(req,res) => {
     const {id,tipoVenta} = req.params;
-    const movimiento = await movProducto.findOneAndUpdate({nro_venta:id,tipo_venta:tipoVenta},req.body);
+    let movimiento = await movProducto.findOneAndUpdate({codigo:id,tipo_venta:tipoVenta},req.body);
     res.send(movimiento);
+};
+
+movimientoCTRL.setCodigo = async(req,res) => {
+    let i = 0;
+    const movimientos = await movProducto.find();
+    for await(let movimiento of movimientos){
+        i++;
+        movimiento.codigo = i;
+        console.log(movimiento)
+        await movimiento.updateOne({$set:{codigo:i}});
+        
+    };
+    res.send('listo')
 };
 
 module.exports = movimientoCTRL;

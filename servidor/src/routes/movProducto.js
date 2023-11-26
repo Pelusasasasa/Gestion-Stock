@@ -1,14 +1,16 @@
 const {Router} = require('express');
 const router = Router();
 
-const {id,cargar,modificarVarios,porId,porRubro, getforNumberAndCliente, putForId, putForIdAndTipoVenta} = require('../controllers/movProducto.controllers');
+const {id,cargar,modificarVarios,getForNroVentaAndTipoVenta,porRubro, getforNumberAndCliente, putForCodigoAndTipoVenta, setCodigo} = require('../controllers/movProducto.controllers');
 
 router.route('/')
+    .get(setCodigo)
     .put(modificarVarios)
     .post(cargar)
-router.route('/:id/:tipoVenta')
-    .get(porId)
-    .put(putForIdAndTipoVenta)
+router.route('/:nro_venta/:tipoVenta')
+    .get(getForNroVentaAndTipoVenta)
+router.route('/forCodigoAndNumeroVenta/:codigo/:tipoVenta')
+    .put(putForCodigoAndTipoVenta)
 router.route('/rubro/:rubro/:desde/:hasta')
     .get(porRubro)
 router.route('/forNumberAndCliente/:number/:cliente')

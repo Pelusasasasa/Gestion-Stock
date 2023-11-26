@@ -367,7 +367,7 @@ facturar.addEventListener('click',async e=>{
                     ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
                 }
 
-                // location.reload();  
+                location.reload();  
             } catch (error) {
                 await sweet.fire({
                     title:"No se pudo generar la venta"

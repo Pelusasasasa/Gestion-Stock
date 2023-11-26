@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const movProducto = new mongoose.Schema({
+    codigo:{
+        type:Number,
+        required:true,
+        unique:true,
+    },
     fecha:{
         type:Date,
         default: Date.now

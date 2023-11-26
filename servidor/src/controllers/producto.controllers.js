@@ -179,10 +179,10 @@ productoCTRL.productosPorMarcas = async(req,res)=>{
 
 productoCTRL.traerProvedores = async(req,res)=>{
     let provedores = [];
-    const productos = await Producto.find({},{_id:1,provedor:1});
+    const productos = await Producto.find({},{provedor:1,_id:0});
     productos.forEach(producto =>{
         if (!provedores.includes(producto.provedor)) {
-            provedores.push(producto);
+            provedores.push(producto.provedor);
         }
     });
     res.send(JSON.stringify(provedores));

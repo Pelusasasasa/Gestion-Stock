@@ -10,6 +10,7 @@ const salir = document.getElementById('salir');
 
 window.addEventListener('load',async e=>{
     const provedores = (await axios.get(`${URL}productos/provedores`)).data;
+    console.log(provedores.includes("GASTRICINI"))
     listarProvedores(provedores);
 });
 
@@ -43,8 +44,8 @@ porcentaje.addEventListener('keypress',e=>{
 const listarProvedores = async(lista)=>{
     for await (let elem of lista){
         const option = document.createElement('option');
-        option.value = elem.provedor;
-        option.text = elem.provedor;
+        option.value = elem;
+        option.text = elem;
 
         select.appendChild(option)
     }
