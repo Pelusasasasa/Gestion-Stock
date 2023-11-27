@@ -57,8 +57,8 @@ movimientoCTRL.getForNroVentaAndTipoVenta = async(req,res)=>{
 };
 
 movimientoCTRL.putForCodigoAndTipoVenta = async(req,res) => {
-    const {id,tipoVenta} = req.params;
-    let movimiento = await movProducto.findOneAndUpdate({codigo:id,tipo_venta:tipoVenta},req.body);
+    const {codigo,tipoVenta} = req.params;
+    let movimiento = await movProducto.findOneAndUpdate({codigo:codigo,tipo_venta:tipoVenta},req.body);
     res.send(movimiento);
 };
 
@@ -68,7 +68,6 @@ movimientoCTRL.setCodigo = async(req,res) => {
     for await(let movimiento of movimientos){
         i++;
         movimiento.codigo = i;
-        console.log(movimiento)
         await movimiento.updateOne({$set:{codigo:i}});
         
     };
