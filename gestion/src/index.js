@@ -181,13 +181,15 @@ const hacerMenu = () => {
           ]
         },
         {
-          label: condIva === "Inscripto" ? "Libro Ventas" :"Alicuotas",
+          label:"Alicuotas",
           click(){
-            if (condIva === "Inscripto") {
+            abrirVentana("alicuotas/alicuotas.html",400,500);
+          }
+        },
+        {
+          label: "Libro Ventas",
+          click(){
               ventanaPrincipal.webContents.send('libroIva');
-            }else{
-              abrirVentana("alicuotas/alicuotas.html",400,500);
-            }
           }          
         },
         {

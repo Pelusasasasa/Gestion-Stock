@@ -5,39 +5,64 @@ let nombreArchivoVentas;
 let nombreArchivoAlicuotas;
 let selectedFile;
 
-document.getElementById('input').addEventListener('change',e=>{
-    selectedFile = e.target.files[0];
-    if (selectedFile) {
-        let fileReader = new FileReader();
-        fileReader.onload = function(e){
-            let data = e.target.result;
-            let woorbook = XLSX.read(data,{
-                type:"binary"
-            });
-            woorbook.SheetNames.forEach(async sheet=>{
-                let datos = XLSX.utils.sheet_to_json(woorbook.Sheets[sheet]);
-                for await(let {Fecha,Tipo,"Denominación Receptor":Cliente,"Punto de Venta":puntoVenta,"Número Desde":numeroDesde,"Tipo Doc. Receptor":tipo_dni,"Nro. Doc. Receptor":dni,"Imp. Total":total} of datos){
-                    const arregloFecha = Fecha.split('/',3);
-                    console.log(Cliente)
-                    const dia = arregloFecha[0];
-                    const mes = arregloFecha[1];
-                    const anio = arregloFecha[2];
-                    nombreArchivoVentas = `${new Date(parseFloat(`${mes}/${dia}/${anio}`)).toLocaleString("es-AR", { month: "long" })} - ${(new Date(`${mes}/${dia}/${anio}`)).getFullYear()}Ventas.txt`;
-                    nombreArchivoAlicuotas = `${new Date(parseFloat(`${mes}/${dia}/${anio}`)).toLocaleString("es-AR", { month: "long" })} - ${(new Date(`${mes}/${dia}/${anio}`)).getFullYear()}Alicuotas.txt`;
-                    const cod_comp = (Tipo.split(' - ',2)[0]).padStart(3,'0');
-                    const tipo_comp = Tipo.split(' - ',2)[1];
-                    const cliente =  Cliente ? Cliente.padEnd(30," ") : "Consumidor Final".padEnd(30," ");
-                    const entero = total.toString().split('.',2)[0]
-                    const decimal = total.toString().split('.',2)[1] === undefined ? "00" : total.toString().split('.',2)[1];
-                    const venta = anio+mes+dia+cod_comp+puntoVenta.toString().padStart(5,'0')+numeroDesde.toString().padStart('20',0)+numeroDesde.toString().padStart('20',0)+tipo_dni+dni.toString().padStart(20,'0')+cliente+entero.padStart(13,'0')+decimal.padEnd(2,'0')+"".padStart(105,'0')+"PES0001000000"+"".padEnd(25,'0');
-                    ventas.push(`${venta}\n`);
+const axios = require('axios');
+require('dotenv').config();
+const URL = process.env.GESTIONURL
 
-                    const alicuota = cod_comp + puntoVenta.toString().padStart(5,'0')+numeroDesde.toString().padStart('20',0)+entero.padStart(13,'0')+decimal.padEnd(2,'0')+"0003"+"0".padStart(13,'0')+"0".padEnd(2,'0');
-                    alicuotas.push(`${alicuota}\n`);
-                }
-            });
-        }
-        fileReader.readAsBinaryString(selectedFile);
+window.addEventListener('load', async e=>{
+    let mes = new Date().getMonth() + 1;
+    let datos = (await axios.get(`${URL}ventas/mes/${mes}`)).data.filter(elem => elem.F);
+    console.log(datos)
+    for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21,gravado105,iva105} of datos){
+        console.log(afip)
+        const arregloFecha = fecha.slice(0,10).split('-',3);
+        const dia = arregloFecha[2];
+        const mes = arregloFecha[1];
+        const anio = arregloFecha[0];
+        nombreArchivoVentas = `${new Date(parseFloat(`${mes}/${dia}/${anio}`)).toLocaleString("es-AR", { month: "long" })} - ${(new Date(`${mes}/${dia}/${anio}`)).getFullYear()}Ventas.txt`;
+        nombreArchivoAlicuotas = `${new Date(parseFloat(`${mes}/${dia}/${anio}`)).toLocaleString("es-AR", { month: "long" })} - ${(new Date(`${mes}/${dia}/${anio}`)).getFullYear()}Alicuotas.txt`;
+
+        const Cod_comp = cod_comp.toString().padStart(3,'0');
+        const PuntoVenta = afip.puntoVenta.toString().padStart(5,'0');
+        const NumeroComp = afip.numero.toString().padStart(20,'0');
+        const TipoDni = cod_doc;
+        const NumDoc = num_doc.padStart(20,'0');
+        const total = precio.toFixed(2).split('.',2);
+        const Entero = total[0].padStart(13,'0');
+        const Decimal = total[1].padStart(2,0);
+        const Tipo_comp = tipo_comp.padStart(20,'0');
+        const Cliente =  cliente ? cliente.padEnd(30," ") : "Consumidor Final".padEnd(30," ");
+        const venta = anio + mes + dia + Cod_comp + PuntoVenta + NumeroComp + NumeroComp + TipoDni + NumDoc + Cliente + Entero 
+        + Decimal + "".padStart(105,'0')+"PES0001000000"+ cantIva +"".padEnd(24,'0');
+        ventas.push(`${venta}\n`);3
+
+
+        const Gravado21Total = gravado21.toFixed(2).split('.',2);
+        const Gravado21Entero = Gravado21Total[0].padStart(13,'0');
+        const Gravado21Decimal = Gravado21Total[1].padStart(2,0);
+
+        const Gravado105Total = gravado105.toFixed(2).split('.',2);
+        const Gravado105Entero = Gravado105Total[0].padStart(13,'0');
+        const Gravado105Decimal = Gravado105Total[1].padStart(2,0);
+        
+        const Iva21Total = iva21.toFixed(2).split('.',2);
+        const Iva21Entero = Iva21Total[0].padStart(13,0);
+        const Iva21Decimal = Iva21Total[1].padStart(2,0);
+        
+        const Iva105Total = iva105.toFixed(2).split('.',2);
+        const Iva105Entero = Iva105Total[0].padStart(13,0);
+        const Iva105Decimal = Iva105Total[1].padStart(2,0);
+        
+
+        if (gravado21 !== 0 ) {
+            const alicuota = Cod_comp + PuntoVenta + NumeroComp + Gravado21Entero + Gravado21Decimal + "0005" + Iva21Entero + Iva21Decimal;
+            alicuotas.push(`${alicuota}\n`);
+        };
+        
+        if (gravado105 !== 0 ) {
+            const alicuota = Cod_comp + PuntoVenta + NumeroComp + Gravado105Entero + Gravado105Decimal + "0004" + Iva105Entero + Iva105Decimal;
+            alicuotas.push(`${alicuota}\n`);
+        };
     }
 });
 
