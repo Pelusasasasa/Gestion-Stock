@@ -10,11 +10,17 @@ require('dotenv').config();
 const URL = process.env.GESTIONURL
 
 window.addEventListener('load', async e=>{
-    let mes = new Date().getMonth() + 1;
-    let datos = (await axios.get(`${URL}ventas/mes/${mes}`)).data.filter(elem => elem.F);
-    console.log(datos)
-    for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21,gravado105,iva105} of datos){
-        console.log(afip)
+    let mes = new Date().getMonth();
+    let datos = (await axios.get(`${URL}ventas/mes/${mes}`)).data.filter(elem => elem.F === true);
+    let recibos = (await axios.get(`${URL}recibo/mes/${mes}`)).data.filter(elem => elem.tipo_venta === "T");
+    // console.log(recibos)
+
+    for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21,gravado105,iva105,gravado0} of datos){
+        if (gravado21 === 0 && gravado105 === 0) {
+            gravado21 = parseFloat((precio / 1.21).toFixed(2));
+            iva21 = parseFloat((gravado21 * 21 / 100).toFixed(2));
+        };
+        
         const arregloFecha = fecha.slice(0,10).split('-',3);
         const dia = arregloFecha[2];
         const mes = arregloFecha[1];
@@ -34,7 +40,7 @@ window.addEventListener('load', async e=>{
         const Cliente =  cliente ? cliente.padEnd(30," ") : "Consumidor Final".padEnd(30," ");
         const venta = anio + mes + dia + Cod_comp + PuntoVenta + NumeroComp + NumeroComp + TipoDni + NumDoc + Cliente + Entero 
         + Decimal + "".padStart(105,'0')+"PES0001000000"+ cantIva +"".padEnd(24,'0');
-        ventas.push(`${venta}\n`);3
+        ventas.push(`${venta}\n`);
 
 
         const Gravado21Total = gravado21.toFixed(2).split('.',2);
@@ -63,6 +69,28 @@ window.addEventListener('load', async e=>{
             const alicuota = Cod_comp + PuntoVenta + NumeroComp + Gravado105Entero + Gravado105Decimal + "0004" + Iva105Entero + Iva105Decimal;
             alicuotas.push(`${alicuota}\n`);
         };
+    };
+
+    for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21} of recibos){
+        console.log(fecha)
+        const arregloFecha = fecha.slice(0,10).split('-',3);
+        const dia = arregloFecha[2];
+        const mes = arregloFecha[1];
+        const anio = arregloFecha[0];
+
+        const Cod_comp = cod_comp.toString().padStart(3,'0');
+        const PuntoVenta = afip ? afip.puntoVenta.toString().padStart(5,'0') : "00007";
+        const NumeroComp = afip ? afip.numero.toString().padStart(20,'0') : "".padStart(20,'0');
+        const TipoDni = cod_doc;
+        const NumDoc = num_doc.padStart(20,'0');
+        const Cliente =  cliente ? cliente.padEnd(30," ") : "Consumidor Final".padEnd(30," ");
+        const total = precio.toFixed(2).split('.',2);
+        const Entero = total[0].padStart(13,'0');
+        const Decimal = total[1].padStart(2,0);
+        
+
+        const venta = anio + mes + dia + Cod_comp + PuntoVenta + NumeroComp + NumeroComp + TipoDni + NumDoc + Cliente + Entero + Decimal + "".padStart(105,'0')+"PES0001000000"+ cantIva +"".padEnd(24,'0');
+        ventas.push(`${venta}\n`);
     }
 });
 

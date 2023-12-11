@@ -40,6 +40,44 @@ const Recibo = new mongoose.Schema({
     caja:{
         type:String,
         default:""
+    },
+    F:{
+        type:Boolean,
+        default:false
+    },
+    condicionIva:{
+        type:String,
+        default:"Consumidor Final"
+    },
+    //para la afip
+
+    afip:{
+        type:Object,
+        default:{}
+    },
+    num_doc:{
+        type:String,
+        default:""
+    },
+    cod_comp:{
+        type:Number,
+        default:0
+    },
+    cod_doc:{
+        type:Number,
+        default:99
+    },
+    iva21:{
+        type:Number,
+        default:0
+    },
+    gravado21:{
+        type:Number,
+        default:0
+    },
+    cantIva:{
+        type:Number,
+        default:0
     }
 });
 

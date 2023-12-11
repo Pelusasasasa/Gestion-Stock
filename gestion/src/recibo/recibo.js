@@ -222,6 +222,7 @@ imprimir.addEventListener('click',async e=>{
     recibo.vendedor = vendedor ? vendedor : "";
     recibo.caja = archivo.caja;
     recibo.tipo_venta = "CD";
+    recibo.condicionIva = condicionIva;
         if (tarjeta.checked) {
             recibo.cod_comp = condicionIva === "Inscripto" ? 1 : 6;
             recibo.num_doc = dni.value !== "" ? dni.value : "00000000";
@@ -239,6 +240,8 @@ imprimir.addEventListener('click',async e=>{
             recibo.iva21 = parseFloat(redondear(recibo.precio - recibo.gravado21,2));
             recibo.iva0 = 0;
             recibo.iva105 = 0;
+
+            recibo.cantIva = 1;
 
             recibo.tipo_venta = "T";
             await cargarFactura(recibo)
