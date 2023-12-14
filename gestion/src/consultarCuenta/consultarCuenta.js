@@ -18,6 +18,7 @@ const tbodyMovRecibo = document.querySelector(".listaMovRecibo tbody");
 const actualizar = document.querySelector('.actualizar');
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
+const imprimirResumen = document.querySelector('#imprimirResumen');
 
 let trSeleccionado = "";
 let clienteTraido = {};
@@ -364,3 +365,26 @@ async function listarMovientosRecibos(movimientos) {
         tbodyMovRecibo.appendChild(tr);
     }
 };
+
+imprimirResumen.addEventListener('click',impresionDeResumen);
+
+
+async function impresionDeResumen() {
+    const date = new Date();
+    const mes = date.getMonth() + 1;
+    const anio = date.getFullYear();
+    
+    await sweet.fire({
+        html:`
+            <section>
+                <input id="fechas" type="date" value=${anio}-${mes}-01 />
+            </section>
+        `,
+        confirmButtonText:"Imprimir",
+        showCancelButton:true
+    });
+    const fecha = document.getElementById('fechas').value;
+
+    const historicas = (await axios.get(`${URL}historica/forDesdeAndCliente/${fecha}/${buscar.value}`)).data;
+    console.log(historicas)
+}

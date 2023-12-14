@@ -50,5 +50,10 @@ historicaCTRL.putForNumberAndType = async(req,res)=>{
     res.end();
 };
 
+historicaCTRL.traerHistoricaDesdeYCliente = async(req,res)=>{
+    const {desde,codigo} = req.params;
+    const historicas = await Historica.find({fecha:{$gte:desde + "T00:00:00.000Z"},idCliente:codigo});
+    res.send(historicas);
+};
 
 module.exports = historicaCTRL;

@@ -70,6 +70,10 @@ table tbody td{
     margin-top: 1rem;
 }
 
+.abajo button{
+    margin-right: 2rem;
+}
+
 .botones button{
     margin: 0 2rem;
 }

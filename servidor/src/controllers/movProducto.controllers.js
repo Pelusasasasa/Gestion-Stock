@@ -9,7 +9,7 @@ movimientoCTRL.modificarVarios = async(req,res)=>{
         console.log(`movimiento con el ID: ${movimiento._id} Modificado`);
     }
     res.send("moviemientos modificados");
-}
+};
 
 movimientoCTRL.cargar = async(req,res)=>{
     let ultimoID = (await movProducto.find({},{_id:1}));
@@ -28,7 +28,7 @@ movimientoCTRL.cargar = async(req,res)=>{
         console.log(`Movimiento con el id: ${movimiento._id} --- ${movimiento.producto} Cargado`);
     }
     res.send(`Movimientos cargados`);
-}
+};
 
 movimientoCTRL.porId = async(req,res)=>{
     const {id,tipoVenta} = req.params;
@@ -36,7 +36,7 @@ movimientoCTRL.porId = async(req,res)=>{
     console.log(id)
     console.log(tipoVenta)
     res.send(movimientos)
-}
+};
 
 movimientoCTRL.porRubro = async(req,res)=>{
     const {rubro,desde,hasta} = req.params;
@@ -48,6 +48,6 @@ movimientoCTRL.porRubro = async(req,res)=>{
         ]
     });
     res.send(productos);
-}
+};
 
 module.exports = movimientoCTRL;
