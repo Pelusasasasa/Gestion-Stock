@@ -386,5 +386,9 @@ async function impresionDeResumen() {
     const fecha = document.getElementById('fechas').value;
 
     const historicas = (await axios.get(`${URL}historica/forDesdeAndCliente/${fecha}/${buscar.value}`)).data;
-    console.log(historicas)
+    const info = {
+        historicas,
+        idCliente:buscar.value
+    }
+    ipcRenderer.send('imprimir-historica',info);
 }

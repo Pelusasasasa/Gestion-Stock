@@ -110,6 +110,13 @@ ipcMain.on('imprimir-ventana',(e,args)=>{
   });
 });
 
+ipcMain.on('imprimir-historica',(e,info)=>{
+  abrirVentana('impresiones/imprimirResumen.html',800,500,false,true);
+  nuevaVentana.webContents.on('did-finish-load',function() {
+    nuevaVentana.webContents.send('imprimir-resumen',JSON.stringify(info));
+  });
+});
+
 let nuevaVentana;
 const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false,show = true)=>{
   nuevaVentana = new BrowserWindow({
