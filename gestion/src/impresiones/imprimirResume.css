@@ -1,0 +1,49 @@
+body{
+    margin: 0 3rem;
+}
+
+header{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+header p,header h3,header h1{
+    margin: 0;
+}
+
+.cliente p{
+    margin: 0;
+    font-weight: bold;
+    margin-left: 2rem;
+}
+
+.table{
+    margin-top: 2rem;
+}
+
+.table table{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table thead tr th{
+    border: .1rem solid black;
+}
+
+
+#final{
+    display: flex;
+    flex-direction: column;
+}
+
+#final main:first-child{
+    margin-top: 2rem;
+    align-self: flex-end;
+}
+
+#final p{
+    font-weight: bold;
+    margin: 0;
+}

@@ -8,12 +8,14 @@ const tbody = document.getElementById('tbody');
 const nombre = document.getElementById('nombre');
 const direccion = document.getElementById('direccion');
 const telefono = document.getElementById('telefono');
+const saldo = document.getElementById('saldo');
 
 
-ipcRenderer.on('imprimir-resumen',(e,info)=>{
+ipcRenderer.on('imprimir-resumen',async (e,info)=>{
     const {idCliente,historicas} = JSON.parse(info);
-    datosCliente(idCliente);
-    llenarTabla(historicas);
+    await datosCliente(idCliente);
+    await llenarTabla(historicas);
+    ipcRenderer.send('imprimir-ventana')
 });
 
 async function datosCliente(idCliente){
@@ -22,6 +24,7 @@ async function datosCliente(idCliente){
     nombre.innerText = cliente.nombre;
     direccion.innerText = cliente.direccion + " - " + cliente.localidad;
     telefono.innerText = cliente.telefono;
+    saldo.innerText = cliente.saldo.toFixed(2);
 };
 
 async function llenarTabla(historicas){
@@ -39,10 +42,10 @@ async function llenarTabla(historicas){
 
         tdFecha.innerText = historica.fecha.slice(0,10).split('-',3).reverse().join('/')
         tdTipo.innerText = historica.tipo_comp;
-        tdNumero.innerText = historica.nro_venta;
-        tdDebe.innerText = historica.debe;
-        tdHaber.innerText = historica.haber;
-        tdSaldo.innerText = historica.saldo;
+        tdNumero.innerText = historica.nro_venta.toString().padStart(8,'0');
+        tdDebe.innerText = historica.debe.toFixed(2);
+        tdHaber.innerText = historica.haber.toFixed(2);
+        tdSaldo.innerText = historica.saldo.toFixed(2);
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdTipo);
@@ -52,8 +55,6 @@ async function llenarTabla(historicas){
         tr.appendChild(tdSaldo);
 
         tbody.appendChild(tr)
-
-        console.log(historica)
     };
 
 
