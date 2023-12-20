@@ -51,7 +51,6 @@ fecha.value = `${a}-${m}-${d}`
 ipcRenderer.on('recibir',(e,args)=>{
     const {informacion} = JSON.parse(args);
     ponerInputs(informacion);
-    codigo.setAttribute('disabled','')
 });
 
 
@@ -70,12 +69,12 @@ const ponerInputs = async(id)=>{
         compensadas.forEach(compensada => {
             ponerVenta(compensada);
         });
+        codigo.setAttribute('disabled','')
     }else{
         await sweet.fire("Cliente no encontrado");
         codigo.value = "";
         nombre.value = "";
         saldo.value = "";
-        localidad.value = "";
         direccion.value = "";
         tbody.innerHTML = "";
     }
@@ -369,7 +368,6 @@ codigo.addEventListener('keypress', async e=>{
     if (e.key === "Enter") {
         if (codigo.value != "") {
             ponerInputs(codigo.value)
-            codigo.setAttribute('disabled',"")
         }else{
             const options = {
                 path:"./clientes/clientes.html",

@@ -12,6 +12,7 @@ const provedor = document.querySelector('#provedor');
 const descripcion = document.querySelector('#descripcion');
 const stockViejo = document.querySelector('#stockViejo');
 const stock = document.querySelector('#stock');
+const stockNuevo = document.querySelector('#stockNuevo');
 const iva = document.querySelector('#iva');
 const ganancia = document.querySelector('#ganancia');
 const costo = document.querySelector('#costo');
@@ -37,6 +38,7 @@ codigo.addEventListener('keypress',async e=>{
             ganancia.value = producto.ganancia.toFixed(2);
             descripcion.value = producto.descripcion;
             stockViejo.value = producto.stock.toFixed(2);
+            nuevoStock.value = producto.stock.toFixed(2);
             precio.value = producto.precio.toFixed(2);
             provedor.focus();
         }else{
@@ -58,9 +60,9 @@ descripcion.addEventListener('keypress',e=>{
 
 stock.addEventListener('keypress',e=>{
     if (e.key === "Enter" && stock.value !== "") {
-        stock.value = parseFloat(stock.value).toFixed(2);
+        nuevoStock.value = (parseFloat(stockViejo.value) + parseFloat(stock.value)).toFixed(2);
     }else if(e.keyCode === 13 && stock.value === ""){
-        stock.value = parseFloat(stockViejo.value).toFixed(2);
+        nuevoSstock.value = (parseFloat(stockViejo.value) + parseFloat(stock.value)).toFixed(2);
     }
     apretarEnter(e,nuevoCosto);
 });
@@ -106,7 +108,7 @@ guardar.addEventListener('click',async e=>{
     producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
     producto.ganancia = parseFloat(nuevaGanancia.value);
     producto.impuesto = nuevoIva.value !== "" ? parseFloat(nuevoIva.value) : producto.impuesto;
-    producto.stock = stock.value !== "" ? parseFloat(stock.value) : producto.stock;
+    producto.stock = parseFloat(stockNuevo.value);
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
 

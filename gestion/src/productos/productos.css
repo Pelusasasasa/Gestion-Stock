@@ -123,9 +123,15 @@ h1{
 .cambio .flex{
     display: flex;
 }
+
 .cambio main label{
     display: inline-block;
     width: 80%;
+}
+
+.stock fieldset{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
 .precio fieldset,.costo fieldset{
