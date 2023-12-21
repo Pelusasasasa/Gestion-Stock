@@ -12,7 +12,7 @@ const provedor = document.querySelector('#provedor');
 const descripcion = document.querySelector('#descripcion');
 const stockViejo = document.querySelector('#stockViejo');
 const stock = document.querySelector('#stock');
-const stockNuevo = document.querySelector('#stockNuevo');
+const nuevoStock = document.querySelector('#nuevoStock');
 const iva = document.querySelector('#iva');
 const ganancia = document.querySelector('#ganancia');
 const costo = document.querySelector('#costo');
@@ -108,7 +108,8 @@ guardar.addEventListener('click',async e=>{
     producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
     producto.ganancia = parseFloat(nuevaGanancia.value);
     producto.impuesto = nuevoIva.value !== "" ? parseFloat(nuevoIva.value) : producto.impuesto;
-    producto.stock = parseFloat(stockNuevo.value);
+    console.log(nuevoStock)
+    producto.stock = parseFloat(nuevoStock.value);
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
 
@@ -130,7 +131,6 @@ salir.addEventListener('click',e=>{
 });
 
 document.addEventListener('keyup',e=>{
-    console.log(e.keyCode)
     if (e.keyCode === 27) {
         window.close();
     }else if(e.keyCode === 117){
