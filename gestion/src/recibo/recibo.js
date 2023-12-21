@@ -221,9 +221,9 @@ imprimir.addEventListener('click',async e=>{
     recibo.vendedor = vendedor ? vendedor : "";
     recibo.caja = archivo.caja;
     recibo.tipo_venta = "CD";
-    recibo.condicionIva = condicionIva;
+    recibo.condicionIva = condicionIva.value;
         if (tarjeta.checked) {
-            recibo.cod_comp = condicionIva === "Inscripto" ? 1 : 6;
+            recibo.cod_comp = condicionIva.value === "Inscripto" ? 1 : 6;
             recibo.num_doc = dni.value !== "" ? dni.value : "00000000";
 
             if (recibo.num_doc === "00000000") {

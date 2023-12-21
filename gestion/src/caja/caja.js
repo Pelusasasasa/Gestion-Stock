@@ -122,7 +122,8 @@ const verQueTraer = async()=>{
         }else{
             return ((await axios.get(`${URL}gastos/dia/${fecha.value}`)).data);
         }
-    }else if(botonSeleccionado.classList.contains("mes")){
+    }else if(botonSeleccionado.classList.contains("botonMes")){
+        
         if (filtro === "Ingresos") {
             ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
             recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
@@ -142,12 +143,12 @@ const verQueTraer = async()=>{
 };
 
 //Cuando se hace click en el boton tarjeta, lo que hacemos es mostrar las ventas con tarjetas
-tarjeta.addEventListener('click',e=>{
+tarjeta.addEventListener('click',async e=>{
     if(!tarjeta.classList.contains('buttonSeleccionado')){
         contado.classList.remove('buttonSeleccionado');
         tarjeta.classList.add('buttonSeleccionado');
         tipoVenta = "T";
-        listarVentas(ventas)
+        listarVentas(await verQueTraer())
     };
 });
 
@@ -359,9 +360,10 @@ tbodyGastos.addEventListener('click',e=>{
 
 const listarVentas = async (ventas)=>{
     tbody.innerHTML = ``;
-    console.log(ventas)
+
     let lista = [];
     //organizamos las ventas por fecha
+    
     ventas.sort((a,b)=>{
         if (a.fecha>b.fecha) {
             return 1;
@@ -370,6 +372,7 @@ const listarVentas = async (ventas)=>{
         }
         return 0;
     });
+
     //filtramos las ventas si son contadas o tarjeta
     if (tipoVenta === "CD") {
         lista = ventas.filter(venta=>(venta.tipo_venta === "CD"));
@@ -379,18 +382,13 @@ const listarVentas = async (ventas)=>{
         lista = ventas.filter(venta=>venta.tipo_venta === "T");
     }else{
         lista = ventas;
-    }
+    };
+
     let totalVenta = 0;
+
     for await(let venta of lista){
-        const fecha = venta.fecha.slice(11,18).split(':',3);
-        let hora = fecha[0];
-        let minutos = fecha[1];
-        let segundos = fecha[2];
-
-        // hora = hora < 10 ? `0${hora}` : hora;
-        // minutos = minutos < 10 ? `0${minutos}` : minutos;
-        segundos = segundos < 10 ? `0${segundos}` : segundos;
-
+        const fecha = venta.fecha.slice(0,10).split('-',3).reverse().join('/');
+        const hora = venta.fecha.slice(11,19)
         const tr = document.createElement('tr');
         tr.id = venta._id;
         tr.classList.add('bold')
@@ -405,18 +403,20 @@ const listarVentas = async (ventas)=>{
         const tdPrecioTotal = document.createElement('td');
         const tdVendedor = document.createElement('td');
         const tdCaja = document.createElement('td');
+        const tdHora = document.createElement('td');
         const tdAcciones = document.createElement('td');
 
         tdAcciones.classList.add('acciones')
 
         tdNumero.innerHTML = venta.numero;
-        tdFecha.innerHTML = `${hora}:${minutos}:${segundos}`;
+        tdFecha.innerHTML = `${fecha}`;
         tdCliente.innerHTML = venta.cliente;
         tdCodProducto.innerHTML = venta.tipo_comp;
         tdProducto.innerHTML = "";
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
         tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
         tdCaja.innerHTML = venta.caja;
+        tdHora.innerText = hora;
         tdAcciones.innerHTML = `
             <div class=tool>
                     <span class=material-icons>edit</span>
@@ -438,6 +438,7 @@ const listarVentas = async (ventas)=>{
         tr.appendChild(tdPrecioTotal);
         tr.appendChild(tdVendedor);
         tr.appendChild(tdCaja);
+        tr.appendChild(tdHora);
         tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
