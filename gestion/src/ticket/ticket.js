@@ -99,5 +99,5 @@ const listar = async(venta,clienteTraido,lista)=>{
         qr.src = venta.afip.QR;
 
     }
-    ipcRenderer.send('imprimir-ventana')
+    ipcRenderer.send('imprimir-ventana');
 }

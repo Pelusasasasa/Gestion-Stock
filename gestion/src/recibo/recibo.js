@@ -267,7 +267,8 @@ imprimir.addEventListener('click',async e=>{
 
         await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
         const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
-        ipcRenderer.send('imprimir',[recibo,cliente,lista])
+        await ipcRenderer.send('imprimir',JSON.stringify([recibo,cliente,lista]))
+        
         location.href = "../menu.html";
 });
 

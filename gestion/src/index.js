@@ -75,9 +75,9 @@ ipcMain.on('enviar-ventana-principal',(e,args)=>{
 });
 
 ipcMain.on('imprimir',(e,args)=>{
-  abrirVentana("ticket/ticket.html",800,500);
+  abrirVentana("ticket/ticket.html",800,500,false,false);
   nuevaVentana.webContents.on('did-finish-load',function() {
-    nuevaVentana.webContents.send('imprimir',JSON.stringify(args));
+    nuevaVentana.webContents.send('imprimir',args);
   });
 });
 
@@ -99,13 +99,13 @@ ipcMain.on('imprimir-ventana',(e,args)=>{
 
 
 let nuevaVentana;
-const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false)=>{
+const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false,show = false)=>{
   nuevaVentana = new BrowserWindow({
     height: altura,
     width: ancho,
     modal:true,
     parent:ventanaPrincipal,
-    show:false,
+    show:show,
     webPreferences:{
       nodeIntegration: true,
       contextIsolation:false

@@ -364,7 +364,7 @@ facturar.addEventListener('click',async e=>{
                 };
 
                 if (impresion.checked) {
-                    ipcRenderer.send('imprimir',[venta,cliente,movimientos]);
+                    ipcRenderer.send('imprimir',JSON.stringify([venta,cliente,movimientos]));
                 }
 
                 location.reload();  

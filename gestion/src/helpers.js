@@ -338,7 +338,7 @@ funciones.ponerNumero = async()=>{
             if (movimientos.length === 0) {
                 movimientos = (await axios.get(`${URL}movimiento/${numero.value}/T`)).data;
             }
-            ipcRenderer.send('imprimir',[venta,cliente,movimientos])
+            ipcRenderer.send('imprimir',JSON.stringify([venta,cliente,movimientos]))
         }
     })
 }
