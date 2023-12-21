@@ -111,7 +111,7 @@ ipcMain.on('imprimir-ventana',(e,args)=>{
 });
 
 ipcMain.on('imprimir-historica',(e,info)=>{
-  abrirVentana('impresiones/imprimirResumen.html',800,500,false,true);
+  abrirVentana('impresiones/imprimirResumen.html',800,500,false,false);
   nuevaVentana.webContents.on('did-finish-load',function() {
     nuevaVentana.webContents.send('imprimir-resumen',JSON.stringify(info));
   });

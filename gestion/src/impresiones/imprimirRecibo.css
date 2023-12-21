@@ -46,7 +46,7 @@ header p,.cliente p{
     justify-content: space-between;
 }
 
-.cliente p,.cliente h2{
+.cliente p,.cliente h4{
     margin: 0;
 }
 
@@ -77,8 +77,8 @@ header p,.cliente p{
 
 #lista{
     border: .1rem solid black;
-    margin: 0rem 2rem 1rem;
-    min-height: 25vh;
+    margin: 0rem 2rem 0rem;
+    min-height: 22vh;
 }
 
 #lista table{
