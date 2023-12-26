@@ -71,6 +71,18 @@ reciboCTRL.deleteForNumber = async(req,res)=>{
     await Recibo.findOneAndDelete({numero:number});
     console.log(`recibo con el numero ${number} borrada`)
     res.end()
-}
+};
+
+reciboCTRL.getRecibosPorFecha = async(req,res) => {
+    const {desde,hasta} = req.params;
+    const recibos = await Recibo.find({
+        $and:[
+            {fecha:{$gte:new Date(desde + "T00:00:00.000Z")}},
+            {fecha:{$lte:new Date(hasta + "T23:59:59.000Z")}}
+        ]
+    });
+
+    res.send(recibos);
+};
 
 module.exports = reciboCTRL;

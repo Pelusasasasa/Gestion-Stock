@@ -24,15 +24,15 @@ window.addEventListener('load',e=>{
 desde.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
         hasta.focus()
-        ventas = (await axios.get(`${URL}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
-        listar([...ventas]);
-    }
+    };
 });
 
 hasta.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
         ventas = (await axios.get(`${URL}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
-        listar([...ventas]);
+        recibos = (await axios.get(`${URL}recibo/porFecha/${desde.value}/${hasta.value}`)).data;
+        recibos = recibos.filter(recibo=>recibo.tipo_venta === "T");
+        listar([...ventas,...recibos]);
     }
 });
 
@@ -83,42 +83,75 @@ const listar = async(ventas)=>{
         const tdIva105 = document.createElement('td');
         const tdTotal = document.createElement('td');
 
-        totalGravado21 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.gravado21 * -1 : venta.gravado21;
-        totalGravado105 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.gravado105 * -1 : venta.gravado105;
-        totalIva21 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.iva21 * -1 : venta.iva21;
-        totalIva105 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.iva105 * -1 : venta.iva105;
-        total += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.precio * -1 : venta.precio;
-        if (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A") {
-            totalNotaCredito += venta.precio;
-            totalGravado21Nota += venta.gravado21;
-            totalIva21Nota += venta.iva21;
-            totalGravado105Nota += venta.gravado105;
-            totalIva105Nota += venta.iva105;
-        }else{
-            totalFacturas += venta.precio;
-            totalGravado21Fact += venta.gravado21;
-            totalIva21Fact += venta.iva21;
-            totalGravado105Fact += venta.gravado105;
-            totalIva105Fact += venta.iva105;
-        }
-        const fecha = venta.fecha.slice(0,10).split('-',3);
-        tdFecha.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
-        tdCliente.innerHTML = venta.cliente.slice(0,20);
-        tdCondIva.innerHTML = venta.condicionIva;
-        tdCuit.innerHTML = venta.num_doc;
-        tdTipo.innerHTML = venta.tipo_comp;
-        tdNumero.innerHTML = venta.afip.puntoVenta.padStart(4,'0') + "-" + venta.afip.numero.toString().padStart(8,'0');
-        tdGravado21.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.gravado21 * -1).toFixed(2) : venta.gravado21.toFixed(2);
-        tdGravado105.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.gravado105 * -1).toFixed(2) : venta.gravado105.toFixed(2);
-        tdIva21.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.iva21 * -1).toFixed(2) : venta.iva21.toFixed(2);
-        tdIva105.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.iva105 * -1).toFixed(2) : venta.iva105.toFixed(2);
-        tdTotal.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.precio * -1).toFixed(2) : venta.precio.toFixed(2);
+        if (venta.tipo_comp !== "Recibo") {
+            totalGravado21 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.gravado21 * -1 : venta.gravado21;
+            totalGravado105 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.gravado105 * -1 : venta.gravado105;
+            totalIva21 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.iva21 * -1 : venta.iva21;
+            totalIva105 += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.iva105 * -1 : venta.iva105;
+            total += (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A" ) ? venta.precio * -1 : venta.precio;
+            if (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A") {
+                totalNotaCredito += venta.precio;
+                totalGravado21Nota += venta.gravado21;
+                totalIva21Nota += venta.iva21;
+                totalGravado105Nota += venta.gravado105;
+                totalIva105Nota += venta.iva105;
+            }else{
+                totalFacturas += venta.precio;
+                totalGravado21Fact += venta.gravado21;
+                totalIva21Fact += venta.iva21;
+                totalGravado105Fact += venta.gravado105;
+                totalIva105Fact += venta.iva105;
+            }
+            const fecha = venta.fecha.slice(0,10).split('-',3);
+            tdFecha.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
+            tdCliente.innerHTML = venta.cliente.slice(0,20);
+            tdCondIva.innerHTML = venta.condicionIva;
+            tdCuit.innerHTML = venta.num_doc;
+            tdTipo.innerHTML = venta.tipo_comp;
+            tdNumero.innerHTML = venta.afip.puntoVenta.padStart(4,'0') + "-" + venta.afip.numero.toString().padStart(8,'0');
+            tdGravado21.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.gravado21 * -1).toFixed(2) : venta.gravado21.toFixed(2);
+            tdGravado105.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.gravado105 * -1).toFixed(2) : venta.gravado105.toFixed(2);
+            tdIva21.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.iva21 * -1).toFixed(2) : venta.iva21.toFixed(2);
+            tdIva105.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.iva105 * -1).toFixed(2) : venta.iva105.toFixed(2);
+            tdTotal.innerHTML = (venta.tipo_comp === "Nota Credito A" || venta.tipo_comp === "Nota Credito B") ? (venta.precio * -1).toFixed(2) : venta.precio.toFixed(2);
 
-        tdGravado21.classList.add('text-rigth');
-        tdGravado105.classList.add('text-rigth');
-        tdIva21.classList.add('text-rigth');
-        tdIva105.classList.add('text-rigth');
-        tdTotal.classList.add('text-rigth');
+        }else{
+
+            totalGravado21 += venta.gravado21 ? venta.gravado21 : parseFloat((venta.precio / 1.21).toFixed(2));
+            totalIva21 += venta.iva21 ? venta.iva21 : parseFloat(((venta.precio / 1.21) * 21 / 100).toFixed(2));
+
+            total += venta.precio;
+            if (venta.tipo_comp === "Nota Credito B" || venta.tipo_comp === "Nota Credito A") {
+                totalNotaCredito += venta.precio;
+                totalGravado21Nota += venta.gravado21;
+                totalIva21Nota += venta.iva21;
+                totalGravado105Nota += venta.gravado105;
+                totalIva105Nota += venta.iva105;
+            }else{
+                totalFacturas += venta.precio;
+                totalGravado21Fact += venta.gravado21 ? venta.gravado21 : parseFloat((venta.precio / 1.21).toFixed(2));
+                totalIva21Fact += venta.iva21 ? venta.iva21 : parseFloat(((venta.precio / 1.21) * 21 / 100).toFixed(2));;
+            }
+            
+            tdFecha.innerText = venta.fecha.slice(0,10).split('-',3).reverse().join('/');
+            tdCliente.innerText = venta.cliente.slice(0,20);
+            tdCondIva.innerText = venta.condicionIva;
+            tdCuit.innerText = venta.num_doc ? venta.num_doc : "00000000";
+            tdTipo.innerText = venta.condicionIva === "Inscripto" ? "Factura A - R" : "Factura B - R" ;
+            tdNumero.innerText = venta.afip ? venta.afip.puntoVenta.padStart(4,'0') + "-" + venta.afip.numero.padStart(8,'0') : "0007-00000000";
+            tdGravado21.innerText = venta.gravado21 ? venta.gravado21.toFixed(2) : (venta.precio / 1.21).toFixed(2);
+            tdIva21.innerText = venta.iva21 ? venta.iva21.toFixed(2) : ((venta.precio / 1.21) * 0.21).toFixed(2);
+            tdGravado105.innerText = "0.00";
+            tdIva105.innerText = "0.00";
+            tdTotal.innerText = venta.precio;
+            // asd
+        };
+
+            tdGravado21.classList.add('text-rigth');
+            tdGravado105.classList.add('text-rigth');
+            tdIva21.classList.add('text-rigth');
+            tdIva105.classList.add('text-rigth');
+            tdTotal.classList.add('text-rigth');
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCliente);
@@ -135,7 +168,9 @@ const listar = async(ventas)=>{
         tbody.appendChild(tr);
 
     };
+
     const tr = document.createElement('tr');
+    const tr1 = document.createElement('tr');
     const tr2 = document.createElement('tr');
     const tr3 = document.createElement('tr');
 
@@ -178,6 +213,23 @@ const listar = async(ventas)=>{
     const tdTotalIva105 = document.createElement('td');
     const tdTotal = document.createElement('td');
 
+    const tdTitulo = document.createElement('td');
+    const tdaux1 = document.createElement('td');
+    const tdaux2 = document.createElement('td');
+    const tdaux3 = document.createElement('td');
+    const tdaux4 = document.createElement('td');
+    const tdaux5 = document.createElement('td');
+    const tdaux6 = document.createElement('td');
+    const tdTitulo1 = document.createElement('td');
+    const tdTitulo2 = document.createElement('td');
+    const tdTitulo3 = document.createElement('td');
+    const tdTitulo4 = document.createElement('td');
+
+    tdTitulo.innerText = "Total"
+    tdTitulo1.innerText = "Gravado 21";
+    tdTitulo2.innerText = "Iva 21";
+    tdTitulo3.innerText = "Gravado 105";
+    tdTitulo4.innerText = "Iva 105";
 
     tdTexto.innerHTML = "Totales Nota De Credito";
     tdTotalGravado21Nota.innerHTML = totalGravado21Nota.toFixed(2);
@@ -236,6 +288,30 @@ const listar = async(ventas)=>{
     tdTotalIva105.classList.add('text-bold');
     tdTotal.classList.add('text-bold');
 
+    tdTitulo1.classList.add('text-rigth');
+    tdTitulo2.classList.add('text-rigth');
+    tdTitulo3.classList.add('text-rigth');
+    tdTitulo4.classList.add('text-rigth');
+    tdTitulo.classList.add('text-rigth');
+
+    tdTitulo1.classList.add('text-bold');
+    tdTitulo2.classList.add('text-bold');
+    tdTitulo3.classList.add('text-bold');
+    tdTitulo4.classList.add('text-bold');
+    tdTitulo.classList.add('text-bold');
+
+    tr1.appendChild(tdaux1);
+    tr1.appendChild(tdaux2);
+    tr1.appendChild(tdaux3);
+    tr1.appendChild(tdaux4);
+    tr1.appendChild(tdaux5);
+    tr1.appendChild(tdaux6);
+    tr1.appendChild(tdTitulo1);
+    tr1.appendChild(tdTitulo2);
+    tr1.appendChild(tdTitulo3);
+    tr1.appendChild(tdTitulo4);
+    tr1.appendChild(tdTitulo);
+
     tr.appendChild(td1);
     tr.appendChild(td2);
     tr.appendChild(td3);
@@ -273,6 +349,7 @@ const listar = async(ventas)=>{
     tr3.appendChild(tdTotalIva105);
     tr3.appendChild(tdTotal);
 
+    tbody.appendChild(tr1);
     tbody.appendChild(tr);
     tbody.appendChild(tr2);
     tbody.appendChild(tr3);

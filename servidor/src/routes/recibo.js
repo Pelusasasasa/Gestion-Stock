@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const router = Router();
 
-const {cargarRecibo,recibosDia,recibosMes, recibosAnio, getForNumber, deleteForNumber}= require('../controllers/recibo.controllers');
+const {cargarRecibo,recibosDia,recibosMes, recibosAnio, getForNumber, deleteForNumber, getRecibosPorFecha}= require('../controllers/recibo.controllers');
 
 
 router.route('/')
@@ -15,5 +15,7 @@ router.route('/mes/:fecha')
     .get(recibosMes)
 router.route('/anio/:fecha')
     .get(recibosAnio)
+router.route('/porFecha/:desde/:hasta')
+    .get(getRecibosPorFecha)
 
 module.exports = router;
