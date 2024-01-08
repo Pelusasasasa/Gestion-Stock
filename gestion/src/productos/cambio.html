@@ -47,7 +47,7 @@
 
             <main>
                 <label for="stock">Suma</label>
-                <input type="Number" name="stock" id="stock">
+                <input type="Number" value="0.00" name="stock" id="stock">
             </main>
         </fieldset>
     </section>
@@ -75,25 +75,35 @@
     <section class="precio">
         <fieldset>
             <legend>Precio</legend>
-            <main>
-                <label for="ganancia">Ganancia</label>
-                <input type="number" name="ganancia" disabled id="ganancia">
-            </main>
+            <div>
+                <main>
+                    <label for="ganancia">Ganancia</label>
+                    <input type="number" name="ganancia" disabled id="ganancia">
+                </main>
+    
+                <main>
+                    <label for="precio">Precio</label>
+                    <input type="number" name="precio" disabled id="precio">
+                </main>
+            </div>
+            <div>
 
-            <main>
-                <label for="precio">Precio</label>
-                <input type="number" name="precio" disabled id="precio">
-            </main>
+                <main>
+                    <label for="nuevaGanancia">Nueva Ganancia</label>
+                    <input type="number" name="nuevaGanancia" id="nuevaGanancia">
+                </main>
+                
+                <main>
+                    <label for="nuevoPrecio">Nuevo Precio</label>
+                    <input type="number" name="nuevoPrecio" id="nuevoPrecio">
+                </main>
 
-            <main>
-                <label for="nuevaGanancia">Nueva Ganancia</label>
-                <input type="number" name="nuevaGanancia" id="nuevaGanancia">
-            </main>
-            
-            <main>
-                <label for="nuevoPrecio">Nuevo Precio</label>
-                <input type="Number" name="nuevoPrecio" id="nuevoPrecio">
-            </main>
+                <main class="none precioOriginal">
+                    <label for="precioOriginal">Precio Original</label>
+                    <input type="number" name="precioOriginal" id="precioOriginal">
+                </main>
+
+            </div>
         </fieldset>
     </section>
 
@@ -101,6 +111,10 @@
         <main class="labelBotones">
             <input type="checkbox" name="ticketPrecio" id="ticketPrecio">
             <label for="ticketPrecio">Imprimir Ticket Precio(F6)</label>
+        </main>
+        <main class="labelBotones">
+            <input type="checkbox" name="oferta" id="oferta">
+            <label for="oferta">Oferta</label>
         </main>
         <button class="guardar">Guardar</button>
         <button class="salir">Salir</button>

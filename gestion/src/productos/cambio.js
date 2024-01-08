@@ -21,7 +21,9 @@ const nuevoCosto = document.querySelector('#nuevoCosto');
 const nuevoIva = document.querySelector('#nuevoIva')
 const nuevaGanancia = document.querySelector('#nuevaGanancia')
 const nuevoPrecio = document.querySelector('#nuevoPrecio');
+const precioOriginal = document.querySelector('#precioOriginal');
 const ticketPrecio = document.querySelector('#ticketPrecio');
+const oferta = document.querySelector('#oferta');
 const guardar = document.querySelector('.guardar');
 const salir = document.querySelector('.salir');
 
@@ -40,6 +42,7 @@ codigo.addEventListener('keypress',async e=>{
             stockViejo.value = producto.stock.toFixed(2);
             nuevoStock.value = producto.stock.toFixed(2);
             precio.value = producto.precio.toFixed(2);
+            precioOriginal.value = producto.precio.toFixed(2);
             provedor.focus();
         }else{
             await sweet.fire({
@@ -99,6 +102,14 @@ nuevoPrecio.addEventListener('focus',e =>{
 })
 
 nuevoPrecio.addEventListener('keypress',e=>{
+    if (precioOriginal.parentElement.classList.contains('none')) {
+        apretarEnter(e,guardar);
+    }else{
+        apretarEnter(e,precioOriginal);
+    }
+});
+
+precioOriginal.addEventListener('keypress',e=>{
     apretarEnter(e,guardar);
 });
 
@@ -121,9 +132,18 @@ guardar.addEventListener('click',async e=>{
 
     await agregarProductoModificadoParaTicket(producto);
 
+    if (oferta.checked) {
+        ipcRenderer.send('imprimir-oferta',producto);
+    }
+
     if (estado) {
         window.close();
     }
+});
+
+oferta.addEventListener('click',e => {
+    document.querySelector('.precioOriginal').classList.toggle('none');
+    nuevoPrecio.parentElement.children[0].innerText = nuevoPrecio.parentElement.children[0].innerText === 'Precio Oferta' ? 'Nuevo Precio' : 'Precio Oferta';
 });
 
 salir.addEventListener('click',e=>{
