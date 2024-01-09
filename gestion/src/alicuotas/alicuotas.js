@@ -4,16 +4,25 @@ let alicuotas = [];
 let nombreArchivoVentas;
 let nombreArchivoAlicuotas;
 let selectedFile;
+let mesInput = document.getElementById('mes');
 
 const axios = require('axios');
 require('dotenv').config();
 const URL = process.env.GESTIONURL
 
-window.addEventListener('load', async e=>{
-    let mes = new Date().getMonth();
-    let datos = (await axios.get(`${URL}ventas/mes/${mes}`)).data.filter(elem => elem.F === true);
-    let recibos = (await axios.get(`${URL}recibo/mes/${mes}`)).data.filter(elem => elem.tipo_venta === "T");
+window.addEventListener('load', e => {
+    let hoy = new Date();
+    let mes = hoy.getMonth() < 10 ? `0${hoy.getMonth() + 1}` : hoy.getMonth() + 1;
+    let year = hoy.getFullYear();
+    mesInput.value = year + "-" + `${mes}`;
+});
 
+mesInput.addEventListener('change', async e=>{
+    if (!mesInput.value) {
+        return;
+    }
+    let datos = (await axios.get(`${URL}ventas/mes/${mesInput.value}`)).data.filter(elem => elem.F === true);
+    let recibos = (await axios.get(`${URL}recibo/mes/${mesInput.value}`)).data.filter(elem => elem.tipo_venta === "T");
     for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21,gravado105,iva105,gravado0} of datos){
         if (gravado21 === 0 && gravado105 === 0) {
             gravado21 = parseFloat((precio / 1.21).toFixed(2));
@@ -41,7 +50,7 @@ window.addEventListener('load', async e=>{
         + Decimal + "".padStart(105,'0')+"PES0001000000"+ cantIva +"".padEnd(24,'0');
         ventas.push(`${venta}\n`);
 
-        const Gravado21Total = (precio/1.21).toFixed(2).split('.',2); //gravado21.toFixed(2).split('.',2);
+        const Gravado21Total = gravado21.toFixed(2).split('.',2); //gravado21.toFixed(2).split('.',2);
         const Gravado21Entero = Gravado21Total[0].padStart(13,'0');
         const Gravado21Decimal = Gravado21Total[1].padStart(2,0);
 
@@ -49,14 +58,13 @@ window.addEventListener('load', async e=>{
         const Gravado105Entero = Gravado105Total[0].padStart(13,'0');
         const Gravado105Decimal = Gravado105Total[1].padStart(2,0);
         
-        const Iva21Total = (precio/1.21*21/100).toFixed(2).split('.',2);
+        const Iva21Total = iva21.toFixed(2).split('.',2);
         const Iva21Entero = Iva21Total[0].padStart(13,0);
         const Iva21Decimal = Iva21Total[1].padStart(2,0);
         
         const Iva105Total = iva105.toFixed(2).split('.',2);
         const Iva105Entero = Iva105Total[0].padStart(13,0);
         const Iva105Decimal = Iva105Total[1].padStart(2,0);
-        
 
         if (gravado21 !== 0 ) {
             const alicuota = Cod_comp + PuntoVenta + NumeroComp + Gravado21Entero + Gravado21Decimal + "0005" + Iva21Entero + Iva21Decimal;
@@ -76,7 +84,7 @@ window.addEventListener('load', async e=>{
         const anio = arregloFecha[0];
 
         const Cod_comp = "006";
-        const PuntoVenta = afip ? afip.puntoVenta.toString().padStart(5,'0') : "00007";
+        const PuntoVenta = afip.puntoVenta ? afip.puntoVenta.toString().padStart(5,'0') : "00007";
         const NumeroComp = afip ? afip.numero.toString().padStart(20,'0') : "".padStart(20,'0');
         const TipoDni = cod_doc;
         const NumDoc = num_doc.padStart(20,'0');

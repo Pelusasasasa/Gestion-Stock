@@ -31,19 +31,36 @@ reciboCTRL.recibosDia = async(req,res)=>{
 
 reciboCTRL.recibosMes = async(req,res)=>{
     const {fecha} = req.params;
-    let mes = parseFloat(fecha);
+    let mes;
     let hoy = new Date();
-    mes = mes>12 ? 1 : mes;
-
-    let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`)
-    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
-    const recibos = await Recibo.find({
-        $and:[
-            {fecha:{$gte:fechaConMes}},
-            {fecha:{$lte:fechaConMesSig}}
-        ]
-    });
-    res.send(recibos);
+    let fechaConMes;
+    let fechaConMesSig;
+    console.log(fecha.length)
+    if (fecha.length === 7) {
+        let year = parseInt(fecha.slice(0,4));
+        mes = parseInt(fecha.slice(5,7));
+        fechaConMes = new Date(`${year}-${mes}-1`);
+        fechaConMesSig = new Date(`${mes == 12 ? year + 1 : year}-${mes == 12 ? 1 : mes + 1}-1`);
+    }else{
+        mes = parseFloat(fecha);
+        mes = mes>12 ? 1 : mes;
+        fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
+        fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
+    }
+    
+    
+    try {
+        const recibos = await Recibo.find({
+            $and:[
+                {fecha:{$gte:new Date(fechaConMes)}},
+                {fecha:{$lte:new Date(fechaConMesSig)}}
+            ]
+            });
+            res.send(recibos);
+    } catch (error) {
+        console.log(error);
+        res.send([]);
+    }
 };
 
 reciboCTRL.recibosAnio = async(req,res)=>{

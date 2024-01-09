@@ -49,18 +49,35 @@ ventaCTRL.VentasDia = async(req,res)=>{
 
 ventaCTRL.ventasMes = async(req,res)=>{
     const {fecha} = req.params;
-    let mes = parseFloat(fecha);
-    mes = mes>12 ? 1 : mes;
+    let mes;
     let hoy = new Date();
-    let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
-    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
-    const ventas = await Venta.find({
-    $and:[
-        {fecha:{$gte:new Date(fechaConMes)}},
-        {fecha:{$lte:new Date(fechaConMesSig)}}
-    ]
-});
-    res.send(ventas);
+    let fechaConMes;
+    let fechaConMesSig;
+    console.log(fecha)
+    if (fecha.length === 7) {
+        let year = parseInt(fecha.slice(0,4));
+        mes = parseInt(fecha.slice(5,7));
+        fechaConMes = new Date(`${year}-${mes}-1`);
+        fechaConMesSig = new Date(`${mes == 12 ? year + 1 : year}-${mes == 12 ? 1 : mes + 1}-1`);
+    }else{
+        mes = parseFloat(fecha);
+        mes = mes>12 ? 1 : mes;
+        fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
+        fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
+    }
+    
+    try {
+        const ventas = await Venta.find({
+            $and:[
+                {fecha:{$gte:new Date(fechaConMes)}},
+                {fecha:{$lte:new Date(fechaConMesSig)}}
+            ]
+        });
+        res.send(ventas);
+    } catch (error) {
+        console.log(error)
+        res.send([])
+    }
 };
 
 ventaCTRL.ventaAnio = async(req,res)=>{
