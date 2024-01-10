@@ -134,19 +134,14 @@ h1{
     grid-template-columns: 1fr 1fr;
 }
 
+.precio fieldset{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 .costo fieldset{
     display: grid;
     grid-template-columns: 1fr 1fr;
-}
-
-.precio fieldset:first-child div{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
-
-.precio fieldset:last-child div{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
 }
 
 .cambio #descripcion{

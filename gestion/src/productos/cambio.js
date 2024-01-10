@@ -21,9 +21,10 @@ const nuevoCosto = document.querySelector('#nuevoCosto');
 const nuevoIva = document.querySelector('#nuevoIva')
 const nuevaGanancia = document.querySelector('#nuevaGanancia')
 const nuevoPrecio = document.querySelector('#nuevoPrecio');
-const precioOriginal = document.querySelector('#precioOriginal');
 const ticketPrecio = document.querySelector('#ticketPrecio');
 const oferta = document.querySelector('#oferta');
+const nuevaOferta = document.querySelector('#nuevaOferta');
+const botonOferta = document.querySelector('#botonOferta');
 const guardar = document.querySelector('.guardar');
 const salir = document.querySelector('.salir');
 
@@ -37,13 +38,13 @@ codigo.addEventListener('keypress',async e=>{
             marca.value = producto.marca;
             provedor.value = producto.provedor;
             iva.value = producto.impuesto.toFixed(2);
-            console.log(producto)
             ganancia.value = producto.ganancia.toFixed(2);
             descripcion.value = producto.descripcion;
             stockViejo.value = producto.stock.toFixed(2);
             nuevoStock.value = producto.stock.toFixed(2);
             precio.value = producto.precio.toFixed(2);
-            precioOriginal.value = producto.precio.toFixed(2);
+            oferta.value = producto.precioOferta?.toFixed(2);
+            producto.oferta && botonOferta.click();
             provedor.focus();
         }else{
             await sweet.fire({
@@ -103,14 +104,14 @@ nuevoPrecio.addEventListener('focus',e =>{
 })
 
 nuevoPrecio.addEventListener('keypress',e=>{
-    if (precioOriginal.parentElement.classList.contains('none')) {
+    if (nuevaOferta.parentElement.classList.contains('none')) {
         apretarEnter(e,guardar);
     }else{
-        apretarEnter(e,precioOriginal);
+        apretarEnter(e,nuevaOferta);
     }
 });
 
-precioOriginal.addEventListener('keypress',e=>{
+nuevaOferta.addEventListener('keypress',e=>{
     apretarEnter(e,guardar);
 });
 
@@ -120,9 +121,11 @@ guardar.addEventListener('click',async e=>{
     producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
     producto.ganancia = parseFloat(nuevaGanancia.value);
     producto.impuesto = nuevoIva.value !== "" ? parseFloat(nuevoIva.value) : producto.impuesto;
-    producto.preciO = precioOriginal.value !== "" ? parseFloat(precioOriginal.value) : producto.precio;
     producto.stock = parseFloat(nuevoStock.value);
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
+    producto.oferta = botonOferta.checked ? true : false;
+    producto.precioOferta = nuevaOferta.value !== "" ? parseFloat(nuevaOferta.value) : producto.precioOferta;
+
     const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
 
     await sweet.fire({
@@ -133,7 +136,7 @@ guardar.addEventListener('click',async e=>{
 
     await agregarProductoModificadoParaTicket(producto);
 
-    if (oferta.checked) {
+    if (botonOferta.checked) {
         ipcRenderer.send('imprimir-oferta',producto);
     }
 
@@ -142,9 +145,10 @@ guardar.addEventListener('click',async e=>{
     }
 });
 
-oferta.addEventListener('click',e => {
-    document.querySelector('.precioOriginal').classList.toggle('none');
-    nuevoPrecio.parentElement.children[0].innerText = nuevoPrecio.parentElement.children[0].innerText === 'Precio Oferta' ? 'Nuevo Precio' : 'Precio Oferta';
+botonOferta.addEventListener('click',e => {
+    document.querySelector('.oferta').classList.toggle('none');
+    document.querySelector('.nuevaOferta').classList.toggle('none');
+    oferta.parentElement.parentElement.style.gridTemplateColumns = oferta.parentElement.classList.contains('none') ?  '1fr 1fr' :  '1fr 1fr 1fr';
 });
 
 salir.addEventListener('click',e=>{
@@ -157,4 +161,9 @@ document.addEventListener('keyup',e=>{
     }else if(e.keyCode === 117){
         ticketPrecio.checked = !ticketPrecio.checked;
     }
+});
+
+
+nuevaOferta.addEventListener('focus',e=>{
+    nuevaOferta.select();
 });

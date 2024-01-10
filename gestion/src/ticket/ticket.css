@@ -136,6 +136,8 @@ img{
 
 .oferta{
     text-align: center;
+    margin: 0;
+    padding-bottom: 1rem;
 }
 
 
@@ -145,16 +147,31 @@ img{
 }
 
 .nuevo p{
-    font-size: 4rem;
+    font-size: 3rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 } 
+
+.oferta .original{
+    padding-bottom: 2rem;
+}
 
 .oferta .original p{
     font-weight: bold;
     text-decoration: line-through;
 }
 
+.oferta .marca{
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 2rem;
+    margin-top: 2rem;
+}
+
+
 @media print{
     .ticketPrecio,.oferta{
+        margin-top: 0;
         -webkit-print-color-adjust:exact;
         print-color-adjust: exact;
     }

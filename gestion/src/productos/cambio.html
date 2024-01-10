@@ -75,7 +75,6 @@
     <section class="precio">
         <fieldset>
             <legend>Precio</legend>
-            <div>
                 <main>
                     <label for="ganancia">Ganancia</label>
                     <input type="number" name="ganancia" disabled id="ganancia">
@@ -85,8 +84,11 @@
                     <label for="precio">Precio</label>
                     <input type="number" name="precio" disabled id="precio">
                 </main>
-            </div>
-            <div>
+
+                <main class="none oferta">
+                    <label for="oferta">Oferta</label>
+                    <input type="number" name="oferta" disabled id="oferta">
+                </main>
 
                 <main>
                     <label for="nuevaGanancia">Nueva Ganancia</label>
@@ -98,12 +100,10 @@
                     <input type="number" name="nuevoPrecio" id="nuevoPrecio">
                 </main>
 
-                <main class="none precioOriginal">
-                    <label for="precioOriginal">Precio Original</label>
-                    <input type="number" name="precioOriginal" id="precioOriginal">
+                <main class="none nuevaOferta">
+                    <label for="nuevaOferta">Nueva Oferta</label>
+                    <input type="number" value="0.00" name="nuevaOferta" id="nuevaOferta">
                 </main>
-
-            </div>
         </fieldset>
     </section>
 
@@ -113,8 +113,8 @@
             <label for="ticketPrecio">Imprimir Ticket Precio(F6)</label>
         </main>
         <main class="labelBotones">
-            <input type="checkbox" name="oferta" id="oferta">
-            <label for="oferta">Oferta</label>
+            <input type="checkbox" name="botonOferta" id="botonOferta">
+            <label for="botonOferta">Oferta</label>
         </main>
         <button class="guardar">Guardar</button>
         <button class="salir">Salir</button>

@@ -47,6 +47,14 @@ const Producto = new mongoose.Schema({
     precio:{
         type:Number,
         required:true
+    },
+    oferta:{
+        type:Boolean,
+        default:false
+    },
+    precioOferta:{
+        type:Number,
+        default:0
     }
 
 
