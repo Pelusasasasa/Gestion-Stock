@@ -88,6 +88,13 @@ ipcMain.on('imprimir-TicketPrecio',(e,args)=>{
   })
 })
 
+ipcMain.on('imprimir-oferta',(e,args) => {
+  abrirVentana('ticket/ticketOferta.html',500,700,false,true);
+  nuevaVentana.webContents.on('did-finish-load',() => {
+    nuevaVentana.webContents.send('info',args);
+  })
+});
+
 ipcMain.on('imprimir-ventana',(e,args)=>{
   nuevaVentana.webContents.print({silent:true},(success,errorType)=>{
     ventanaPrincipal.focus();

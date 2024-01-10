@@ -59,7 +59,7 @@ reciboCTRL.recibosMes = async(req,res)=>{
             res.send(recibos);
     } catch (error) {
         console.log(error);
-        res.send([]);
+        res.send([]);   
     }
 };
 

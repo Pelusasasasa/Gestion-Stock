@@ -37,6 +37,7 @@ codigo.addEventListener('keypress',async e=>{
             marca.value = producto.marca;
             provedor.value = producto.provedor;
             iva.value = producto.impuesto.toFixed(2);
+            console.log(producto)
             ganancia.value = producto.ganancia.toFixed(2);
             descripcion.value = producto.descripcion;
             stockViejo.value = producto.stock.toFixed(2);
@@ -119,7 +120,7 @@ guardar.addEventListener('click',async e=>{
     producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
     producto.ganancia = parseFloat(nuevaGanancia.value);
     producto.impuesto = nuevoIva.value !== "" ? parseFloat(nuevoIva.value) : producto.impuesto;
-    console.log(nuevoStock)
+    producto.preciO = precioOriginal.value !== "" ? parseFloat(precioOriginal.value) : producto.precio;
     producto.stock = parseFloat(nuevoStock.value);
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
