@@ -4,6 +4,22 @@
     flex-direction: column;
 }
 
+.productos .precioOferta{
+    display: flex;
+    flex-direction: column;
+}
+
+.productos .precioOferta span:first-child{
+    color: red;
+    font-size: 1.8rem;
+}
+
+.productos .precioOferta span:last-child{
+    text-align: center;
+    text-decoration: line-through;
+    font-size: 1.3rem;
+}
+
 .buscador fieldset{
     display: flex;
     justify-content: space-around;
@@ -211,7 +227,7 @@ h1{
 .agregarProducto .accesorios,.modificarProducto .accesorios{
     margin-top: 2rem;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-around;
     width: 100%;
 }
 

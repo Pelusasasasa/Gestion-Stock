@@ -13,8 +13,10 @@ const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
+const precioOferta = document.querySelector('#precioOferta');
 const guardar = document.querySelector('.guardar');
 const ticketPrecio = document.querySelector('#ticketPrecio');
+const oferta = document.querySelector('#oferta');
 
 const sweet  = require('sweetalert2');
 const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, imprimirTicketPrecio, agregarProductoModificadoParaTicket} = require('../helpers');
@@ -64,6 +66,10 @@ total.addEventListener('focus',e=>{
     total.value = (parseFloat(costoIva.value) + (parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100)).toFixed(2);
 });
 
+oferta.addEventListener('click',e => {
+    precioOferta.parentElement.classList.toggle('none');
+});
+
 guardar.addEventListener('click',async ()=>{
     const producto = {}
     producto._id = codigo.value;
@@ -78,6 +84,8 @@ guardar.addEventListener('click',async ()=>{
     producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
     producto.ganancia = ganancia.value;
     producto.precio = total.value;
+    producto.oferta = oferta.checked;
+    producto.precioOferta = precioOferta.value;
 
     const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data;
     vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
@@ -161,8 +169,16 @@ ganancia.addEventListener('keypress',e=>{
 })
 
 total.addEventListener('keypress',e=>{
-    apretarEnter(e,guardar);
+    if (precioOferta.parentElement.classList.contains('none')) {
+        apretarEnter(e,guardar);
+    }else{
+        apretarEnter(e,precioOferta);
+    }
 })
+
+precioOferta.addEventListener('keypress',e=>{
+    apretarEnter(e,guardar);
+});
 
 salir.addEventListener('click',e=>{
     window.close();
@@ -220,4 +236,8 @@ ganancia.addEventListener('focus',e=>{
 
 total.addEventListener('focus',e=>{
     total.select();
+});
+
+precioOferta.addEventListener('focus',e=>{
+    precioOferta.select();
 });

@@ -54,7 +54,7 @@ ipcRenderer.on('informacion-a-ventana',(e,args)=>{
 
 const listar = (productos)=>{
     tbody.innerHTML = "";
-    for(let {_id,descripcion,marca,stock,precio} of productos){
+    for(let {_id,descripcion,marca,stock,precio,oferta,precioOferta} of productos){
         const tr = document.createElement('tr');
         tr.id = _id;
 
@@ -71,7 +71,7 @@ const listar = (productos)=>{
 
         tdId.innerHTML = _id;
         tdDescripcion.innerHTML = descripcion;
-        tdPrecio.innerHTML = redondear(precio,2);
+        tdPrecio.innerHTML = oferta ? ponerPrecioOferta(precioOferta,precio) : redondear(precio,2);
         tdStock.innerHTML = redondear(stock,2);
         tdMarca.innerHTML = marca;
         tdAcciones.innerHTML = `
@@ -218,3 +218,16 @@ document.addEventListener("keydown",e=>{
     recorrerFlechas(e.keyCode);
 });
 
+
+const ponerPrecioOferta = (precioOferta,precio) => {
+
+    return (
+        `
+        <div class=precioOferta>
+            <span>${precioOferta.toFixed(2)}</span>
+            <span>${precio.toFixed(2)}</span>
+        </div>
+        `
+    )
+
+};
