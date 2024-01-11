@@ -23,9 +23,11 @@ const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
+const precioOferta = document.querySelector('#precioOferta');
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 const ticketPrecio = document.querySelector('#ticketPrecio');
+const oferta = document.querySelector('#oferta');
 
 let vendedor;
 
@@ -63,6 +65,10 @@ const llenarInputs = async(codigoProducto)=>{
     costo.value = producto.costo.toFixed(2);
     costoDolar.value = producto.costoDolar.toFixed(2);
     impuesto.value = producto.impuesto.toFixed(2);
+    precioOferta.value = producto.precioOferta.toFixed(2);
+    if (producto.oferta) {
+        oferta.click();
+    }
     if (producto.costoDolar !== 0) {
         costoIva.value = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(dolar.value),2);
     }else{
@@ -86,6 +92,8 @@ modificar.addEventListener('click',async e=>{
     producto.impuesto = parseFloat(impuesto.value).toFixed(2);
     producto.ganancia = parseFloat(ganancia.value).toFixed(2);
     producto.precio = parseFloat(total.value).toFixed(2);
+    producto.precioOferta = precioOferta.value;
+    producto.oferta = oferta.checked;
     const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
 
     await ipcRenderer.send('informacion-a-ventana',producto);
@@ -160,7 +168,11 @@ ganancia.addEventListener('keypress',e=>{
 });
 
 total.addEventListener('keypress',e=>{
-    apretarEnter(e,modificar);
+    if (precioOferta.parentElement.classList.contains('none')) {
+        apretarEnter(e,modificar);
+    }else{
+        apretarEnter(e,precioOferta);
+    }
 });
 
 descripcion.addEventListener('focus',e=>{
@@ -230,3 +242,14 @@ document.addEventListener('keyup',e=>{
 });
 
 
+oferta.addEventListener('click',e=>{
+    precioOferta.parentElement.classList.toggle('none');
+});
+
+precioOferta.addEventListener('focus',e => {
+    precioOferta.select();
+});
+
+precioOferta.addEventListener('keypress',e=>{
+    apretarEnter(e,modificar);
+});
