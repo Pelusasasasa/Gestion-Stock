@@ -55,6 +55,10 @@ const movProducto = new mongoose.Schema({
     vendedor:{
         type:String,
         default: ""
+    },
+    oferta:{
+        type:Boolean,
+        required:true,
     }
 });
 

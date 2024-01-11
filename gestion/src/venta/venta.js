@@ -402,12 +402,9 @@ const listarCliente = async(id)=>{
 const listarProducto =async(id)=>{
     let producto;
     if (id.slice(0,2) === "20") {
-        console.log(id)
         const aux = id.slice(2,6);
         const cantEnt = id.slice(6,9);
         const cantDec = id.slice(9,12);
-        console.log(cantEnt)
-        console.log(cantDec)
         producto = (await axios.get(`${URL}productos/${aux}`)).data;
         cantidad.value = parseFloat(cantEnt + "." + cantDec);
     }else{
@@ -416,13 +413,15 @@ const listarProducto =async(id)=>{
     
     producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
     producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
-if (producto !== "") {
-    const productoYaUsado = listaProductos.find(({producto: product})=>{
+    if (producto !== "") {
+        const productoYaUsado = listaProductos.find(({producto: product})=>{
        if (product._id === producto._id) {
            return product
        };
     });
 
+
+    //Lenamos los espacios
     if(producto !== "" && !productoYaUsado){
         if (producto.stock === 0 && archivo.stockNegativo) {
             await sweet.fire({
@@ -435,7 +434,8 @@ if (producto !== "") {
         });
     }
     listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
-    precioU.value = redondear(producto.precio,2);
+    console.log(producto.oferta)
+    precioU.value = producto.oferta ? producto.precioOferta.toFixed(2) : redondear(producto.precio,2);
     idProducto++;
     producto.idTabla = `${idProducto}`;
     tbody.innerHTML += `
@@ -444,7 +444,7 @@ if (producto !== "") {
         <td>${producto._id}</td>
         <td>${producto.descripcion.toUpperCase()}</td>
         <td>${producto.marca}</td>
-        <td>${parseFloat(precioU.value).toFixed(2)}</td>
+        <td>${ parseFloat(precioU.value).toFixed(2)}</td>
         <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value),2)}</td>
         <td class=acciones>
             <div class=tool>
@@ -460,12 +460,13 @@ if (producto !== "") {
     total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
     totalGlobal = parseFloat(total.value);
     }else if(producto !== "" && productoYaUsado){
+        const precio = producto.oferta ? producto.precioOferta : producto.precio;
         productoYaUsado.cantidad += parseFloat(cantidad.value)
         producto.idTabla = productoYaUsado.producto.idTabla;
         const tr = document.getElementById(producto.idTabla);
         tr.children[0].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) + parseFloat(cantidad.value),2);
-        tr.children[5].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * producto.precio,2);
-        total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * producto.precio),2);
+        tr.children[5].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * precio,2);
+        total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * precio),2);
         totalGlobal = parseFloat(total.value);
     }
     cantidad.value = "1.00";
@@ -515,13 +516,14 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
-    movimiento.precio = producto.precio //parseFloat(redondear(producto.precio - (producto.precio * parseFloat(descuentoPor.value) / 100),2));
+    movimiento.precio = producto.oferta ? producto.precioOferta : producto.precio; 
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
     movimiento.tipo_comp = tipo_comp;
     movimiento.caja = caja,
     movimiento.series = series;
     movimiento.vendedor = vendedor
+    movimiento.oferta = producto.oferta;
     movimientos.push(movimiento);
 };
 

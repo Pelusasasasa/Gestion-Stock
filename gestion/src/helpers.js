@@ -240,16 +240,15 @@ funciones.sacarIva = (lista) => {
     let totalIva105= 0;
     let gravado105 = 0;
     lista.forEach(({producto,cantidad}) =>{
+        const precio = producto.oferta ? producto.precioOferta : producto.precio;
         if (producto.impuesto === 21 || producto.impuesto === 0) {
-            gravado21 += cantidad * producto.precio / 1.21;
-            totalIva21 += (cantidad * (producto.precio / 1.21)) * 21 / 100;
+            gravado21 += cantidad * precio / 1.21;
+            totalIva21 += (cantidad * (precio / 1.21)) * 21 / 100;
         }else if(producto.impuesto === 10.5){ 
-            gravado105 += cantidad * producto.precio / 1.105
-            totalIva105 += (cantidad * (producto.precio / 1.105)) * 10.5 / 100;
-        }else{
-            gravado0 += cantidad*producto.precio/1;
-            totalIva0 += 0;
-        }
+            gravado105 += cantidad * precio / 1.105
+            totalIva105 += (cantidad * (precio / 1.105)) * 10.5 / 100;
+        };
+        
     });
     let cantIva = 0
     if (gravado0 !== 0) {
