@@ -15,11 +15,10 @@ const borrar = document.querySelector('.borrar');
 const tbodyVenta = document.querySelector(".listaVentas tbody");
 const tbodyProducto = document.querySelector(".listaProductos tbody");
 const tbodyMovRecibo = document.querySelector(".listaMovRecibos tbody");
-const actualizar = document.querySelector('.actualizar');
 const alerta = document.querySelector('.alerta');
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
-const actualizarTodo = document.getElementById('actualizarTodo');
+const actualizar = document.getElementById('actualizar');
 
 let trSeleccionado = "";
 let clienteTraido = {};
@@ -239,73 +238,7 @@ const listarMovRecibo = async(lista) => {
     }
 };
 
-//cuando tocamos actualizar una venta, actualizamos con los precios de hoy en dia
-actualizar.addEventListener('click',async e=>{
-    if(trSeleccionado){
-        //traemos las compensa que seleccionamos
-        const cuentaCompensada = (await axios.get(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`)).data;
-        //Traemos la historica que seleccionamos
-        const cuentaHistorica = (await axios.get(`${URL}historica/PorId/id/${trSeleccionado.id}`)).data;
-        //traemos los movimientos de productos de esa cuenta compensada
-        const movimientos = (await axios.get(`${URL}movimiento/${trSeleccionado.id}/CC`)).data;
-        //Traemos la venta de lo seleccionado
-        const venta = (await axios.get(`${URL}ventas/numeroYtipo/${trSeleccionado.id}/CC`)).data;
-        //Traemos el cliente
-        const  cliente = (await axios.get(`${URL}clientes/id/${cuentaCompensada.idCliente}`)).data;
 
-        let total = 0;
-        for await(let movimiento of movimientos){
-            const precio = (await axios.get(`${URL}productos/traerPrecio/${movimiento.codProd}`)).data;
-            movimiento.precio = precio !== "" ? precio : movimiento.precio;
-            total += (movimiento.precio*movimiento.cantidad);
-        };
-        
-        sweet.fire({
-            title:"Grabar Importe?",
-            "showCancelButton":true,
-            "confirmButtonText":"Aceptar"
-        }).then(async (result)=>{
-            if (result.isConfirmed){ //si decimos aceptar actualizamos la venta
-            total = parseFloat(total.toFixed(2));
-            let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${cuentaHistorica.idCliente}`)).data;
-            cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.nro_venta>cuentaHistorica.nro_venta && cuenta.fecha >= cuentaHistorica.fecha));
-            //modificamos el saldo del cliente
-            cliente.saldo -= parseFloat(cuentaCompensada.importe.toFixed(2));
-            //modificamos el nuevo importe de la compensada
-            cuentaCompensada.importe = total;
-            cuentaCompensada.saldo = parseFloat((total - cuentaCompensada.pagado).toFixed(2));
-            //Modificamos el saldo y debe de la cuenta historica
-            cuentaHistorica.saldo = parseFloat((cuentaHistorica.saldo - cuentaHistorica.debe+total).toFixed(2));
-            cuentaHistorica.debe = parseFloat(total.toFixed(2));
-            //Le ponemos al cliente el saldo del importe nuevo
-            cliente.saldo = (cliente.saldo + cuentaCompensada.importe).toFixed(2);
-            //esto sirve para poner en las nuevas cuentas historicas el saldo
-            let saldoAnterior = cuentaHistorica.saldo;
-
-            for await(let cuenta of cuentasHistoricasRestantes){
-                cuenta.saldo = cuenta.tipo_comp === "Recibo" ? parseFloat((saldoAnterior - cuenta.haber).toFixed(2)) : parseFloat((saldoAnterior + cuenta.debe).toFixed(2));
-                saldoAnterior = cuenta.saldo;
-                await axios.put(`${URL}historica/PorId/id/${cuenta._id}`,cuenta);
-            };
-            
-            await axios.put(`${URL}movimiento`,movimientos);
-            await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
-            await axios.put(`${URL}ventas/id/${venta.numero}/CC`,venta);
-            await axios.put(`${URL}compensada/traerCompensada/id/${cuentaCompensada.nro_venta}`,cuentaCompensada);
-            await axios.put(`${URL}historica/PorId/id/${cuentaHistorica._id}`,cuentaHistorica);
-            const cuentaModificada = (await axios.get(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`)).data;
-            listarProductos(movimientos)
-            trSeleccionado.children[4].innerHTML = cuentaModificada.importe;
-            trSeleccionado.children[6].innerHTML = cuentaModificada.saldo;
-            saldo.value = cliente.saldo;
-        }
-        })
-    }
-});
-
-volver.addEventListener('click',e=>{
-    location.href = "../menu.html";
-});
 
 
 borrar.addEventListener('click', async e=>{
@@ -332,77 +265,82 @@ borrar.addEventListener('click', async e=>{
     }
 });
 
-actualizarTodo.addEventListener('click',actualizarTodosLosTrs);
+actualizar.addEventListener('click',actualizarTodo);
 
-async function actualizarTodosLosTrs(e) {
-    const trs = document.querySelectorAll('.listaVentas tbody tr');
+async function actualizarTodo(e){
+    tbodyVenta.innerText = "";
+
+    let saldo = 0;
     alerta.classList.remove('none');
-    for await (let cuenta of listaCompensada){
-        if(cuenta.tipo_comp === "Comprobante"){
-            await actualizarCuenta(cuenta,cuenta.importe); 
-        }
-    };
-    alerta.classList.add('none');
+    for await(let cuenta of listaCompensada){
+        //compensadas
+        cuenta.importe = await actualizarMovimientos(cuenta);
+        cuenta.saldo = cuenta.importe - cuenta.pagado;
+        saldo += cuenta.importe - cuenta.pagado;
+        // ponerVenta(cuenta);//Ponemos la venta en el tbody actualizada
+        await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta,configAxios);//guardamos la venta actualizada en la base de datos
 
-    compensada.classList.add('none');
-    historica.classList.remove('none');
-    tipoLista = "compensada";
-    listarVentas(listaCompensada);
-};
+        //historicas
+        const historica = (await axios.get(`${URL}historica/porId/id/${cuenta.nro_venta}`)).data
 
-async function actualizarCuenta(cuenta,importeViejo) {
-     //Traemos la historica que seleccionamos
-     const cuentaHistorica = (await axios.get(`${URL}historica/PorId/id/${cuenta.nro_venta}`)).data;
-     //traemos los movimientos de productos de esa cuenta compensada
-     const movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`)).data;
-     //Traemos la venta de lo seleccionado
-     const venta = (await axios.get(`${URL}ventas/numeroYtipo/${cuenta.nro_venta}/CC`)).data;
-     //Traemos el cliente
-     const  cliente = (await axios.get(`${URL}clientes/id/${cuenta.idCliente}`)).data;
-    let total = 0;
-
-    for await (let mov of movimientos){
-        const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`)).data;
-        mov.precio = precio ? precio : mov.precio;
-        total += mov.precio * mov.cantidad;
-    }
-    cuenta.importe = parseFloat(total.toFixed(2));
-    cuenta.saldo = parseFloat(redondear(total - cuenta.pagado,2));
-    
-    venta.precio = total; //Cambiamos el precio de venta
-
-    //Modificamos el saldo y debe de la cuenta historica
-    cuentaHistorica.saldo = parseFloat((cuentaHistorica.saldo - cuentaHistorica.debe+total).toFixed(2));
-    cuentaHistorica.debe = parseFloat(total.toFixed(2));
-
-
-    let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${cuentaHistorica.idCliente}`)).data;
-    cuentasHistoricasRestantes.sort((a,b)=>{
-        if (a.fecha>b.fecha) {
-            return 1
-        }else if(a.fecha<b.fecha){
-            return -1
+        if (historica) {
+            historica.saldo = parseFloat(redondear(historica.saldo - historica.debe + cuenta.importe,2));
+            historica.debe = parseFloat(cuenta.importe.toFixed(2));
+            await axios.put(`${URL}historica/PorNumeroAndCliente/${historica.nro_venta}/${historica.idCliente}`,historica,configAxios).data;
         };
-        return 0
-    })
-    cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.fecha > cuentaHistorica.fecha));
-    cliente.saldo = redondear(cliente.saldo + total - importeViejo,2)//Nuvo saldo del cliente
-    saldo.value = cliente.saldo;
 
-    await axios.put(`${URL}movimiento`,movimientos);
-    await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
-    await axios.put(`${URL}ventas/id/${venta.numero}/CC`,venta);
-    await axios.put(`${URL}compensada/traerCompensada/id/${cuenta.nro_venta}`,cuenta);
-    await axios.put(`${URL}historica/PorId/id/${cuentaHistorica._id}`,cuentaHistorica,configAxios);
+        let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${cuenta.idCliente}`,configAxios)).data;
+        cuentasHistoricasRestantes.sort((a,b)=>{
 
-    let saldoAnterior = cuentaHistorica.saldo;
-    let aux = -1;
-    for await(let elem of cuentasHistoricasRestantes){
-        if (!(aux === elem.nro_venta)) {
-            elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
-            saldoAnterior = elem.saldo;
-            await axios.put(`${URL}historica/PorId/id/${elem._id}`,elem,configAxios);
-        }
-        aux = elem.nro_venta;
-    }
+            if (a.fecha < b.fecha) {
+                return 1;
+            }else if(a.fecha > b.fecha){
+                return -1;
+            }
+            
+            return 0;
+        });
+        //Filtramos las cuentas historicas que sean despues de la principal
+        cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(elem=>(elem.fecha > historica.fecha));
+        
+        let saldoAnterior = historica.saldo;
+
+        //modificamos las cuentas historicas restantes
+        let aux = -1;
+
+        for await(let elem of cuentasHistoricasRestantes){
+            if(!aux === elem.nro_venta){
+                elem.saldo = elem.tipo_comp === 'Comprobante' ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
+                saldoAnterior = elem.saldo;
+                await axios.put(`${URL}historica/porNumeroAndCliente/${elem.nro_venta}/${elem.idCliente}`,elem,configAxios);
+            };
+            aux = elem.nro_venta;
+        };
+    };
+
+    alerta.classList.add('none');
+    actualizarSaldo(saldo);
 };
+
+async function actualizarMovimientos(cuenta){
+    let total = 0;
+    let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
+    for(let mov of movimientos){
+        const precio = mov.oferta ? mov.precio : (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
+        mov.precio = precio ? precio : mov.precio; 
+        total += mov.precio * mov.cantidad;
+        await axios.put(`${URL}movimiento/forCodigoAndNumeroVenta/${mov.codigo}/${mov.tipo_venta}`,mov,configAxios);  
+    };
+    return total;
+};
+
+async function actualizarSaldo(numero) {
+    let cliente = (await axios.get(`${URL}clientes/id/${buscar.value}`,configAxios)).data;
+    cliente.saldo = numero.toFixed(2);
+    saldo.value = numero.toFixed(2);
+    (await axios.put(`${URL}clientes/id/${buscar.value}`,cliente,configAxios));
+}
+
+volver.addEventListener('click',e=>{
+    location.href = "../menu.html";
+});

@@ -440,6 +440,7 @@ async function actualizarTodo(e) {
             aux = elem.nro_venta;
         };
     }
+    
     alerta.classList.add('none');
     actualizarSaldo(saldo);
 };
