@@ -222,6 +222,12 @@ imprimir.addEventListener('click',async e=>{
     recibo.caja = archivo.caja;
     recibo.tipo_venta = "CD";
     recibo.condicionIva = condicionIva.value;
+    if ((dni.value === "" || dni.value === "00000000") && (recibo.precio > archivo.maxFactura) && tarjeta.checked) {
+        await sweet.fire({
+            title:`Una factura con el importe mayor a ${archivo.maxFactura.toFixed(2)} debe contener ${recibo.condicionIva === "Inscripto" ? 'CUIT' : 'DNI'}`
+        });
+        return;
+    };
         if (tarjeta.checked) {
             recibo.cod_comp = condicionIva.value === "Inscripto" ? 1 : 6;
             recibo.num_doc = dni.value !== "" ? dni.value : "00000000";
@@ -244,6 +250,7 @@ imprimir.addEventListener('click',async e=>{
 
             recibo.tipo_venta = "T";
             await cargarFactura(recibo)
+            
         }
         await ponerEnCuentaHistorica(recibo);
         cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
@@ -441,8 +448,8 @@ async function actualizarMovimientos(cuenta){
         let total = 0;
         let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
         for(let mov of movimientos){
-            const precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
-            mov.precio = precio ? precio : mov.precio   ;
+            const precio = mov.oferta ? mov.precio : (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
+            mov.precio = precio ? precio : mov.precio;
             total += mov.precio * mov.cantidad;
             await axios.put(`${URL}movimiento/forCodigoAndNumeroVenta/${mov.codigo}/${mov.tipo_venta}`,mov,configAxios);
         };

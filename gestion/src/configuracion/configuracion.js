@@ -18,6 +18,7 @@ const condIva = document.getElementById('condIva');
 const multiple = document.querySelectorAll("input[name=multipleVendedores]");
 const multipleStockNegativos = document.querySelectorAll("input[name=stockNegativo]");
 const dolar = document.querySelectorAll("input[name=dolar]");
+const maxFactura = document.getElementById('maxFactura');
 
 
 const si = document.getElementById('si');
@@ -55,6 +56,7 @@ window.addEventListener('load',async e=>{
     archivo.stockNegativo === false ? noStockNegativo.checked = true : siStockNegativo.checked = true;
     archivo.dolar === false ? noDolar.checked = true : siDolar.checked = true;
     cuit.value = archivo.cuit;
+    maxFactura.value = archivo.maxFactura;
     puntoVenta.value = archivo.puntoVenta;
     condIva.value = archivo.condIva;
 
@@ -70,6 +72,7 @@ modificar.addEventListener('click',async e=>{
     objeto.cuit = cuit.value;
     objeto.dolar = await verMultiplesRadios(dolar);
     objeto.condIva = condIva.value;
+    objeto.maxFactura = parseFloat(maxFactura.value);
     
     fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
