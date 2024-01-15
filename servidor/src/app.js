@@ -10,13 +10,19 @@ app.use(cors());
 app.use(express.json());
 
 //routes
+
 app.use('/morel/productos',require('./routes/producto'));
 app.use('/morel/clientes',require('./routes/cliente'));
+
+//comprobantes
 app.use('/morel/ventas',require('./routes/venta'));
 app.use('/morel/recibo',require('./routes/recibo'));
-app.use('/morel/movRecibo',require('./routes/movRecibo'));
+app.use('/morel/Cancelado',require('./routes/cancelado'));
 
+//movimientos
+app.use('/morel/movRecibo',require('./routes/movRecibo'));
 app.use('/morel/movimiento',require('./routes/movProducto'));
+
 app.use('/morel/compensada',require('./routes/compensada'));
 app.use('/morel/historica',require('./routes/historica'));
 app.use('/morel/numero',require('./routes/numero'));

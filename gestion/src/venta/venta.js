@@ -523,7 +523,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.caja = caja,
     movimiento.series = series;
     movimiento.vendedor = vendedor
-    movimiento.oferta = producto.oferta;
+    movimiento.oferta = producto.oferta ? producto.oferta : false;
     movimientos.push(movimiento);
 };
 
