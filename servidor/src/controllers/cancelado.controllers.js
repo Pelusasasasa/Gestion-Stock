@@ -4,7 +4,6 @@ const Cancelado = require('../models/Cancelado');
 
 canceladoCTRL.getCanceladosForDay = async(req,res) => {
     const {desde,hasta} = req.params;
-    console.log(desde,hasta);
     const cancelados = await Cancelado.find({
         $and:[
             {fecha:{$gte:new Date( desde + 'T00:00:00.000Z' )}},

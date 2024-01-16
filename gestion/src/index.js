@@ -284,6 +284,17 @@ const hacerMenu = () => {
       }
     },
     {
+      label:"Utilidad",
+      submenu:[
+        {
+          label:"Cancelados",
+          click(){
+            ventanaPrincipal.loadFile('src/cancelados/cancelados.html')
+          }
+        }
+      ]
+    },
+    {
       label:"Configuracion",
       click(){
         abrirVentana('configuracion/configuracion.html',700,700,false)

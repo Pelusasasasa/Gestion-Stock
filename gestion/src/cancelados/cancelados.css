@@ -1,0 +1,47 @@
+h1{
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.fechas{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.fechas main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tabla{
+    margin-top: 2rem;
+    overflow: scroll;
+    height: 65vh;
+    background-color: white;
+}
+
+.tabla table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla table thead th{
+    border: .1rem solid black;
+}
+
+.tool{
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+}
+
+tbody tr:hover{
+    background-color: lightgray;
+    cursor: pointer;
+}
+
+tr td{
+    border: .1rem solid black;
+}

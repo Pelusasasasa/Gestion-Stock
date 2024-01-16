@@ -13,7 +13,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva, configAxios} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -590,6 +590,7 @@ document.addEventListener('keydown',e=>{
             "cancelButtonText" : "Cancelar"
         }).then((result)=>{
             if (result.isConfirmed) {
+                cancelarVenta();
                 location.href = "../menu.html" ;
             }
         });
@@ -636,6 +637,20 @@ const movimientoRecibo = async(codigo,nombre,numero,precio,nro_comp,tipo)=>{
     await axios.post(`${URL}movRecibo`,mov);
 };
 
+
+const cancelarVenta = async () => {
+
+    const cancelado = {};
+
+    cancelado.cliente = nombre.value;
+    cancelado.tipo_comp = "CL";
+    cancelado.precio = parseFloat(total.value);
+    cancelado.caja = archivo.caja ? archivo.caja : "Caja";
+    cancelado.vendedor = archivo.vendedor ? archivo.vendedor : "Vendedor";
+
+    await axios.post(`${URL}Cancelado`,cancelado,configAxios);
+
+};
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
 const cambiarSituacion = (situacion) =>{
     situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
