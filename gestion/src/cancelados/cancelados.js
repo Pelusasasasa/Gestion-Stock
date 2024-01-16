@@ -21,7 +21,21 @@ window.addEventListener('load', async() => {
     
 });
 
-const listarCancelados = (cancelados) => {
+desde.addEventListener('keypress',e => {
+    if (e.keyCode === 13) {
+        hasta.focus();
+    };
+});
+
+hasta.addEventListener('keypress',async e => {
+    if (e.keyCode === 13) {
+        cancelados = (await axios.get(`${URL}Cancelado/forDay/${desde.value}/${hasta.value}`)).data;
+        listarCancelados(cancelados);
+    }
+});
+
+const listarCancelados = async(cancelados) => {
+    tbody.innerHTML = '';
 
     cancelados.sort( (a,b) => {
         if (a.fecha > b.fecha) return 1;
@@ -34,6 +48,7 @@ const listarCancelados = (cancelados) => {
 
         const tdFecha = document.createElement('td');
         const tdCliente = document.createElement('td');
+        const tdNumero = document.createElement('td');
         const tdPrecio = document.createElement('td');
         const tdVenedor = document.createElement('td');
         const tdCaja = document.createElement('td');
@@ -41,10 +56,18 @@ const listarCancelados = (cancelados) => {
         const tdAcciones = document.createElement('td');
 
         tdPrecio.classList.add('text-rigth');
-        tdPrecio.classList.add('text-rigth');
+        
+        tdFecha.classList.add('text-bold');
+        tdCliente.classList.add('text-bold');
+        tdNumero.classList.add('text-bold');
+        tdPrecio.classList.add('text-bold');
+        tdVenedor.classList.add('text-bold');
+        tdCaja.classList.add('text-bold');
+        tdHora.classList.add('text-bold');
 
         tdFecha.innerHTML = elem.fecha.slice(0,10).split('-',3).reverse().join('/');
         tdCliente.innerText = elem.cliente;
+        tdNumero.innerText = elem.numero ? elem.numero.toString().padStart(8,'0') : '00000000';  
         tdPrecio.innerText = elem.precio.toFixed(2);
         tdVenedor.innerText = elem.vendedor;
         tdCaja.innerText = elem.caja;
@@ -58,6 +81,7 @@ const listarCancelados = (cancelados) => {
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCliente);
+        tr.appendChild(tdNumero);
         tr.appendChild(tdPrecio);
         tr.appendChild(tdVenedor);
         tr.appendChild(tdCaja);
@@ -66,8 +90,41 @@ const listarCancelados = (cancelados) => {
 
         tbody.appendChild(tr);
 
+        await listarMovimientos(elem.numero,elem.tipo_comp);
+
     }
 
+};
+
+const listarMovimientos = async(numero,tipo) => {
+    const movimientos = (await axios.get(`${URL}movimiento/${numero}/${tipo}`)).data;
+    
+    for(let mov of movimientos){
+        const tr = document.createElement('tr');
+
+        const tdFecha = document.createElement('td');
+        const tdProducto = document.createElement('td');
+        const tdCodProducto = document.createElement('td');
+        const tdCantidad = document.createElement('td');
+        const tdPrecio = document.createElement('td');
+        const tdTotal = document.createElement('td');
+
+        tdFecha.innerText = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
+        tdProducto.innerText = mov.producto;
+        tdCodProducto.innerText = mov.codProd;
+        tdCantidad.innerText = mov.cantidad;
+        tdPrecio.innerText = mov.precio.toFixed(2);
+        tdTotal.innerText = (mov.precio * mov.cantidad).toFixed(2);
+
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdProducto);
+        tr.appendChild(tdCodProducto);
+        tr.appendChild(tdCantidad);
+        tr.appendChild(tdPrecio);
+        tr.appendChild(tdTotal);
+
+        tbody.appendChild(tr);
+    }
 };
 
 volver.addEventListener('click', () => {
