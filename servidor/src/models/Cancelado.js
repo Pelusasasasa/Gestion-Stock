@@ -12,6 +12,10 @@ const Cancelado = new Schema({
         set: ( valor )  => valor.toUpperCase(),
         
     },
+    numero:{
+        type:Number,
+        required:true
+    },
     precio:{
         type:Number,
         required:true,

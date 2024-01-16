@@ -582,7 +582,6 @@ const sumarSaldo = async(id,nuevoSaldo,venta)=>{
 
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {
-        
         sweet.fire({
             title: "Cancelar Venta?",
             "showCancelButton": true,
@@ -639,18 +638,28 @@ const movimientoRecibo = async(codigo,nombre,numero,precio,nro_comp,tipo)=>{
 
 
 const cancelarVenta = async () => {
+    if (listaProductos.length > 0) {
+        const cancelado = {};
 
-    const cancelado = {};
+        const ultimo = (await axios.get(`${URL}Cancelado/ultimo`)).data;
 
-    cancelado.cliente = nombre.value;
-    cancelado.tipo_comp = "CL";
-    cancelado.precio = parseFloat(total.value);
-    cancelado.caja = archivo.caja ? archivo.caja : "Caja";
-    cancelado.vendedor = archivo.vendedor ? archivo.vendedor : "Vendedor";
+        cancelado.cliente = nombre.value;
+        cancelado.tipo_comp = "CL";
+        cancelado.precio = parseFloat(total.value);
+        cancelado.caja = archivo.caja ? archivo.caja : "Caja";
+        cancelado.vendedor = archivo.vendedor ? archivo.vendedor : "Vendedor";
+        cancelado.numero = ultimo ? ultimo + 1 : 1;
 
-    await axios.post(`${URL}Cancelado`,cancelado,configAxios);
+        await axios.post(`${URL}Cancelado`,cancelado,configAxios);
 
+        for(let producto of listaProductos){
+            cargarMovimiento(producto,cancelado.numero,cancelado.cliente,cancelado.tipo_comp,cancelado.tipo_comp,cancelado.caja,cancelado.vendedor);
+        };
+        //Cargamos el movimiento de producto
+        await axios.post(`${URL}movimiento`,movimientos,configAxios);   
+    }
 };
+
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
 const cambiarSituacion = (situacion) =>{
     situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
@@ -721,7 +730,8 @@ cantidad.addEventListener('keydown',e=>{
     }
 });
 
-volver.addEventListener('click',()=>{
+volver.addEventListener('click',async ()=>{
+    await cancelarVenta();
     location.href = "../menu.html";
 });
 

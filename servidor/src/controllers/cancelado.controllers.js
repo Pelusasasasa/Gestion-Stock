@@ -26,4 +26,13 @@ canceladoCTRL.post = async(req,res) => {
 
 };
 
+canceladoCTRL.getUltimo = async(req,res) => {
+    const cancelado = await Cancelado.findOne().sort({$natural: -1});
+    if (cancelado.numero) {
+        res.send(`${cancelado.numero}`);
+    }else{
+        res.send(`${0}`);
+    }
+}
+
 module.exports = canceladoCTRL;
