@@ -1,8 +1,10 @@
+const sweet = require('sweetalert2');
 const axios  = require("axios");
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
-const { fechaHoy, cerrarVentana } = require("../helpers");
+const { fechaHoy, cerrarVentana, configAxios } = require("../helpers");
+
 
 const desde = document.getElementById('desde');
 const hasta = document.getElementById('hasta');
@@ -45,6 +47,7 @@ const listarCancelados = async(cancelados) => {
 
     for (let elem of cancelados){
         const tr = document.createElement('tr');
+        tr.id = elem.numero;
 
         const tdFecha = document.createElement('td');
         const tdCliente = document.createElement('td');
@@ -73,11 +76,12 @@ const listarCancelados = async(cancelados) => {
         tdCaja.innerText = elem.caja;
         tdHora.innerText = elem.fecha.slice(11,19);
         tdAcciones.innerHTML = `
-        <div class=tool>
+        <div class=tool id="hacerVenta">
             <span class=material-icons>edit</span>
             <p class=tooltip>Hacer Venta</p>
         </div>
         `;
+
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCliente);
@@ -90,7 +94,9 @@ const listarCancelados = async(cancelados) => {
 
         tbody.appendChild(tr);
 
-        await listarMovimientos(elem.numero,elem.tipo_comp);
+        await listarMovimientos(elem.numero,elem.tipo_venta);
+
+        tdAcciones.addEventListener('click',hacerVenta);
 
     }
 
@@ -126,6 +132,60 @@ const listarMovimientos = async(numero,tipo) => {
         tbody.appendChild(tr);
     }
 };
+
+const hacerVenta = async(e) => {
+    let numero = '';
+    if (e.target.tagName === 'SPAN') {
+        numero = e.target.parentElement.parentElement.parentElement.id;
+    }else if(e.target.tagName === 'P'){
+        numero = e.target.parentElement.parentElement.parentElement.id;
+    }else if (e.target.tagName === 'DIV'){
+        numero = (parseInt(e.target.parentElement.parentElement.id));
+    };
+    
+    const res = await sweet.fire({
+        title: 'Seguro quiere pasar a venta',
+        confirmButtonText: "Aceptar",
+        showCancelButton: true,        
+    });
+
+    if(res.isConfirmed){
+        const cancelado = (await axios.get(`${URL}Cancelado/forNumber/${numero}`,configAxios)).data;
+        const numComp = (await axios.get(`${URL}numero/Contado`,configAxios)).data;
+        const venta = {};
+
+        venta.cliente = cancelado.cliente;
+        venta.idCliente = cancelado.idCliente;
+        venta.concidcionIva = cancelado.condicionIva;
+        venta.cod_doc = cancelado.cod_doc;
+        venta.num_doc = cancelado.num_doc;
+        venta.cod_comp = cancelado.cod_comp;
+
+        venta.precio = cancelado.precio;
+        venta.descuento = 0;
+
+        venta.caja = cancelado.caja;
+        venta.vendedor = cancelado.vendedor;
+
+        venta.numero = numComp + 1;
+        venta.tipo_venta = 'CD';
+        venta.tipo_comp = 'Comprobante';
+        venta.descuento = 0;
+
+        venta.F = false;
+        venta.gravado21 = cancelado.gravado21;
+        venta.gravado105 = cancelado.gravado105;
+        venta.iva21 = cancelado.iva21;
+        venta.iva105 = cancelado.iva105;
+        venta.cantIva = cancelado.cantIva;
+
+        
+        //Actualizamos el numero de contado, creamos la venta y borramos el cancelado
+        await axios.put(`${URL}numero/Contado`,{Contado:venta.numero},configAxios);
+        await axios.post(`${URL}ventas`,venta,configAxios);
+        await axios.delete(`${URL}Cancelado/forId/${cancelado._id}`);
+    }
+}
 
 volver.addEventListener('click', () => {
     location.href = '../menu.html';

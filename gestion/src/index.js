@@ -1,6 +1,6 @@
 global.ventanaPrincipal = null;
 
-const { dialog, app, BrowserWindow,Menu } = require('electron');
+const { dialog, app, BrowserWindow,Menu, ipcRenderer } = require('electron');
 const { ipcMain } = require('electron/main');
 const path = require('path');
 const {condIva} = require('./configuracion.json');
@@ -150,6 +150,7 @@ ipcMain.on('mostrar-menu',(e,args)=>{
   const {ventana,x,y} = args;
   mostrarMenu(ventana,x,y,ventanaPrincipal);
 });
+
 
 const hacerMenu = () => {
   //Hacemos el menu

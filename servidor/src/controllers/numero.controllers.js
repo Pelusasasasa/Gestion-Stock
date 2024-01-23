@@ -26,8 +26,11 @@ numeroCTRL.traerNumero = async(req,res)=>{
 
 numeroCTRL.modificarNumero = async(req,res)=>{
     const {numero} = req.params;
-    const numeros = (await Numero.find())[0];
+
+    const numeros = (await Numero.findOne());
+    console.log(req.body)
     numeros[numero] = req.body[numero];
+    console.log(numeros)
     await Numero.findOneAndUpdate({_id:numeros._id},numeros);
     console.log("Numero Modificado")
     res.send(`Numero del tipo ${numero} Modificado`);

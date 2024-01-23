@@ -644,16 +644,30 @@ const cancelarVenta = async () => {
         const ultimo = (await axios.get(`${URL}Cancelado/ultimo`)).data;
 
         cancelado.cliente = nombre.value;
-        cancelado.tipo_comp = "CL";
+        cancelado.idCliente = codigo.value;
+        cancelado.num_doc = cuit.value ? cuit.value : "00000000";
+        cancelado.cod_doc = await verCodigoDocumento(cuit.value);
+        cancelado.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value;
+        cancelado.cod_comp = 0;
+        cancelado.tipo_comp = "Cancelado";
+        cancelado.tipo_venta = "CL";
         cancelado.precio = parseFloat(total.value);
+        cancelado.descuento = 0;
         cancelado.caja = archivo.caja ? archivo.caja : "Caja";
         cancelado.vendedor = archivo.vendedor ? archivo.vendedor : "Vendedor";
         cancelado.numero = ultimo ? ultimo + 1 : 1;
 
+        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
+        cancelado.iva21 = iva21;
+        cancelado.iva105 = iva105;
+        cancelado.gravado21 =  gravado21,
+        cancelado.gravado105 = gravado105,
+        cancelado.cantIva = cantIva;
+
         await axios.post(`${URL}Cancelado`,cancelado,configAxios);
 
         for(let producto of listaProductos){
-            cargarMovimiento(producto,cancelado.numero,cancelado.cliente,cancelado.tipo_comp,cancelado.tipo_comp,cancelado.caja,cancelado.vendedor);
+            cargarMovimiento(producto,cancelado.numero,cancelado.cliente,cancelado.tipo_venta,cancelado.tipo_comp,cancelado.caja,cancelado.vendedor);
         };
         //Cargamos el movimiento de producto
         await axios.post(`${URL}movimiento`,movimientos,configAxios);   

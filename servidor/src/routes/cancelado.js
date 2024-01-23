@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-const { post, getCanceladosForDay, getUltimo, } = require('../controllers/cancelado.controllers');
+const { post, getCanceladosForDay, getUltimo, getForNumber, deleteForId, } = require('../controllers/cancelado.controllers');
 
 
 router.route('/')
@@ -10,5 +10,9 @@ router.route('/forDay/:desde/:hasta')
     .get(getCanceladosForDay)
 router.route('/ultimo')
     .get(getUltimo)
+router.route('/forNumber/:numero')
+    .get(getForNumber)
+router.route('/forId/:id')
+    .delete(deleteForId)
 
 module.exports = router;

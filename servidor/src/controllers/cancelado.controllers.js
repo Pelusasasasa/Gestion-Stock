@@ -28,11 +28,24 @@ canceladoCTRL.post = async(req,res) => {
 
 canceladoCTRL.getUltimo = async(req,res) => {
     const cancelado = await Cancelado.findOne().sort({$natural: -1});
-    if (cancelado.numero) {
+    if (cancelado) {
         res.send(`${cancelado.numero}`);
     }else{
         res.send(`${0}`);
     }
 }
+
+canceladoCTRL.getForNumber = async(req,res) => {
+    const { numero } = req.params;
+    const cancelado = await Cancelado.findOne({numero: numero});
+    res.send(cancelado);
+}
+
+canceladoCTRL.deleteForId = async(req,res) => {
+    const { id } = req.params;
+    const cancelado = await Cancelado.findOneAndDelete({_id:id});
+    console.log(`Cancelado del cliente ${cancelado.cliente} Eliminado con el numero ${cancelado.numero}`);
+    res.send(`Cancelado del cliente ${cancelado.cliente} Eliminado con el numero ${cancelado.numero}`);
+};
 
 module.exports = canceladoCTRL;

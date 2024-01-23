@@ -94,6 +94,9 @@ const traerProductos = async(rubro,mesBandera)=>{
         movimiento = (await axios.get(`${URL}movimiento/rubro/${rubro}/${desde.value}/${hasta.value}`)).data;
     };
 
+    //Sacamos de el arreglo los movimientos que son cancelados
+    movimiento = movimiento.filter(mov => mov.tipo_comp !== "CL");
+
     movimiento.sort((a,b)=>{
         if (a.fecha > b.fecha) {
             return 1;
