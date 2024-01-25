@@ -516,7 +516,12 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
-    movimiento.precio = producto.oferta ? producto.precioOferta : producto.precio; 
+    if (producto.oferta) {
+        movimiento.precio = producto.precioOferta ? producto.precioOferta : producto.precio;     
+    }else{
+        movimiento.precio = producto.precio
+    }
+    
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
     movimiento.tipo_comp = tipo_comp;
@@ -733,8 +738,11 @@ condicionIva.addEventListener('keypress',async e=>{
 });
 
 cantidad.addEventListener('keypress',async e=>{
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 && e.target.value !== "") {
         listarProducto(descripcion.value);
+    }else if(e.keyCode === 13 && e.target.value === ""){
+        await sweet.fire({title:"Poner una cantidad"});
+        cantidad.value = "1.00"
     }
 });
 
