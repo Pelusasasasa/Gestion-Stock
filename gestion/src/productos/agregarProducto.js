@@ -13,6 +13,7 @@ const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
+const precioTarjeta = document.querySelector('#precioTarjeta');
 const precioOferta = document.querySelector('#precioOferta');
 const guardar = document.querySelector('.guardar');
 const ticketPrecio = document.querySelector('#ticketPrecio');
@@ -84,6 +85,7 @@ guardar.addEventListener('click',async ()=>{
     producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
     producto.ganancia = ganancia.value;
     producto.precio = total.value;
+    producto.precioTarjeta = precioTarjeta.value;
     producto.oferta = oferta.checked;
     producto.precioOferta = precioOferta.value;
 
@@ -168,7 +170,13 @@ ganancia.addEventListener('keypress',e=>{
     apretarEnter(e,total);
 })
 
-total.addEventListener('keypress',e=>{
+total.addEventListener('keypress', e=> {
+    precioTarjeta.value = redondear(parseFloat(total.value) + parseFloat(total.value) * archivo.descuentoEfectivo / 100,2);
+    apretarEnter(e,precioTarjeta);
+    // precioTarjeta.focus();
+});
+
+precioTarjeta.addEventListener('keypress',e=>{
     if (precioOferta.parentElement.classList.contains('none')) {
         apretarEnter(e,guardar);
     }else{
@@ -236,6 +244,10 @@ ganancia.addEventListener('focus',e=>{
 
 total.addEventListener('focus',e=>{
     total.select();
+});
+
+precioTarjeta.addEventListener('focus',e=>{
+    precioTarjeta.select();
 });
 
 precioOferta.addEventListener('focus',e=>{
