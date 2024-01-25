@@ -3,8 +3,9 @@ require('dotenv').config()
 const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
-const {apretarEnter, imprimirTicketPrecio, agregarProductoModificadoParaTicket} = require('../helpers');
+const {apretarEnter, imprimirTicketPrecio, agregarProductoModificadoParaTicket, redondear} = require('../helpers');
 const { ipcRenderer } = require('electron');
+const {descuentoEfectivo} = require('../configuracion.json');
 
 const codigo = document.querySelector('#codigo');
 const marca = document.querySelector('#marca');
@@ -17,10 +18,12 @@ const iva = document.querySelector('#iva');
 const ganancia = document.querySelector('#ganancia');
 const costo = document.querySelector('#costo');
 const precio = document.querySelector('#precio');
+const tarjetaPrecio = document.querySelector('#tarjetaPrecio');
 const nuevoCosto = document.querySelector('#nuevoCosto');
 const nuevoIva = document.querySelector('#nuevoIva')
 const nuevaGanancia = document.querySelector('#nuevaGanancia')
 const nuevoPrecio = document.querySelector('#nuevoPrecio');
+const nuevoPrecioTarjeta = document.querySelector('#nuevoPrecioTarjeta');
 const ticketPrecio = document.querySelector('#ticketPrecio');
 const oferta = document.querySelector('#oferta');
 const nuevaOferta = document.querySelector('#nuevaOferta');
@@ -43,7 +46,10 @@ codigo.addEventListener('keypress',async e=>{
             stockViejo.value = producto.stock.toFixed(2);
             nuevoStock.value = producto.stock.toFixed(2);
             precio.value = producto.precio.toFixed(2);
+            console.log(producto)
+            tarjetaPrecio.value = producto.precioTarjeta ? producto.precioTarjeta.toFixed(2) : "0";
             oferta.value = producto.precioOferta?.toFixed(2);
+            
             producto.oferta && botonOferta.click();
             provedor.focus();
         }else{
@@ -71,7 +77,6 @@ stock.addEventListener('keypress',e=>{
     }
     apretarEnter(e,nuevoCosto);
 });
-
 
 nuevoCosto.addEventListener('keypress',e=>{
     if (e.key === "Enter" && nuevoCosto.value !== "") {
@@ -101,13 +106,20 @@ nuevaGanancia.addEventListener('keypress',e=>{
 
 nuevoPrecio.addEventListener('focus',e =>{
     nuevoPrecio.select();
-})
+});
 
 nuevoPrecio.addEventListener('keypress',e=>{
-    if (nuevaOferta.parentElement.classList.contains('none')) {
-        apretarEnter(e,guardar);
-    }else{
+
+    nuevoPrecioTarjeta.value = redondear(parseFloat(nuevoPrecio.value) + (parseFloat(nuevoPrecio.value) * descuentoEfectivo / 100),2);
+
+    apretarEnter(e,nuevoPrecioTarjeta);
+});
+
+nuevoPrecioTarjeta.addEventListener('keypress',e=>{
+    if (botonOferta.checked) {
         apretarEnter(e,nuevaOferta);
+    }else{
+        apretarEnter(e,guardar);
     }
 });
 
@@ -125,8 +137,9 @@ guardar.addEventListener('click',async e=>{
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     producto.oferta = botonOferta.checked ? true : false;
     producto.precioOferta = nuevaOferta.value !== "" ? parseFloat(nuevaOferta.value) : producto.precioOferta;
+    producto.precioTarjeta = parseFloat(nuevoPrecioTarjeta.value);
 
-    const {mensaje,estado} =(await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+    const {mensaje,estado} = (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
 
     await sweet.fire({
         title:mensaje
@@ -148,7 +161,7 @@ guardar.addEventListener('click',async e=>{
 botonOferta.addEventListener('click',e => {
     document.querySelector('.oferta').classList.toggle('none');
     document.querySelector('.nuevaOferta').classList.toggle('none');
-    oferta.parentElement.parentElement.style.gridTemplateColumns = oferta.parentElement.classList.contains('none') ?  '1fr 1fr' :  '1fr 1fr 1fr';
+    oferta.parentElement.parentElement.style.gridTemplateColumns = oferta.parentElement.classList.contains('none') ?  '1fr 1fr 1fr' :  '1fr 1fr 1fr 1fr';
 });
 
 salir.addEventListener('click',e=>{

@@ -19,6 +19,8 @@ const multiple = document.querySelectorAll("input[name=multipleVendedores]");
 const multipleStockNegativos = document.querySelectorAll("input[name=stockNegativo]");
 const dolar = document.querySelectorAll("input[name=dolar]");
 const maxFactura = document.getElementById('maxFactura');
+const descuentoEfectivo = document.getElementById('descuentoEfectivo');
+
 
 
 const si = document.getElementById('si');
@@ -59,6 +61,7 @@ window.addEventListener('load',async e=>{
     maxFactura.value = archivo.maxFactura;
     puntoVenta.value = archivo.puntoVenta;
     condIva.value = archivo.condIva;
+    descuentoEfectivo.value = archivo.descuentoEfectivo ? archivo.descuentoEfectivo : "0";
 
 });
 
@@ -73,6 +76,7 @@ modificar.addEventListener('click',async e=>{
     objeto.dolar = await verMultiplesRadios(dolar);
     objeto.condIva = condIva.value;
     objeto.maxFactura = parseFloat(maxFactura.value);
+    objeto.descuentoEfectivo = parseFloat(descuentoEfectivo.value);
     
     fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
