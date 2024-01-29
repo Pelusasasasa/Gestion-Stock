@@ -252,6 +252,72 @@ const verTipoVenta = ()=>{
     return retornar;
 };
 
+document.getElementById('contado').addEventListener('change', e => {
+
+    for(let {cantidad,producto} of listaProductos){
+        if (!producto.oferta) {
+            const tr = document.getElementById(producto.idTabla);
+            if (parseFloat(tr.children[4].innerText) === producto.precioTarjeta) {
+                totalGlobal -=  parseFloat(redondear(producto.precioTarjeta * cantidad,2));
+            }else{
+                totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
+            }
+
+            
+            tr.children[4].innerText = producto.precio.toFixed(2);
+            tr.children[5].innerText = redondear(producto.precio * cantidad ,2);
+            totalGlobal = parseFloat(redondear(totalGlobal + producto.precio * cantidad,2));
+            total.value = totalGlobal.toFixed(2);
+        }
+
+    };
+
+});
+
+document.getElementById('tarjeta').addEventListener('change', e => {
+
+    for(let {cantidad,producto} of listaProductos){
+        if (!producto.oferta) {
+            const tr = document.getElementById(producto.idTabla);
+            if (parseFloat(tr.children[4].innerText) === producto.precioTarjeta) {
+                totalGlobal -=  parseFloat(redondear(producto.precioTarjeta * cantidad,2));
+            }else{
+                totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
+            }
+
+            
+            tr.children[4].innerText = producto.precioTarjeta ? producto.precioTarjeta.toFixed(2) : producto.precio;
+            tr.children[5].innerText = redondear(producto.precioTarjeta * cantidad ,2);
+            totalGlobal = parseFloat(redondear(totalGlobal + producto.precioTarjeta * cantidad,2));
+            total.value = totalGlobal.toFixed(2);
+        }
+
+    };
+
+});
+
+document.getElementById('cuentaCorriente').addEventListener('change', e => {
+
+    for(let {cantidad,producto} of listaProductos){
+        if (!producto.oferta) {
+            const tr = document.getElementById(producto.idTabla);
+            if (parseFloat(tr.children[4].innerText) === producto.precioTarjeta) {
+                totalGlobal -=  parseFloat(redondear(producto.precioTarjeta * cantidad,2));
+            }else{
+                totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
+            }
+
+            
+            tr.children[4].innerText = producto.precioTarjeta.toFixed(2);
+            tr.children[5].innerText = redondear(producto.precioTarjeta * cantidad ,2);
+            totalGlobal = parseFloat(redondear(totalGlobal + producto.precioTarjeta * cantidad,2));
+            total.value = totalGlobal.toFixed(2);
+        }
+
+    };
+
+});
+
 facturar.addEventListener('click',async e=>{
     if (codigo.value === "") {
         sweet.fire({
@@ -399,7 +465,7 @@ const listarCliente = async(id)=>{
 };
 
 //Lo que hacemos es listar el producto traido
-const listarProducto =async(id)=>{
+const listarProducto = async(id) => {
     let producto;
     if (id.slice(0,2) === "20") {
         const aux = id.slice(2,6);
@@ -434,8 +500,16 @@ const listarProducto =async(id)=>{
         });
     }
     listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
-    console.log(producto.oferta)
-    precioU.value = producto.oferta ? producto.precioOferta.toFixed(2) : redondear(producto.precio,2);
+    //listammos el precio dependiendo de la condicion
+    if (producto.oferta) {
+        precioU.value = producto.precioOferta.toFixed(2);  
+    }else if(verTipoVenta() === "CD" || verTipoVenta() === "CC"){
+        precioU.value = producto.precio.toFixed(2);
+    }else{
+        precioU.value = producto.precioTarjeta.toFixed(2);
+    }
+    
+
     idProducto++;
     producto.idTabla = `${idProducto}`;
     tbody.innerHTML += `
@@ -459,8 +533,19 @@ const listarProducto =async(id)=>{
     });
     total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
     totalGlobal = parseFloat(total.value);
+
     }else if(producto !== "" && productoYaUsado){
-        const precio = producto.oferta ? producto.precioOferta : producto.precio;
+
+        let precio = "";
+
+        if (producto.oferta) {
+            precio = producto.precioOferta;
+        }else if(verTipoVenta() === "CD" || verTipoVenta() === "CC"){
+            precio = producto.precio;
+        }else{
+            precio = producto.precioTarjeta
+        };
+
         productoYaUsado.cantidad += parseFloat(cantidad.value)
         producto.idTabla = productoYaUsado.producto.idTabla;
         const tr = document.getElementById(producto.idTabla);
@@ -742,7 +827,7 @@ cantidad.addEventListener('keypress',async e=>{
         listarProducto(descripcion.value);
     }else if(e.keyCode === 13 && e.target.value === ""){
         await sweet.fire({title:"Poner una cantidad"});
-        cantidad.value = "1.00"
+        cantidad.value = "1.00";
     }
 });
 
