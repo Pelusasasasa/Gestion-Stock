@@ -82,7 +82,7 @@ ipcMain.on('imprimir',(e,args)=>{
 });
 
 ipcMain.on('imprimir-TicketPrecio',(e,args)=>{
-  abrirVentana('ticket/ticketPrecio.html',500,700);
+  abrirVentana('ticket/ticketPrecio.html',500,700,false,true);
   nuevaVentana.webContents.on('did-finish-load',function() {
     nuevaVentana.webContents.send('imprimir',args);
   })

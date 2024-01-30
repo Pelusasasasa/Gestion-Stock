@@ -145,7 +145,7 @@ guardar.addEventListener('click',async e=>{
         title:mensaje
     });
 
-    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked);
+    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),parseFloat(producto.precioTarjeta),ticketPrecio.checked,);
 
     await agregarProductoModificadoParaTicket(producto);
 

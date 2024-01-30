@@ -452,11 +452,12 @@ funciones.verClienteValido = async(codigo)=>{
     };
 }
 
-funciones.imprimirTicketPrecio =(descripcion,precio,condicion)=>{
+funciones.imprimirTicketPrecio =(descripcion,precio,precioTarjeta,condicion)=>{
     if (condicion) {
         ipcRenderer.send('imprimir-TicketPrecio',JSON.stringify({
             descripcion,
-            precio
+            precio,
+            precioTarjeta
         }));
     };
 };
