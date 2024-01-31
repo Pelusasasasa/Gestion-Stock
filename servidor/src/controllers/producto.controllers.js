@@ -116,7 +116,17 @@ productoCTRL.cargarProducto = async(req,res)=>{
         mensaje,
         estado
     }));
-}
+};
+
+productoCTRL.ponerPrecioTarjeta = async(req,res) => {
+    const productos = await Producto.find({});
+    for await(let producto of productos){
+        producto.precioTarjeta = producto.precio + producto.precio * 5 / 100;
+        await producto.save();
+    }
+    console.log('Listo')
+    res.send('Listo')
+};
 
 productoCTRL.eliminarProducto = async(req,res)=>{
     const {id} = req.params;

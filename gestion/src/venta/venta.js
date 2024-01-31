@@ -257,8 +257,8 @@ document.getElementById('contado').addEventListener('change', e => {
     for(let {cantidad,producto} of listaProductos){
         if (!producto.oferta) {
             const tr = document.getElementById(producto.idTabla);
-            if (parseFloat(tr.children[4].innerText) === producto.precioTarjeta) {
-                totalGlobal -=  parseFloat(redondear(producto.precioTarjeta * cantidad,2));
+            if (parseFloat(tr.children[4].innerText) !== producto.precio) {
+                totalGlobal -=  parseFloat(redondear((producto.precio + producto.precio * archivo.descuentoEfectivo / 100) * cantidad,2));
             }else{
                 totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
             }
@@ -279,16 +279,17 @@ document.getElementById('tarjeta').addEventListener('change', e => {
     for(let {cantidad,producto} of listaProductos){
         if (!producto.oferta) {
             const tr = document.getElementById(producto.idTabla);
-            if (parseFloat(tr.children[4].innerText) === producto.precioTarjeta) {
-                totalGlobal -=  parseFloat(redondear(producto.precioTarjeta * cantidad,2));
+            if (parseFloat(tr.children[4].innerText) !== producto.precio) {
+                totalGlobal -=  parseFloat(redondear((producto.precio + producto.precio * archivo.descuentoEfectivo / 100) * cantidad,2));
             }else{
                 totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
             }
 
             
-            tr.children[4].innerText = producto.precioTarjeta ? producto.precioTarjeta.toFixed(2) : producto.precio;
-            tr.children[5].innerText = redondear(producto.precioTarjeta * cantidad ,2);
-            totalGlobal = parseFloat(redondear(totalGlobal + producto.precioTarjeta * cantidad,2));
+            tr.children[4].innerText = (producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2);
+            tr.children[5].innerText = (parseFloat(tr.children[4].innerText) * cantidad).toFixed(2)
+            console.log(cantidad)
+            totalGlobal = parseFloat(redondear(totalGlobal + parseFloat(tr.children[5].innerText),2));
             total.value = totalGlobal.toFixed(2);
         }
 
@@ -301,16 +302,16 @@ document.getElementById('cuentaCorriente').addEventListener('change', e => {
     for(let {cantidad,producto} of listaProductos){
         if (!producto.oferta) {
             const tr = document.getElementById(producto.idTabla);
-            if (parseFloat(tr.children[4].innerText) === producto.precioTarjeta) {
-                totalGlobal -=  parseFloat(redondear(producto.precioTarjeta * cantidad,2));
+            if (parseFloat(tr.children[4].innerText) !== producto.precio) {
+                totalGlobal -=  parseFloat(redondear((producto.precio + producto.precio * archivo.descuentoEfectivo / 100) * cantidad,2));
             }else{
                 totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
             }
 
             
-            tr.children[4].innerText = producto.precioTarjeta.toFixed(2);
-            tr.children[5].innerText = redondear(producto.precioTarjeta * cantidad ,2);
-            totalGlobal = parseFloat(redondear(totalGlobal + producto.precioTarjeta * cantidad,2));
+            tr.children[4].innerText = (producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2);
+            tr.children[5].innerText = (parseFloat(tr.children[4].innerText) * cantidad).toFixed(2)
+            totalGlobal = parseFloat(redondear(totalGlobal + parseFloat(tr.children[5].innerText),2));
             total.value = totalGlobal.toFixed(2);
         }
 
@@ -503,10 +504,10 @@ const listarProducto = async(id) => {
     //listammos el precio dependiendo de la condicion
     if (producto.oferta) {
         precioU.value = producto.precioOferta.toFixed(2);  
-    }else if(verTipoVenta() === "CD" || verTipoVenta() === "CC"){
+    }else if(verTipoVenta() === "CD"){
         precioU.value = producto.precio.toFixed(2);
     }else{
-        precioU.value = producto.precioTarjeta.toFixed(2);
+        precioU.value = redondear(producto.precio + producto.precio * archivo.descuentoEfectivo / 100,2);
     }
     
 
@@ -540,10 +541,10 @@ const listarProducto = async(id) => {
 
         if (producto.oferta) {
             precio = producto.precioOferta;
-        }else if(verTipoVenta() === "CD" || verTipoVenta() === "CC"){
+        }else if(verTipoVenta() === "CD"){
             precio = producto.precio;
         }else{
-            precio = producto.precioTarjeta
+            precio = parseFloat(redondear(producto.precio + producto.precio * archivo.descuentoEfectivo / 100,2));
         };
 
         productoYaUsado.cantidad += parseFloat(cantidad.value)
@@ -603,8 +604,10 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.marca = producto.marca;
     if (producto.oferta) {
         movimiento.precio = producto.precioOferta ? producto.precioOferta : producto.precio;     
+    }else if(movimiento.tipo_venta === "CD"){
+        movimiento.precio = producto.precio;
     }else{
-        movimiento.precio = producto.precio
+        movimiento.precio = parseFloat((producto.precio + (producto.precio * archivo.descuentoEfectivo / 100)).toFixed(2))
     }
     
     movimiento.rubro = producto.rubro;

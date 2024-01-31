@@ -1,5 +1,6 @@
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron/renderer');
+const {descuentoEfectivo} = require('../configuracion.json');
 
 const axios = require('axios');
 require("dotenv").config();
@@ -326,7 +327,14 @@ async function actualizarMovimientos(cuenta){
     let total = 0;
     let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
     for(let mov of movimientos){
-        const precio = mov.oferta ? mov.precio : (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
+        let precio = 0;
+        if (mov.oferta) {
+            precio = mov.precio;
+        }else{
+            precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
+            precio = parseFloat((precio + precio * descuentoEfectivo / 100).toFixed(2));
+        }
+        
         mov.precio = precio ? precio : mov.precio; 
         total += mov.precio * mov.cantidad;
         await axios.put(`${URL}movimiento/forCodigoAndNumeroVenta/${mov.codigo}/${mov.tipo_venta}`,mov,configAxios);  
