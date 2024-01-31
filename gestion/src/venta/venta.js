@@ -257,11 +257,7 @@ document.getElementById('contado').addEventListener('change', e => {
     for(let {cantidad,producto} of listaProductos){
         if (!producto.oferta) {
             const tr = document.getElementById(producto.idTabla);
-            if (parseFloat(tr.children[4].innerText) !== producto.precio) {
-                totalGlobal -=  parseFloat(redondear((producto.precio + producto.precio * archivo.descuentoEfectivo / 100) * cantidad,2));
-            }else{
-                totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
-            }
+            totalGlobal -= parseFloat(tr.children[5].innerText);
 
             
             tr.children[4].innerText = producto.precio.toFixed(2);
@@ -279,12 +275,7 @@ document.getElementById('tarjeta').addEventListener('change', e => {
     for(let {cantidad,producto} of listaProductos){
         if (!producto.oferta) {
             const tr = document.getElementById(producto.idTabla);
-            if (parseFloat(tr.children[4].innerText) !== producto.precio) {
-                totalGlobal -=  parseFloat(redondear((producto.precio + producto.precio * archivo.descuentoEfectivo / 100) * cantidad,2));
-            }else{
-                totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
-            }
-
+            totalGlobal -= parseFloat(tr.children[5].innerText);
             
             tr.children[4].innerText = (producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2);
             tr.children[5].innerText = (parseFloat(tr.children[4].innerText) * cantidad).toFixed(2)
@@ -302,12 +293,7 @@ document.getElementById('cuentaCorriente').addEventListener('change', e => {
     for(let {cantidad,producto} of listaProductos){
         if (!producto.oferta) {
             const tr = document.getElementById(producto.idTabla);
-            if (parseFloat(tr.children[4].innerText) !== producto.precio) {
-                totalGlobal -=  parseFloat(redondear((producto.precio + producto.precio * archivo.descuentoEfectivo / 100) * cantidad,2));
-            }else{
-                totalGlobal -=  parseFloat(redondear(producto.precio * cantidad,2));
-            }
-
+            totalGlobal -= parseFloat(tr.children[5].innerText);
             
             tr.children[4].innerText = (producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2);
             tr.children[5].innerText = (parseFloat(tr.children[4].innerText) * cantidad).toFixed(2)
@@ -363,7 +349,7 @@ facturar.addEventListener('click',async e=>{
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
-        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
+        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos,venta.tipo_ventas); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
         venta.gravado0 = gravado0;

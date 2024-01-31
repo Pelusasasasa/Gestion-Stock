@@ -77,7 +77,7 @@ const llenarInputs = async(codigoProducto)=>{
     }
     ganancia.value = producto.ganancia.toFixed(2);
     total.value = producto.precio.toFixed(2);    
-    precioTarjeta.value = producto.precioTarjeta.toFixed(2);
+    precioTarjeta.value = Math.round(producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2)
 }
 
 //al hacer click modificamos los productos con el valor de los inputs
@@ -94,7 +94,6 @@ modificar.addEventListener('click',async e=>{
     producto.impuesto = parseFloat(impuesto.value).toFixed(2);
     producto.ganancia = parseFloat(ganancia.value).toFixed(2);
     producto.precio = parseFloat(total.value).toFixed(2);
-    producto.precioTarjeta = precioTarjeta.value;
     producto.precioOferta = precioOferta.value;
     producto.oferta = oferta.checked;
     const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
@@ -171,12 +170,7 @@ ganancia.addEventListener('keypress',e=>{
 });
 
 total.addEventListener('keypress',e=>{
-    precioTarjeta.value = redondear(parseFloat(total.value) + parseFloat(total.value) * archivo.descuentoEfectivo / 100,2);
-
-    apretarEnter(e,precioTarjeta);
-});
-
-precioTarjeta.addEventListener('keypress',e=>{
+    precioTarjeta.value = Math.round(parseFloat(total.value) + parseFloat(total.value) * archivo.descuentoEfectivo / 100 ).toFixed(2);
     if (precioOferta.parentElement.classList.contains('none')) {
         apretarEnter(e,modificar);
     }else{

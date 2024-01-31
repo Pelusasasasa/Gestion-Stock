@@ -85,7 +85,6 @@ guardar.addEventListener('click',async ()=>{
     producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
     producto.ganancia = ganancia.value;
     producto.precio = total.value;
-    producto.precioTarjeta = precioTarjeta.value;
     producto.oferta = oferta.checked;
     producto.precioOferta = precioOferta.value;
 
@@ -168,15 +167,10 @@ costoIva.addEventListener('keypress',e=>{
 
 ganancia.addEventListener('keypress',e=>{
     apretarEnter(e,total);
-})
-
-total.addEventListener('keypress', e=> {
-    precioTarjeta.value = redondear(parseFloat(total.value) + parseFloat(total.value) * archivo.descuentoEfectivo / 100,2);
-    apretarEnter(e,precioTarjeta);
-    // precioTarjeta.focus();
 });
 
-precioTarjeta.addEventListener('keypress',e=>{
+total.addEventListener('keypress',e=>{
+    precioTarjeta.value = redondear(parseFloat(total.value) + parseFloat(total.value) * archivo.descuentoEfectivo / 100,2);
     if (precioOferta.parentElement.classList.contains('none')) {
         apretarEnter(e,guardar);
     }else{

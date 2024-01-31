@@ -232,7 +232,7 @@ funciones.recorrerFlechas = (code)=>{
     }
 };
 
-funciones.sacarIva = (lista) => {
+funciones.sacarIva = (lista,tipo) => {
     let totalIva0 = 0;
     let totalIva21= 0;
     let gravado21 = 0; 
@@ -240,7 +240,14 @@ funciones.sacarIva = (lista) => {
     let totalIva105= 0;
     let gravado105 = 0;
     lista.forEach(({producto,cantidad}) =>{
-        const precio = producto.oferta ? producto.precioOferta : producto.precio;
+        let precio = 0;
+        if (producto.oferta) {
+            precio = producto.precioOferta;
+        }else if(tipo === "CD"){
+            precio = producto.precio;
+        }else{
+            precio = producto.precio + producto.precio * archivo.descuentoEfectivo / 100;
+        }
         if (producto.impuesto === 21 || producto.impuesto === 0) {
             gravado21 += cantidad * precio / 1.21;
             totalIva21 += (cantidad * (precio / 1.21)) * 21 / 100;
