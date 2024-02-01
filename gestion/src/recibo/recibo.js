@@ -31,6 +31,7 @@ const total = document.querySelector('#total');
 const imprimir = document.querySelector('.imprimir');
 const entregado = document.querySelector('#entregado');
 const tarjeta = document.querySelector('#tarjeta');
+const contado = document.querySelector('#contado');
 
 const alerta = document.querySelector('.alerta');
 
@@ -209,6 +210,11 @@ imprimir.addEventListener('click',async e=>{
         });
         codigo.focus();
         return;
+    }else if(!tarjeta.checked && !contado.checked){
+        await sweet.fire({
+            title:"Seleccione un Tipo Venta"
+        });
+        return;
     };
     const recibo = {};
     recibo.fecha = new Date();
@@ -344,11 +350,9 @@ const crearCuentaCompensada = async(cuenta)=>{
     }
 }
 
-
 entregado.addEventListener('focus',e=>{
     entregado.select();
 });
-
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,dni)
@@ -365,7 +369,6 @@ condicionIva.addEventListener('keypress',e=>{
 direccion.addEventListener('keypress',e=>{
     apretarEnter(e,fecha);
 });
-
 
 cancelar.addEventListener('click',e=>{
     location.href = "../menu.html";
@@ -392,6 +395,8 @@ document.addEventListener('keyup',e=>{
     }
 });
 
+contado.addEventListener('change',hacerDescuento);
+tarjeta.addEventListener('change',ponerPrecioOriginal);
 
 actualizar.addEventListener('click',actualizarTodo);
 
@@ -450,7 +455,7 @@ async function actualizarMovimientos(cuenta){
         let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
         for(let mov of movimientos){
             const precio = mov.oferta ? mov.precio : (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
-            mov.precio = precio ? precio : mov.precio;
+            mov.precio = precio ? Math.round(precio + precio * archivo.descuentoEfectivo / 100) : mov.precio;
             total += mov.precio * mov.cantidad;
             await axios.put(`${URL}movimiento/forCodigoAndNumeroVenta/${mov.codigo}/${mov.tipo_venta}`,mov,configAxios);
         };
@@ -462,4 +467,19 @@ async function actualizarSaldo(numero) {
     cliente.saldo = numero.toFixed(2);
     saldo.value = numero.toFixed(2);
     (await axios.put(`${URL}clientes/id/${codigo.value}`,cliente,configAxios))
+};
+
+async function hacerDescuento() {
+    const precio = parseFloat(total.value);
+    total.value = Math.round(precio - precio * archivo.descuentoEfectivo / 100).toFixed(2);
+};
+
+async function ponerPrecioOriginal(){
+    const trs = document.querySelectorAll('tbody tr');
+    let precio = 0;
+    for await(let tr of trs){
+        precio += parseFloat(tr.children[5].children[0].value);
+    }
+
+    total.value = precio.toFixed(2);
 };

@@ -55,10 +55,6 @@ const Producto = new mongoose.Schema({
     precioOferta:{
         type:Number,
         default:0
-    },
-    precioTarjeta:{
-        type:Number,
-        default:0
     }
 
 

@@ -59,7 +59,7 @@ footer{
     justify-content: space-around;
 }
 
-.saldos #tarjeta{
+.saldos #tarjeta,.saldos #contado{
     padding: 2rem;
     font-size: 1.5rem;
     transform: scale(2);

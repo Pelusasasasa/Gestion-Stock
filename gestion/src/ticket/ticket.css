@@ -133,6 +133,15 @@ img{
     margin: 0;
 }
 
+.ticketPrecio .porcentaje{
+    display: flex;
+    justify-content: space-between;
+}
+
+.ticketPrecio .porcentaje p{
+    font-size: 18px;
+}
+
 .oferta{
     text-align: center;
     margin: 0;

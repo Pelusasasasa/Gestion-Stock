@@ -46,8 +46,7 @@ codigo.addEventListener('keypress',async e=>{
             stockViejo.value = producto.stock.toFixed(2);
             nuevoStock.value = producto.stock.toFixed(2);
             precio.value = producto.precio.toFixed(2);
-            console.log(producto)
-            tarjetaPrecio.value = producto.precioTarjeta ? producto.precioTarjeta.toFixed(2) : "0";
+            tarjetaPrecio.value = Math.round(producto.precio + producto.precio * descuentoEfectivo / 100).toFixed(2);
             oferta.value = producto.precioOferta?.toFixed(2);
             
             producto.oferta && botonOferta.click();
@@ -137,7 +136,6 @@ guardar.addEventListener('click',async e=>{
     producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     producto.oferta = botonOferta.checked ? true : false;
     producto.precioOferta = nuevaOferta.value !== "" ? parseFloat(nuevaOferta.value) : producto.precioOferta;
-    producto.precioTarjeta = parseFloat(nuevoPrecioTarjeta.value);
 
     const {mensaje,estado} = (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
 
@@ -145,7 +143,7 @@ guardar.addEventListener('click',async e=>{
         title:mensaje
     });
 
-    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),parseFloat(producto.precioTarjeta),ticketPrecio.checked,);
+    imprimirTicketPrecio(producto.descripcion,parseFloat(producto.precio),ticketPrecio.checked,);
 
     await agregarProductoModificadoParaTicket(producto);
 

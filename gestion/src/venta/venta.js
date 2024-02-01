@@ -243,7 +243,7 @@ porcentaje.addEventListener('change',async e=>{
 
 //Vemos que input tipo radio esta seleccionado
 const verTipoVenta = ()=>{
-    let retornar;
+    let retornar = false;
     radio.forEach(input =>{
         if (input.checked) {
             retornar = input.value;
@@ -330,6 +330,10 @@ facturar.addEventListener('click',async e=>{
                 title:"No se puede hacer Factura B a un Inscripto"
             });
         }
+    }else if(!verTipoVenta()){
+        await sweet.fire({
+            title:"Seleccionar un tipo de venta"
+        });
     }else{
         alerta.classList.remove('none');
         const numeros = (await axios.get(`${URL}numero`)).data;
