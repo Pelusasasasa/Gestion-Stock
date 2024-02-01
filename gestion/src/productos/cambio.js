@@ -5,7 +5,7 @@ const sweet = require('sweetalert2');
 
 const {apretarEnter, imprimirTicketPrecio, agregarProductoModificadoParaTicket, redondear} = require('../helpers');
 const { ipcRenderer } = require('electron');
-const {descuentoEfectivo} = require('../configuracion.json');
+const {descuentoEfectivo,ImprecioTicketPrecio} = require('../configuracion.json');
 
 const codigo = document.querySelector('#codigo');
 const marca = document.querySelector('#marca');
@@ -32,6 +32,10 @@ const guardar = document.querySelector('.guardar');
 const salir = document.querySelector('.salir');
 
 let producto = {};
+
+window.addEventListener('load', () => {
+    ticketPrecio.checked = ImprecioTicketPrecio;
+});
 
 codigo.addEventListener('keypress',async e=>{
     if (e.key === "Enter") {

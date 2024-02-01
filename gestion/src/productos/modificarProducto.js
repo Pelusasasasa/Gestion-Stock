@@ -52,6 +52,10 @@ ipcRenderer.on('informacion',async (e,args)=>{
     llenarInputs(informacion);
 });
 
+window.addEventListener('load', e => {
+    ticketPrecio.checked = archivo.ImprecioTicketPrecio;
+});
+
 
 //llenamos los inputs con la informacion que tenemos
 const llenarInputs = async(codigoProducto)=>{

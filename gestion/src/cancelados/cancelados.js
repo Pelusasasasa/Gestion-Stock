@@ -104,7 +104,6 @@ const listarCancelados = async(cancelados) => {
 
 const listarMovimientos = async(numero,tipo) => {
     const movimientos = (await axios.get(`${URL}movimiento/${numero}/${tipo}`)).data;
-    
     for(let mov of movimientos){
         const tr = document.createElement('tr');
 
@@ -118,15 +117,19 @@ const listarMovimientos = async(numero,tipo) => {
         tdFecha.innerText = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
         tdProducto.innerText = mov.producto;
         tdCodProducto.innerText = mov.codProd;
-        tdCantidad.innerText = mov.cantidad;
+        tdCantidad.innerText = mov.cantidad.toFixed(2);
         tdPrecio.innerText = mov.precio.toFixed(2);
         tdTotal.innerText = (mov.precio * mov.cantidad).toFixed(2);
+
+        tdCantidad.classList.add('text-rigth');
+        tdPrecio.classList.add('text-rigth');
+        tdTotal.classList.add('text-rigth');
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdProducto);
         tr.appendChild(tdCodProducto);
-        tr.appendChild(tdCantidad);
         tr.appendChild(tdPrecio);
+        tr.appendChild(tdCantidad);
         tr.appendChild(tdTotal);
 
         tbody.appendChild(tr);

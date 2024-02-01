@@ -41,6 +41,10 @@ const traerRubros = async()=>{
     }
 }
 
+window.addEventListener('load', e => {
+    ticketPrecio.checked = archivo.ImprecioTicketPrecio;
+});
+
 traerRubros();
 
 ipcRenderer.on('informacion',(e,args)=>{

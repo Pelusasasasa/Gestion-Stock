@@ -18,6 +18,7 @@ const condIva = document.getElementById('condIva');
 const multiple = document.querySelectorAll("input[name=multipleVendedores]");
 const multipleStockNegativos = document.querySelectorAll("input[name=stockNegativo]");
 const dolar = document.querySelectorAll("input[name=dolar]");
+const impresionTicketPrecio = document.querySelectorAll("input[name=impresionTicketPrecio]");
 const maxFactura = document.getElementById('maxFactura');
 const descuentoEfectivo = document.getElementById('descuentoEfectivo');
 
@@ -28,6 +29,9 @@ const no = document.getElementById('no');
 
 const siStockNegativo = document.getElementById('siStockNegativo');
 const noStockNegativo = document.getElementById('noStockNegativo');
+
+const siImprecioTicketPrecio = document.getElementById('siImprecioTicketPrecio');
+const noImprecioTicketPrecio = document.getElementById('noImprecioTicketPrecio');
 
 const siDolar = document.getElementById('siDolar');
 const noDolar = document.getElementById('noDolar');
@@ -57,6 +61,7 @@ window.addEventListener('load',async e=>{
     archivo.vendedores === false ? no.checked = true : si.checked = true;
     archivo.stockNegativo === false ? noStockNegativo.checked = true : siStockNegativo.checked = true;
     archivo.dolar === false ? noDolar.checked = true : siDolar.checked = true;
+    archivo.ImprecioTicketPrecio === false ? noImprecioTicketPrecio.checked = true : siImprecioTicketPrecio.checked = true;
     cuit.value = archivo.cuit;
     maxFactura.value = archivo.maxFactura;
     puntoVenta.value = archivo.puntoVenta;
@@ -77,6 +82,7 @@ modificar.addEventListener('click',async e=>{
     objeto.condIva = condIva.value;
     objeto.maxFactura = parseFloat(maxFactura.value);
     objeto.descuentoEfectivo = parseFloat(descuentoEfectivo.value);
+    objeto.ImprecioTicketPrecio = await verMultiplesRadios(impresionTicketPrecio);
     
     fs.writeFile(path.join(__dirname, '../configuracion.json'),JSON.stringify(objeto),(error)=>{
         if(error) throw error;
