@@ -670,9 +670,9 @@ document.addEventListener('keydown',e=>{
             "showCancelButton": true,
             "confirmButtonText" : "Aceptar",
             "cancelButtonText" : "Cancelar"
-        }).then((result)=>{
+        }).then(async (result)=>{
             if (result.isConfirmed) {
-                cancelarVenta();
+                await cancelarVenta();
                 location.href = "../menu.html" ;
             }
         });
