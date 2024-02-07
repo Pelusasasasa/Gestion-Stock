@@ -295,7 +295,7 @@ document.getElementById('cuentaCorriente').addEventListener('change', e => {
             const tr = document.getElementById(producto.idTabla);
             totalGlobal -= parseFloat(tr.children[5].innerText);
             
-            tr.children[4].innerText = (producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2);
+            tr.children[4].innerText = producto.precio.toFixed(2);
             tr.children[5].innerText = (parseFloat(tr.children[4].innerText) * cantidad).toFixed(2)
             totalGlobal = parseFloat(redondear(totalGlobal + parseFloat(tr.children[5].innerText),2));
             total.value = totalGlobal.toFixed(2);

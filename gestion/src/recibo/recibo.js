@@ -260,9 +260,9 @@ imprimir.addEventListener('click',async e=>{
         }
         await ponerEnCuentaHistorica(recibo);
         cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
-        await modificarCuentaCompensadas();
+        let importe = await modificarCuentaCompensadas();
         
-        await descontarSaldoCliente(recibo.idCliente,recibo.precio);
+        await descontarSaldoCliente(recibo.idCliente,importe);
         await axios.post(`${URL}recibo`,recibo);
         //Lo usamos paara imprimir
         const lista = [];
@@ -294,16 +294,19 @@ const descontarSaldoCliente =async(idCliente,precio)=>{
 
 //Todas las compensadas que se modificaron las modificamos
 const modificarCuentaCompensadas = async()=>{
+    let total = 0;
     const trs = document.querySelectorAll('tbody tr');
     for await(let tr of trs){
         const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : "";
         const compensada =  numero !== "" ? (await axios.get(`${URL}compensada/traerCompensada/id/${numero}`)).data : "";
         if (compensada !== "") {
+            total += parseFloat(tr.children[5].children[0].value);
             compensada.pagado = parseFloat((compensada.pagado + parseFloat(tr.children[5].children[0].value)).toFixed(2));
             compensada.saldo = parseFloat(tr.children[6].innerHTML).toFixed(2);
             await axios.put(`${URL}compensada/traerCompensada/id/${compensada.nro_venta}`,compensada);
         }
     }
+    return  total;
 };
 
 //Ponemos en historica el recibo
@@ -395,8 +398,8 @@ document.addEventListener('keyup',e=>{
     }
 });
 
-contado.addEventListener('change',hacerDescuento);
-tarjeta.addEventListener('change',ponerPrecioOriginal);
+contado.addEventListener('change',ponerPrecioOriginal);
+tarjeta.addEventListener('change',hacerAumento);
 
 actualizar.addEventListener('click',actualizarTodo);
 
@@ -438,7 +441,7 @@ async function actualizarTodo(e) {
         for(let elem of cuentasHistoricasRestantes){
             if (!(aux === elem.nro_venta)) {
                 elem.saldo = elem.tipo_comp === "Comprobante" ? parseFloat(redondear(elem.debe + saldoAnterior,2)) : parseFloat(redondear(saldoAnterior - elem.haber,2));
-            saldoAnterior = elem.saldo;
+                saldoAnterior = elem.saldo;
             await axios.put(`${URL}historica/PorNumeroAndCliente/${elem.nro_venta}/${elem.idCliente}`,elem,configAxios);
             }
 
@@ -455,7 +458,7 @@ async function actualizarMovimientos(cuenta){
         let movimientos = (await axios.get(`${URL}movimiento/${cuenta.nro_venta}/CC`,configAxios)).data;
         for(let mov of movimientos){
             const precio = mov.oferta ? mov.precio : (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
-            mov.precio = precio ? Math.round(precio + precio * archivo.descuentoEfectivo / 100) : mov.precio;
+            mov.precio = precio ? parseFloat(precio.toFixed(2)): mov.precio;
             total += mov.precio * mov.cantidad;
             await axios.put(`${URL}movimiento/forCodigoAndNumeroVenta/${mov.codigo}/${mov.tipo_venta}`,mov,configAxios);
         };
@@ -469,9 +472,9 @@ async function actualizarSaldo(numero) {
     (await axios.put(`${URL}clientes/id/${codigo.value}`,cliente,configAxios))
 };
 
-async function hacerDescuento() {
+async function hacerAumento() {
     const precio = parseFloat(total.value);
-    total.value = Math.round(precio - precio * archivo.descuentoEfectivo / 100).toFixed(2);
+    total.value = Math.round(precio + precio * archivo.descuentoEfectivo / 100).toFixed(2);
 };
 
 async function ponerPrecioOriginal(){
