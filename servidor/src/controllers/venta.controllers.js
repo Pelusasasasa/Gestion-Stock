@@ -53,7 +53,6 @@ ventaCTRL.ventasMes = async(req,res)=>{
     let hoy = new Date();
     let fechaConMes;
     let fechaConMesSig;
-    console.log(fecha)
     if (fecha.length === 7) {
         let year = parseInt(fecha.slice(0,4));
         mes = parseInt(fecha.slice(5,7));

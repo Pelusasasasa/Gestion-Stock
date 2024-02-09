@@ -229,16 +229,17 @@ porcentaje.addEventListener('change',async e=>{
         porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value;
         descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100,2);
         for await(let {cantidad,producto} of listaProductos){       
-            totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2))
-            producto.precio = parseFloat(redondear(producto.precio / (porcentajeH/100 + 1),2));
-            producto.precio = parseFloat(redondear(producto.precio + producto.precio*parseFloat(porcentaje.value)/100,2));
+            totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2));
+
+            producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
+            
             const tr = document.getElementById(producto.idTabla)
             tr.children[4].innerHTML = producto.precio.toFixed(2);
             tr.children[5].innerHTML = redondear(producto.precio*cantidad,2);
+
             totalGlobal = parseFloat(redondear(totalGlobal + producto.precio*cantidad,2));
             total.value = totalGlobal.toFixed(2);
-        }
-        porcentajeH = parseFloat(porcentaje.value);
+        };
 });
 
 //Vemos que input tipo radio esta seleccionado
@@ -740,7 +741,7 @@ const cancelarVenta = async () => {
         cancelado.vendedor = archivo.vendedor ? archivo.vendedor : "Vendedor";
         cancelado.numero = ultimo ? ultimo + 1 : 1;
 
-        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
+        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos,cacenlado.tipo_venta); //sacamos el iva de los productos
         cancelado.iva21 = iva21;
         cancelado.iva105 = iva105;
         cancelado.gravado21 =  gravado21,

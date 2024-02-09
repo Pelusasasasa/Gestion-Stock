@@ -5,7 +5,6 @@ const pdf = require('html-pdf');
 const fs = require('fs');
 const path = require('path');
 
-
  funcion.crearPDF = async(venta)=>{
 
     let html = fs.readFileSync(path.join(__dirname,'../html/pdf.html'),'utf8');
@@ -79,9 +78,7 @@ const path = require('path');
             console.log(res)
         }
     })
- }
-
-
+};
 
 const verTipoFactura = (codigo) =>{
     if (codigo === 11) {
@@ -92,5 +89,6 @@ const verTipoFactura = (codigo) =>{
         return "B"
     }
     return ""
-}
+};
+
 module.exports = funcion

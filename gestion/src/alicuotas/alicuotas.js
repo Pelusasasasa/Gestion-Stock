@@ -92,6 +92,7 @@ mesInput.addEventListener('change', async e=>{
         const mes = arregloFecha[1];
         const anio = arregloFecha[0];
 
+
         const Cod_comp = "006";
         const PuntoVenta = afip.puntoVenta ? afip.puntoVenta.toString().padStart(5,'0') : "00007";
         const NumeroComp = afip ? afip.numero.toString().padStart(20,'0') : "".padStart(20,'0');
@@ -101,7 +102,7 @@ mesInput.addEventListener('change', async e=>{
         const total = precio.toFixed(2).split('.',2);
         const Entero = total[0].padStart(13,'0');
         const Decimal = total[1].padStart(2,0);
-        console.log(afip.numero)
+    
         const venta = anio + mes + dia + Cod_comp + PuntoVenta + NumeroComp + NumeroComp + TipoDni + NumDoc + Cliente + Entero + Decimal + "".padStart(105,'0')+"PES0001000000"+ cantIva +"".padEnd(24,'0');
         ventas.push(`${venta}\n`);
 

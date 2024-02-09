@@ -243,7 +243,7 @@ funciones.sacarIva = (lista,tipo) => {
         let precio = 0;
         if (producto.oferta) {
             precio = producto.precioOferta;
-        }else if(tipo === "CD"){
+        }else if(tipo !== "T"){
             precio = producto.precio;
         }else{
             precio = producto.precio + producto.precio * archivo.descuentoEfectivo / 100;
@@ -255,8 +255,8 @@ funciones.sacarIva = (lista,tipo) => {
             gravado105 += cantidad * precio / 1.105
             totalIva105 += (cantidad * (precio / 1.105)) * 10.5 / 100;
         };
-        
     });
+    
     let cantIva = 0
     if (gravado0 !== 0) {
         cantIva++;
