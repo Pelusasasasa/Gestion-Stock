@@ -243,6 +243,7 @@ funciones.sacarIva = (lista,tipo) => {
         let precio = 0;
         if (producto.oferta) {
             precio = producto.precioOferta;
+
         }else if(tipo !== "T"){
             precio = producto.precio;
         }else{

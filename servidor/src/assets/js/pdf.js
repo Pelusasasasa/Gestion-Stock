@@ -61,7 +61,7 @@ const path = require('path');
     html = html.replace('{{subTotal}}',venta.precio.toFixed(2));
     html = html.replace('{{iva21}}',venta.condicionIva === "Inscripto" ? `IVA 21%: ${venta.iva21.toFixed(2)} `: "");
     html = html.replace('{{iva105}}',venta.condicionIva === "Inscripto" ? `IVA 10.5% ${venta.iva105.toFixed(2)} ` : "");
-    html = html.replace('{{descuento}}',venta.descuento.toFixed(2));
+    html = html.replace('{{descuento}}',venta.descuento?.toFixed(2));
     html = html.replace('{{total}}',venta.precio.toFixed(2));
     
     const config = {

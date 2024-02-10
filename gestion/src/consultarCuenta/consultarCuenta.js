@@ -332,7 +332,7 @@ async function actualizarMovimientos(cuenta){
             precio = mov.precio;
         }else{
             precio = (await axios.get(`${URL}productos/traerPrecio/${mov.codProd}`,configAxios)).data;
-            precio = parseFloat(precio.toFixed(2));
+            precio = precio ? parseFloat(precio.toFixed(2)) : mov.precio;
         }
         
         mov.precio = precio ? precio : mov.precio; 

@@ -228,10 +228,12 @@ ipcRenderer.on('recibir',(e,args)=>{
 porcentaje.addEventListener('change',async e=>{
         porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value;
         descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100,2);
-        for await(let {cantidad,producto} of listaProductos){       
+        for await(let {cantidad,producto} of listaProductos){      
+            const precio = (await axios.get(`${URL}productos/traerPrecio/${producto._id}`)).data ;
+            
             totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2));
 
-            producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
+            producto.precio = parseFloat(redondear(precio + precio * parseFloat(porcentaje.value)/100,2));
             
             const tr = document.getElementById(producto.idTabla)
             tr.children[4].innerHTML = producto.precio.toFixed(2);
@@ -344,7 +346,7 @@ facturar.addEventListener('click',async e=>{
         venta.fecha = new Date();
         venta.idCliente = codigo.value;
         venta.precio = parseFloat(total.value);
-        venta.descuento = descuento;
+        venta.descuento = descuento ? descuento : 0;
         venta.tipo_venta = await verTipoVenta();
         venta.listaProductos = listaProductos;
         
@@ -354,7 +356,7 @@ facturar.addEventListener('click',async e=>{
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
-        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos,venta.tipo_ventas); //sacamos el iva de los productos
+        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos,venta.tipo_venta); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
         venta.gravado0 = gravado0;
@@ -741,7 +743,7 @@ const cancelarVenta = async () => {
         cancelado.vendedor = archivo.vendedor ? archivo.vendedor : "Vendedor";
         cancelado.numero = ultimo ? ultimo + 1 : 1;
 
-        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos,cacenlado.tipo_venta); //sacamos el iva de los productos
+        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos,cancelado.tipo_venta); //sacamos el iva de los productos
         cancelado.iva21 = iva21;
         cancelado.iva105 = iva105;
         cancelado.gravado21 =  gravado21,
