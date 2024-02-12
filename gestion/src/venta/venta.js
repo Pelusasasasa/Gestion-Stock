@@ -233,7 +233,7 @@ porcentaje.addEventListener('change',async e=>{
             
             totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2));
 
-            producto.precio = parseFloat(redondear(precio + precio * parseFloat(porcentaje.value)/100,2));
+            producto.precio = precio ? parseFloat(redondear(precio + precio * parseFloat(porcentaje.value)/100,2)) : parseFloat((producto.precio + producto.precio * parseFloat(porcentaje.value) / 100).toFixed(2));
             
             const tr = document.getElementById(producto.idTabla)
             tr.children[4].innerHTML = producto.precio.toFixed(2);
@@ -597,7 +597,7 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.marca = producto.marca;
     if (producto.oferta) {
         movimiento.precio = producto.precioOferta ? producto.precioOferta : producto.precio;     
-    }else if(movimiento.tipo_venta === "CD"){
+    }else if(movimiento.tipo_venta !== "T"){
         movimiento.precio = producto.precio;
     }else{
         movimiento.precio = parseFloat((producto.precio + (producto.precio * archivo.descuentoEfectivo / 100)).toFixed(2))
