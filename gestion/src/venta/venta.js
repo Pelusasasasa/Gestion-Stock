@@ -229,9 +229,17 @@ porcentaje.addEventListener('change',async e=>{
         porcentaje.value = porcentaje.value === "" ? "0.00"  : porcentaje.value;
         descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100,2);
         for await(let {cantidad,producto} of listaProductos){      
-            const precio = (await axios.get(`${URL}productos/traerPrecio/${producto._id}`)).data ;
+            let precio = (await axios.get(`${URL}productos/traerPrecio/${producto._id}`)).data ;
             
-            totalGlobal -= parseFloat(redondear(producto.precio*cantidad,2));
+            
+
+            if (verTipoVenta() === 'T') {
+                let aux = producto.precio + producto.precio * archivo.descuentoEfectivo / 100;
+                totalGlobal -= parseFloat(redondear(aux*cantidad,2));
+                precio = aux;
+            }else{
+                totalGlobal -= parseFloat(redondear(precio*cantidad,2));
+            }
 
             producto.precio = precio ? parseFloat(redondear(precio + precio * parseFloat(porcentaje.value)/100,2)) : parseFloat((producto.precio + producto.precio * parseFloat(porcentaje.value) / 100).toFixed(2));
             

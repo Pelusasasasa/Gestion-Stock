@@ -107,9 +107,14 @@ const ponerVenta = async(cuenta)=>{
     tdFecha.innerHTML = `${dia}/${mes}/${anio}`;
     tdNumero.innerHTML = cuenta.nro_venta;
     tdTipoComp.innerHTML = cuenta.tipo_comp;
-    tdImporte.innerHTML = cuenta.tipo_comp === "Nota Credito C" ? redondear(cuenta.importe * -1, 2) : redondear(cuenta.importe,2) ;
+    if (cuenta.tipo_comp === "Nota Credito C" || cuenta.tipo_comp === "Nota Credito B" || cuenta.tipo_comp === "Nota Credito A") {
+        tdImporte.innerText = redondear(cuenta.importe * -1, 2);
+        tdSaldo.innerText = redondear(cuenta.saldo * -1,2);
+    }else{
+        tdImporte.innerText = redondear(cuenta.importe, 2);
+        tdSaldo.innerText = redondear(cuenta.saldo, 2);
+    }
     tdPagado.innerHTML = redondear(cuenta.pagado,2);
-    tdSaldo.innerHTML = cuenta.tipo_comp === "Nota Credito C" ? redondear(cuenta.saldo * -1,2) : redondear(cuenta.saldo,2);
     inputActual.value = "0.00";
     inputActual.type = "number"
     inputActual.id = cuenta.nro_venta;
