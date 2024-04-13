@@ -170,7 +170,7 @@ tbody.addEventListener('click',e=>{
             path: "./productos/modificarProducto.html",
             botones:true,
             informacion:seleccionado.id,
-            altura:600,
+            altura:800,
             vendedor:vendedor
         }
         ipcRenderer.send('abrir-ventana',opciones);

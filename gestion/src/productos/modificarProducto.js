@@ -13,24 +13,33 @@ const dolar = document.getElementById('dolar');
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const codigoManual = document.querySelector('#codigoManual');
+
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const provedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
+
 const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
+const descuento1 = document.querySelector('#descuento1');
+const descuento2 = document.querySelector('#descuento2');
+const descuento3 = document.querySelector('#descuento3');
+
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
+
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
 const precioTarjeta = document.querySelector('#precioTarjeta');
 const precioOferta = document.querySelector('#precioOferta');
+
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 const ticketPrecio = document.querySelector('#ticketPrecio');
 const oferta = document.querySelector('#oferta');
 
 let vendedor;
+let precioAux = 0;
 
 
 //Recibimos la informacion del producto para luego llenar los inputs
@@ -63,21 +72,33 @@ const llenarInputs = async(codigoProducto)=>{
     const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
     descripcion.value = producto.descripcion;
     codigoManual.value = producto.codigoManual === true ? 'true' : 'false';
+
     marca.value = producto.marca;
+    select.value = producto.rubro;
     provedor.value = producto.provedor;
     stock.value = producto.stock;
-    select.value = producto.rubro;
+    
     costo.value = producto.costo.toFixed(2);
     costoDolar.value = producto.costoDolar.toFixed(2);
+    descuento1.value = producto.descuento1.toFixed(2);
+    descuento2.value = producto.descuento2.toFixed(2);
+    descuento3.value = producto.descuento3.toFixed(2);
+
     impuesto.value = producto.impuesto.toFixed(2);
     precioOferta.value = producto.precioOferta.toFixed(2);
+
     if (producto.oferta) {
         oferta.click();
     }
+
     if (producto.costoDolar !== 0) {
         costoIva.value = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(dolar.value),2);
     }else{
-        costoIva.value = (producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2);
+        precioAux = producto.costo;
+        precioAux = parseFloat(redondear(precioAux - (precioAux * producto.descuento1 / 100),2));
+        precioAux = parseFloat(redondear(precioAux - (precioAux * producto.descuento2 / 100),2));
+        precioAux = parseFloat(redondear(precioAux - (precioAux * producto.descuento3 / 100),2));
+        costoIva.value = (precioAux + (precioAux * producto.impuesto / 100)).toFixed(2);
     }
     ganancia.value = producto.ganancia.toFixed(2);
     total.value = producto.precio.toFixed(2);    
@@ -89,14 +110,21 @@ modificar.addEventListener('click',async e=>{
     const producto = {};
     producto._id = codigo.value;
     producto.descripcion = descripcion.value.trim().toUpperCase();
+
     producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim().toUpperCase();
     producto.provedor = provedor.value.trim().toUpperCase();
     producto.stock = parseFloat(stock.value).toFixed(2);
+
     producto.costo = parseFloat(costo.value).toFixed(2);
     producto.costoDolar = parseFloat(costoDolar.value).toFixed(2);
+    producto.descuento1 = parseFloat(descuento1.value).toFixed(2);
+    producto.descuento2 = parseFloat(descuento2.value).toFixed(2);
+    producto.descuento3 = parseFloat(descuento3.value).toFixed(2);
+
     producto.impuesto = parseFloat(impuesto.value).toFixed(2);
     producto.ganancia = parseFloat(ganancia.value).toFixed(2);
+
     producto.precio = parseFloat(total.value).toFixed(2);
     producto.precioOferta = precioOferta.value;
     producto.oferta = oferta.checked;
@@ -150,14 +178,41 @@ stock.addEventListener('keypress',e=>{
 });
 
 costo.addEventListener('keypress',e=>{
+    precioAux = parseFloat(costo.value);
     if (costoDolar.hasAttribute('disabled')) {
-        apretarEnter(e,impuesto);
+        apretarEnter(e,descuento1);
     }else{
         apretarEnter(e,costoDolar);
     }
 });
 
 costoDolar.addEventListener('keypress',e=>{
+    apretarEnter(e,descuento1);
+});
+
+descuento1.addEventListener('keypress',e=>{
+
+    if (e.keyCode === 13 && parseFloat(descuento1.value) !== 0) {
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento1.value) / 100),2));
+    };
+
+    apretarEnter(e,descuento2);
+});
+descuento2.addEventListener('keypress',e=>{
+
+    if (e.keyCode === 13 && parseFloat(descuento2.value) !== 0) {
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento2.value) / 100),2));
+    };
+
+    apretarEnter(e,descuento3);
+});
+
+descuento3.addEventListener('keypress',e=>{
+
+    if (e.keyCode === 13 && parseFloat(descuento3.value) !== 0) {
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento3.value) / 100),2));
+    };
+
     apretarEnter(e,impuesto);
 });
 
@@ -207,6 +262,18 @@ costoDolar.addEventListener('focus',e=>{
     costoDolar.select()
 });
 
+descuento1.addEventListener('focus',e=>{
+    descuento1.select()
+});
+
+descuento2.addEventListener('focus',e=>{
+    descuento2.select()
+});
+
+descuento3.addEventListener('focus',e=>{
+    descuento3.select()
+});
+
 impuesto.addEventListener('focus',e=>{
     impuesto.select()
 });
@@ -227,7 +294,7 @@ impuesto.addEventListener('blur',e=>{
     if (parseFloat(costoDolar.value) !== 0) {
         costoIva.value = redondear((parseFloat(costoDolar.value) + (parseFloat(costoDolar.value) * parseFloat(impuesto.value) / 100 ))*parseFloat(dolar.value),2);
     }else{
-        costoIva.value = (parseFloat(costo.value) + (parseFloat(costo.value) * parseFloat(impuesto.value) / 100 )).toFixed(2);
+        costoIva.value = (precioAux + (precioAux * parseFloat(impuesto.value) / 100 )).toFixed(2);
     }
 });
 
