@@ -27,13 +27,12 @@ mesInput.addEventListener('change', async e=>{
     let a = 0;
     let b = 0;
     let c = 0;
-
+    let i = 0;
     for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21,gravado105,iva105,gravado0} of datos){
         if (gravado21 === 0 && gravado105 === 0) {
             gravado21 = parseFloat((precio / 1.21).toFixed(2));
             iva21 = parseFloat((precio - gravado21).toFixed(2));
         };
-        
         const arregloFecha = fecha.slice(0,10).split('-',3);
         const dia = arregloFecha[2];
         const mes = arregloFecha[1];
@@ -85,13 +84,12 @@ mesInput.addEventListener('change', async e=>{
             alicuotas.push(`${alicuota}\n`);
         };
     };
-
+    
     for await(let {fecha,cod_comp,tipo_comp,cliente,afip,cod_doc,num_doc,precio,cantIva,gravado21,iva21} of recibos){
         const arregloFecha = fecha.slice(0,10).split('-',3);
         const dia = arregloFecha[2];
         const mes = arregloFecha[1];
         const anio = arregloFecha[0];
-
 
         const Cod_comp = "006";
         const PuntoVenta = afip.puntoVenta ? afip.puntoVenta.toString().padStart(5,'0') : "00007";

@@ -3,18 +3,27 @@ const salir = document.querySelector('.salir');
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const codigoManual = document.querySelector('#codigoManual');
+
 const marca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
 const provedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
+
 const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
+const descuento1 = document.querySelector('#descuento1');
+const descuento2 = document.querySelector('#descuento2');
+const descuento3 = document.querySelector('#descuento3');
+
+
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
+
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
 const precioTarjeta = document.querySelector('#precioTarjeta');
 const precioOferta = document.querySelector('#precioOferta');
+
 const guardar = document.querySelector('.guardar');
 const ticketPrecio = document.querySelector('#ticketPrecio');
 const oferta = document.querySelector('#oferta');
@@ -30,6 +39,7 @@ require('dotenv').config()
 const URL = process.env.GESTIONURL;
 
 let vendedor;
+let precioAux = 0;
 
 const traerRubros = async()=>{
     const rubros =  (await axios.get(`${URL}rubro`)).data;
@@ -61,9 +71,9 @@ window.addEventListener('load',async e=>{
 impuesto.addEventListener('blur',e=>{
     impuesto.value = impuesto.value === "" ? 0 : impuesto.value;
     if (parseFloat(costoDolar.value) !== 0) {
-        costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoDolar.value)/100) + parseFloat(costoDolar.value)) * parseFloat(dolar.value),2)
+        costoIva.value = redondear(((parseFloat(impuesto.value) * precioAux/100) + precioAux) * parseFloat(dolar.value),2)
     }else{
-        costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costo.value)/100) + parseFloat(costo.value)).toFixed(2);
+        costoIva.value = ((parseFloat(impuesto.value) * precioAux/100) + precioAux).toFixed(2);
     }
 });
 
@@ -80,14 +90,21 @@ guardar.addEventListener('click',async ()=>{
     producto._id = codigo.value;
     producto.descripcion = descripcion.value.trim().toUpperCase();
     producto.codigoManual = codigoManual.value === "false" ? false : true;
+
     producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim();
     producto.provedor = provedor.value.toUpperCase().trim();
     producto.stock = stock.value;
+
     producto.costo = costo.value;
     producto.costoDolar = costoDolar.value;
+    producto.descuento1 = descuento1.value;
+    producto.descuento2 = descuento2.value;
+    producto.descuento3 = descuento3.value;
+
     producto.impuesto = impuesto.value === "" ? 0 : impuesto.value;
     producto.ganancia = ganancia.value;
+
     producto.precio = total.value;
     producto.oferta = oferta.checked;
     producto.precioOferta = precioOferta.value;
@@ -150,15 +167,38 @@ stock.addEventListener('keypress',e=>{
 })
 
 costo.addEventListener('keypress',e=>{
+    precioAux = parseFloat(costo.value);
     if (costoDolar.hasAttribute('disabled')) {
-        apretarEnter(e,impuesto);
+        apretarEnter(e,descuento1);
     }else{
         apretarEnter(e,costoDolar);
     }
 });
 
 costoDolar.addEventListener('keypress',e=>{
-    apretarEnter(e,impuesto);
+    precioAux = parseFloat(costoDolar.value);
+    apretarEnter(e,descuento1);
+});
+
+descuento1.addEventListener('keypress',e=>{
+    if (parseFloat(descuento1.value) !== 0 && e.keyCode === 13) {
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento1.value) / 100),2));
+    };
+    apretarEnter(e, descuento2);
+});
+
+descuento2.addEventListener('keypress',e=>{
+    if (parseFloat(descuento2.value) !== 0 && e.keyCode === 13) {
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento2.value) / 100),2));
+    }
+    apretarEnter(e, descuento3);
+});
+
+descuento3.addEventListener('keypress',e=>{
+    if (parseFloat(descuento3.value) !== 0 && e.keyCode === 13) {
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento3.value) / 100),2));
+    }
+    apretarEnter(e, impuesto);
 });
 
 impuesto.addEventListener('keypress',e=>{
@@ -226,6 +266,18 @@ costo.addEventListener('focus',e=>{
 
 costoDolar.addEventListener('focus',e=>{
     costoDolar.select();
+});
+
+descuento1.addEventListener('focus',e=>{
+    descuento1.select();
+});
+
+descuento2.addEventListener('focus',e=>{
+    descuento2.select();
+});
+
+descuento3.addEventListener('focus',e=>{
+    descuento3.select();
 });
 
 impuesto.addEventListener('focus',e=>{

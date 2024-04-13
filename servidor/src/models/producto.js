@@ -9,25 +9,6 @@ const Producto = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    descripcion:{
-        type: String,
-        required:true
-    },
-    marca:{
-        type: String,
-    },
-    rubro:{
-        type:String,
-        default:""
-    },
-    provedor:{
-        type:String,
-        default:""
-    },
-    stock:{
-        type: Number,
-        required: true
-    },
     costo:{
         type: Number,
         required: true
@@ -36,28 +17,57 @@ const Producto = new mongoose.Schema({
         type: Number,
         required: true
     },
-    impuesto:{
-        type:Number,
+    descripcion:{
+        type: String,
+        required:true
+    },
+    descuento1:{
+        type: Number,
+        default: 0
+    },
+    descuento2:{
+        type: Number,
+        default: 0
+    },
+    descuento3:{
+        type: Number,
         default: 0
     },
     ganancia:{
         type: Number,
         required:true
     },
-    precio:{
+    impuesto:{
         type:Number,
-        required:true
+        default: 0
+    },
+    marca:{
+        type: String,
     },
     oferta:{
         type:Boolean,
         default:false
     },
+    provedor:{
+        type:String,
+        default:""
+    },
     precioOferta:{
         type:Number,
         default:0
-    }
-
-
+    },
+    precio:{
+        type:Number,
+        required:true
+    },
+    rubro:{
+        type:String,
+        default:""
+    },
+    stock:{
+        type: Number,
+        required: true
+    },
 });
 
 module.exports = mongoose.model('Producto',Producto);

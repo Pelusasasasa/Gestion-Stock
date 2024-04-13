@@ -182,7 +182,7 @@ agregar.addEventListener('click',e=>{
     const opciones = {
         path: "./productos/agregarProducto.html",
         botones:true,
-        altura:600,
+        altura:800,
         vendedor:vendedor
     }
     ipcRenderer.send('abrir-ventana',opciones);
