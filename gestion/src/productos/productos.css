@@ -155,9 +155,15 @@ h1{
     grid-template-columns: 1fr 1fr 1fr;
 }
 
+/****************************************************** Costo en cambio *****************************************************************/
 .costo fieldset{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+#descuento1,#descuento2,#descuento3{
+    padding: 0.3rem;
+    font-size: 1.1rem;
 }
 
 .cambio #descripcion{

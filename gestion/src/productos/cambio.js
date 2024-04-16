@@ -10,16 +10,26 @@ const {descuentoEfectivo,ImprecioTicketPrecio} = require('../configuracion.json'
 const codigo = document.querySelector('#codigo');
 const marca = document.querySelector('#marca');
 const provedor = document.querySelector('#provedor');
+
 const descripcion = document.querySelector('#descripcion');
+
 const stockViejo = document.querySelector('#stockViejo');
 const stock = document.querySelector('#stock');
 const nuevoStock = document.querySelector('#nuevoStock');
+
+const costo = document.querySelector('#costo');
+const nuevoCosto = document.querySelector('#nuevoCosto');
+
+const descuento1 = document.querySelector('#descuento1');
+const descuento2 = document.querySelector('#descuento2');
+const descuento3 = document.querySelector('#descuento3');
+
 const iva = document.querySelector('#iva');
 const ganancia = document.querySelector('#ganancia');
-const costo = document.querySelector('#costo');
+
 const precio = document.querySelector('#precio');
 const tarjetaPrecio = document.querySelector('#tarjetaPrecio');
-const nuevoCosto = document.querySelector('#nuevoCosto');
+
 const nuevoIva = document.querySelector('#nuevoIva')
 const nuevaGanancia = document.querySelector('#nuevaGanancia')
 const nuevoPrecio = document.querySelector('#nuevoPrecio');
@@ -32,6 +42,7 @@ const guardar = document.querySelector('.guardar');
 const salir = document.querySelector('.salir');
 
 let producto = {};
+let precioAux = 0;
 
 window.addEventListener('load', () => {
     ticketPrecio.checked = ImprecioTicketPrecio;
@@ -41,15 +52,22 @@ codigo.addEventListener('keypress',async e=>{
     if (e.key === "Enter") {
         producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
         if (producto !== "") {
-            costo.value = producto.costo.toFixed(2);
             marca.value = producto.marca;
             provedor.value = producto.provedor;
-            iva.value = producto.impuesto.toFixed(2);
-            ganancia.value = producto.ganancia.toFixed(2);
             descripcion.value = producto.descripcion;
+
             stockViejo.value = producto.stock.toFixed(2);
             nuevoStock.value = producto.stock.toFixed(2);
+            
+            costo.value = producto.costo.toFixed(2);
+            descuento1.value = producto.descuento1.toFixed(2);
+            descuento2.value = producto.descuento2.toFixed(2);
+            descuento3.value = producto.descuento3.toFixed(2);
+            iva.value = producto.impuesto.toFixed(2);
+
+            ganancia.value = producto.ganancia.toFixed(2);
             precio.value = producto.precio.toFixed(2);
+            
             tarjetaPrecio.value = Math.round(producto.precio + producto.precio * descuentoEfectivo / 100).toFixed(2);
             oferta.value = producto.precioOferta?.toFixed(2);
             
@@ -87,22 +105,47 @@ nuevoCosto.addEventListener('keypress',e=>{
     }else if(e.key === "Enter" && nuevoCosto.value === ""){
         nuevoCosto.value = parseFloat(costo.value).toFixed(2)
     };
-    apretarEnter(e,nuevoIva)
+    precioAux = parseFloat(nuevoCosto.value);
+    apretarEnter(e,descuento1);
+});
+
+descuento1.addEventListener('keypress', e => {
+    precioAux = precioAux - (precioAux * parseFloat(descuento1.value) / 100);
+    console.log(precioAux)
+    if (e.keyCode === 13) {
+        apretarEnter(e, descuento2);
+    };
+});
+
+descuento2.addEventListener('keypress', e => {
+    precioAux = precioAux - (precioAux * parseFloat(descuento2.value) / 100);
+    console.log(precioAux)
+    if (e.keyCode === 13) {
+        apretarEnter(e, descuento3);
+    };
+});
+
+descuento3.addEventListener('keypress', e => {
+    precioAux = precioAux - (precioAux * parseFloat(descuento3.value) / 100);
+    if (e.keyCode === 13) {
+        apretarEnter(e, nuevoIva);
+    };
 });
 
 nuevoIva.addEventListener('keypress',e=>{
         if(e.key === "Enter"){
             nuevoIva.value = nuevoIva.value === "" ? iva.value : nuevoIva.value;
-        }
+        };
         apretarEnter(e,nuevaGanancia)
 });
 
 nuevaGanancia.addEventListener('keypress',e=>{
     if (e.key === "Enter") {
         nuevaGanancia.value = nuevaGanancia.value === "" ? ganancia.value : nuevaGanancia.value;
-        const impuesto = parseFloat((parseFloat(nuevoCosto.value)*parseFloat(nuevoIva.value)/100).toFixed(2)) + parseFloat(nuevoCosto.value);
+        const impuesto = parseFloat((precioAux * parseFloat(nuevoIva.value) / 100).toFixed(2) ) + precioAux;
+        console.log(impuesto)
+
         nuevoPrecio.value = (parseFloat(( impuesto*parseFloat(nuevaGanancia.value)/100).toFixed(2)) + impuesto).toFixed(2);
-        nuevoCosto.value = parseFloat(nuevoCosto.value).toFixed(2);
     }
     apretarEnter(e,nuevoPrecio);
 });
@@ -131,13 +174,21 @@ nuevaOferta.addEventListener('keypress',e=>{
 });
 
 guardar.addEventListener('click',async e=>{
+    producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
     producto.provedor = provedor.value.trim().toUpperCase();
+
+    producto.stock = parseFloat(nuevoStock.value);
+    
     producto.costo = nuevoCosto.value !== "" ? parseFloat(nuevoCosto.value) : producto.costo;
-    producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
+    producto.descuento1 = descuento1.value !== "" ? parseFloat(descuento1.value) : producto.descuento1;
+    producto.descuento2 = descuento2.value !== "" ? parseFloat(descuento2.value) : producto.descuento2;
+    producto.descuento3 = descuento3.value !== "" ? parseFloat(descuento3.value) : producto.descuento3;
+    
     producto.ganancia = parseFloat(nuevaGanancia.value);
     producto.impuesto = nuevoIva.value !== "" ? parseFloat(nuevoIva.value) : producto.impuesto;
-    producto.stock = parseFloat(nuevoStock.value);
-    producto.descripcion = descripcion.value !== "" ? descripcion.value.toUpperCase() : producto.descripcion;
+    producto.precio = nuevoPrecio.value !== "" ? parseFloat(nuevoPrecio.value) : producto.precio;
+    
+    
     producto.oferta = botonOferta.checked ? true : false;
     producto.precioOferta = nuevaOferta.value !== "" ? parseFloat(nuevaOferta.value) : producto.precioOferta;
 
