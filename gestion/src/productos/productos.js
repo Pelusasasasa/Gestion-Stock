@@ -121,7 +121,7 @@ buscador.addEventListener('keyup',e=>{
     }
 });
 
-buscador.addEventListener('change',e=>{
+buscador.addEventListener('keyup',e=>{
     filtrar();
 });
 
@@ -195,8 +195,8 @@ body.addEventListener('keypress',e=>{
     if (e.key === "Enter" && ventanaSecundaria){
         if (seleccionado) {
             ipcRenderer.send('enviar',{
-                        tipo:"producto",
-                        informacion:seleccionado.id,
+                tipo:"producto",
+                informacion:seleccionado.id,
             });
             window.close();
         }else{

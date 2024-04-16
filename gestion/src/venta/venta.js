@@ -27,7 +27,7 @@ const condicionIva = document.querySelector('#condicion');
 
 //Parte Producto
 const cantidad = document.querySelector('#cantidad');
-const codBarra = document.querySelector('#cod-barra')
+const codigoProd = document.querySelector('#codigoProd')
 const precioU = document.querySelector('#precio-U');
 const rubro = document.querySelector('#rubro');
 const tbody = document.querySelector('.tbody');
@@ -150,11 +150,16 @@ codigo.addEventListener('keypress',async e=>{
 });
 
 
-descripcion.addEventListener('keypress',e=>{
-    if (e.keyCode === 13 && descripcion.value !== "") {
-        listarProducto(descripcion.value);
-    }else if(e.keyCode === 13 && descripcion.value === ""){
-        precioU.focus();
+codigoProd.addEventListener('keypress',e=>{
+    if (e.keyCode === 13 && codigoProd.value !== "") {
+        listarProducto(codigoProd.value);
+    }else if(e.keyCode === 13 && codigoProd.value === ""){
+        const opciones = {
+            path:"productos/productos.html",
+            botones:false
+        };
+
+        ipcRenderer.send('abrir-ventana', opciones);
     }
 });
 
@@ -180,7 +185,7 @@ rubro.addEventListener('keypress',e=>{
 const crearProducto = ()=>{
     idProducto++;
     const producto = {
-        descripcion:descripcion.value.toUpperCase(),
+        descripcion:codigoProd.value.toUpperCase(),
         precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
         rubro:rubro.value,
         idTabla:`${idProducto}`,
@@ -193,7 +198,7 @@ const crearProducto = ()=>{
         <tr id=${idProducto}>
             <td>${cantidad.value}</td>
             <td></td>
-            <td>${descripcion.value.toUpperCase()}</td>
+            <td>${codigoProd.value.toUpperCase()}</td>
             <td></td>
             <td>${parseFloat(producto.precio).toFixed(2)}</td>
             <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
@@ -214,8 +219,8 @@ const crearProducto = ()=>{
     cantidad.value = "1.00";
     precioU.value = "";
     rubro.value = "";
-    descripcion.value = "";
-    descripcion.focus();
+    codigoProd.value = "";
+    codigoProd.focus();
 };
 
 ipcRenderer.on('recibir',(e,args)=>{
@@ -458,7 +463,7 @@ const listarCliente = async(id)=>{
         localidad.value = cliente.localidad;
         cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
-        descripcion.focus();
+        codigoProd.focus();
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')
     }else{
         codigo.value = "";
@@ -557,9 +562,9 @@ const listarProducto = async(id) => {
         totalGlobal = parseFloat(total.value);
     }
     cantidad.value = "1.00";
-    descripcion.value = "";
+    codigoProd.value = "";
     precioU.value = "";
-    descripcion.focus();  
+    codigoProd.focus();  
 }else{
     precioU.focus();
 }
@@ -828,7 +833,7 @@ condicionIva.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && e.target.value !== "") {
-        listarProducto(descripcion.value);
+        listarProducto(codigoProd.value);
     }else if(e.keyCode === 13 && e.target.value === ""){
         await sweet.fire({title:"Poner una cantidad"});
         cantidad.value = "1.00";
@@ -837,7 +842,7 @@ cantidad.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keydown',e=>{
     if(e.keyCode === 39){
-        descripcion.focus();
+        codigoProd.focus();
     }
 });
 
