@@ -110,23 +110,33 @@ nuevoCosto.addEventListener('keypress',e=>{
 });
 
 descuento1.addEventListener('keypress', e => {
+    precioAux = nuevoCosto.value !== "" ? parseFloat(nuevoCosto.value) : parseFloat(costo.value) ;
+
     precioAux = precioAux - (precioAux * parseFloat(descuento1.value) / 100);
-    console.log(precioAux)
+
     if (e.keyCode === 13) {
         apretarEnter(e, descuento2);
     };
 });
 
 descuento2.addEventListener('keypress', e => {
+    precioAux = nuevoCosto.value !== "" ? parseFloat(nuevoCosto.value) : parseFloat(costo.value) ;
+
+    precioAux = precioAux - (precioAux * parseFloat(descuento1.value) / 100);
     precioAux = precioAux - (precioAux * parseFloat(descuento2.value) / 100);
-    console.log(precioAux)
+    
     if (e.keyCode === 13) {
         apretarEnter(e, descuento3);
     };
 });
 
 descuento3.addEventListener('keypress', e => {
+    precioAux = nuevoCosto.value !== "" ? parseFloat(nuevoCosto.value) : parseFloat(costo.value) ;
+
+    precioAux = precioAux - (precioAux * parseFloat(descuento1.value) / 100);
+    precioAux = precioAux - (precioAux * parseFloat(descuento2.value) / 100);
     precioAux = precioAux - (precioAux * parseFloat(descuento3.value) / 100);
+
     if (e.keyCode === 13) {
         apretarEnter(e, nuevoIva);
     };
@@ -143,9 +153,9 @@ nuevaGanancia.addEventListener('keypress',e=>{
     if (e.key === "Enter") {
         nuevaGanancia.value = nuevaGanancia.value === "" ? ganancia.value : nuevaGanancia.value;
         const impuesto = parseFloat((precioAux * parseFloat(nuevoIva.value) / 100).toFixed(2) ) + precioAux;
-        console.log(impuesto)
+        
 
-        nuevoPrecio.value = (parseFloat(( impuesto*parseFloat(nuevaGanancia.value)/100).toFixed(2)) + impuesto).toFixed(2);
+        nuevoPrecio.value = Math.round(parseFloat(( impuesto*parseFloat(nuevaGanancia.value)/100).toFixed(2)) + impuesto).toFixed(2);
     }
     apretarEnter(e,nuevoPrecio);
 });
@@ -156,7 +166,7 @@ nuevoPrecio.addEventListener('focus',e =>{
 
 nuevoPrecio.addEventListener('keypress',e=>{
 
-    nuevoPrecioTarjeta.value = redondear(parseFloat(nuevoPrecio.value) + (parseFloat(nuevoPrecio.value) * descuentoEfectivo / 100),2);
+    nuevoPrecioTarjeta.value = Math.round(parseFloat(nuevoPrecio.value) + (parseFloat(nuevoPrecio.value) * descuentoEfectivo / 100)).toFixed(2);
 
     apretarEnter(e,nuevoPrecioTarjeta);
 });
