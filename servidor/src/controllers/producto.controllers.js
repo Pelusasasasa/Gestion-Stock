@@ -125,7 +125,6 @@ productoCTRL.eliminarProducto = async(req,res)=>{
     res.send(`Producto ${producto.descripcion} eliminado`);
 }
 
-
 productoCTRL.traerMarcas = async(req,res)=>{
     const productos = await Producto.find({},{_id:0,marca:1});
     let marcas = [];

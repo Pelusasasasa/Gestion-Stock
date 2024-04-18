@@ -69,7 +69,9 @@ window.addEventListener('load', e => {
 //llenamos los inputs con la informacion que tenemos
 const llenarInputs = async(codigoProducto)=>{
     codigo.value = codigoProducto;
-    const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+    codigoProducto = codigoProducto.replace(/\//g,'%2F');
+    
+    const producto = (await axios.get(`${URL}productos/${codigoProducto}`)).data;
     descripcion.value = producto.descripcion;
     codigoManual.value = producto.codigoManual === true ? 'true' : 'false';
 
@@ -128,7 +130,7 @@ modificar.addEventListener('click',async e=>{
     producto.precio = parseFloat(total.value).toFixed(2);
     producto.precioOferta = precioOferta.value;
     producto.oferta = oferta.checked;
-    const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+    const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id.replace(/\//g,'%2F')}`,producto)).data;
 
     await ipcRenderer.send('informacion-a-ventana',producto);
     vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);

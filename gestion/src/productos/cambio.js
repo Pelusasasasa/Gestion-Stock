@@ -50,7 +50,7 @@ window.addEventListener('load', () => {
 
 codigo.addEventListener('keypress',async e=>{
     if (e.key === "Enter") {
-        producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+        producto = (await axios.get(`${URL}productos/${codigo.value.replace(/\//g,"%2F")}`)).data;
         if (producto !== "") {
             marca.value = producto.marca;
             provedor.value = producto.provedor;
@@ -202,7 +202,7 @@ guardar.addEventListener('click',async e=>{
     producto.oferta = botonOferta.checked ? true : false;
     producto.precioOferta = nuevaOferta.value !== "" ? parseFloat(nuevaOferta.value) : producto.precioOferta;
 
-    const {mensaje,estado} = (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+    const {mensaje,estado} = (await axios.put(`${URL}productos/${producto._id.replace(/\//g,'%2F')}`,producto)).data;
 
     await sweet.fire({
         title:mensaje

@@ -125,8 +125,16 @@ guardar.addEventListener('click',async ()=>{
 });
 
 codigo.addEventListener('keypress',async e=>{
+
+    let aux = codigo.value;
+
 if (e.keyCode === 13) {
-    const prodcutoExistente = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+    if (aux.includes('/')) {
+        aux = aux.replace(/\//g,'%2F');
+        console.log(aux)
+    }
+    const prodcutoExistente = (await axios.get(`${URL}productos/${aux}`)).data;
+    console.log(prodcutoExistente)
     if (prodcutoExistente) {
         await sweet.fire({
             title:"Codigo Ya Utilizado"
