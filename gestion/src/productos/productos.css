@@ -105,8 +105,6 @@ h1{
     flex-direction: column;
 }
 
-
-
 .agregarProducto legend,.modificarProducto legend{
     text-align: start;
 }
@@ -133,6 +131,17 @@ h1{
 
 .descripcion #descripcion{
     width: 100%;
+}
+
+.agregarProducto .informacion .select{
+    display: flex;
+    gap: 1.5rem;
+}
+
+.agregarProducto .informacion .select button{
+    border: .1rem solid black;
+    padding: 0.5rem;
+    border-radius: 5px;
 }
 
 /* Cambio producto */

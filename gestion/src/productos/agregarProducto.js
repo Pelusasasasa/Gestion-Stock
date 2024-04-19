@@ -4,9 +4,10 @@ const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const codigoManual = document.querySelector('#codigoManual');
 
-const marca = document.querySelector('#marca');
+const selectMarca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
-const provedor = document.querySelector('#provedor');
+const agregarRubro = document.querySelector('#agregarRubro');
+const selectProvedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
 
 const costo = document.querySelector('#costo');
@@ -49,13 +50,35 @@ const traerRubros = async()=>{
         option.value = rubro;
         select.appendChild(option)
     }
+};
+
+const traerProvedores = async()=>{
+    const provedores =  (await axios.get(`${URL}provedor`)).data;
+    for await(let {numero,provedor} of provedores){
+        const option = document.createElement('option');
+        option.text = numero + " - " + provedor,
+        option.value = provedor;
+        selectProvedor.appendChild(option)
+    }
+};
+
+const traerMarcas = async() => {
+    const marcas = (await axios.get(`${URL}marca`)).data;
+    for await(let {numero,marca} of marcas){
+        const option = document.createElement('option');
+        option.text = numero + ' - ' + marca;
+        option.value = marca;
+        selectMarca.appendChild(option)
+    };
 }
 
 window.addEventListener('load', e => {
     ticketPrecio.checked = archivo.ImprecioTicketPrecio;
+    traerRubros();
+    traerMarcas();
+    traerProvedores();
 });
 
-traerRubros();
 
 ipcRenderer.on('informacion',(e,args)=>{
     vendedor = args.vendedor;
@@ -311,3 +334,27 @@ precioTarjeta.addEventListener('focus',e=>{
 precioOferta.addEventListener('focus',e=>{
     precioOferta.select();
 });
+
+agregarRubro.addEventListener('click', async e => {
+    const {value} = await sweet.fire({
+        title: "Agregar Rubro",
+        input: "text",
+        confirmButtonText: "Agregar",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar"
+    });
+
+    if (value) {
+        const numero = (await axios.get(`${URL}rubro/last`)).data;
+        const rubro = {
+            numero: numero + 1,
+            rubro: value
+        };
+        await axios.post(`${URL}rubro`, rubro);
+        const option = document.createElement('option');
+        option.value = rubro.rubro.toUpperCase();
+        option.text = rubro.numero + " - " + rubro.rubro.toUpperCase();
+
+        select.appendChild(option);
+    }
+})
