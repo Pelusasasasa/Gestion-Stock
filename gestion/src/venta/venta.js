@@ -478,10 +478,10 @@ const listarProducto = async(id) => {
         const aux = id.slice(2,6);
         const cantEnt = id.slice(6,9);
         const cantDec = id.slice(9,12);
-        producto = (await axios.get(`${URL}productos/${aux}`)).data;
+        producto = (await axios.get(`${URL}productos/${aux.replace(/\//g,'%2F')}`)).data;
         cantidad.value = parseFloat(cantEnt + "." + cantDec);
     }else{
-        producto = (await axios.get(`${URL}productos/${id}`)).data;
+        producto = (await axios.get(`${URL}productos/${id.replace(/\//g,'%2F')}`)).data;
     };
     
     producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;

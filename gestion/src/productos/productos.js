@@ -111,7 +111,7 @@ const filtrar = async()=>{
         condicion="_id";
     };
     const descripcion = buscador.value !== "" ? buscador.value : "textoVacio";
-    const producto = (await axios.get(`${URL}productos/${descripcion}/${condicion}`)).data;
+    const producto = (await axios.get(`${URL}productos/${descripcion.replace(/\//g,'%2F')}/${condicion}`)).data;
     producto.length !== 0 && listar(producto);
 }
 

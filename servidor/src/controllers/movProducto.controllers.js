@@ -13,7 +13,7 @@ movimientoCTRL.modificarVarios = async(req,res)=>{
 
 movimientoCTRL.cargar = async(req,res)=>{
     let ultimoMovimiento = await movProducto.findOne().sort({$natural:-1});
-    let codigo = ultimoMovimiento.codigo + 1;
+    let codigo = ultimoMovimiento ? ultimoMovimiento.codigo + 1 : 1;
     console.log("EL codigo inicial es: " + codigo);
     for await(let movimiento of req.body){
         movimiento.codigo = codigo;

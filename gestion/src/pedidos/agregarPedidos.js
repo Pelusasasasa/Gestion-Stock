@@ -32,7 +32,7 @@ const salir = document.getElementById('salir');
 
 codigo.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && codigo.value !== "") {
-        const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+        const producto = (await axios.get(`${URL}productos/${codigo.value.replace(/\//g,'%2F')}`)).data;
         if (producto) {
             listarProducto(producto);
         }
