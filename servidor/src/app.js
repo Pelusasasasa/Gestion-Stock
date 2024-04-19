@@ -26,12 +26,16 @@ app.use('/morel/movimiento',require('./routes/movProducto'));
 app.use('/morel/compensada',require('./routes/compensada'));
 app.use('/morel/historica',require('./routes/historica'));
 app.use('/morel/numero',require('./routes/numero'));
-app.use('/morel/rubro',require('./routes/rubro'));
+
 app.use('/morel/gastos',require('./routes/gasto'));
 app.use('/morel/pedidos',require('./routes/pedido'));
 app.use('/morel/servicios',require('./routes/servicio'));
 app.use('/morel/vendedores',require('./routes/vendedor'));
 app.use('/morel/movVendedores',require('./routes/movVendedores'));
 app.use('/morel/productosModificados',require('./routes/productosModificados'));
+
+//
+app.use('/morel/rubro',require('./routes/rubro'));
+app.use('/morel/marca',require('./routes/marca'));
 
 module.exports = app;
