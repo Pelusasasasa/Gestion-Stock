@@ -166,9 +166,9 @@ const hacerMenu = () => {
           }
         },
         {
-          label:"Rubros",
+          label:"Rubros/Marcas/Provedores",
           click(){
-            abrirVentana("rubros/rubros.html",600,900)
+            abrirVentana("rubrosMarcaProvedor/rubrosMarcaProvedor.html",600,900)
           }
         },
         {

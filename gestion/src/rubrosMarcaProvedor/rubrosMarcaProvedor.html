@@ -6,22 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rubros</title>
     <link rel="stylesheet" href="../assets/global.css">
-    <link rel="stylesheet" href="./rubros.css">
+    <link rel="stylesheet" href="./rubrosMarcaProvedor.css">
     <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
 </head>
 <body>
-    <section class="agregarRubro">
+    <section class="agregar">
+
+        <main class="tipo">
+            <label for="tipo">Tipo</label>
+            <select autofocus name="tipo" id="tipo">
+                <option value="marca">Marca</option>
+                <option value="provedor">Provedor</option>
+                <option value="rubro">Rubro</option>
+            </select>
+        </main>
+
         <main>
             <label for="numero">Numero</label>
             <input type="text" name="numero" id="numero">
         </main>
         <main>
             <label for="nombre">Nombre</label>
-            <input type="text" autofocus name="nombre" id="nombre">
+            <input type="text" name="nombre" id="nombre">
         </main>
 
         <main class="botones">
-            <button class="agregar">Agregar</button>
+            <button class="guardar">Agregar</button>
             <button class="modificar none">Modificar</button>
         </main>
     </section>
@@ -38,5 +48,5 @@
         </table>
     </section>
 </body>
-<script src="./rubros.js"></script>
+<script src="./rubrosMarcaProvedor.js"></script>
 </html>

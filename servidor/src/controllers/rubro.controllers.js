@@ -30,7 +30,7 @@ rubroCTRL.postRubro = async (req, res) => {
     const rubro = new Rubros(req.body);
     await rubro.save();
     
-    res.send(`Rubro ${rubro.rubro} Cargado con exito`);
+    res.send(rubro);
 };
 
 rubroCTRL.putRubro = async(req,res)=>{

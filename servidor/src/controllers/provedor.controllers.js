@@ -26,7 +26,7 @@ provedorCTRL.postProvedor = async (req, res) => {
     const provedor = new Provedor(req.body);
     await provedor.save();
 
-    res.send(`Provedor ${provedor.provedor} creado con exito`);
+    res.send(provedor);
 };
 
 provedorCTRL.putProvedor = async (req, res) => {

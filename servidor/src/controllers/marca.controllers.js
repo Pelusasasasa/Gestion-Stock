@@ -19,10 +19,11 @@ marcaCTRL.postMarca = async (req, res) => {
     const marca = new Marca(req.body);
     await marca.save();
 
-    res.send(`La marca ${marca.marca} Se Creo con exito`);
+    res.send(marca);
 };
 
 marcaCTRL.putMarca = async (req, res) => {
+    console.log(req.params)
     const {numero} = req.params;
     await Marca.findOneAndUpdate({numero:numero},req.body);
 
