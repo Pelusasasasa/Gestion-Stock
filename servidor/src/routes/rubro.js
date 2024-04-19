@@ -1,17 +1,19 @@
 const {Router} = require('express');
 const router = Router();
 
-const {getsRubros,deleteForId, postRubro, putRubro, getLastId} = require('../controllers/rubro.controllers');
+const {getsRubros,deleteForId, postRubro, putRubro, getLastNumero, getsRubro} = require('../controllers/rubro.controllers');
 
 router.route('/')
     .get(getsRubros)
     .post(postRubro)
-router.route('/:numero')
+router.route('/last')
+    .get(getLastNumero)
+router.route('/numero/:numero')
+    .get(getsRubro)
     .put(putRubro)
-router.route('/codigo/:id')
     .delete(deleteForId)
-router.route('/id')
-    .get(getLastId)
+    
+
 
 
 module.exports = router;

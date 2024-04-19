@@ -37,5 +37,6 @@ app.use('/morel/productosModificados',require('./routes/productosModificados'));
 //
 app.use('/morel/rubro',require('./routes/rubro'));
 app.use('/morel/marca',require('./routes/marca'));
+app.use('/morel/provedor',require('./routes/provedor'));
 
 module.exports = app;

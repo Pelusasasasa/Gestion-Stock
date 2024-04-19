@@ -15,7 +15,6 @@ marcaCTRL.getMarcas = async (req, res) => {
     res.send(marcas);
 };
 
-
 marcaCTRL.postMarca = async (req, res) => {
     const marca = new Marca(req.body);
     await marca.save();

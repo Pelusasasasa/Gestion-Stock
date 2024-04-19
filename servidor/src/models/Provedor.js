@@ -9,6 +9,7 @@ const Provedor = new Schema({
     provedor:{
         type:String,
         unique:true,
+        set: (value) => value.toUpperCase(),
         required:true
     }
 });
