@@ -42,7 +42,7 @@ window.addEventListener('load',async e => {
     for(let rubro of rubros){
         const option = document.createElement('option');
         option.innerHTML = rubro.numero + "-" + rubro.rubro;
-        option.value = rubro.rubro;
+        option.value = rubro.numero;
         select.appendChild(option);
     };
     traerProductos(select.value);

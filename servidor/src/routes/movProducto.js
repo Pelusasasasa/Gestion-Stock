@@ -1,10 +1,9 @@
 const {Router} = require('express');
 const router = Router();
 
-const {id,cargar,modificarVarios,getForNroVentaAndTipoVenta,porRubro, getforNumberAndCliente, putForCodigoAndTipoVenta, setCodigo} = require('../controllers/movProducto.controllers');
+const {id,cargar,modificarVarios,getForNroVentaAndTipoVenta,porRubro, getforNumberAndCliente, putForCodigoAndTipoVenta} = require('../controllers/movProducto.controllers');
 
 router.route('/')
-    .get(setCodigo)
     .put(modificarVarios)
     .post(cargar)
 router.route('/:nro_venta/:tipoVenta')
