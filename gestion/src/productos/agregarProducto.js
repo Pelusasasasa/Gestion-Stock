@@ -5,9 +5,11 @@ const descripcion = document.querySelector('#descripcion');
 const codigoManual = document.querySelector('#codigoManual');
 
 const selectMarca = document.querySelector('#marca');
+const agregarMarca = document.querySelector('#agregarMarca');
 const select = document.querySelector('#rubro');
 const agregarRubro = document.querySelector('#agregarRubro');
 const selectProvedor = document.querySelector('#provedor');
+const agregarProvedor = document.querySelector('#agregarProvedor');
 const stock = document.querySelector('#stock');
 
 const costo = document.querySelector('#costo');
@@ -47,7 +49,7 @@ const traerRubros = async()=>{
     for await(let {numero,rubro} of rubros){
         const option = document.createElement('option');
         option.text = numero + " - " + rubro,
-        option.value = rubro;
+        option.value = numero;
         select.appendChild(option)
     }
 };
@@ -57,7 +59,7 @@ const traerProvedores = async()=>{
     for await(let {numero,provedor} of provedores){
         const option = document.createElement('option');
         option.text = numero + " - " + provedor,
-        option.value = provedor;
+        option.value = numero;
         selectProvedor.appendChild(option)
     }
 };
@@ -67,7 +69,7 @@ const traerMarcas = async() => {
     for await(let {numero,marca} of marcas){
         const option = document.createElement('option');
         option.text = numero + ' - ' + marca;
-        option.value = marca;
+        option.value = numero;
         selectMarca.appendChild(option)
     };
 }
@@ -279,14 +281,6 @@ descripcion.addEventListener('focus',e=>{
     descripcion.select();
 });
 
-marca.addEventListener('focus',e=>{
-    marca.select();
-});
-
-provedor.addEventListener('focus',e=>{
-    provedor.select();
-});
-
 stock.addEventListener('focus',e=>{
     stock.select();
 });
@@ -345,16 +339,70 @@ agregarRubro.addEventListener('click', async e => {
     });
 
     if (value) {
-        const numero = (await axios.get(`${URL}rubro/last`)).data;
+        const numero = parseInt((await axios.get(`${URL}rubro/last`)).data);
         const rubro = {
             numero: numero + 1,
             rubro: value
         };
-        await axios.post(`${URL}rubro`, rubro);
+        const nuevo = (await axios.post(`${URL}rubro`, rubro)).data;
         const option = document.createElement('option');
-        option.value = rubro.rubro.toUpperCase();
-        option.text = rubro.numero + " - " + rubro.rubro.toUpperCase();
+        option.value = nuevo.numero;
+        option.text = nuevo.numero + " - " + nuevo.rubro.toUpperCase();
 
         select.appendChild(option);
     }
-})
+});
+
+agregarMarca.addEventListener('click', async e => {
+    const {value} = await sweet.fire({
+        title: "Agregar Marca",
+        input: "text",
+        confirmButtonText: "Agregar",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar"
+    });
+
+    if (value) {
+        const numero = parseInt((await axios.get(`${URL}marca/last`)).data);
+        const marca = {
+            numero: numero + 1,
+            marca: value
+        };
+        const nuevo = (await axios.post(`${URL}marca`, marca)).data;
+        const option = document.createElement('option');
+        option.value = nuevo.numero;
+        option.text = nuevo.numero + " - " + marca.marca.toUpperCase();
+
+        selectMarca.appendChild(option);
+    }
+});
+
+agregarProvedor.addEventListener('click', async e => {
+    const {value} = await sweet.fire({
+        title: "Agregar Provedor",
+        input: "text",
+        confirmButtonText: "Agregar",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar"
+    });
+
+    if (value) {
+        const numero = parseInt((await axios.get(`${URL}provedor/last`)).data);
+        const provedor = {
+            numero: numero + 1,
+            provedor: value
+        };
+        const nuevo = (await axios.post(`${URL}provedor`, provedor)).data;
+        if (nuevo.name === "ValidatorError") {
+            await sweet.fire({
+                title: nuevo.message
+            });
+            return;
+        }
+        const option = document.createElement('option');
+        option.value = nuevo.numero;
+        option.text = nuevo.numero + " - " + nuevo.provedor.toUpperCase();
+
+        selectProvedor.appendChild(option);
+    }
+});

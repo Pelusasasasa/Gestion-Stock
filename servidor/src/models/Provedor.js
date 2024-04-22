@@ -8,9 +8,17 @@ const Provedor = new Schema({
     },
     provedor:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
+        
         unique:true,
-        set: (value) => value.toUpperCase(),
-        required:true
+        required:true,
+        validate:{
+            validator: async function(value) {
+                const existe = await this.constructor.findOne({ provedor: value });
+                return !existe;
+            },
+            message: "El nombre del provedor ya existe"
+        },
     }
 });
 

@@ -24,9 +24,12 @@ provedorCTRL.getProvedor = async (req, res) => {
 provedorCTRL.postProvedor = async (req, res) => {
 
     const provedor = new Provedor(req.body);
-    await provedor.save();
-
-    res.send(provedor);
+    try {
+        await provedor.save();
+        res.send(provedor);
+    } catch (error) {
+        res.send(error.errors.provedor);
+    };
 };
 
 provedorCTRL.putProvedor = async (req, res) => {
