@@ -14,9 +14,9 @@ const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 const codigoManual = document.querySelector('#codigoManual');
 
-const marca = document.querySelector('#marca');
+const selectMarca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
-const provedor = document.querySelector('#provedor');
+const selectProvedor = document.querySelector('#provedor');
 const stock = document.querySelector('#stock');
 
 const costo = document.querySelector('#costo');
@@ -50,21 +50,50 @@ ipcRenderer.on('informacion',async (e,args)=>{
     dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
     const {informacion}= args;
     vendedor = args.vendedor;
+    await traerProvedores();
+    await traerRubros();
+    await traerMarcas();
+    llenarInputs(informacion);
+});
+
+const traerRubros = async() => {
     const rubros = (await axios.get(`${URL}rubro`)).data;
     for await(let {rubro,numero} of rubros){
         const option = document.createElement('option');
         option.text = numero + "-" + rubro;
         option.id = numero;
-        option.value = rubro;
+        option.value = numero;
         select.appendChild(option);
-    }
-    llenarInputs(informacion);
-});
+    };
+    select.value = rubros[0].numero;
+};
 
-window.addEventListener('load', e => {
+const traerMarcas = async() => {
+    const marcas = (await axios.get(`${URL}marca`)).data;
+    for await(let {marca,numero} of marcas){
+        const option = document.createElement('option');
+        option.text = numero + "-" + marca;
+        option.id = numero;
+        option.value = numero;
+        selectMarca.appendChild(option);
+    };
+    selectMarca.value = marcas[0].numero;
+};
+
+const traerProvedores = async() => {
+    const provedores = (await axios.get(`${URL}provedor`)).data;
+    for await(let {provedor,numero} of provedores){
+        const option = document.createElement('option');
+        option.text = numero + "-" + provedor;
+        option.id = numero;
+        option.value = numero;
+        selectProvedor.appendChild(option);
+    };
+};
+
+window.addEventListener('load',async e => {
     ticketPrecio.checked = archivo.ImprecioTicketPrecio;
 });
-
 
 //llenamos los inputs con la informacion que tenemos
 const llenarInputs = async(codigoProducto)=>{
@@ -75,9 +104,9 @@ const llenarInputs = async(codigoProducto)=>{
     descripcion.value = producto.descripcion;
     codigoManual.value = producto.codigoManual === true ? 'true' : 'false';
 
-    marca.value = producto.marca;
+    selectMarca.value = producto.marca;
     select.value = producto.rubro;
-    provedor.value = producto.provedor;
+    selectProvedor.value = producto.provedor;
     stock.value = producto.stock;
     
     costo.value = producto.costo.toFixed(2);

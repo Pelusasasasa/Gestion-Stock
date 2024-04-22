@@ -133,12 +133,12 @@ h1{
     width: 100%;
 }
 
-.agregarProducto .informacion .select{
+.agregarProducto .informacion .select,.modificarProducto .informacion .select{
     display: flex;
     gap: 1.5rem;
 }
 
-.agregarProducto .informacion .select button{
+.agregarProducto .informacion .select button,.modificarProducto .informacion .select button{
     border: .1rem solid black;
     padding: 0.5rem;
     border-radius: 5px;
