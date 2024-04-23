@@ -53,11 +53,11 @@ gastoCTRL.forYear = async(req,res)=>{
 }
 
 gastoCTRL.getBetweenDates = async(req,res)=>{
-    const {desde,hasta} = req.paramas;
+    const {desde,hasta} = req.params;
     const gastos = await Gasto.find(
        {$and:[
             {fecha:{$gte:desde}},
-            {fecha:{$lte:hasta}}
+            {fecha:{$lte:hasta + 'T23:59:59.000Z'}}
         ]}
     )
     res.send(gastos);
