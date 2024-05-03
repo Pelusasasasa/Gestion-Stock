@@ -224,9 +224,9 @@ const crearProducto = ()=>{
 };
 
 ipcRenderer.on('recibir',(e,args)=>{
-    const {tipo ,informacion} = JSON.parse(args);
+    const {tipo ,informacion,cantidad} = JSON.parse(args);
     tipo === "cliente" && listarCliente(informacion);
-    tipo === "producto" && listarProducto(informacion);
+    tipo === "producto" && listarProducto(informacion,cantidad);
     tipo === "Ningun cliente" && nombre.focus();
 });
 
@@ -472,7 +472,8 @@ const listarCliente = async(id)=>{
 };
 
 //Lo que hacemos es listar el producto traido
-const listarProducto = async(id) => {
+const listarProducto = async(id,cant) => {
+    cantidad.value = cant;
     let producto;
     if (id.slice(0,2) === "20") {
         const aux = id.slice(2,6);

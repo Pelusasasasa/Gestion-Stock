@@ -22,10 +22,14 @@ let subSeleccionado;
 let ventanaSecundaria = false;
 
 const seleccion = document.querySelector('#seleccion');
+const buscador = document.querySelector('#buscarProducto');
+
+const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
+
 const agregar = document.querySelector('.agregar');
 const salir = document.querySelector('.salir');
-const buscador = document.querySelector('#buscarProducto');
+
 
 window.addEventListener('load',async e=>{
     filtrar();
@@ -116,8 +120,9 @@ const filtrar = async()=>{
 }
 
 buscador.addEventListener('keyup',e=>{
-    if ((buscador.value === "" && e.keyCode === 40) || (buscador.value === "" && e.keyCode === 39)) {
+    if (e.keyCode === 40 || (buscador.value === "" && e.keyCode === 39)) {
         buscador.blur();
+        tbody.focus();
     }
 });
 
@@ -178,36 +183,26 @@ tbody.addEventListener('click',e=>{
 
 })
 
-agregar.addEventListener('click',e=>{
-    const opciones = {
-        path: "./productos/agregarProducto.html",
-        botones:true,
-        altura:800,
-        vendedor:vendedor
-    }
-    ipcRenderer.send('abrir-ventana',opciones);
-})
-
-
-const body = document.querySelector('body');
-
-body.addEventListener('keypress',e=>{
+body.addEventListener('keypress', async e=>{
     if (e.key === "Enter" && ventanaSecundaria){
         if (seleccionado) {
+            const {value} = await sweet.fire({
+                title:"Cantidad",
+                input:"number",
+            });
+
             ipcRenderer.send('enviar',{
                 tipo:"producto",
                 informacion:seleccionado.id,
+                cantidad:value
             });
             window.close();
+
         }else{
             sweet.fire({title:"Producto no seleccionado"});
         }
     }
 })
-
-salir.addEventListener('click',e=>{
-    location.href = "../menu.html";
-});
 
 document.addEventListener("keydown",e=>{
     if (e.key === "Escape" && ventanaSecundaria) {
@@ -215,9 +210,11 @@ document.addEventListener("keydown",e=>{
     }else if(e.key === "Escape" && !ventanaSecundaria){
         location.href = "../menu.html";
     }
-    recorrerFlechas(e.keyCode);
+    
+    if (document.activeElement !== buscador) {
+        recorrerFlechas(e.keyCode);
+    }
 });
-
 
 const ponerPrecioOferta = (precioOferta,precio) => {
 
@@ -231,3 +228,18 @@ const ponerPrecioOferta = (precioOferta,precio) => {
     )
 
 };
+
+agregar.addEventListener('click',e=>{
+    const opciones = {
+        path: "./productos/agregarProducto.html",
+        botones:true,
+        altura:800,
+        vendedor:vendedor
+    }
+    ipcRenderer.send('abrir-ventana',opciones);
+});
+
+
+salir.addEventListener('click',e=>{
+    location.href = "../menu.html";
+});

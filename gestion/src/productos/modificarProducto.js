@@ -224,6 +224,7 @@ costoDolar.addEventListener('keypress',e=>{
 descuento1.addEventListener('keypress',e=>{
 
     if (e.keyCode === 13 && parseFloat(descuento1.value) !== 0) {
+        precioAux = parseFloat(costoDolar.value) !== 0 ? parseFloat(costoDolar.value) : parseFloat(costo.value);
         precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento1.value) / 100),2));
     };
 
@@ -232,6 +233,8 @@ descuento1.addEventListener('keypress',e=>{
 descuento2.addEventListener('keypress',e=>{
 
     if (e.keyCode === 13 && parseFloat(descuento2.value) !== 0) {
+        precioAux = parseFloat(costoDolar.value) !== 0 ? parseFloat(costoDolar.value) : parseFloat(costo.value);
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento1.value) / 100),2));
         precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento2.value) / 100),2));
     };
 
@@ -241,6 +244,9 @@ descuento2.addEventListener('keypress',e=>{
 descuento3.addEventListener('keypress',e=>{
 
     if (e.keyCode === 13 && parseFloat(descuento3.value) !== 0) {
+        precioAux = parseFloat(costoDolar.value) !== 0 ? parseFloat(costoDolar.value) : parseFloat(costo.value);
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento1.value) / 100),2));
+        precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento2.value) / 100),2));
         precioAux = parseFloat(redondear(precioAux - (precioAux * parseFloat(descuento3.value) / 100),2));
     };
 
