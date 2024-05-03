@@ -335,3 +335,20 @@ h1{
         overflow: hidden;
     }
 }
+
+#cambioPrecio .inputs{
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+}
+
+#cambioPrecio .inputs div{
+    display: flex;
+    flex-direction: column;
+}
+
+#cambioPrecio #table{
+    height: 60vh;
+    background-color: white;
+    overflow: scroll;
+}

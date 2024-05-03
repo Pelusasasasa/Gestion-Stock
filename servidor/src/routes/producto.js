@@ -5,7 +5,8 @@ const {
        traerProducto,descontarStock,traerPrecio,cargarProducto,eliminarProducto,
        getsProductos,modificarProducto,traerProductoPorNombre,traerMarcas, 
        putMarcas, cambioPreciosPorDolar, productosPorMarcas, traerProvedores, 
-       putForProvedor
+       putForProvedor,
+       getForTypeAndId
     } = require('../controllers/producto.controllers');
 
 router.route('/')
@@ -32,5 +33,7 @@ router.route('/:descripcion/:condicion')
     .get(getsProductos)
 router.route('/buscar/porNombre/:nombre')
     .get(traerProductoPorNombre)
+router.route('/traerPorTipo/:tipo/:id')
+    .get(getForTypeAndId)
 module.exports = router;
     

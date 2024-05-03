@@ -230,15 +230,9 @@ const hacerMenu = () => {
           }
         },
         {
-          label:"Aumento Por Marcas",
+          label:"Cambio de Precios",
           click(){
-            abrirVentana('productos/marcas.html',300,500,true);
-          }
-        },
-        {
-          label:"Aumento Por Provedores",
-          click(){
-            abrirVentana('productos/aumentoPorProvedor.html',300,500,true);
+              ventanaPrincipal.loadFile('src/productos/cambioPrecio.html')
           }
         },
         {

@@ -199,6 +199,14 @@ productoCTRL.putForProvedor = async(req,res)=>{
     });
     console.log(`Productos de provedor ${provedor} Modificados`);
     res.send("Productos modificados");
+};
+
+productoCTRL.getForTypeAndId = async(req, res) => {
+    const {tipo,id} = req.params;
+    console.log(tipo)
+    const productos = await Producto.find({[tipo]:id});
+
+    res.send(productos)
 }
 
 module.exports = productoCTRL
