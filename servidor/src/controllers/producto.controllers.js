@@ -17,21 +17,21 @@ productoCTRL.getsProductos = async(req,res)=>{
     const {descripcion,condicion} = req.params;
     let productos;
     if (descripcion === "textoVacio") {
-         productos = await Producto.find({}).limit(50);
+         productos = await Producto.find({});
     }else{  
         let re;
         try {
             if (descripcion[0] === "*") {
                 re = new RegExp(`${descripcion.substr(1)}`);
             }else{
-                re = new RegExp(`^${descripcion}`);
+                re = new RegExp(`^${descripcion.replace('(','\\(').replace(')','\\)')}`);
             }
-            productos = await Producto.find({[condicion]:{$regex:re,$options:"i"}}).limit(50);
+            productos = await Producto.find({[condicion]:{$regex:re,$options:"i"}});
         } catch (error) {
             re = descripcion;
             productos = await Producto.find().limit(50);
         }
-    }
+    };
     res.send(productos);
 };
 
