@@ -22,6 +22,10 @@ const Servicio = new Schema({
         type:String,
         default:""
     },
+    codProd:{
+        type:String,
+        default:"0000"
+    },
     producto:{
         type:String,
         require:true
@@ -51,7 +55,11 @@ const Servicio = new Schema({
     },
     vendedor:{
         type:String,
-        default:""
+        require: true
+    },
+    estado:{
+        type: Number,
+        default: 0
     }
 });
 

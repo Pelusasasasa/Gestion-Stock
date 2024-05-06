@@ -229,4 +229,4 @@ const cargarPrimerCliente = async()=>{
             })
         }
     }
-}
+};

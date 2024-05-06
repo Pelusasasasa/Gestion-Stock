@@ -23,7 +23,9 @@ app.use('/gestion/numero',require('./routes/numero'));
 app.use('/gestion/rubro',require('./routes/rubro'));
 app.use('/gestion/gastos',require('./routes/gasto'));
 app.use('/gestion/pedidos',require('./routes/pedido'));
-app.use('/gestion/servicios',require('./routes/servicio'));
+
+app.use('/gestion/servicios',require('./routes/servicioTecnico'));
+
 app.use('/gestion/vendedores',require('./routes/vendedor'));
 app.use('/gestion/movVendedores',require('./routes/movVendedores'));
 app.use('/gestion/movRecibo',require('./routes/movRecibo'));
