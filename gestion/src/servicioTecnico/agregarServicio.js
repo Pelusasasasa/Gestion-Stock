@@ -35,6 +35,7 @@ ipcRenderer.on('informacion',async (e,args)=>{
     vendedor.value = args.vendedor.nombre;
     if (args.informacion) {
         servicio = (await axios.get(`${URL}servicios/id/${args.informacion}`)).data;
+        console.log(servicio)
         listarServicio(servicio);
 
         egreso.classList.remove('none');

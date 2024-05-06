@@ -7,6 +7,20 @@ servicioCTRL.getAll = async(req,res)=>{
     res.send(servicios)
 };
 
+servicioCTRL.getForId = async(req, res) => {
+    const servicio = await Servicio.findById(req.params.id);
+    res.send(servicio);
+};
+
+servicioCTRL.getForText = async(req, res) => {
+    const {text} = req.params;
+    const re = new RegExp(`^${text}`);
+    
+    const servicios = await Servicio.find({producto:{$regex:re, $options:"i"}});
+    res.send(servicios);
+
+};
+
 servicioCTRL.post = async(req, res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();

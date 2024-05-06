@@ -1,12 +1,25 @@
+.buscador{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 2rem;
+}
+
+.buscador label{
+    font-size: 2rem;
+    font-family: 'Courier New', Courier, monospace;
+}
+
 .listaServicio h1{
     text-align: center;
 }
 
 .listaServicio .table{
-    height: 75vh;
+    height: 65vh;
     background-color: white;
     overflow: scroll;
 }
+
 .table{
     width: 100%;
 }

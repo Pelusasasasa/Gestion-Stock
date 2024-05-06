@@ -12,10 +12,12 @@ const Servicio = new Schema({
     },
     cliente:{
         type:String,
-        default:""
+        default:"",
+        set: (value) => value.toUpperCase().trim()
     },
     direccion:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
         default:""
     },
     telefono:{
@@ -28,22 +30,32 @@ const Servicio = new Schema({
     },
     producto:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
         require:true
     },
     modelo:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
         default:""
     },
     marca:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
         default:""
     },
     serie:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
+        default:""
+    },
+    problemas:{
+        type:String,
+        set: (value) => value.toUpperCase().trim(),
         default:""
     },
     detalles:{
         type:String,
+        set: (value) => value.toUpperCase().trim(),
         default:""
     },
     total:{

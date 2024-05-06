@@ -7,6 +7,8 @@ const sweet = require('sweetalert2');
 const {caja,vendedores} = require('../configuracion.json');
 const { verificarUsuarios } = require('../helpers');
 
+const buscador = document.getElementById('buscador');
+
 const tbody = document.querySelector('tbody');
 
 //botones
@@ -18,6 +20,14 @@ let seleccionado;
 let subSeleccionado;
 
 let vendedor;
+
+const buscarServicios = async(e) => {
+
+    if (e.keyCode === 13) {
+        const servicios = (await axios.get(`${URL}servicios/forText/${e.target.value}`)).data;
+        listarServicios(servicios)
+    }
+}
 
 window.addEventListener('load',async e=>{
 
@@ -31,20 +41,24 @@ window.addEventListener('load',async e=>{
         }else if(vendedores && !vendedor){
             location.href = '../menu.html';
         }
-    }
+    };
+
+    buscador.focus();
 
     servicios = (await axios.get(`${URL}servicios`)).data;
     listarServicios(servicios);
 });
 
-
 const listarServicios = (lista)=>{
+
+    tbody.innerHTML = "";
+
     for(let servicio of lista){
         const tr = document.createElement('tr');
         tr.id = servicio._id;
 
         const fechaIngreso  = servicio.fecha.slice(0,10).split('-',3);
-        const fechaEgreso = servicio.fechaEgreso.slice(0,10).split('-',3);
+        const fechaEgreso = servicio.fechaEgreso?.slice(0,10).split('-',3);
 
         const tdFechaIngreso = document.createElement('td');
         const tdCliente = document.createElement('td');
@@ -54,10 +68,7 @@ const listarServicios = (lista)=>{
         const tdMarca = document.createElement('td');
         const tdModelo = document.createElement('td');
         const tdNumeroSerie = document.createElement('td');
-        const tdDetalles = document.createElement('td');
-        const tdImporte = document.createElement('td');
         const tdEgreso = document.createElement('td');
-        const tdAcciones = document.createElement('td');
         const tdVendedor = document.createElement('td');
         
 
@@ -69,15 +80,7 @@ const listarServicios = (lista)=>{
         tdMarca.innerHTML = servicio.producto;
         tdModelo.innerHTML = servicio.producto;
         tdNumeroSerie.innerHTML = servicio.serie;
-        tdDetalles.innerHTML = servicio.detalles;
-        tdImporte.innerHTML = servicio.total.toFixed(2);
-        tdEgreso.innerHTML = `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}`
-        tdAcciones.classList.add('acciones');
-        tdAcciones.innerHTML = `
-            <span id=edit class=material-icons>edit</span>
-            <span id=delete class=material-icons>delete</span>
-        `
-        console.log(servicio)
+        tdEgreso.innerHTML = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
         tdVendedor.innerHTML = servicio.vendedor;
 
         tr.appendChild(tdFechaIngreso);
@@ -88,10 +91,7 @@ const listarServicios = (lista)=>{
         tr.appendChild(tdMarca);
         tr.appendChild(tdModelo);
         tr.appendChild(tdNumeroSerie);
-        tr.appendChild(tdDetalles);
-        tr.appendChild(tdImporte);
         tr.appendChild(tdEgreso);
-        tr.appendChild(tdAcciones);
         
         tbody.appendChild(tr);
     }
@@ -147,14 +147,11 @@ tbody.addEventListener('click',e=>{
     }
 });
 
-agregar.addEventListener('click',e=>{
-    ipcRenderer.send('abrir-ventana',{
-        path:"servicioTecnico/agregarServicio.html",
-        ancho:1200,
-        altura:550,
-        reinicio:true,
-        vendedor:vendedor
-    })
+buscador.addEventListener('keypress', buscarServicios);
+
+agregar.addEventListener('click', async e=>{
+    const ven = await verificarUsuarios();
+    location.href = `agregarServicio.html?vendedor=${ven}`;
 });
 
 salir.addEventListener('click',e=>{
