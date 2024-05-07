@@ -31,10 +31,15 @@
 
         </fieldset>
     </section>
-    <section>
+
+    <section class="productos">
         <fieldset>
             <legend>Producto</legend>
             <section class="producto">
+                <main>
+                    <label for="codProd">Cod. Prod *</label>
+                    <input type="text" name="codProd" id="codProd">
+                </main>
                 <main>
                     <label for="producto">Producto *</label>
                     <input type="text" name="producto" id="producto">
@@ -53,36 +58,33 @@
                 </main>
             </section>
             <main class="detalles">
-                <label for="detalles">Detalles</label>
-                <textarea type="text" name="detalles" id="detalles" cols="10" rows="5"></textarea>
+                <label for="problemas">Problemas</label>
+                <textarea type="text" name="problemas" id="problemas" cols="10" rows="5"></textarea>
             </main>
         </fieldset>
     </section>
 
-    <section class="egreso">
-        <fieldset>
-            <legend>Egreso</legend>
+    <section >
+        <fieldset class="egreso"">
+            <legend>Detalles</legend>
             <main>
-                <label for="fechaEgreso">Fecha Egreso</label>
-                <input type="date" name="fechaEgreso" id="fechaEgreso">
+                <label for="detalles">Detalles</label>
+                <textarea type="text" name="problemas" id="problemas" cols="10" rows="5"></textarea>
             </main>
-            <main>
-                <label for="total">Total</label>
-                <input type="number" value="0.00" name="total" id="total">
-            </main>
-            <main>
+            
+            <main class="vendedor">
                 <label for="vendedor">Vendedor</label>
                 <input type="text" name="vendedor" id="vendedor" disabled>
             </main>
         </fieldset>
     </section>
 
-
     <section class="botones">
         <button id="agregar">Agregar</button>
         <button id="modificar" class="none">Modificar</button>
         <button id="salir">Salir</button>
     </section>
+
     <script src="./agregarServicio.js"></script>
 </body>
 </html>

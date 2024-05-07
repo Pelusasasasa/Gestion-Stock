@@ -54,12 +54,9 @@ table td:hover{
 }
 
 .cliente fieldset{
-    display: flex;
-    justify-content: space-around;
-}
-
-.cliente #idCliente{
-    width: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 2fr;
+    gap: 2rem;
 }
 
 .cliente label{
@@ -75,12 +72,16 @@ table td:hover{
 .producto{
     display: grid;
     gap: 2rem;
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns: 1fr 2fr 2fr 2fr 2fr;
 }
 
 .egreso fieldset{
     display: flex;
     justify-content: space-around;
+}
+
+.egreso .vendedor{
+    width: 20%;
 }
 
 .detalles{

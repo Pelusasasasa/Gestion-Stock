@@ -1,3 +1,12 @@
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+};
+
+const vend = getParameterByName('vendedor');
+
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
@@ -12,15 +21,12 @@ const cliente = document.getElementById('cliente');
 const direccion = document.getElementById('direccion');
 const telefono = document.getElementById('telefono');
 
+const codProd = document.getElementById('codProd');
 const producto = document.getElementById('producto');
 const modelo = document.getElementById('modelo');
 const marca = document.getElementById('marca');
 const serie = document.getElementById('serie');
-const detalles = document.getElementById('detalles');
-
-const egreso = document.querySelector('.egreso');
-const inputEgreso = document.getElementById('fechaEgreso');
-const total = document.getElementById('total');
+const problemas = document.getElementById('problemas');
 
 const vendedor = document.getElementById('vendedor');
 
@@ -30,6 +36,8 @@ const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 let servicio;
+
+vendedor.value = vend;
 
 ipcRenderer.on('informacion',async (e,args)=>{
     vendedor.value = args.vendedor.nombre;
@@ -56,8 +64,22 @@ ipcRenderer.on('informacion',async (e,args)=>{
     }
 });
 
-const listarServicio = (servicio)=>{
-    console.log(servicio)
+ipcRenderer.on('recibir', async(e,args) => {
+    const {tipo,informacion} = JSON.parse(args);
+    if (tipo === 'cliente') {
+        const elem = (await axios.get(`${URL}clientes/id/${informacion}`)).data;
+        listarCliente(elem);
+    };
+
+    if (tipo === 'producto') {
+        console.log(tipo,informacion)
+        const elem = (await axios.get(`${URL}productos/${informacion}`)).data;
+        
+        listarProducto(elem);
+    };
+});
+
+const listarServicio = (servicio) => {
     cliente.value = servicio.cliente;
     direccion.vlaue = servicio.direccion;
     telefono.value = servicio.telefono;
@@ -67,10 +89,25 @@ const listarServicio = (servicio)=>{
     modelo.value = servicio.modelo;
     marca.value = servicio.marca;
     serie.value = servicio.numeroSerie;
-    detalles.value = servicio.detalles;
+    problemas.value = servicio.problemas;
 
     vendedor.value = servicio.vendedor;
-}
+};
+
+const listarCliente = (elem) => {
+    idCliente.value = elem._id;
+    cliente.value = elem.nombre;
+    direccion.value = elem.direccion;
+    telefono.value = elem.telefono;
+    codProd.focus();
+};
+
+const listarProducto = (elem) => {
+    codProd.value = elem._id;
+    producto.value = elem.descripcion;
+    marca.value = elem.marca;
+    modelo.focus();
+};
 
 idCliente.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && idCliente.value !== "") {
@@ -78,7 +115,7 @@ idCliente.addEventListener('keypress',async e=>{
         console.log(cliente)
         if (cliente) {
             listarCliente(cliente);
-            producto.focus();
+            codProd.focus();
         }else{
             await sweet.fire({
                 title:"Cliente no encontrado"
@@ -86,8 +123,14 @@ idCliente.addEventListener('keypress',async e=>{
             idCliente.value = "";
         }
     }else if(e.keyCode === 13 && idCliente.value === ""){
-        idCliente.value = "0000";
-        cliente.focus();
+        
+        const opciones = {
+            path: './clientes/clientes.html',
+            botones:false,
+        }
+
+        ipcRenderer.send('abrir-ventana', opciones);
+
     };
 });
 
@@ -109,9 +152,13 @@ telefono.addEventListener('keypress',e=>{
     }
 });
 
-producto.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        modelo.focus();
+codProd.addEventListener('keypress',e=>{
+    if (e.keyCode === 13 && producto.value === "") {
+        const opciones = {
+            botones:false,
+            path: './productos/productos.html'
+        }
+        ipcRenderer.send('abrir-ventana',opciones);
     }
 });
 
@@ -129,31 +176,11 @@ marca.addEventListener('keypress',e=>{
 
 serie.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
-        detalles.focus();
+        problemas.focus();
     }
 });
 
-fechaEgreso.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        total.focus();
-    }
-});
 
-total.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        if (agregar.classList.contains('none')) {
-            modificar.focus();
-        }else{
-            agregar.focus();
-        }
-    }
-});
-
-const listarCliente = (elem)=>{
-    cliente.value = elem.nombre;
-    direccion.value = elem.direccion;
-    telefono.value = elem.telefono;
-}
 
 agregar.addEventListener('click',async e=>{
     const servicio = {};
@@ -162,20 +189,19 @@ agregar.addEventListener('click',async e=>{
     servicio.direccion = direccion.value.toUpperCase();
     servicio.telefono = telefono.value;
 
+    servicio.codProd = codProd.value;
     servicio.producto = producto.value.toUpperCase();
     servicio.modelo = modelo.value.toUpperCase();
     servicio.marca = marca.value.toUpperCase();
     servicio.serie = serie.value;
 
-    servicio.total = total.value;
-    servicio.fechaEgreso = inputEgreso.value;
     servicio.vendedor = vendedor.value;
 
-    servicio.detalles = detalles.value.toUpperCase();
+    servicio.problemas = problemas.value.toUpperCase();
 
     try {
         await axios.post(`${URL}servicios`,servicio);
-        window.close();
+        location.href = './servicio.html';
     } catch (error) {
         await sweet.fire({
             title:"No se pudo cargar el servicio"
@@ -195,7 +221,7 @@ modificar.addEventListener('click',async e=>{
     servicioNuevo.marca = marca.value.toUpperCase();
     servicioNuevo.serie = serie.value;
 
-    servicioNuevo.detalles = detalles.value.toUpperCase();
+    servicioNuevo.problemas = problemas.value.toUpperCase();
 
     servicioNuevo.fechaEgreso = inputEgreso.value;
     servicioNuevo.total = total.value;
@@ -213,13 +239,12 @@ modificar.addEventListener('click',async e=>{
     }
 });
 
-
 const modificacionesEnServicios = async(servicioViejo,servicioNuevo)=>{
     if (servicioViejo.cliente !== servicioNuevo.cliente) {
         await agregarMovimientoVendedores(`Se modifico el cliente ${servicioViejo.cliente} a ${servicioNuevo.cliente}`,vendedor.value);
     }
-    if (servicioViejo.detalles !== servicioNuevo.detalles) {
-        await agregarMovimientoVendedores(`Se modifico el detalle ${servicioViejo.detalles} a ${servicioNuevo.detalles}`,vendedor.value);
+    if (servicioViejo.problemas !== servicioNuevo.problemas) {
+        await agregarMovimientoVendedores(`Se modifico el detalle ${servicioViejo.problemas} a ${servicioNuevo.problemas}`,vendedor.value);
     }
     if (servicioViejo.marca !== servicioNuevo.marca) {
         await agregarMovimientoVendedores(`Se modifico la marca ${servicioViejo.marca} a ${servicioNuevo.marca}`,vendedor.value);
@@ -242,14 +267,14 @@ const modificacionesEnServicios = async(servicioViejo,servicioNuevo)=>{
     if (servicioViejo.direccion !== servicioNuevo.direccion) {
         await agregarMovimientoVendedores(`Se modifico la direccion ${servicioViejo.direccion} a ${servicioNuevo.direccion}`,vendedor.value);
     }
-}
+};
 
 salir.addEventListener('click',e=>{
-    window.close();
+    location.href = './servicio.html';
 });
 
 document.addEventListener('keyup',e=>{
     if (e.keyCode === 27) {
-        window.close();
+        location.href = './servicio.html';
     }
 });

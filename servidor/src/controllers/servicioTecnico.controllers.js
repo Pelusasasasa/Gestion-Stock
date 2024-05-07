@@ -14,10 +14,22 @@ servicioCTRL.getForId = async(req, res) => {
 
 servicioCTRL.getForText = async(req, res) => {
     const {text} = req.params;
-    const re = new RegExp(`^${text}`);
+    if (text !== 'vacio') {
+        const re = new RegExp(`^${text}`);
     
-    const servicios = await Servicio.find({producto:{$regex:re, $options:"i"}});
-    res.send(servicios);
+        const servicios = await Servicio.find({
+            $or: [
+                {producto:{$regex:re, $options: 'i'}},
+                {marca:{$regex:re, $options: 'i'}},
+                {modelo:{$regex:re, $options: 'i'}},
+                {cliente:{$regex:re, $options: 'i'}},
+            ]
+        });
+        res.send(servicios);
+    }else{
+        const servicios = await Servicio.find();
+        res.send(servicios);
+    }
 
 };
 

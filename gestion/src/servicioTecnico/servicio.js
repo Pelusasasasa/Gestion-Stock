@@ -21,14 +21,6 @@ let subSeleccionado;
 
 let vendedor;
 
-const buscarServicios = async(e) => {
-
-    if (e.keyCode === 13) {
-        const servicios = (await axios.get(`${URL}servicios/forText/${e.target.value}`)).data;
-        listarServicios(servicios)
-    }
-}
-
 window.addEventListener('load',async e=>{
 
     if (vendedores) {
@@ -77,8 +69,8 @@ const listarServicios = (lista)=>{
         tdTelefono.innerHTML = servicio.telefono;
         tdDireccion.innerHTML = servicio.direccion;
         tdProducto.innerHTML = servicio.producto;
-        tdMarca.innerHTML = servicio.producto;
-        tdModelo.innerHTML = servicio.producto;
+        tdMarca.innerHTML = servicio.marca;
+        tdModelo.innerHTML = servicio.modelo;
         tdNumeroSerie.innerHTML = servicio.serie;
         tdEgreso.innerHTML = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
         tdVendedor.innerHTML = servicio.vendedor;
@@ -94,6 +86,14 @@ const listarServicios = (lista)=>{
         tr.appendChild(tdEgreso);
         
         tbody.appendChild(tr);
+    }
+};
+
+const buscarServicios = async(e) => {
+    let text = e.target.value === "" ? "vacio" : e.target.value;
+    if (e.keyCode === 13) {
+        const servicios = (await axios.get(`${URL}servicios/forText/${text}`)).data;
+        listarServicios(servicios)
     }
 };
 
@@ -151,9 +151,17 @@ buscador.addEventListener('keypress', buscarServicios);
 
 agregar.addEventListener('click', async e=>{
     const ven = await verificarUsuarios();
-    location.href = `agregarServicio.html?vendedor=${ven}`;
+    location.href = `agregarServicio.html?vendedor=${ven.nombre}`;
 });
 
 salir.addEventListener('click',e=>{
     location.href = '../menu.html';
+});
+
+document.addEventListener('keyup', e => {
+
+    if (e.keyCode === 27) {
+        location.href = '../menu.html';
+    };
+
 });
