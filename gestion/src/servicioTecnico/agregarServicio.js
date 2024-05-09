@@ -6,6 +6,7 @@ function getParameterByName(name) {
 };
 
 const vend = getParameterByName('vendedor');
+const servicioId = getParameterByName('id');
 
 const axios = require('axios');
 require("dotenv").config();
@@ -28,7 +29,9 @@ const marca = document.getElementById('marca');
 const serie = document.getElementById('serie');
 const problemas = document.getElementById('problemas');
 
+const detalles = document.getElementById('detalles');
 const vendedor = document.getElementById('vendedor');
+const estado = document.getElementById('estado');
 
 
 const agregar = document.getElementById('agregar');
@@ -38,6 +41,17 @@ const salir = document.getElementById('salir');
 let servicio;
 
 vendedor.value = vend;
+
+window.addEventListener('load', async e => {
+    if (servicioId) {
+        document.querySelector('title').innerText = 'Modificar Servicio';
+        servicio = (await axios.get(`${URL}servicios/id/${servicioId}`)).data;
+        listarServicio(servicio);
+        modificar.classList.remove('none');
+        agregar.classList.add('none');
+    };
+    
+});
 
 ipcRenderer.on('informacion',async (e,args)=>{
     vendedor.value = args.vendedor.nombre;
@@ -81,17 +95,21 @@ ipcRenderer.on('recibir', async(e,args) => {
 
 const listarServicio = (servicio) => {
     cliente.value = servicio.cliente;
-    direccion.vlaue = servicio.direccion;
+    direccion.value = servicio.direccion;
     telefono.value = servicio.telefono;
     idCliente.value = servicio.idCliente;
 
+    codProd.value = servicio.codProd;
     producto.value = servicio.producto;
     modelo.value = servicio.modelo;
     marca.value = servicio.marca;
-    serie.value = servicio.numeroSerie;
+    serie.value = servicio.serie;
     problemas.value = servicio.problemas;
 
+    detalles.value = servicio.detalles;
     vendedor.value = servicio.vendedor;
+    estado.value = servicio.estado;
+    
 };
 
 const listarCliente = (elem) => {
@@ -180,8 +198,6 @@ serie.addEventListener('keypress',e=>{
     }
 });
 
-
-
 agregar.addEventListener('click',async e=>{
     const servicio = {};
     servicio.idCliente = idCliente.value;
@@ -216,6 +232,7 @@ modificar.addEventListener('click',async e=>{
     servicioNuevo.direccion = direccion.value.toUpperCase();
     servicioNuevo.telefono = telefono.value;
 
+    servicioNuevo.codProd = codProd.value;
     servicioNuevo.producto = producto.value.toUpperCase();
     servicioNuevo.modelo = modelo.value.toUpperCase();
     servicioNuevo.marca = marca.value.toUpperCase();
@@ -223,15 +240,15 @@ modificar.addEventListener('click',async e=>{
 
     servicioNuevo.problemas = problemas.value.toUpperCase();
 
-    servicioNuevo.fechaEgreso = inputEgreso.value;
-    servicioNuevo.total = total.value;
-    servicio.vendedor = vendedor.value;
+    servicioNuevo.detalles = detalles.value.toUpperCase();
+    servicioNuevo.vendedor = vendedor.value;
+    servicioNuevo.estado = estado.value;
 
 
-    vendedor.value && await modificacionesEnServicios(servicio,servicioNuevo)
+    // vendedor.value && await modificacionesEnServicios(servicio,servicioNuevo)
     try {
-        await axios.put(`${URL}servicios/id/${modificar.id}`,servicioNuevo);
-        window.close();
+        await axios.put(`${URL}servicios/id/${servicioId}`,servicioNuevo);
+        location.href = './servicio.html';
     } catch (error) {
         sweet.fire({
             title:"No se pudo modificar el servicio"

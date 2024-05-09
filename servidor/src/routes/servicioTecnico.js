@@ -8,6 +8,7 @@ router.route('/')
     .post(post)
 router.route('/id/:id')
     .get(getForId)
+    .put(putForId)
 router.route('/forText/:text')
     .get(getForText)
 

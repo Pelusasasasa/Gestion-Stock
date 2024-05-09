@@ -75,13 +75,19 @@ table td:hover{
     grid-template-columns: 1fr 2fr 2fr 2fr 2fr;
 }
 
-.egreso fieldset{
+.egreso{
     display: flex;
+    flex-direction: column;
     justify-content: space-around;
 }
 
 .egreso .vendedor{
     width: 20%;
+}
+
+.egreso div{
+    display: flex;
+    justify-content: space-around;
 }
 
 .detalles{

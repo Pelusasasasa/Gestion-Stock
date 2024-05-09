@@ -43,4 +43,13 @@ servicioCTRL.post = async(req, res)=>{
     res.send({message: `Servicio creado por el vendedor ${req.body.vendedor} a la hora ${req.body.fecha.slice(0,19)}`});
 };
 
+servicioCTRL.putForId = async(req, res) => {
+
+    const {id} = req.params;
+    console.log(req.body)
+    const servicio = await Servicio.findByIdAndUpdate({_id:id},req.body);
+    res.send(servicio);
+
+};
+
 module.exports = servicioCTRL;

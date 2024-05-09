@@ -67,15 +67,27 @@
     <section >
         <fieldset class="egreso"">
             <legend>Detalles</legend>
-            <main>
+            <main class="detalles">
                 <label for="detalles">Detalles</label>
-                <textarea type="text" name="problemas" id="problemas" cols="10" rows="5"></textarea>
+                <textarea type="text" name="detalles" id="detalles" cols="10" rows="5"></textarea>
             </main>
             
-            <main class="vendedor">
-                <label for="vendedor">Vendedor</label>
-                <input type="text" name="vendedor" id="vendedor" disabled>
-            </main>
+            <div>
+                <main class="vendedor">
+                    <label for="vendedor">Vendedor</label>
+                    <input type="text" name="vendedor" id="vendedor" disabled>
+                </main>
+                
+                <main class="estado">
+                    <label for="estado">Estado</label>
+                    <select name="estado" id="estado">
+                        <option value="0">Sin Revisar</option>
+                        <option value="1">En Proceso</option>
+                        <option value="2">Finalizado</option>
+                        <option value="3">Egresado</option>
+                    </select>
+                </main>
+            </div>
         </fieldset>
     </section>
 
