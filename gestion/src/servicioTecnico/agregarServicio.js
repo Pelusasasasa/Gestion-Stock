@@ -212,7 +212,7 @@ agregar.addEventListener('click',async e=>{
     servicio.serie = serie.value;
 
     servicio.vendedor = vendedor.value;
-
+    servicio.estado = estado.value;
     servicio.problemas = problemas.value.toUpperCase();
 
     try {

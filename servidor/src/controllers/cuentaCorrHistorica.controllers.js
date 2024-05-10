@@ -2,6 +2,32 @@ const historicaCTRL = {};
 
 const Historica = require('../models/cuentaCorrHisto');
 
+
+historicaCTRL.traerHistoricaPorCliente = async(req,res)=>{
+    const {id} = req.params;
+    const historicas = await Historica.find({idCliente:id});
+    res.send(historicas);
+}
+
+historicaCTRL.traerHistorica = async(req,res)=>{
+    const {id} = req.params;
+    const historica = await Historica.find({nro_venta:id});
+    res.send(historica[0]);
+};
+
+historicaCTRL.traerHistoricaDesdeYCliente = async(req,res)=>{
+    const {desde,codigo} = req.params;
+    const historicas = await Historica.find({fecha:{$gte:desde + "T00:00:00.000Z"},idCliente:codigo});
+    res.send(historicas);
+};
+
+historicaCTRL.porNumberAndType = async(req,res)=>{
+    const {number,type} = req.params;
+    const historica = await Historica.findOne({nro_venta:number,tipo_comp:type});
+    res.send(historica);
+};
+
+
 historicaCTRL.cargarHistorica = async(req,res)=>{
     const ultimaHistorica = (await Historica.find({},{_id:1}));
     let arreglo  = ultimaHistorica.map((e)=>{
@@ -17,18 +43,6 @@ historicaCTRL.cargarHistorica = async(req,res)=>{
     res.send(`Historica ${req.body._id} Guardada`);
 };
 
-historicaCTRL.traerHistoricaPorCliente = async(req,res)=>{
-    const {id} = req.params;
-    const historicas = await Historica.find({idCliente:id});
-    res.send(historicas);
-}
-
-historicaCTRL.traerHistorica = async(req,res)=>{
-    const {id} = req.params;
-    const historica = await Historica.find({nro_venta:id});
-    res.send(historica[0]);
-}
-
 historicaCTRL.modificarHistorica = async(req,res)=>{
     const {id} = req.params;
     delete req.body._id;
@@ -38,11 +52,6 @@ historicaCTRL.modificarHistorica = async(req,res)=>{
     res.send(`historica ${id} modificada`);
 };
 
-historicaCTRL.porNumberAndType = async(req,res)=>{
-    const {number,type} = req.params;
-    const historica = await Historica.findOne({nro_venta:number,tipo_comp:type});
-    res.send(historica);
-};
 
 historicaCTRL.putForNumberAndType = async(req,res)=>{
     const {number,type} = req.params;
@@ -50,10 +59,6 @@ historicaCTRL.putForNumberAndType = async(req,res)=>{
     res.end();
 };
 
-historicaCTRL.traerHistoricaDesdeYCliente = async(req,res)=>{
-    const {desde,codigo} = req.params;
-    const historicas = await Historica.find({fecha:{$gte:desde + "T00:00:00.000Z"},idCliente:codigo});
-    res.send(historicas);
-};
+
 
 module.exports = historicaCTRL;

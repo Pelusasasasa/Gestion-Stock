@@ -84,6 +84,8 @@ ipcRenderer.on('recibir',async (e,args)=>{
         const cliente = (await axios.get(`${URL}clientes/id/${informacion}`)).data;
         saldo.value = cliente.saldo;
         clienteInput.value = cliente.nombre;
+        buscar.value = cliente._id;
+        buscar.blur()
         
         listarVentas(listaCompensada)
         
@@ -309,10 +311,6 @@ actualizar.addEventListener('click',async e=>{
     }
 });
 
-volver.addEventListener('click',e=>{
-    location.href = "../menu.html";
-});
-
 borrar.addEventListener('click', async e=>{
     if (trSeleccionado) {
         await sweet.fire({
@@ -392,3 +390,7 @@ async function impresionDeResumen() {
     }
     ipcRenderer.send('imprimir-historica',info);
 }
+
+volver.addEventListener('click',e=>{
+    location.href = "../menu.html";
+});

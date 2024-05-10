@@ -87,7 +87,7 @@ const listarClientes = async(clientes)=>{
         tdAcciones.classList.add('acciones');
 
         tdId.innerText = _id;
-        tdNombre.innerText = nombre;
+        tdNombre.innerText = nombre.slice(0,65);
         tdDireccion.innerText = direccion + " - " + localidad;
         tdTelefono.innerText = telefono;
         tdCuit.innerText = cuit ? cuit : ""
