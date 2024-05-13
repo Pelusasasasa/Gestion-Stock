@@ -8,12 +8,12 @@ const Servicio = new Schema({
     },
     idCliente:{
         type:String,
-        default: ""
+        required:true
     },
     cliente:{
         type:String,
-        default:"",
-        set: (value) => value.toUpperCase().trim()
+        required:[true, 'El nombre del Cliente es Obligatorio'],
+        set: (value) => value.toUpperCase().trim(),
     },
     direccion:{
         type:String,
@@ -31,7 +31,7 @@ const Servicio = new Schema({
     producto:{
         type:String,
         set: (value) => value.toUpperCase().trim(),
-        require:true
+        required:true
     },
     modelo:{
         type:String,
@@ -46,7 +46,7 @@ const Servicio = new Schema({
     serie:{
         type:String,
         set: (value) => value.toUpperCase().trim(),
-        default:""
+        required:true
     },
     problemas:{
         type:String,
@@ -67,7 +67,7 @@ const Servicio = new Schema({
     },
     vendedor:{
         type:String,
-        require: true
+        required: true
     },
     estado:{
         type: Number,

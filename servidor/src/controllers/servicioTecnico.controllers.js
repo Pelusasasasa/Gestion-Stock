@@ -38,15 +38,24 @@ servicioCTRL.post = async(req, res)=>{
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
 
     const servicio = new Servicio(req.body);
-    await servicio.save();
+    try {
+        await servicio.save();
 
-    res.send({message: `Servicio creado por el vendedor ${req.body.vendedor} a la hora ${req.body.fecha.slice(0,19)}`});
+        res.send({message: `Servicio creado por el vendedor ${req.body.vendedor} a la fecha ${req.body.fecha.slice(0,10).split('-',3).reverse().join('/')}`});
+    } catch (error) {
+        res.send(error.errors);
+    }
 };
 
 servicioCTRL.putForId = async(req, res) => {
 
     const {id} = req.params;
-    console.log(req.body)
+
+    const now = new Date();
+    if(req.body.fechaEgreso){
+       req.body.fechaEgreso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString(); 
+    }
+    
     const servicio = await Servicio.findByIdAndUpdate({_id:id},req.body);
     res.send(servicio);
 
