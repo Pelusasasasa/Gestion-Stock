@@ -57,6 +57,8 @@ const listarServicios = (lista)=>{
         const tr = document.createElement('tr');
         tr.id = servicio._id;
 
+        servicio.estado === 3 && tr.classList.add('servicioEgresado');
+
         const fechaIngreso  = servicio.fecha.slice(0,10).split('-',3);
         const fechaEgreso = servicio.fechaEgreso?.slice(0,10).split('-',3);
 
@@ -70,7 +72,21 @@ const listarServicios = (lista)=>{
         const tdNumeroSerie = document.createElement('td');
         const tdEgreso = document.createElement('td');
         const tdVendedor = document.createElement('td');
+        const tdEstado = document.createElement('td');
         
+        let estadoAux = "";
+
+        if (servicio.estado === 0) {
+            estadoAux = "Sin Revisar";
+        }else if (servicio.estado === 1) {
+            estadoAux = "Revisado";
+        }else if (servicio.estado === 2) {
+            estadoAux = "Finalizado";
+        }else if (servicio.estado === 3) {
+            estadoAux = "Egresado";
+        }; {
+            
+        }
 
         tdFechaIngreso.innerHTML = `${fechaIngreso[2]}/${fechaIngreso[1]}/${fechaIngreso[0]}`;
         tdCliente.innerHTML = servicio.cliente;
@@ -82,6 +98,7 @@ const listarServicios = (lista)=>{
         tdNumeroSerie.innerHTML = servicio.serie;
         tdEgreso.innerHTML = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
         tdVendedor.innerHTML = servicio.vendedor;
+        tdEstado.innerText = estadoAux;
 
         tr.appendChild(tdFechaIngreso);
         tr.appendChild(tdCliente);
@@ -92,6 +109,7 @@ const listarServicios = (lista)=>{
         tr.appendChild(tdModelo);
         tr.appendChild(tdNumeroSerie);
         tr.appendChild(tdEgreso);
+        tr.appendChild(tdEstado);
         
         tbody.appendChild(tr);
     }

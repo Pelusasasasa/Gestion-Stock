@@ -57,7 +57,6 @@ ipcRenderer.on('informacion',async (e,args)=>{
     vendedor.value = args.vendedor.nombre;
     if (args.informacion) {
         servicio = (await axios.get(`${URL}servicios/id/${args.informacion}`)).data;
-        console.log(servicio)
         listarServicio(servicio);
 
         egreso.classList.remove('none');
@@ -214,15 +213,27 @@ agregar.addEventListener('click',async e=>{
     servicio.vendedor = vendedor.value;
     servicio.estado = estado.value;
     servicio.problemas = problemas.value.toUpperCase();
-
-    try {
-        await axios.post(`${URL}servicios`,servicio);
-        location.href = './servicio.html';
-    } catch (error) {
+    const {cliente:cli, producto:pro, serie:ser, message} = (await axios.post(`${URL}servicios`,servicio)).data;
+    
+    if (cli) {
         await sweet.fire({
-            title:"No se pudo cargar el servicio"
-        })
-    }
+            title: "El Nombre del cliente es Necesario "
+        });
+    }else if(pro){
+        await sweet.fire({
+            title: "El Producto es Necesario "
+        });
+    }else if(ser){
+        await sweet.fire({
+            title: "El Numero de serie es Necesario "
+        });
+    }else if(message){
+        await sweet.fire({
+            title: message
+        });
+        location.href = './servicio.html';
+    };
+
 });
 
 modificar.addEventListener('click',async e=>{
@@ -244,6 +255,7 @@ modificar.addEventListener('click',async e=>{
     servicioNuevo.vendedor = vendedor.value;
     servicioNuevo.estado = estado.value;
 
+    servicioNuevo.fechaEgreso = servicioNuevo.estado === "3" ? new Date() : servicioNuevo.fechaEgreso = '';
 
     // vendedor.value && await modificacionesEnServicios(servicio,servicioNuevo)
     try {
