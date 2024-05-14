@@ -30,6 +30,7 @@ const serie = document.getElementById('serie');
 const problemas = document.getElementById('problemas');
 
 const detalles = document.getElementById('detalles');
+const numero = document.getElementById('numero');
 const vendedor = document.getElementById('vendedor');
 const estado = document.getElementById('estado');
 
@@ -43,12 +44,15 @@ let servicio;
 vendedor.value = vend;
 
 window.addEventListener('load', async e => {
+    
     if (servicioId) {
         document.querySelector('title').innerText = 'Modificar Servicio';
-        servicio = (await axios.get(`${URL}servicios/id/${servicioId}`)).data;
+        servicio = (await axios.get(`${URL}servicios/id/${servicioId}`)).data;        
         listarServicio(servicio);
         modificar.classList.remove('none');
         agregar.classList.add('none');
+    }else{
+        numero.value = (await axios.get(`${URL}numero/Servicio`)).data + 1;
     };
     
 });
@@ -106,6 +110,7 @@ const listarServicio = (servicio) => {
     problemas.value = servicio.problemas;
 
     detalles.value = servicio.detalles;
+    numero.value = servicio.numero;
     vendedor.value = servicio.vendedor;
     estado.value = servicio.estado;
     
@@ -199,6 +204,7 @@ serie.addEventListener('keypress',e=>{
 
 agregar.addEventListener('click',async e=>{
     const servicio = {};
+    servicio.numero = numero.value;
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
     servicio.direccion = direccion.value.toUpperCase();
@@ -213,7 +219,9 @@ agregar.addEventListener('click',async e=>{
     servicio.vendedor = vendedor.value;
     servicio.estado = estado.value;
     servicio.problemas = problemas.value.toUpperCase();
+
     const {cliente:cli, producto:pro, serie:ser, message} = (await axios.post(`${URL}servicios`,servicio)).data;
+    await axios.put(`${URL}numero/Servicio`, {"Servicio": servicio.numero});
     
     if (cli) {
         await sweet.fire({

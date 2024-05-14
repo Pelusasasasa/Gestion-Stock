@@ -2,6 +2,11 @@ const {Schema, model} = require('mongoose');
 
 
 const Servicio = new Schema({
+    numero:{
+        type:Number,
+        required:true,
+        unique:true
+    },
     fecha:{
         type:Date,
         default: Date.now
