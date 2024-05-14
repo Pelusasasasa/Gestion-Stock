@@ -115,6 +115,39 @@ textarea{
     align-self: center;
 }
 
-.servicioEgresado{
+.colores{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.colores div{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.square{
+    width: 10px;
+    height: 10px;
+}
+
+.colores p{
+    margin: 0;
+}
+
+.bg-red{
+    background-color: rgb(253, 97, 97);
+}
+
+.bg-green{
     background-color: rgb(139, 255, 139);
+}
+
+.bg-yellow{
+    background-color: yellow;
+}
+
+.bg-gray{
+    background-color: lightgray;
 }

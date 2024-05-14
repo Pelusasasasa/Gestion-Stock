@@ -57,7 +57,10 @@ const listarServicios = (lista)=>{
         const tr = document.createElement('tr');
         tr.id = servicio._id;
 
-        servicio.estado === 3 && tr.classList.add('servicioEgresado');
+        servicio.estado === 3 && tr.classList.add('bg-green');
+        servicio.estado === 2 && tr.classList.add('bg-gray');
+        servicio.estado === 1 && tr.classList.add('bg-yellow');
+        servicio.estado === 0 && tr.classList.add('bg-red');
 
         const fechaIngreso  = servicio.fecha.slice(0,10).split('-',3);
         const fechaEgreso = servicio.fechaEgreso?.slice(0,10).split('-',3);
