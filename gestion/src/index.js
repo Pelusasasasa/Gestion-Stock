@@ -154,6 +154,17 @@ ipcMain.handle('saveDialog',async(e,args)=>{
   return path
 });
 
+//Servicio
+
+ipcMain.on('imprimir_servicio',(e,servicio) => {
+  abrirVentana('servicioTecnico/impresion.html',500,500,false,true);
+  nuevaVentana.webContents.on('did-finish-load', () =>{
+    nuevaVentana.webContents.send('recibir_servicio_impresion',servicio);
+  });
+});
+
+//Servicio
+
 const hacerMenu = () => {
   //Hacemos el menu
 

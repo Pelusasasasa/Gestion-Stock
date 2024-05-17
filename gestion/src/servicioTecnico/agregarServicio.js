@@ -239,8 +239,11 @@ agregar.addEventListener('click',async e=>{
         await sweet.fire({
             title: message
         });
-        location.href = './servicio.html';
+        ipcRenderer.send('imprimir_servicio', JSON.stringify(servicio));
+        // location.href = './servicio.html';
     };
+
+    
 
 });
 
