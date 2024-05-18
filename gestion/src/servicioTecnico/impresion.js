@@ -44,7 +44,6 @@ const cargarProducto = (producto, mar, mode, ser) => {
 ipcRenderer.on('recibir_servicio_impresion', async(e, args) => {
     const servicio = JSON.parse(args);
 
-    console.log(servicio)
     await cargarHeader(servicio.numero);
     await cargarCliente(servicio.idCliente, servicio.cliente, servicio.direccion, servicio.telefono)
     await cargarProducto(servicio.producto, servicio.marca, servicio.modelo, servicio.serie);

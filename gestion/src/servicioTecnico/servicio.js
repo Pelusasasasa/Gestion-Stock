@@ -24,24 +24,24 @@ let vendedor;
 
 window.addEventListener('load',async e=>{
 
-    if (vendedores) {
-        vendedor = await verificarUsuarios();
-        if (vendedores && vendedor === "") {
-           await sweet.fire({
-            title:"Contraseña incorrecta"
-           });
-           location.reload();
-        }else if(vendedores && !vendedor){
-            location.href = '../menu.html';
-        };
+    vendedor = await verificarUsuarios();
 
-        const movVendedor = {
-            descripcion: `El vendedor ${vendedor.nombre} Ingreso a la lista de Servicio Tecnico`,
-            vendedor: vendedor.nombre
-        };
-
-        await axios.post(`${URL}movVendedores`, movVendedor);
+    if (vendedores && vendedor === "") {
+        await sweet.fire({
+        title:"Contraseña incorrecta"
+        });
+        location.reload();
+        
+    }else if(vendedores && !vendedor){
+        location.href = '../menu.html';
     };
+
+    const movVendedor = {
+        descripcion: `El vendedor ${vendedor.nombre} Ingreso a la lista de Servicio Tecnico`,
+        vendedor: vendedor.nombre
+    };
+
+    await axios.post(`${URL}movVendedores`, movVendedor);
 
     buscador.focus();
 
@@ -125,10 +125,14 @@ const listarServicios = (lista)=>{
 const buscarServicios = async(e) => {
     let text = e.target.value === "" ? "vacio" : e.target.value;
     if (e.keyCode === 13) {
+
         const servicios = (await axios.get(`${URL}servicios/forText/${text}`)).data;
         listarServicios(servicios);
+
+        const numerosServicios = (servicios.map( ser => ser.numero)).join(',');
+
         const movVendedor = {
-            descripcion: `El vendedor ${vendedor.nombre} busco los servicios ${text.toUpperCase()}`,
+            descripcion: `El vendedor ${vendedor.nombre} busco los servicios ${text.toUpperCase()} Y se encontraron los servicios ${numerosServicios}`,
             vendedor: vendedor.nombre
         };
 
