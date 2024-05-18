@@ -236,11 +236,20 @@ agregar.addEventListener('click',async e=>{
             title: "El Numero de serie es Necesario "
         });
     }else if(message){
+
         await sweet.fire({
             title: message
         });
+
         ipcRenderer.send('imprimir_servicio', JSON.stringify(servicio));
-        // location.href = './servicio.html';
+
+        const movVendedor = {
+            descripcion: `El vendedor ${vend} Agrego el Servicio Tecnico del producto ${servicio.producto} del cliente ${servicio.cliente}`,
+            vendedor: vend
+        };
+
+        await axios.post(`${URL}movVendedores`, movVendedor);
+        location.href = './servicio.html';
     };
 
     

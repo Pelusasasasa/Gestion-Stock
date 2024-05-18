@@ -65,6 +65,7 @@ const listarServicios = (lista)=>{
         const fechaIngreso  = servicio.fecha.slice(0,10).split('-',3);
         const fechaEgreso = servicio.fechaEgreso?.slice(0,10).split('-',3);
 
+        const tdNum = document.createElement('td');
         const tdFechaIngreso = document.createElement('td');
         const tdCliente = document.createElement('td');
         const tdTelefono = document.createElement('td');
@@ -91,18 +92,21 @@ const listarServicios = (lista)=>{
             
         }
 
-        tdFechaIngreso.innerHTML = `${fechaIngreso[2]}/${fechaIngreso[1]}/${fechaIngreso[0]}`;
-        tdCliente.innerHTML = servicio.cliente;
-        tdTelefono.innerHTML = servicio.telefono;
-        tdDireccion.innerHTML = servicio.direccion;
-        tdProducto.innerHTML = servicio.producto;
-        tdMarca.innerHTML = servicio.marca;
-        tdModelo.innerHTML = servicio.modelo;
-        tdNumeroSerie.innerHTML = servicio.serie;
-        tdEgreso.innerHTML = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
-        tdVendedor.innerHTML = servicio.vendedor;
+        tdNum.innerText = servicio.numero;
+        tdFechaIngreso.innerText = `${fechaIngreso[2]}/${fechaIngreso[1]}/${fechaIngreso[0]}`;
+        tdCliente.innerText = servicio.cliente;
+        tdTelefono.innerText = servicio.telefono;
+        tdDireccion.innerText = servicio.direccion;
+        tdProducto.innerText = servicio.producto;
+        tdMarca.innerText = servicio.marca;
+        tdModelo.innerText = servicio.modelo;
+        tdNumeroSerie.innerText = servicio.serie;
+        tdEgreso.innerText = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
+        tdVendedor.innerText = servicio.vendedor;
         tdEstado.innerText = estadoAux;
 
+
+        tr.appendChild(tdNum);
         tr.appendChild(tdFechaIngreso);
         tr.appendChild(tdCliente);
         tr.appendChild(tdTelefono);
@@ -186,7 +190,20 @@ buscador.addEventListener('keypress', buscarServicios);
 
 agregar.addEventListener('click', async e=>{
     const ven = await verificarUsuarios();
-    location.href = `agregarServicio.html?vendedor=${ven.nombre}`;
+    
+    if (ven) {
+        const movVendedor = {
+        descripcion: `El vendedor ${ven.nombre} Ingreso a Agregar un Servicio Tecnico`,
+        vendedor: ven.nombre
+        };
+
+        await axios.post(`${URL}movVendedores`, movVendedor);
+        location.href = `agregarServicio.html?vendedor=${ven.nombre}`;
+    }else{
+        await sweet.fire({
+            title: "Contraseña incorrecta"
+        })
+    }
 });
 
 modificar.addEventListener('click', async e => {
