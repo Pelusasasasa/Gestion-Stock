@@ -468,4 +468,15 @@ funciones.verificarDatos = async ()=>{
     return true;
 };
 
+funciones.diferenciaObjetoServicio = async(objeto1, objeto2) => {
+    let retorno = "";
+    if (objeto1.cliente !== objeto2.cliente) {
+        retorno += `Se cambio el cliente de ${objeto1.cliente} a ${objeto2.cliente}`;
+    }else if(objeto1.producto !== objeto2.producto){
+        retorno += `Se cambio el producto de ${objeto1.producto} a ${objeto2.producto}`;
+    }else if(objeto1.marca !== objeto2.marca){
+        
+    };
+};
+
 module.exports = funciones;

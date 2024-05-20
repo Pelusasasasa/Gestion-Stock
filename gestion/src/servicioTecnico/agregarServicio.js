@@ -15,7 +15,7 @@ const URL = process.env.GESTIONURL;
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 
-const {agregarMovimientoVendedores} = require('../helpers')
+const {agregarMovimientoVendedores, diferenciaObjetoServicio} = require('../helpers')
 
 const idCliente = document.getElementById('idCliente');
 const cliente = document.getElementById('cliente');
@@ -258,6 +258,7 @@ agregar.addEventListener('click',async e=>{
 
 modificar.addEventListener('click',async e=>{
     const servicioNuevo = {};
+    
     servicioNuevo.idCliente = idCliente.value;
     servicioNuevo.cliente = cliente.value.toUpperCase();
     servicioNuevo.direccion = direccion.value.toUpperCase();
@@ -279,8 +280,10 @@ modificar.addEventListener('click',async e=>{
 
     // vendedor.value && await modificacionesEnServicios(servicio,servicioNuevo)
     try {
-        await axios.put(`${URL}servicios/id/${servicioId}`,servicioNuevo);
-        location.href = './servicio.html';
+        const a = (await axios.put(`${URL}servicios/id/${servicioId}`,servicioNuevo)).data;
+        console.log(a)
+        diferenciaObjetoServicio(a,servicioNuevo)
+        // location.href = './servicio.html';
     } catch (error) {
         sweet.fire({
             title:"No se pudo modificar el servicio"
