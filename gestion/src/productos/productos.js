@@ -194,7 +194,7 @@ body.addEventListener('keypress', async e=>{
             ipcRenderer.send('enviar',{
                 tipo:"producto",
                 informacion:seleccionado.id,
-                cantidad:value
+                cantidad:value ? value : 1
             });
             window.close();
 

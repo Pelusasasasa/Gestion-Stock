@@ -4,6 +4,7 @@ const URL = process.env.GESTIONURL;
 
 const tipo = document.getElementById('tipo');
 const datos = document.getElementById('datos');
+const iva = document.getElementById('iva');
 
 const costo = document.getElementById('costo');
 const descuento1 = document.getElementById('descuento1');
@@ -43,6 +44,7 @@ const listarProductos = async() => {
         const tdDescuento1 = document.createElement('td');
         const tdDescuento2 = document.createElement('td');
         const tdDescuento3 = document.createElement('td');
+        const tdIva = document.createElement('td');
         const tdPrecio = document.createElement('td');
 
         tdCodigo.innerText = elem._id;
@@ -53,6 +55,8 @@ const listarProductos = async() => {
         tdDescuento2.innerText = elem.descuento2.toFixed(2);
         tdDescuento3.innerText = elem.descuento3.toFixed(2);
 
+        tdIva.innerText = elem.impuesto.toFixed(2);
+
         tdPrecio.innerText = elem.precio.toFixed(2);
 
         tr.appendChild(tdCodigo);
@@ -61,6 +65,7 @@ const listarProductos = async() => {
         tr.appendChild(tdDescuento1);
         tr.appendChild(tdDescuento2);
         tr.appendChild(tdDescuento3);
+        tr.appendChild(tdIva);
         tr.appendChild(tdPrecio);
 
         tbody.appendChild(tr);
@@ -69,6 +74,10 @@ const listarProductos = async() => {
 
 const actualizarCosto = async(numero) => {
     for (let elem of productos){
+
+        if (iva.value !== "") {
+            elem.impuesto = parseFloat(iva.value);
+        };
 
         elem.costo = elem.costo + (elem.costo * (numero / 100));
 
@@ -91,6 +100,10 @@ const actualizarDescuento1 = async(numero) => {
         elem.descuento2 = parseFloat(descuento2.value);
         elem.descuento3 = parseFloat(descuento3.value);
 
+        if (iva.value !== "") {
+            elem.impuesto = parseFloat(iva.value);
+        };
+
         const costoDescuento1 = elem.costo - (elem.costo * (numero / 100));
         const costoDescuento2 = costoDescuento1 - (costoDescuento1 * (elem.descuento2 / 100));  
         const costoDescuento3 = costoDescuento2 - (costoDescuento2 * (elem.descuento3 / 100));
@@ -110,6 +123,10 @@ const actualizarDescuento2 = async(numero) => {
         elem.descuento2 = numero;
         elem.descuento3 = parseFloat(descuento3.value);
 
+        if (iva.value !== "") {
+            elem.impuesto = parseFloat(iva.value);
+        };
+
         const costoDescuento1 = elem.costo - (elem.costo * (elem.descuento1  / 100));  
         const costoDescuento2 = costoDescuento1 - (costoDescuento1 * (elem.descuento2 / 100));
         const costoDescuento3 = costoDescuento2 - (costoDescuento2 * (elem.descuento3 / 100));
@@ -128,6 +145,10 @@ const actualizarDescuento3 = async(numero) => {
         elem.descuento1 = parseFloat(descuento1.value);
         elem.descuento2 = parseFloat(descuento2.value);
         elem.descuento3 = numero;
+
+        if (iva.value !== "") {
+            elem.impuesto = parseFloat(iva.value);
+        };
         
 
         const costoDescuento1 = elem.costo - (elem.costo * (elem.descuento1  / 100));  
@@ -211,7 +232,6 @@ document.addEventListener('keyup', e => {
         location.href = '../menu.html';
     };
 });
-
 
 guardar.addEventListener('click', guardarCambios);
 
