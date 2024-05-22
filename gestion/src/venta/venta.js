@@ -152,7 +152,7 @@ codigo.addEventListener('keypress',async e=>{
 
 codigoProd.addEventListener('keypress',e=>{
     if (e.keyCode === 13 && codigoProd.value !== "") {
-        listarProducto(codigoProd.value);
+        listarProducto(codigoProd.value,cantidad.value);
     }else if(e.keyCode === 13 && codigoProd.value === ""){
         const opciones = {
             path:"productos/productos.html",
@@ -834,7 +834,7 @@ condicionIva.addEventListener('keypress',async e=>{
 
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && e.target.value !== "") {
-        listarProducto(codigoProd.value);
+        listarProducto(codigoProd.value, cantidad.value);
     }else if(e.keyCode === 13 && e.target.value === ""){
         await sweet.fire({title:"Poner una cantidad"});
         cantidad.value = "1.00";
