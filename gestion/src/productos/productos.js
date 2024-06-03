@@ -188,13 +188,13 @@ body.addEventListener('keypress', async e=>{
         if (seleccionado) {
             const {value} = await sweet.fire({
                 title:"Cantidad",
-                input:"number",
+                input:"text",
             });
 
             ipcRenderer.send('enviar',{
                 tipo:"producto",
                 informacion:seleccionado.id,
-                cantidad:value ? value : 1
+                cantidad:parseFloat(value) ? parseFloat(value) : 1
             });
             window.close();
 
