@@ -6,9 +6,9 @@ const Producto = new mongoose.Schema({
         required:true,
         set: (value) => value.trim()
     },
-    codigoManual:{
-        type: Boolean,
-        default: false
+    unidad:{
+        type: String,
+        default: "U"
     },
     costo:{
         type: Number,

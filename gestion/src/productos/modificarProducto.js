@@ -12,7 +12,7 @@ const dolar = document.getElementById('dolar');
 
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
-const codigoManual = document.querySelector('#codigoManual');
+const unidad = document.querySelector('#unidad');
 
 const selectMarca = document.querySelector('#marca');
 const select = document.querySelector('#rubro');
@@ -102,7 +102,7 @@ const llenarInputs = async(codigoProducto)=>{
     
     const producto = (await axios.get(`${URL}productos/${codigoProducto}`)).data;
     descripcion.value = producto.descripcion;
-    codigoManual.value = producto.codigoManual === true ? 'true' : 'false';
+    unidad.value = producto.unidad;
 
     selectMarca.value = producto.marca;
     select.value = producto.rubro;
@@ -141,6 +141,7 @@ modificar.addEventListener('click',async e=>{
     const producto = {};
     producto._id = codigo.value;
     producto.descripcion = descripcion.value.trim().toUpperCase();
+    producto.unidad = unidad.value;
 
     producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim().toUpperCase();
@@ -181,10 +182,10 @@ codigo.addEventListener('keypress',e=>{
 });
 
 descripcion.addEventListener('keypress',e=>{
-    apretarEnter(e,codigoManual);
+    apretarEnter(e,unidad);
 });
 
-codigoManual.addEventListener('keypress',e=>{
+unidad.addEventListener('keypress',e=>{
     e.preventDefault();
     apretarEnter(e,marca);
 });

@@ -2,7 +2,7 @@ const salir = document.querySelector('.salir');
 
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
-const codigoManual = document.querySelector('#codigoManual');
+const unidad = document.querySelector('#unidad');
 
 const selectMarca = document.querySelector('#marca');
 const agregarMarca = document.querySelector('#agregarMarca');
@@ -114,7 +114,7 @@ guardar.addEventListener('click',async ()=>{
     const producto = {}
     producto._id = codigo.value;
     producto.descripcion = descripcion.value.trim().toUpperCase();
-    producto.codigoManual = codigoManual.value === "false" ? false : true;
+    producto.unidad = unidad.value;
 
     producto.marca = marca.value.trim().toUpperCase();
     producto.rubro = rubro.value.trim();
@@ -172,10 +172,10 @@ if (e.keyCode === 13) {
 })
 
 descripcion.addEventListener('keypress',e=>{
-    apretarEnter(e,codigoManual);
+    apretarEnter(e,unidad);
 });
 
-codigoManual.addEventListener('keypress',e=>{
+unidad.addEventListener('keypress',e=>{
     e.preventDefault();
     apretarEnter(e,marca);
 });
