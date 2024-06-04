@@ -5,6 +5,8 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
+
+
 const vend = getParameterByName('vendedor');
 const servicioId = getParameterByName('id');
 
@@ -26,7 +28,8 @@ const codProd = document.getElementById('codProd');
 const producto = document.getElementById('producto');
 const modelo = document.getElementById('modelo');
 const marca = document.getElementById('marca');
-const serie = document.getElementById('serie');
+const agregarProduct = document.getElementById('agregarProduct');
+
 const problemas = document.getElementById('problemas');
 
 const detalles = document.getElementById('detalles');
@@ -40,6 +43,7 @@ const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 let servicio;
+let listaProductos = []; //lista para los productos que vamos agrgar al servicio tecnico 
 
 vendedor.value = vend;
 
@@ -155,6 +159,8 @@ idCliente.addEventListener('keypress',async e=>{
 
     };
 });
+
+
 
 cliente.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {

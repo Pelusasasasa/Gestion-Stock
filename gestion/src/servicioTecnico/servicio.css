@@ -72,7 +72,16 @@ table td:hover{
 .producto{
     display: grid;
     gap: 2rem;
-    grid-template-columns: 1fr 2fr 2fr 2fr 2fr;
+    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 1fr;
+}
+
+.producto svg{
+    width: 4rem;
+    cursor: pointer;
+}
+
+.producto svg:hover{
+    transform: scale(1.2);
 }
 
 .egreso{
@@ -199,7 +208,8 @@ textarea{
             padding-left: 1rem;
             font-weight: bold;
 
-            p{
+            p,span{
+                font-size: 1rem;
                 margin: 0.2rem;
             }
         }
