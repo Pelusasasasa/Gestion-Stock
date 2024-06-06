@@ -48,11 +48,6 @@ const Servicio = new Schema({
         set: (value) => value.toUpperCase().trim(),
         default:""
     },
-    serie:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-        required:true
-    },
     problemas:{
         type:String,
         set: (value) => value.toUpperCase().trim(),

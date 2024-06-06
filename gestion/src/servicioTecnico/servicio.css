@@ -64,7 +64,7 @@ table td:hover{
     width: 10rem;
 }
 
-.producto .cliente, main{
+.productos fieldset, .cliente, main{
     display: flex;
     flex-direction: column;
 }
@@ -72,15 +72,19 @@ table td:hover{
 .producto{
     display: grid;
     gap: 2rem;
-    grid-template-columns: 1fr 2fr 2fr 2fr 2fr 1fr;
+    grid-template-columns: 1fr 6fr 3fr 3fr;
 }
 
-.producto svg{
+.agregarProduct{
+    align-self: center;
+}
+
+.agregarProduct svg{
     width: 4rem;
     cursor: pointer;
 }
 
-.producto svg:hover{
+.agregarProduct svg:hover{
     transform: scale(1.2);
 }
 
@@ -100,7 +104,18 @@ table td:hover{
 }
 
 .detalles{
-    width: 100%;
+    height: 20rem;
+    background-color: white;
+    border: .1rem solid black;
+    overflow: scroll;
+}
+
+.detalles table{
+    border-collapse: collapse;
+}
+
+.detalles th{
+    border: .1rem solid black;
 }
 
 textarea{

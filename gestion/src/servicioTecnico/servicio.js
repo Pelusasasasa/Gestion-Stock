@@ -73,7 +73,6 @@ const listarServicios = (lista)=>{
         const tdProducto = document.createElement('td');
         const tdMarca = document.createElement('td');
         const tdModelo = document.createElement('td');
-        const tdNumeroSerie = document.createElement('td');
         const tdEgreso = document.createElement('td');
         const tdVendedor = document.createElement('td');
         const tdEstado = document.createElement('td');
@@ -100,7 +99,6 @@ const listarServicios = (lista)=>{
         tdProducto.innerText = servicio.producto;
         tdMarca.innerText = servicio.marca;
         tdModelo.innerText = servicio.modelo;
-        tdNumeroSerie.innerText = servicio.serie;
         tdEgreso.innerText = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
         tdVendedor.innerText = servicio.vendedor;
         tdEstado.innerText = estadoAux;
@@ -114,7 +112,6 @@ const listarServicios = (lista)=>{
         tr.appendChild(tdProducto);
         tr.appendChild(tdMarca);
         tr.appendChild(tdModelo);
-        tr.appendChild(tdNumeroSerie);
         tr.appendChild(tdEgreso);
         tr.appendChild(tdEstado);
         

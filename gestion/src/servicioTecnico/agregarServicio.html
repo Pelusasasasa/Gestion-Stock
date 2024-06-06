@@ -7,6 +7,7 @@
     <title>Agregar Servicio</title>
     <link rel="stylesheet" href="../assets/global.css">
     <link rel="stylesheet" href="./servicio.css">
+    <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
 </head>
 <body>
     <section class="cliente">
@@ -52,25 +53,21 @@
                     <label for="marca">Marca</label>
                     <input type="text" name="marca" id="marca">
                 </main>
-                <main>
-                    <label for="serie">Serie *</label>
-                    <input type="text" name="serie" id="serie">
-                </main>
 
-                <main>
-                    <label for="agregarProduct">Agregar</label>
-                    <svg id="agregarProduct" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
-                        className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    
-
-                </main>
             </section>
-            <main class="detalles">
+            <main class="problemas">
                 <label for="problemas">Problemas</label>
                 <textarea type="text" name="problemas" id="problemas" cols="10" rows="5"></textarea>
             </main>
+
+            <main class="agregarProduct">
+                <label for="agregarProduct">Agregar</label>
+                <svg id="agregarProduct" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                    stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </main>
+
         </fieldset>
     </section>
 
@@ -78,8 +75,18 @@
         <fieldset class="egreso"">
             <legend>Detalles</legend>
             <main class="detalles">
-                <label for="detalles">Detalles</label>
-                <textarea type="text" name="detalles" id="detalles" cols="10" rows="5"></textarea>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cod Prod</th>
+                            <th>Producto</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </main>
             
             <div>

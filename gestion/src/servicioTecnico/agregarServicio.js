@@ -5,8 +5,6 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
-
-
 const vend = getParameterByName('vendedor');
 const servicioId = getParameterByName('id');
 
@@ -32,7 +30,7 @@ const agregarProduct = document.getElementById('agregarProduct');
 
 const problemas = document.getElementById('problemas');
 
-const detalles = document.getElementById('detalles');
+const tbody = document.querySelector('tbody');
 const numero = document.getElementById('numero');
 const vendedor = document.getElementById('vendedor');
 const estado = document.getElementById('estado');
@@ -43,6 +41,7 @@ const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 let servicio;
+let seleccionado;
 let listaProductos = []; //lista para los productos que vamos agrgar al servicio tecnico 
 
 vendedor.value = vend;
@@ -93,7 +92,6 @@ ipcRenderer.on('recibir', async(e,args) => {
     };
 
     if (tipo === 'producto') {
-        console.log(tipo,informacion)
         const elem = (await axios.get(`${URL}productos/${informacion}`)).data;
         
         listarProducto(elem);
@@ -110,10 +108,8 @@ const listarServicio = (servicio) => {
     producto.value = servicio.producto;
     modelo.value = servicio.modelo;
     marca.value = servicio.marca;
-    serie.value = servicio.serie;
     problemas.value = servicio.problemas;
 
-    detalles.value = servicio.detalles;
     numero.value = servicio.numero;
     vendedor.value = servicio.vendedor;
     estado.value = servicio.estado;
@@ -133,6 +129,108 @@ const listarProducto = (elem) => {
     producto.value = elem.descripcion;
     marca.value = elem.marca;
     modelo.focus();
+};
+
+const agregarProducto = () =>{
+    const elem = {};
+    elem.codProd = codProd.value.toUpperCase().trim();
+    elem.producto = producto.value.toUpperCase().trim();
+    elem.marca = marca.value.toUpperCase().trim();
+    elem.modelo = modelo.value.toUpperCase().trim();
+    elem.problemas = problemas.value;
+
+    listaProductos.push(elem);
+    
+    codProd.value = '';
+    producto.value = '';
+    marca.value = '';
+    modelo.value = '';
+    problemas.value = '';
+
+    codProd.focus();
+
+    listarEnDetalles(elem);
+};
+
+
+tbody.addEventListener('click', e => {
+    seleccionado && seleccionado.classList.remove('seleccionado');
+
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+    }else if(e.target.nodeName === "TR"){
+        seleccionado = e.target;
+    }else if(e.target.nodeName === 'SPAN' || e.target.nodeName === 'P'){
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+    };
+
+    seleccionado.classList.add('seleccionado');
+})
+
+const listarEnDetalles = (parametro) => {
+    const tr = document.createElement('tr');
+    tr.id = parametro.codProd;
+
+    const tdCodigo = document.createElement('td');
+    const tdProducto = document.createElement('td');
+    const tdMarca = document.createElement('td');
+    const tdModelo = document.createElement('td');
+    const tdAcciones = document.createElement('td');
+
+    tdAcciones.classList.add('acciones')
+
+    tdCodigo.innerText = parametro.codProd;
+    tdProducto.innerText = parametro.producto;
+    tdMarca.innerText = parametro.marca;
+    tdModelo.innerText = parametro.modelo;
+    tdAcciones.innerHTML = `
+        <div id=edit class=tool>
+            <span id=edit class=material-icons>edit</span>
+            <p class=tooltip>Modificar</p>
+        </div>
+        <div id=delete class=tool>
+            <span id=delete class=material-icons>delete</span>
+            <p class=tooltip>Eliminar</p>
+        </div>
+    `
+
+    tdAcciones.addEventListener('click', async(e) => {
+                seleccionado && seleccionado.classList.remove('seleccionado');
+                seleccionado = e.target.parentNode.parentNode.parentNode;
+                seleccionado.classList.add('seleccionado');
+
+            if (e.target.innerText === "edit" || e.target.innerText === "Modificar") {
+
+                tbody.removeChild(seleccionado);
+
+                const elem = listaProductos.find( elem => elem.codProd === seleccionado.id);
+                listaProductos = listaProductos.filter( elem => elem.codProd !== seleccionado.id);
+
+                codProd.value = elem.codProd;
+                producto.value = elem.producto;
+                marca.value = elem.marca;
+                modelo.value = elem.modelo;
+                problemas.value = elem.problemas;
+                
+                seleccionado = '';
+            }else if(e.target.innerText === "delete" || e.target.innerText === 'Eliminar'){
+                
+                tbody.removeChild(seleccionado);
+
+                listaProductos = listaProductos.filter( elem => elem.codProd !== seleccionado.id);
+
+                seleccionado = '';
+            };
+    });
+
+    tr.appendChild(tdCodigo);
+    tr.appendChild(tdProducto);
+    tr.appendChild(tdMarca);
+    tr.appendChild(tdModelo);
+    tr.appendChild(tdAcciones);
+
+    tbody.appendChild(tr);
+
 };
 
 idCliente.addEventListener('keypress',async e=>{
@@ -159,8 +257,6 @@ idCliente.addEventListener('keypress',async e=>{
 
     };
 });
-
-
 
 cliente.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
@@ -198,37 +294,38 @@ modelo.addEventListener('keypress',e=>{
 
 marca.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
-        serie.focus();
-    }
-});
-
-serie.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
         problemas.focus();
     }
 });
 
+agregarProduct.addEventListener('click', agregarProducto);
+
 agregar.addEventListener('click',async e=>{
-    const servicio = {};
+   for(let elem of listaProductos){
+
+     const servicio = {};
+    
     servicio.numero = numero.value;
+    
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
     servicio.direccion = direccion.value.toUpperCase();
     servicio.telefono = telefono.value;
 
-    servicio.codProd = codProd.value;
-    servicio.producto = producto.value.toUpperCase();
-    servicio.modelo = modelo.value.toUpperCase();
-    servicio.marca = marca.value.toUpperCase();
-    servicio.serie = serie.value;
+    servicio.codProd = elem.codProd;
+    servicio.producto = elem.producto.toUpperCase();
+    servicio.modelo = elem.modelo.toUpperCase();
+    servicio.marca = elem.marca.toUpperCase();
+    servicio.problemas = elem.problemas.toUpperCase();
 
     servicio.vendedor = vendedor.value;
     servicio.estado = estado.value;
-    servicio.problemas = problemas.value.toUpperCase();
+    
 
-    const {cliente:cli, producto:pro, serie:ser, message} = (await axios.post(`${URL}servicios`,servicio)).data;
+    const {cliente:cli, producto:pro, message} = (await axios.post(`${URL}servicios`,servicio)).data;
     await axios.put(`${URL}numero/Servicio`, {"Servicio": servicio.numero});
     
+    numero.value = parseInt(numero.value) + 1;
     if (cli) {
         await sweet.fire({
             title: "El Nombre del cliente es Necesario "
@@ -237,17 +334,12 @@ agregar.addEventListener('click',async e=>{
         await sweet.fire({
             title: "El Producto es Necesario "
         });
-    }else if(ser){
-        await sweet.fire({
-            title: "El Numero de serie es Necesario "
-        });
     }else if(message){
 
         await sweet.fire({
             title: message
         });
 
-        ipcRenderer.send('imprimir_servicio', JSON.stringify(servicio));
 
         const movVendedor = {
             descripcion: `El vendedor ${vend} Agrego el Servicio Tecnico del producto ${servicio.producto} del cliente ${servicio.cliente}`,
@@ -255,9 +347,11 @@ agregar.addEventListener('click',async e=>{
         };
 
         await axios.post(`${URL}movVendedores`, movVendedor);
-        location.href = './servicio.html';
     };
+   };
 
+   // ipcRenderer.send('imprimir_servicio', JSON.stringify(servicio));
+   location.href = './servicio.html';
     
 
 });
@@ -274,11 +368,9 @@ modificar.addEventListener('click',async e=>{
     servicioNuevo.producto = producto.value.toUpperCase();
     servicioNuevo.modelo = modelo.value.toUpperCase();
     servicioNuevo.marca = marca.value.toUpperCase();
-    servicioNuevo.serie = serie.value;
 
     servicioNuevo.problemas = problemas.value.toUpperCase();
 
-    servicioNuevo.detalles = detalles.value.toUpperCase();
     servicioNuevo.vendedor = vendedor.value;
     servicioNuevo.estado = estado.value;
 
@@ -312,9 +404,6 @@ const modificacionesEnServicios = async(servicioViejo,servicioNuevo)=>{
     }
     if (servicioViejo.producto !== servicioNuevo.producto) {
         await agregarMovimientoVendedores(`Se modifico el prodcuto ${servicioViejo.producto} a ${servicioNuevo.producto}`,vendedor.value);
-    }
-    if (servicioViejo.serie !== servicioNuevo.serie) {
-        await agregarMovimientoVendedores(`Se modifico el numero de serie ${servicioViejo.serie} a ${servicioNuevo.serie}`,vendedor.value);
     }
     if (servicioViejo.telefono !== servicioNuevo.telefono) {
         await agregarMovimientoVendedores(`Se modifico el telefono ${servicioViejo.telefono} a ${servicioNuevo.telefono}`,vendedor.value);
