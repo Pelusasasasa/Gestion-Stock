@@ -212,7 +212,7 @@ textarea{
         }
     }
 
-    .producto,.cliente{
+    .cliente{
         border: .1rem solid black;
         grid-template-columns: 1fr;
         main{
@@ -230,7 +230,7 @@ textarea{
         }
     }
 
-    .infoCliente,.infoProducto{
+    .infoCliente{
         display: grid;
         grid-template-columns: 1fr 1fr;
 
@@ -242,7 +242,7 @@ textarea{
 
             p{
                 font-size: 1rem;
-                background-color: lightseagreen;
+                background-color: rgb(139, 255, 139);
                 border: .1rem solid black;
                 padding: 0.6rem;
                 font-weight: bold;
@@ -259,10 +259,56 @@ textarea{
     }
 
     .infoProducto{
-        grid-template-columns: repeat(3,1fr);
+        display: flex;
+        border: .1rem solid black;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        padding-left: 1rem;
+        flex-direction: column;
+
+        .producto{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+
+            div{
+                margin-bottom: 1rem;
+            }
+
+            div p{
+                margin: 0;
+                font-size: 1rem;
+            }
+        }
+
+        #numero p{
+            margin: 0;
+        }
+
+        div{
+            display: flex;
+            align-items: center;
+
+            span{
+                border: .1rem solid black;
+                flex: 1;
+                font-size: 1rem;
+                padding: 0.6rem;
+            }
+        }
+
+        div p{
+            border: .1rem solid black;
+            background-color: rgb(139, 255, 139);
+            padding: .5rem;
+        }
+
+        .inconvenientes{
+            margin: 0;
+            margin-bottom: 1rem;
+        }
     }
 
-    .problema,.service{
+    .service{
         border: .1rem solid black;
         padding-left: 0.5rem;
 

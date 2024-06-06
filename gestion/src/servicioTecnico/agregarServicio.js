@@ -301,11 +301,13 @@ marca.addEventListener('keypress',e=>{
 agregarProduct.addEventListener('click', agregarProducto);
 
 agregar.addEventListener('click',async e=>{
+    let info = {}
    for(let elem of listaProductos){
 
      const servicio = {};
     
     servicio.numero = numero.value;
+    elem.numero = servicio.numero;
     
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
@@ -320,6 +322,12 @@ agregar.addEventListener('click',async e=>{
 
     servicio.vendedor = vendedor.value;
     servicio.estado = estado.value;
+
+    info.idCliente = idCliente.value;
+    info.cliente = cliente.value;
+    info.direccion = direccion.value;
+    info.telefono = telefono.value;
+    info.vendedor = vendedor.value;
     
 
     const {cliente:cli, producto:pro, message} = (await axios.post(`${URL}servicios`,servicio)).data;
@@ -336,9 +344,9 @@ agregar.addEventListener('click',async e=>{
         });
     }else if(message){
 
-        await sweet.fire({
-            title: message
-        });
+        // await sweet.fire({
+        //     title: message
+        // });
 
 
         const movVendedor = {
@@ -350,7 +358,7 @@ agregar.addEventListener('click',async e=>{
     };
    };
 
-   // ipcRenderer.send('imprimir_servicio', JSON.stringify(servicio));
+   ipcRenderer.send('imprimir_servicio', JSON.stringify([info,listaProductos]));
    location.href = './servicio.html';
     
 

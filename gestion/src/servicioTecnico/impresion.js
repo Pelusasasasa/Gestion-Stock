@@ -14,11 +14,10 @@ const telefono = document.getElementById('telefono');
 const descripcion = document.getElementById('descripcion');
 const marca = document.getElementById('marca');
 const modelo = document.getElementById('modelo');
-const serie = document.getElementById('serie');
 
-const cargarHeader = (num) => {
+const infoProductos = document.getElementById('infoProductos');
 
-    numero.innerText = num.padStart(8,'0');
+const cargarHeader = () => {
     fecha.innerText = (new Date().toISOString()).slice(0,10).split('-',3).reverse().join('/');
 
 };
@@ -31,22 +30,45 @@ const cargarCliente = (id, nombre, direccion, tel) => {
 
 };
 
-const cargarProducto = (producto, mar, mode, ser) => {
+const cargarProductos = (lista) => {
 
-    descripcion.innerText = producto;
-    marca.innerText = mar ? mar : "S/M";
-    modelo.innerText = mode ? mode : "S/M";
-    serie.innerText = ser ? ser : "0";
+    for( let elem of lista){
+        infoProductos.innerHTML += `
+        <main id="numero">
+            <p>N°${elem.numero}</p>
+        </main>
+        <main class="producto">
+            <div>
+                <p>PRODUCTO: </p>
+                <span id="descripcion">${elem.producto}</span>
+            </div>
+            
+            <div>
+                <p>MARCA: </p>
+                <span id="marca">${elem.marca ? elem.marca : 'S/M'}</span>
+            </div>
+            
+            <div>
+                <p>MODELO</p>
+                <span id="modelo">${elem.modelo ? elem.modelo : 'S/M'}</span>
+            </div>
 
+        </main>
+
+        <main>
+            <p class="inconvenientes">Inconvenientes: <span id="problemas">${elem.problemas}</span></p>
+        </main>
+        `
+
+    };
 
 };
 
 ipcRenderer.on('recibir_servicio_impresion', async(e, args) => {
-    const servicio = JSON.parse(args);
+    const [servicio,lista] = JSON.parse(args);
 
-    await cargarHeader(servicio.numero);
+    await cargarHeader();
     await cargarCliente(servicio.idCliente, servicio.cliente, servicio.direccion, servicio.telefono)
-    await cargarProducto(servicio.producto, servicio.marca, servicio.modelo, servicio.serie);
-    
+    await cargarProductos(lista);
     ipcRenderer.send('imprimir-ventana');
 });
