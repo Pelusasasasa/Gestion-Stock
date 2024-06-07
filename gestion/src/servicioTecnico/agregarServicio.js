@@ -31,6 +31,7 @@ const agregarProduct = document.getElementById('agregarProduct');
 const problemas = document.getElementById('problemas');
 
 const tbody = document.querySelector('tbody');
+const soluciones = document.getElementById('soluciones');
 const numero = document.getElementById('numero');
 const vendedor = document.getElementById('vendedor');
 const estado = document.getElementById('estado');
@@ -54,6 +55,9 @@ window.addEventListener('load', async e => {
         listarServicio(servicio);
         modificar.classList.remove('none');
         agregar.classList.add('none');
+        agregarProduct.parentNode.classList.add('none');
+        tbody.parentNode.parentNode.classList.add('none');
+        soluciones.parentNode.classList.remove('none');
     }else{
         numero.value = (await axios.get(`${URL}numero/Servicio`)).data + 1;
     };
@@ -110,6 +114,8 @@ const listarServicio = (servicio) => {
     marca.value = servicio.marca;
     problemas.value = servicio.problemas;
 
+
+    soluciones.value = servicio.detalles;
     numero.value = servicio.numero;
     vendedor.value = servicio.vendedor;
     estado.value = servicio.estado;
@@ -378,18 +384,18 @@ modificar.addEventListener('click',async e=>{
     servicioNuevo.marca = marca.value.toUpperCase();
 
     servicioNuevo.problemas = problemas.value.toUpperCase();
+    servicioNuevo.detalles = soluciones.value.toUpperCase();
 
     servicioNuevo.vendedor = vendedor.value;
     servicioNuevo.estado = estado.value;
 
     servicioNuevo.fechaEgreso = servicioNuevo.estado === "3" ? new Date() : servicioNuevo.fechaEgreso = '';
 
-    // vendedor.value && await modificacionesEnServicios(servicio,servicioNuevo)
     try {
         const a = (await axios.put(`${URL}servicios/id/${servicioId}`,servicioNuevo)).data;
         console.log(a)
         diferenciaObjetoServicio(a,servicioNuevo)
-        // location.href = './servicio.html';
+        location.href = './servicio.html';
     } catch (error) {
         sweet.fire({
             title:"No se pudo modificar el servicio"
@@ -397,32 +403,6 @@ modificar.addEventListener('click',async e=>{
     }
 });
 
-const modificacionesEnServicios = async(servicioViejo,servicioNuevo)=>{
-    if (servicioViejo.cliente !== servicioNuevo.cliente) {
-        await agregarMovimientoVendedores(`Se modifico el cliente ${servicioViejo.cliente} a ${servicioNuevo.cliente}`,vendedor.value);
-    }
-    if (servicioViejo.problemas !== servicioNuevo.problemas) {
-        await agregarMovimientoVendedores(`Se modifico el detalle ${servicioViejo.problemas} a ${servicioNuevo.problemas}`,vendedor.value);
-    }
-    if (servicioViejo.marca !== servicioNuevo.marca) {
-        await agregarMovimientoVendedores(`Se modifico la marca ${servicioViejo.marca} a ${servicioNuevo.marca}`,vendedor.value);
-    }
-    if (servicioViejo.modelo !== servicioNuevo.modelo) {
-        await agregarMovimientoVendedores(`Se modifico el modelo ${servicioViejo.modelo} a ${servicioNuevo.modelo}`,vendedor.value);
-    }
-    if (servicioViejo.producto !== servicioNuevo.producto) {
-        await agregarMovimientoVendedores(`Se modifico el prodcuto ${servicioViejo.producto} a ${servicioNuevo.producto}`,vendedor.value);
-    }
-    if (servicioViejo.telefono !== servicioNuevo.telefono) {
-        await agregarMovimientoVendedores(`Se modifico el telefono ${servicioViejo.telefono} a ${servicioNuevo.telefono}`,vendedor.value);
-    }
-    if (servicioViejo.total !== servicioNuevo.total) {
-        await agregarMovimientoVendedores(`Se modifico el total ${servicioViejo.total} a ${servicioNuevo.total}`,vendedor.value);
-    }
-    if (servicioViejo.direccion !== servicioNuevo.direccion) {
-        await agregarMovimientoVendedores(`Se modifico la direccion ${servicioViejo.direccion} a ${servicioNuevo.direccion}`,vendedor.value);
-    }
-};
 
 salir.addEventListener('click',e=>{
     location.href = './servicio.html';
