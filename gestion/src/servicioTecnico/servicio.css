@@ -192,9 +192,13 @@ textarea{
             margin: 0.2rem;
         }
 
+        img{
+            width: 30rem;
+        }
+
         main{
             display: flex;
-            flex-direction: row;
+
             div {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
@@ -204,11 +208,12 @@ textarea{
                         flex: 1;
                         align-self: center;
                     }
-
-                    p{
-                        margin: 0.5rem;
-                    }
                 }
+
+            p {
+                text-align: center;
+                margin: 0;
+            }
         }
     }
 
@@ -224,7 +229,7 @@ textarea{
             font-weight: bold;
 
             p,span{
-                font-size: 1rem;
+                font-size: 1.2rem;
                 margin: 0.2rem;
             }
         }
@@ -241,7 +246,7 @@ textarea{
             flex-direction: row;
 
             p{
-                font-size: 1rem;
+                font-size: 0.8rem;
                 background-color: rgb(139, 255, 139);
                 border: .1rem solid black;
                 padding: 0.6rem;
@@ -250,7 +255,7 @@ textarea{
             }
 
             span{
-                font-size: 1rem;
+                font-size: 0.8rem;
                 flex: 1;
                 padding: 0.6rem;
                 border: .1rem solid black;
@@ -286,10 +291,11 @@ textarea{
 
         div{
             display: flex;
+            flex-direction: column;
             align-items: center;
 
             span{
-                border: .1rem solid black;
+                
                 flex: 1;
                 font-size: 1rem;
                 padding: 0.6rem;
@@ -297,8 +303,7 @@ textarea{
         }
 
         div p{
-            border: .1rem solid black;
-            background-color: rgb(139, 255, 139);
+            font-weight: bold;
             padding: .5rem;
         }
 

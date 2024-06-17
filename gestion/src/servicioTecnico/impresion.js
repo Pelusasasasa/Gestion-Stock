@@ -34,9 +34,6 @@ const cargarProductos = (lista) => {
 
     for( let elem of lista){
         infoProductos.innerHTML += `
-        <main id="numero">
-            <p>N°${elem.numero}</p>
-        </main>
         <main class="producto">
             <div>
                 <p>PRODUCTO: </p>
@@ -70,5 +67,5 @@ ipcRenderer.on('recibir_servicio_impresion', async(e, args) => {
     await cargarHeader();
     await cargarCliente(servicio.idCliente, servicio.cliente, servicio.direccion, servicio.telefono)
     await cargarProductos(lista);
-    ipcRenderer.send('imprimir-ventana');
+    // ipcRenderer.send('imprimir-ventana');
 });
