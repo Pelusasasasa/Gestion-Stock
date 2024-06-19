@@ -38,7 +38,8 @@ window.addEventListener('load',async e=>{
 
     const movVendedor = {
         descripcion: `El vendedor ${vendedor.nombre} Ingreso a la lista de Servicio Tecnico`,
-        vendedor: vendedor.nombre
+        vendedor: vendedor.nombre,
+        tipo: 'Servicio'
     };
 
     await axios.post(`${URL}movVendedores`, movVendedor);
@@ -130,7 +131,8 @@ const buscarServicios = async(e) => {
 
         const movVendedor = {
             descripcion: `El vendedor ${vendedor.nombre} busco los servicios ${text.toUpperCase()} Y se encontraron los servicios ${numerosServicios}`,
-            vendedor: vendedor.nombre
+            vendedor: vendedor.nombre,
+            tipo: 'Servicio'
         };
 
         await axios.post(`${URL}movVendedores`, movVendedor);

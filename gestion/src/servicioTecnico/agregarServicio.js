@@ -357,7 +357,8 @@ agregar.addEventListener('click',async e=>{
 
         const movVendedor = {
             descripcion: `El vendedor ${vend} Agrego el Servicio Tecnico del producto ${servicio.producto} del cliente ${servicio.cliente}`,
-            vendedor: vend
+            vendedor: vend,
+            tipo: 'Servicio'
         };
 
         await axios.post(`${URL}movVendedores`, movVendedor);

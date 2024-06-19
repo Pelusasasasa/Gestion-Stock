@@ -9,6 +9,10 @@ const MovVendedor = new Schema({
         type:String,
         required:true
     },
+    tipo:{
+        type:String,
+        default: ''
+    },
     vendedor:{
         type:String,
         required:true

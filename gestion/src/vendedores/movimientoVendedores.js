@@ -9,9 +9,11 @@ const {vendedores:verVendedores} = require('../configuracion.json');
 
 const fecha = document.getElementById('fecha');
 const select = document.getElementById('vendedores');
+const tipo = document.getElementById('tipo');
 
 const tbody = document.querySelector('tbody');
 
+let movimientos;
 let vendedores;
 
 window.addEventListener('load',async e=>{
@@ -46,7 +48,7 @@ window.addEventListener('load',async e=>{
     vendedores = (await axios.get(`${URL}vendedores`)).data;
     await listarVendedores(vendedores);
 
-    const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+    movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
     listarMovimientos(movimientos)
 });
 
@@ -60,6 +62,7 @@ const listarVendedores = (lista)=>{
 };
 
 const listarMovimientos = (lista)=>{
+    console.log(lista)
     tbody.innerHTML = "";
     lista.forEach(elem =>{
         const tr = document.createElement('tr');
@@ -82,8 +85,16 @@ const listarMovimientos = (lista)=>{
     });
 };
 
+const listarConTipo = (lista, tipo) => {
+    let movAux = [];
+
+    movAux = lista.filter(mov => mov.tipo === tipo);
+
+    listarMovimientos(movAux);
+}
+
 select.addEventListener('change',async ()=>{
-    const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+    movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
     listarMovimientos(movimientos);
 });
 
@@ -92,12 +103,15 @@ fecha.addEventListener('change',async ()=>{
     listarMovimientos(movimientos);
 });
 
+tipo.addEventListener('change', async (e) =>{
+    listarConTipo(movimientos, e.target.value);
+});
+
 fecha.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
         select.focus();
     }
 });
-
 
 document.addEventListener('keyup',e=>{
     if (e.keyCode === 27) {
