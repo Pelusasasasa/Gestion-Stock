@@ -215,6 +215,10 @@ textarea{
                 margin: 0;
             }
         }
+
+        .logo{
+            font-size: 1.2rem;
+        }
     }
 
     .cliente{
@@ -298,7 +302,6 @@ textarea{
                 
                 flex: 1;
                 font-size: 1rem;
-                padding: 0.6rem;
             }
         }
 

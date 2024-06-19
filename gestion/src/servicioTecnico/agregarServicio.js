@@ -334,7 +334,7 @@ agregar.addEventListener('click',async e=>{
     info.direccion = direccion.value;
     info.telefono = telefono.value;
     info.vendedor = vendedor.value;
-    
+    info.numero = servicio.numero
 
     const {cliente:cli, producto:pro, message} = (await axios.post(`${URL}servicios`,servicio)).data;
     await axios.put(`${URL}numero/Servicio`, {"Servicio": servicio.numero});

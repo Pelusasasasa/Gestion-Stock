@@ -17,9 +17,9 @@ const modelo = document.getElementById('modelo');
 
 const infoProductos = document.getElementById('infoProductos');
 
-const cargarHeader = () => {
+const cargarHeader = (num) => {
     fecha.innerText = (new Date().toISOString()).slice(0,10).split('-',3).reverse().join('/');
-
+    numero.innerText = num.padStart(4,'0');
 };
 
 const cargarCliente = (id, nombre, direccion, tel) => {
@@ -64,7 +64,7 @@ const cargarProductos = (lista) => {
 ipcRenderer.on('recibir_servicio_impresion', async(e, args) => {
     const [servicio,lista] = JSON.parse(args);
 
-    await cargarHeader();
+    await cargarHeader(servicio.numero);
     await cargarCliente(servicio.idCliente, servicio.cliente, servicio.direccion, servicio.telefono)
     await cargarProductos(lista);
     // ipcRenderer.send('imprimir-ventana');
