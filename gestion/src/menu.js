@@ -109,21 +109,18 @@ ventas.addEventListener('click',async e=>{
 
 
 clientes.addEventListener('click',async e=>{
-    if (verVendedores) {
-        const vendedor = await verificarUsuarios();
-        if (vendedor) {
-            location.href = `./clientes/clientes.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
-            ipcRenderer.send('sacar-cierre');
-        }else if(vendedor === ""){
-            await sweet.fire({
-                title:"Contraseña incorrecta"
-            })
-            clientes.click()
-        }
-    }else{
-        location.href = `./clientes/clientes.html`;
+    const vendedor = await verificarUsuarios();
+    
+    if (vendedor) {
+        location.href = `./clientes/clientes.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
         ipcRenderer.send('sacar-cierre');
-    }
+    }else if(vendedor === ""){
+        await sweet.fire({
+            title:"Contraseña incorrecta"
+        });
+        clientes.click();
+    };
+    
     
 });
 

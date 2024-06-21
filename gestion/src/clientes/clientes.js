@@ -3,7 +3,7 @@ function getParameterByName(name) {
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
     results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+};
 
 let vendedor = getParameterByName("vendedor")
 let permiso = getParameterByName("permiso");
@@ -93,8 +93,9 @@ const listarClientes = async(clientes)=>{
         tdCuit.innerText = cuit ? cuit : ""
         tdCondicionIva.innerText = condicionIva ? condicionIva : ""
         tdSaldo.innerText = saldo.toFixed(2);
+        
         tdAcciones.innerHTML = `
-            <div class=tool>
+            <div class=tool ${(permiso !== 0 || permiso !== 1) && 'none'}>
                 <span class=material-icons>edit</span>
                 <p class=tooltip>Modificar</p>
             </div>
@@ -111,7 +112,8 @@ const listarClientes = async(clientes)=>{
         tr.appendChild(tdCondicionIva);
         tr.appendChild(tdSaldo);
         if (!ventanaSecundaria) {
-            tr.appendChild(tdAcciones);
+            permiso !== 2 && tr.appendChild(tdAcciones);
+
             
         }
         tbody.appendChild(tr);
@@ -264,4 +266,4 @@ function listarclienteNuevo(e,cliente){
     tr.appendChild(tdAcciones);
 
     tbody.appendChild(tr);
-}
+};
