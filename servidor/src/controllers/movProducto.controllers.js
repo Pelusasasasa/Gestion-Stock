@@ -33,8 +33,6 @@ movimientoCTRL.cargar = async(req,res)=>{
 movimientoCTRL.porId = async(req,res)=>{
     const {id,tipoVenta} = req.params;
     const movimientos = await movProducto.find({nro_venta:id,tipo_venta:tipoVenta});
-    console.log(id)
-    console.log(tipoVenta)
     res.send(movimientos)
 };
 

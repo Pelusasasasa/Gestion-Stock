@@ -272,7 +272,7 @@ const hacerMenu = () => {
         {
           label:"Listado Saldos",
           click(){
-            abrirVentana("clientes/listadoSaldo.html",1000,1200)
+            abrirVentana("clientes/listadoSaldo.html",800,1200)
           }
         },
         {

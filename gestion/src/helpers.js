@@ -267,6 +267,7 @@ funciones.ponerNumero = async()=>{
                         <option value="CD">Contado - ${(await axios.get(`${URL}numero`)).data.Contado}</option>
                         <option value="CC">Cuenta Corriente - ${(await axios.get(`${URL}numero`)).data["Cuenta Corriente"]}</option>
                         <option value="PP">Presupuesto - ${(await axios.get(`${URL}numero`)).data.Presupuesto}</option>
+                        <option value="RC">Recibo - ${(await axios.get(`${URL}numero/Recibo`)).data}</option>
                     </select>
                 </main>
                 <main>
@@ -284,28 +285,50 @@ funciones.ponerNumero = async()=>{
         let cliente;
         let movimientos;
         let venta;
+        let recibo;
         if (isConfirmed) {
             if (tipo.value === "PP") {
                 venta = (await axios.get(`${URL}presupuesto/forNumber/${numero.value}`)).data;
+            }else if (tipo.value === "RC"){
+                recibo = (await axios.get(`${URL}recibo/id/${numero.value}`)).data;
             }else{
                 venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/${tipo.value}`)).data;
                 if (!venta) {
                    venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/T`)).data; 
                 }
             }
-            cliente = (await axios.get(`${URL}clientes/id/${venta.idCliente}`)).data;
+            
+            cliente = recibo 
+                ? (await axios.get(`${URL}clientes/id/${recibo.idCliente}`)).data 
+                : (await axios.get(`${URL}clientes/id/${venta.idCliente}`)).data;
+
             movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;
             if (movimientos.length === 0) {
                 movimientos = (await axios.get(`${URL}movimiento/${numero.value}/T`)).data;
             }
+
+            movimientos = tipo.value === "RC" ? (await axios.get(`${URL}movRecibo/forNumber/${numero.value}`)).data : movimientos;
+
             let situacion;
-            if (venta.F) {
-                situacion = "blanco"
-            }else{
-                situacion = "negro"
+            if (venta) {
+                if (venta.F) {
+                    situacion = "blanco"
+                }else{
+                    situacion = "negro"
+                }
+            }else if (recibo){
+                if (recibo.F) {
+                    situacion = "blanco"
+                }else{
+                    situacion = "negro"
+                }
             }
-            
-            ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
+
+            if (recibo) {
+                ipcRenderer.send('imprimir-recibo',[recibo,cliente,movimientos,false])    
+            }else{
+                ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
+            };
         }
     })
 }

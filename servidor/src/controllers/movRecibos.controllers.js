@@ -14,7 +14,6 @@ movReciboCTRL.getForNumber = async(req,res)=>{
     const {number} = req.params;
 
     const movRecibos = await MovRecibo.find({numeroRecibo:number});
-    console.log(movRecibos);
     res.send(movRecibos);
 
 };
