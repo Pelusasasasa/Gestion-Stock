@@ -33,7 +33,7 @@
 
 .parteCliente2{
   display: grid;
-  grid-template-columns: repeat(4,1fr);
+  grid-template-columns: repeat(5,1fr);
   border: .1rem solid black;
   border-top: none;
   padding-bottom: 1rem;
@@ -41,12 +41,12 @@
 
 .parteCliente2 div input,.parteCliente2 div select{
   width: 70%;
-  font-size: 1.8rem;
+  /* font-size: 1.8rem; */
 }
 
 .parteCliente div #nombre,.parteCliente div input{
   width: 100%;
-  font-size: 1.8rem;
+  /* font-size: 1.8rem; */
 }
 
 .parteCliente div #saldo,.parteCliente div #codigo{
@@ -66,12 +66,12 @@
 
 .parteProductos .buscarProductos div input{
   width: 70%;
-  font-size: 1.7rem;
+  /* font-size: 1.7rem; */
 }
 
 .parteProductos .buscarProductos #rubro{
   padding: .5rem;
-  font-size: 1.5rem;
+  /* font-size: 1.5rem; */
 }
 
 .parteProductos .cod-barra{
@@ -153,12 +153,12 @@
 }
 
 .totales input{
-  font-size: 1.7rem;
+  /* font-size: 1.7rem; */
   padding: 1rem;
 }
 
 .cobrado input{
-  font-size: 1.7rem;
+  /* font-size: 1.7rem; */
   padding: 1rem;
 }
 
@@ -182,7 +182,7 @@
 }
 
 .texto p{
-  font-size: 2rem;
+  /* font-size: 2rem; */
 }
 
 .spinner{
@@ -224,7 +224,7 @@ footer main,footer button{
 }
 
 .cambio main label{
-  font-size: 1.5rem;
+  /* font-size: 1.5rem; */
   display: inline-block;
   width: 7rem;
 }

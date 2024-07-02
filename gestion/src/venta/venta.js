@@ -26,6 +26,7 @@ const direccion = document.querySelector('#direccion');
 const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
 const lista = document.getElementById('lista');
+const observaciones = document.getElementById('observaciones');
 
 
 //Parte Producto
@@ -330,6 +331,7 @@ const ponerEnCuentaCompensada = async(venta)=>{
     cuenta.condicion = venta.condicion;
     cuenta.tipo_comp = venta.tipo_comp;
     cuenta.saldo = venta.precio - parseFloat(inputRecibo.value);
+    cuenta.observaciones = observaciones.value;
     await axios.post(`${URL}compensada`,cuenta);
 };
 
@@ -342,6 +344,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
     cuenta.debe = venta.precio;
     cuenta.condicion = venta.condicion;
     cuenta.saldo = facturaAnterior ? saldo - venta.precio : venta.precio + saldo;
+    cuenta.observaciones = observaciones.value;
     (await axios.post(`${URL}historica`,cuenta)).data;
 }
 
@@ -932,6 +935,10 @@ direccion.addEventListener('keypress',e=>{
 
 condicionIva.addEventListener('keypress',e=>{
     e.preventDefault();
+    apretarEnter(e,observaciones);
+});
+
+observaciones.addEventListener('keypress',e=>{
     apretarEnter(e,codBarra);
 });
 

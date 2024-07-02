@@ -40,6 +40,10 @@ const Historica = new mongoose.Schema({
     fecha:{
         type:Date,
         default: Date.now
+    },
+    observaciones:{
+        type:String,
+        default:""
     }
 });
 

@@ -41,6 +41,10 @@ const CuentaCompensada = new mongoose.Schema({
         type: Number,
         required: true
     },
+    observaciones:{
+        type:String,
+        default:""
+    }
 });
 
 module.exports = mongoose.model("CuentaCompensada",CuentaCompensada);
