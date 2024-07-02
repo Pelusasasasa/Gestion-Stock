@@ -61,3 +61,9 @@ footer{
     transform: scale(2);
 }
 
+.observacionesAlerta{
+    color: white;
+    background-color: red;
+    border: none;
+    font-weight: bold;
+}

@@ -43,7 +43,8 @@ const CuentaCompensada = new mongoose.Schema({
     },
     observaciones:{
         type:String,
-        default:""
+        default:"",
+        set: (value) => value.toUpperCase()
     }
 });
 

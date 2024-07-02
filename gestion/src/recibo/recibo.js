@@ -24,6 +24,7 @@ const localidad = document.querySelector('#localidad');
 const direccion = document.querySelector('#direccion');
 
 const fecha = document.querySelector('#fecha');
+const observaciones = document.getElementById('observaciones');
 
 
 const tbody = document.querySelector('tbody');
@@ -86,6 +87,10 @@ const ponerInputs = async(id)=>{
         const compensadas = (await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`)).data;
         tbody.innerHTML = "";
         compensadas.forEach(compensada => {
+            if (compensada.observaciones) {
+                observaciones.value += ' / ' + compensada.observaciones;
+            };
+
             ponerVenta(compensada);
         });
     }else{
@@ -163,7 +168,6 @@ tbody.addEventListener('click',e=>{
 });
 
 //cuando cambiamos el valor del input, tambien cambiamos el valor de las demas columnas y el total del recibo
-
 inputSeleccionado.addEventListener('change',e=>{
         total.value = parseFloat(total.value) -  (parseFloat(trSeleccionado.children[3].innerHTML) - parseFloat(trSeleccionado.children[4].innerHTML) - parseFloat(trSeleccionado.children[6].innerHTML));
         trSeleccionado.children[6].innerHTML = (parseFloat(trSeleccionado.children[3].innerHTML) - parseFloat(trSeleccionado.children[4].innerHTML) - parseFloat(inputSeleccionado.value)).toFixed(2);
@@ -180,7 +184,6 @@ inputSeleccionado.addEventListener('change',e=>{
             entregado.removeAttribute('disabled');
         }   
 });
-
 
 entregado.addEventListener('change',async e=>{
     const trs = document.querySelectorAll('tbody tr');
@@ -351,7 +354,6 @@ entregado.addEventListener('focus',e=>{
     entregado.select();
 });
 
-
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,localidad)
 });
@@ -370,7 +372,7 @@ fecha.addEventListener('keypress',e=>{
 
 cancelar.addEventListener('click',e=>{
     location.href = "../menu.html";
-})
+});
 
 //si apretramos enter y el valor es vacio abrimos para buscar los clientes
 codigo.addEventListener('keypress', async e=>{
@@ -386,3 +388,9 @@ codigo.addEventListener('keypress', async e=>{
         }
     }
 });
+
+setInterval(() => {
+    if (observaciones.value !== "") {
+        observaciones.classList.toggle('observacionesAlerta');
+    };
+}, 800);
