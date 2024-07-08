@@ -86,14 +86,20 @@ const ponerInputs = async(id)=>{
         direccion.value = cliente.direccion;
         const compensadas = (await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`)).data;
         tbody.innerHTML = "";
+
+        let i = 1;
         compensadas.forEach(compensada => {
+            
             if (compensada.observaciones) {
-                observaciones.value += ' / ' + compensada.observaciones;
+                observaciones.value = observaciones.value + compensada.nro_venta + ' ' + compensada.observaciones + "; "
+                i++;
             };
 
             ponerVenta(compensada);
         });
+
     }else{
+
         await sweet.fire("Cliente no encontrado");
         codigo.value = "";
         nombre.value = "";
@@ -390,14 +396,26 @@ codigo.addEventListener('keypress', async e=>{
 });
 
 
-observaciones.parentElement.addEventListener('dblclick', e => {
-    sweet.fire({
+
+observaciones.parentElement.addEventListener('dblclick',async e => {
+    const {isConfirmed, value} = await sweet.fire({
         title:"Observaciones",
         input:"textarea",
         inputValue: observaciones.value,
-        // confirmButtonText: "Modificar",
+        confirmButtonText: "Modificar",
         showCancelButton: true
-    })
+    });
+    
+    if(isConfirmed){
+        const valores = value.split(';');
+        
+        valores.map( async valor => {
+            console.log(valor.trim()[0])
+            if (valor.trim()[0]) {
+                await axios.put(`${URL}compensada/observaciones/${valor.trim()[0]}`, {observaciones: valor.trim().slice(1)});
+            }
+        })
+    }
 });
 
 setInterval(() => {
