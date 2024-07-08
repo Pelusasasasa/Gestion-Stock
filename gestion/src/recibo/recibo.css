@@ -67,3 +67,8 @@ footer{
     border: none;
     font-weight: bold;
 }
+
+
+#observaciones{
+    pointer-events: none;;
+}

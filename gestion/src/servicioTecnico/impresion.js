@@ -67,5 +67,5 @@ ipcRenderer.on('recibir_servicio_impresion', async(e, args) => {
     await cargarHeader(servicio.numero);
     await cargarCliente(servicio.idCliente, servicio.cliente, servicio.direccion, servicio.telefono)
     await cargarProductos(lista);
-    // ipcRenderer.send('imprimir-ventana');
+    ipcRenderer.send('imprimir-ventana');
 });

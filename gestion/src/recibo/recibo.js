@@ -389,6 +389,17 @@ codigo.addEventListener('keypress', async e=>{
     }
 });
 
+
+observaciones.parentElement.addEventListener('dblclick', e => {
+    sweet.fire({
+        title:"Observaciones",
+        input:"textarea",
+        inputValue: observaciones.value,
+        // confirmButtonText: "Modificar",
+        showCancelButton: true
+    })
+});
+
 setInterval(() => {
     if (observaciones.value !== "") {
         observaciones.classList.toggle('observacionesAlerta');

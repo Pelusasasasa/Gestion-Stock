@@ -357,11 +357,17 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
+
     if (checkboxDolar.checked) {
-        movimiento.precio = producto.precio / dolar;
+        if (lista.value === "2") {
+            movimiento.precio = producto.costo !== 0 ? (producto.costo + (producto.costo * producto.impuesto / 100))  / dolar : producto.costoDolar + (producto.costoDolar * producto.impuesto / 100);
+        }else{
+            movimiento.precio = producto.precio / dolar;
+        }
     }else{
         movimiento.precio = lista.value === "1" ? producto.precio : parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar));
     }
+
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
     movimiento.impuesto = producto.impuesto;
