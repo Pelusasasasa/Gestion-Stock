@@ -91,7 +91,7 @@ const ponerInputs = async(id)=>{
         compensadas.forEach(compensada => {
             
             if (compensada.observaciones) {
-                observaciones.value = observaciones.value + compensada.nro_venta + ' ' + compensada.observaciones + "; "
+                observaciones.value = observaciones.value + compensada.nro_venta + ' ' + compensada.observaciones + ";"
                 i++;
             };
 
@@ -401,7 +401,7 @@ observaciones.parentElement.addEventListener('dblclick',async e => {
     const {isConfirmed, value} = await sweet.fire({
         title:"Observaciones",
         input:"textarea",
-        inputValue: observaciones.value,
+        inputValue: observaciones.value.split(';').join(';\n'),
         confirmButtonText: "Modificar",
         showCancelButton: true
     });
@@ -410,9 +410,20 @@ observaciones.parentElement.addEventListener('dblclick',async e => {
         const valores = value.split(';');
         
         valores.map( async valor => {
-            console.log(valor.trim()[0])
-            if (valor.trim()[0]) {
-                await axios.put(`${URL}compensada/observaciones/${valor.trim()[0]}`, {observaciones: valor.trim().slice(1)});
+            let aux = '';
+            let auxText = '';
+
+            for (let i = 0; i < valor.trim().length; i++) {
+                if (!isNaN(parseInt(valor[i]))) {
+                    aux += valor[i];
+                }else{
+                    auxText += valor[i];
+                };
+            }
+
+            if (aux) {
+                await axios.put(`${URL}compensada/observaciones/${aux}`, {observaciones: auxText.trim()});
+                observaciones.value = value.toUpperCase();
             }
         })
     }

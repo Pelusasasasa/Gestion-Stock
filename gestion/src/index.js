@@ -296,6 +296,12 @@ const hacerMenu = () => {
       }
     },
     {
+      label: "Ver Prestamos",
+      click(){
+        ventanaPrincipal.loadFile('src/prestamos/prestamos.html')
+      }
+    },
+    {
       label:"Configuracion",
       click(){
         abrirVentana('configuracion/configuracion.html',700,700,false)

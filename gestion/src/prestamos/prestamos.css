@@ -1,0 +1,17 @@
+.table{
+    overflow: scroll;
+    background-color: white;
+    height: 80vh;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,td{
+    text-align: center;
+    border: .1rem solid black;
+    cursor: pointer;
+}
+

@@ -67,6 +67,10 @@ input:disabled{
   text-align: right;
 }
 
+.text-center{
+  text-align: center;
+}
+
 .text-bold{
   font-weight: bold;
 }
