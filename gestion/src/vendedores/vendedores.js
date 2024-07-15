@@ -5,7 +5,8 @@ const sweet = require('sweetalert2');
 
 const {cerrarVentana, verificarUsuarios} = require('../helpers')
 
-const {vendedores:verVendedores} = require('../configuracion.json')
+const {vendedores:verVendedores} = require('../configuracion.json');
+const { ipcRenderer } = require('electron');
 
 const tbody = document.querySelector('tbody');
 
@@ -38,7 +39,6 @@ window.addEventListener('load',async e=>{
     vendedores = (await axios.get(`${URL}vendedores`)).data;
     listarVendedores(vendedores)
 });
-
 
 const listarVendedores = (lista)=>{
     tbody.innerHTML = "";

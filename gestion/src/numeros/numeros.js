@@ -6,7 +6,7 @@ const sweet = require('sweetalert2');
 
 const {vendedores,condIva} = require('../configuracion.json')
 
-const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB} = require('../helpers');
+const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB, agregarMovimientoVendedores, verNombrePc} = require('../helpers');
 const { ipcRenderer } = require('electron');
 
 const dolar = document.querySelector('#dolar');
@@ -28,6 +28,7 @@ const salir = document.querySelector('.salir');
 
 let id;
 let dolarTraido;
+let usuario = ''
 
 
 window.addEventListener('load',async e=>{
@@ -84,6 +85,10 @@ window.addEventListener('load',async e=>{
     }
 });
 
+ipcRenderer.on('informacion', (e,args) => {
+    usuario =  args.info;
+});
+
 //aca lo que hacemos es poner un boton para que si los numeros no estan cargados se carguen por primera vez
 cargar.addEventListener('click',async e=>{
     const numero = {
@@ -115,6 +120,8 @@ guardar.addEventListener('click',async e=>{
 
     if (dolarTraido !== parseFloat(dolar.value)) {
         await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
+        const pc = await verNombrePc();
+        agregarMovimientoVendedores(`Cambio el Dolar de ${dolarTraido} a ${dolar.value} en la Computadora ${pc}`, usuario);
     }
 
     try {

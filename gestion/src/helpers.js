@@ -357,7 +357,7 @@ funciones.verificarUsuarios = async()=>{
     let retorno
     await sweet.fire({
         title: "Contraseña",
-        input:"text",
+        input:"password",
         confirmButtonText:"Aceptar",
         showCancelButton:true
     }).then(async({isConfirmed,value})=>{
@@ -366,6 +366,12 @@ funciones.verificarUsuarios = async()=>{
         }
     });
     return retorno
+}
+
+funciones.verNombrePc = async() => {
+    require('hostname-patcher');
+    const os = require('os');
+    return os.hostname();
 }
 
 funciones.agregarMovimientoVendedores = async(descripcion,vendedor = "")=>{

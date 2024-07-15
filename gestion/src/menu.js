@@ -227,3 +227,39 @@ const cargarPrimerCliente = async()=>{
         }
     }
 };
+
+
+ipcRenderer.on('verificarUsuario', async(e,args) => {
+    let path = '';
+    const {permiso,nombre} = await verificarUsuarios();
+    
+    if (args === 'numeros') {
+        path = `numeros/numeros.html`
+    }else if(args === 'infoVendedores'){
+        path = 'vendedores/vendedores.html'
+    }else if(args === 'movVendedores'){
+        path = 'vendedores/movimientoVendedores.html';
+    };
+
+    if (permiso === 0) {
+        ipcRenderer.send('abrir-ventana',{
+            path: path,
+            ancho:1000,
+            altura:700,
+            info: nombre
+        });
+    }else if(permiso === 1 && args === 'numeros'){
+
+        ipcRenderer.send('abrir-ventana',{
+            path: path,
+            ancho:1000,
+            altura:700,
+            info: nombre
+        });
+
+    }else{
+        await sweet.fire({
+            title: "No tiene Permisos"
+        })
+    }
+});

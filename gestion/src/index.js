@@ -1,7 +1,8 @@
-const { dialog, app, BrowserWindow,Menu } = require('electron');
+const { dialog, app, BrowserWindow,Menu, ipcRenderer } = require('electron');
 const { ipcMain } = require('electron/main');
 const path = require('path');
-const {condIva} = require('./configuracion.json')
+const {condIva} = require('./configuracion.json');
+const { verificarUsuarios } = require('./helpers');
 
 var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
 
@@ -175,7 +176,7 @@ const hacerMenu = () => {
         {
           label:"Numeros",
           click(){
-            abrirVentana("numeros/numeros.html",750,700)
+            ventanaPrincipal.webContents.send('verificarUsuario','numeros');
           }
         },
         {
@@ -190,13 +191,14 @@ const hacerMenu = () => {
             {
               label:"Informacion Vendedores",
               click(){
-                abrirVentana("vendedores/vendedores.html",600,800);
+                ventanaPrincipal.webContents.send('verificarUsuario','infoVendedores');
               }
             },
             {
               label:"Movimiento Vendedores",
                 click(){
-                  abrirVentana("vendedores/movimientoVendedores.html",600,1100);
+                  ventanaPrincipal.webContents.send('verificarUsuario','movVendedores');
+                  
                 }
             }
           ]
