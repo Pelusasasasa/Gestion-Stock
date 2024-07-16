@@ -16,7 +16,6 @@ const { ipcRenderer } = require('electron');
 const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
 const archivo = require('../configuracion.json');
 
-
 //Parte Cliente
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');
@@ -27,7 +26,6 @@ const cuit = document.querySelector('#cuit');
 const condicionIva = document.querySelector('#condicion');
 const lista = document.getElementById('lista');
 const observaciones = document.getElementById('observaciones');
-
 
 //Parte Producto
 const cantidad = document.querySelector('#cantidad');
@@ -872,7 +870,9 @@ volver.addEventListener('click',()=>{
 
 async function togglePrecios(e) { 
     for await(let {cantidad,producto} of listaProductos){
+
         const tr = document.getElementById(`${producto.idTabla}`);
+
         if(lista.value === "1"){
             if (checkboxDolar.checked) {
                 tr.children[5].innerText = redondear(producto.precio / dolar,2);
@@ -888,7 +888,7 @@ async function togglePrecios(e) {
                     tr.children[6].innerText = redondear((producto.costo + (producto.costo * producto.impuesto / 100)) / dolar * parseFloat(tr.children[1].innerText), 2);
                 }else{
                     tr.children[5].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100), 2);
-                    tr.children[6].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100) * parseFloat(tr.children[1].innerText), 2);
+                    tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(tr.children[1].innerText), 2);
                 }
             }else{
                 if (producto.costo !== 0) {
