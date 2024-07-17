@@ -78,12 +78,22 @@ document.addEventListener('keyup',async e=>{
         }
         ipcRenderer.send('abrir-ventana',opciones)
     }else if(e.keyCode === 116){
+        const usuario = await verificarUsuarios();
+
         const opciones = {
             path:"gastos/gastos.html",
             ancho:500,
-            altura:550
+            altura:700,
+            info: usuario.nombre
+        };
+        
+        if (usuario.permiso === 2) {
+            await sweet.fire({
+                title: "No tienes permisos para acceder a gastos"
+            })
+        }else{
+            ipcRenderer.send('abrir-ventana',opciones);
         }
-        ipcRenderer.send('abrir-ventana',opciones);
     }
 });
 
@@ -144,25 +154,25 @@ productos.addEventListener('click',async e=>{
 });
 
 caja.addEventListener('click',async e=>{
-    if (verVendedores) {
         const vendedor = await verificarUsuarios();
+
         if (vendedor) {
-            if (vendedor.permiso === 2) {
-                sweet.fire({
+
+            if (vendedor.permiso !== 0) {
+                await sweet.fire({
                     title:"No tiene Permisos para ingresar a Caja"
-                })
+                });
             }else{
                 location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;    
             }
         }else if(vendedor === ""){
+
             await sweet.fire({
                 title:"Contraseña incorrecta"
-            })
-            caja.click()
-        }
-    }else{
-        location.href = "./caja/caja.html";
-    }
+            });
+            caja.click();
+
+        };
 });
 
 movimiento.addEventListener('click',e=>{

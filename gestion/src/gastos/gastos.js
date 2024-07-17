@@ -7,29 +7,17 @@ const {cerrarVentana, verificarUsuarios} = require('../helpers');
 
 const fecha = document.getElementById('fecha');
 const descripcion = document.getElementById('descripcion');
+const cuenta = document.getElementById('cuenta');
 const importe = document.getElementById('importe');
 const inputVendedor = document.getElementById('vendedor');
 const aceptar = document.querySelector('.aceptar');
 const salir = document.querySelector('.salir');
 
 const {caja,vendedores} = require('../configuracion.json');
+const { ipcRenderer } = require('electron');
 
-let vendedor;
 
 window.addEventListener('load',async e=>{
-    console.log(vendedores)
-    if (vendedores) {
-        vendedor = await verificarUsuarios();
-
-        if (vendedor) {
-            inputVendedor.value = vendedor.nombre;
-        }else{
-            await sweet.fire({
-                title:"Contraseña Incorrecta"
-            });
-            location.reload();
-        }
-    }
 
     const date = new Date();
     let day = date.getDate();
@@ -43,6 +31,12 @@ window.addEventListener('load',async e=>{
     fecha.value =  `${year}-${month}-${day}`;
 });
 
+ipcRenderer.on('informacion', (e,args) => {
+  
+    inputVendedor.value = args.info;
+    
+});
+
 
 fecha.addEventListener('keyup',e=>{
     if (e.keyCode === 13) {
@@ -52,8 +46,15 @@ fecha.addEventListener('keyup',e=>{
 
 descripcion.addEventListener('keyup',e=>{
     if (e.keyCode === 13) {
-        importe.focus();
+        cuenta.focus();
     }
+});
+
+cuenta.addEventListener('keyup', e => {
+    e.preventDefault();
+    if (e.keyCode === 13){
+        importe.focus();
+    };
 });
 
 importe.addEventListener('keyup',e=>{
