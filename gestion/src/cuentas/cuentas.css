@@ -1,0 +1,11 @@
+.cuentas{
+    display: flex;
+    gap: 2rem;
+}
+
+.cuentas div{
+    display: flex;
+    flex-direction: column;
+}
+
+

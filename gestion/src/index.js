@@ -204,6 +204,12 @@ const hacerMenu = () => {
           ]
         },
         {
+          label: "Cuentas",
+          click(){
+            abrirVentana("cuentas/cuentas.html", 500, 550)
+          }
+        },
+        {
           label: condIva === "Inscripto" ? "Libro Ventas" :"Alicuotas",
           click(){
             if (condIva === "Inscripto") {
