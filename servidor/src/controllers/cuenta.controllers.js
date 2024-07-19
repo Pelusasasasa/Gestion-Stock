@@ -6,6 +6,12 @@ cuentaCTRL.getCuentas = async (req, res) => {
     res.send(cuentas);
 };
 
+cuentaCTRL.getCuenta = async(req, res) => {
+    const {id} = req.params;
+    const cuenta = await Cuenta.findOne({idCuenta:id});
+    res.send(cuenta);
+};
+
 cuentaCTRL.postCuenta = async (req, res) => {
     const cuenta = new Cuenta(req.body);
     await cuenta.save();

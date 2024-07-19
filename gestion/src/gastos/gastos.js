@@ -3,7 +3,7 @@ require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
-const {cerrarVentana, verificarUsuarios} = require('../helpers');
+const {cerrarVentana, verificarUsuarios, agregarMovimientoVendedores, verNombrePc} = require('../helpers');
 
 const fecha = document.getElementById('fecha');
 const descripcion = document.getElementById('descripcion');
@@ -29,6 +29,9 @@ window.addEventListener('load',async e=>{
     month = month < 10 ? `0${month}` : month;
 
     fecha.value =  `${year}-${month}-${day}`;
+
+    const cuentas = (await axios.get(`${URL}cuenta`)).data;
+    listarCuentas(cuentas);
 });
 
 ipcRenderer.on('informacion', (e,args) => {
@@ -38,26 +41,26 @@ ipcRenderer.on('informacion', (e,args) => {
 });
 
 
-fecha.addEventListener('keyup',e=>{
+fecha.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
         descripcion.focus();
     }
 });
 
-descripcion.addEventListener('keyup',e=>{
+descripcion.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
         cuenta.focus();
     }
 });
 
-cuenta.addEventListener('keyup', e => {
+cuenta.addEventListener('keypress', e => {
     e.preventDefault();
     if (e.keyCode === 13){
         importe.focus();
     };
 });
 
-importe.addEventListener('keyup',e=>{
+importe.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
         aceptar.focus();
     }
@@ -66,11 +69,31 @@ importe.addEventListener('keyup',e=>{
 aceptar.addEventListener('click',async e=>{
     const gasto = {};
 
+    if (descripcion.value === "") {
+        await sweet.fire({ 
+            title: "Poner Descripcion",
+            returnFocus:false
+        });
+        descripcion.focus();
+        return;
+    };
+
+    if (importe.value === "") {
+        await sweet.fire({ 
+            title: "Poner Importe",
+            returnFocus:false
+        });
+        importe.focus();
+        return;
+    };
+
     gasto.fecha = fecha.value;
     gasto.descripcion = descripcion.value.toUpperCase();
     gasto.importe = importe.value;
+    gasto.cuenta = (await axios.get(`${URL}cuenta/idCuenta/${cuenta.value}`)).data.cuenta;
     gasto.vendedor = inputVendedor.value;
     gasto.caja = caja;
+
     try {
         await axios.post(`${URL}gastos`,gasto);
         window.close();
@@ -79,7 +102,10 @@ aceptar.addEventListener('click',async e=>{
         await sweet.fire({
             title:"No se puedo cargar el Gasto General"
         })
-    }
+    };
+    
+    const pc = await verNombrePc();
+    agregarMovimientoVendedores(`${inputVendedor.value} agrego el gasto de ${gasto.descripcion} a la cuenta ${gasto.cuenta} desde la compu ${pc}`, gasto.vendedor)
 });
 
 salir.addEventListener('click',e=>{
@@ -88,4 +114,16 @@ salir.addEventListener('click',e=>{
 
 document.addEventListener('keyup',e=>{
     cerrarVentana(e);
-})
+});
+
+
+const listarCuentas = (lista) => {
+    for(let elem of lista){
+        const option = document.createElement('option');
+        option.text = elem.cuenta;
+        option.value = elem.idCuenta;
+
+        cuenta.appendChild(option)
+
+    };
+}

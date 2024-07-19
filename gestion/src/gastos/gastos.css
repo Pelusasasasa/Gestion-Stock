@@ -14,3 +14,7 @@ h1{
 .inputs main input{
     width: 70%;
 }
+
+select{
+    width: 70%;
+}

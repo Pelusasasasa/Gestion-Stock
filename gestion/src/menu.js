@@ -91,6 +91,10 @@ document.addEventListener('keyup',async e=>{
             await sweet.fire({
                 title: "No tienes permisos para acceder a gastos"
             })
+        }else if(!usuario){
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            });
         }else{
             ipcRenderer.send('abrir-ventana',opciones);
         }
