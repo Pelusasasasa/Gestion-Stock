@@ -1,6 +1,15 @@
+.seccionCuentas{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+}
+
 .cuentas{
     display: flex;
     gap: 2rem;
+    align-items: end;
 }
 
 .cuentas div{
@@ -8,4 +17,17 @@
     flex-direction: column;
 }
 
+.agregarCuenta{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
 
+.agregarCuenta select{
+    width: 70%;
+}
+
+.agregarCuenta label{
+    width: 7rem;
+    display: inline-block;
+}

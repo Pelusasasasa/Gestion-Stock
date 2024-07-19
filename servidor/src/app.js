@@ -25,6 +25,7 @@ app.use('/gestion/compensada',require('./routes/compensada'));
 app.use('/gestion/historica',require('./routes/historica'));
 app.use('/gestion/numero',require('./routes/numero'));
 app.use('/gestion/rubro',require('./routes/rubro'));
+app.use('/gestion/cuenta', require('./routes/cuenta'));
 app.use('/gestion/gastos',require('./routes/gasto'));
 app.use('/gestion/pedidos',require('./routes/pedido'));
 
