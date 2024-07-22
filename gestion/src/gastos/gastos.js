@@ -31,6 +31,16 @@ window.addEventListener('load',async e=>{
     fecha.value =  `${year}-${month}-${day}`;
 
     const cuentas = (await axios.get(`${URL}cuenta`)).data;
+
+    cuentas.sort((a,b) => {
+        if (a.cuenta > b.cuenta) {
+            return 1;
+        }else if(a.cuenta < b.cuenta){
+            return -1
+        }
+        return 0;   
+    })
+
     listarCuentas(cuentas);
 });
 
@@ -93,6 +103,9 @@ aceptar.addEventListener('click',async e=>{
     gasto.cuenta = (await axios.get(`${URL}cuenta/idCuenta/${cuenta.value}`)).data.cuenta;
     gasto.vendedor = inputVendedor.value;
     gasto.caja = caja;
+    
+    const pc = await verNombrePc();
+    agregarMovimientoVendedores(`${inputVendedor.value} agrego el gasto de ${gasto.descripcion} a la cuenta ${gasto.cuenta} desde la compu ${pc}`, gasto.vendedor)
 
     try {
         await axios.post(`${URL}gastos`,gasto);
@@ -103,9 +116,7 @@ aceptar.addEventListener('click',async e=>{
             title:"No se puedo cargar el Gasto General"
         })
     };
-    
-    const pc = await verNombrePc();
-    agregarMovimientoVendedores(`${inputVendedor.value} agrego el gasto de ${gasto.descripcion} a la cuenta ${gasto.cuenta} desde la compu ${pc}`, gasto.vendedor)
+
 });
 
 salir.addEventListener('click',e=>{
