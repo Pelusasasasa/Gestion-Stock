@@ -1,7 +1,15 @@
-.table{
+.table,.movimientos{
     overflow: scroll;
     background-color: white;
+}
+
+.table{
     height: 80vh;
+}
+
+.movimientos{
+    height: 40vh;
+    background-color: lightgray;
 }
 
 table{
