@@ -3,18 +3,18 @@ function getParameterByName(name) {
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
     results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+};
 
 let vendedor = getParameterByName('vendedor');
 
 const axios = require('axios');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
-const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva, configAxios} = require('../helpers');
+const sweet = require('sweetalert2');
 const archivo = require('../configuracion.json');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva, configAxios} = require('../helpers');
 
 //Parte Cliente
 const codigo = document.querySelector('#codigo');
@@ -27,7 +27,8 @@ const condicionIva = document.querySelector('#condicion');
 
 //Parte Producto
 const cantidad = document.querySelector('#cantidad');
-const codigoProd = document.querySelector('#codigoProd')
+const codigoProd = document.querySelector('#codigoProd');
+const lista = document.querySelector('#lista');
 const precioU = document.querySelector('#precio-U');
 const rubro = document.querySelector('#rubro');
 const tbody = document.querySelector('.tbody');
@@ -63,6 +64,64 @@ let situacion = "negro";
 let porcentajeH = 0;
 let descuento = 0;
 let listaProductos = [];
+
+const crearProducto = ()=>{
+    idProducto++;
+    const producto = {
+        descripcion:codigoProd.value.toUpperCase(),
+        precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
+        rubro:rubro.value,
+        idTabla:`${idProducto}`,
+        impuesto:0,
+        productoCreado:true
+    };
+
+    listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
+        tbody.innerHTML += `
+        <tr id=${idProducto}>
+            <td>${cantidad.value}</td>
+            <td></td>
+            <td>${codigoProd.value.toUpperCase()}</td>
+            <td></td>
+            <td>${parseFloat(producto.precio).toFixed(2)}</td>
+            <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
+            <td class=acciones>
+                <div class=tool>
+                    <span class=material-icons>delete</span>
+                    <p class=tooltip>Eliminar</p>
+                </div>
+            </td>
+        </tr>
+    `;
+    tbody.scrollIntoView({
+        block:"end"
+    });
+
+    total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)),2);
+    totalGlobal = parseFloat(total.value);
+    cantidad.value = "1.00";
+    precioU.value = "";
+    rubro.value = "";
+    codigoProd.value = "";
+    codigoProd.focus();
+};
+
+const traerProducto = (e) => {
+    codigoProd.value = e.target.id;
+    lista.classList.add('none');
+    cantidad.focus();
+};
+
+//Vemos que input tipo radio esta seleccionado
+const verTipoVenta = ()=>{
+    let retornar = false;
+    radio.forEach(input =>{
+        if (input.checked) {
+            retornar = input.value;
+        }
+    });
+    return retornar;
+};
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load',async e=>{
@@ -149,8 +208,7 @@ codigo.addEventListener('keypress',async e=>{
     }
 });
 
-
-codigoProd.addEventListener('keypress',e=>{
+codigoProd.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && codigoProd.value !== "") {
         listarProducto(codigoProd.value,cantidad.value);
     }else if(e.keyCode === 13 && codigoProd.value === ""){
@@ -162,6 +220,28 @@ codigoProd.addEventListener('keypress',e=>{
         ipcRenderer.send('abrir-ventana', opciones);
     }
 });
+
+codigoProd.addEventListener('keyup', async e => {
+    lista.innerHTML = '';
+    if (e.target.value === "") {
+        lista.classList.add('none');
+    }else{
+        lista.classList.remove('none');
+    }
+    
+    const listProducto = (await axios.get(`${URL}productos/${e.target.value.replace(/\//g,'%2F')}/descripcion`)).data;
+    for(let elem of listProducto){
+        const p = document.createElement('p');
+        p.id = elem._id;
+        p.classList.add('cursor-pointer');
+
+        p.addEventListener('click', traerProducto);
+
+        p.innerText = elem.descripcion;
+
+        lista.appendChild(p);
+    }
+})
 
 precioU.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
@@ -181,47 +261,6 @@ rubro.addEventListener('keypress',e=>{
         precioU.focus();
     }
 });
-
-const crearProducto = ()=>{
-    idProducto++;
-    const producto = {
-        descripcion:codigoProd.value.toUpperCase(),
-        precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)/100),2)),
-        rubro:rubro.value,
-        idTabla:`${idProducto}`,
-        impuesto:0,
-        productoCreado:true
-    };
-
-    listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
-        tbody.innerHTML += `
-        <tr id=${idProducto}>
-            <td>${cantidad.value}</td>
-            <td></td>
-            <td>${codigoProd.value.toUpperCase()}</td>
-            <td></td>
-            <td>${parseFloat(producto.precio).toFixed(2)}</td>
-            <td>${redondear((producto.precio * parseFloat(cantidad.value)),2)}</td>
-            <td class=acciones>
-                <div class=tool>
-                    <span class=material-icons>delete</span>
-                    <p class=tooltip>Eliminar</p>
-                </div>
-            </td>
-        </tr>
-    `;
-    tbody.scrollIntoView({
-        block:"end"
-    });
-
-    total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)),2);
-    totalGlobal = parseFloat(total.value);
-    cantidad.value = "1.00";
-    precioU.value = "";
-    rubro.value = "";
-    codigoProd.value = "";
-    codigoProd.focus();
-};
 
 ipcRenderer.on('recibir',(e,args)=>{
     const {tipo ,informacion,cantidad} = JSON.parse(args);
@@ -256,17 +295,6 @@ porcentaje.addEventListener('change',async e=>{
             total.value = totalGlobal.toFixed(2);
         };
 });
-
-//Vemos que input tipo radio esta seleccionado
-const verTipoVenta = ()=>{
-    let retornar = false;
-    radio.forEach(input =>{
-        if (input.checked) {
-            retornar = input.value;
-        }
-    });
-    return retornar;
-};
 
 document.getElementById('contado').addEventListener('change', e => {
 

@@ -189,3 +189,30 @@ footer main,footer button{
       padding: 0;
     }
 }
+
+#lista{
+  position: absolute;
+  top: 30%;
+  background-color: white;
+  width: 40%;
+  left: 25px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border: .1rem solid black;
+  height: auto;
+  max-height: 200px;
+}
+
+#lista p {
+  width: 100%;
+  /* margin: .1rem; */
+  margin: 0;
+  padding: .3rem;
+  border: .1rem solid black;
+}
+
+#lista p:hover{
+  cursor: pointer;
+  background-color: lightgray;
+  font-weight: bold;
+}
