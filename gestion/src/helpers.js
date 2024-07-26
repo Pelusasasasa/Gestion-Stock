@@ -181,6 +181,7 @@ async function generarQR(texto) {
 };
 
 funciones.recorrerFlechas = (code)=>{
+    console.log(seleccionado)
     if (code === 40 && seleccionado.nextElementSibling) {
         let aux = 0;
         let i = 0;
@@ -230,6 +231,43 @@ funciones.recorrerFlechas = (code)=>{
         subSeleccionado = subSeleccionado.nextElementSibling;
         subSeleccionado.classList.add('subSeleccionado');
     }
+};
+
+funciones.recorrerFlechasP = (code)=>{
+    if (code === 40 && seleccionado.nextElementSibling) {
+
+        let aux = 0;
+        let i = 0;
+        const spans = document.querySelectorAll('span');
+
+        for(let elem of spans){
+            if(elem.classList.contains('subSeleccionado')){
+                aux = i;
+            }
+            i++;
+        }
+
+        seleccionado && seleccionado.classList.remove('seleccionado');
+        seleccionado = seleccionado.nextElementSibling;
+        seleccionado.classList.add('seleccionado');
+
+    }else if(code === 38 && seleccionado.previousElementSibling){
+
+        let aux = 0;
+        let i = 0;
+        const spans = document.querySelectorAll('span');
+
+        for(let elem of spans){
+            if(elem.classList.contains('subSeleccionado')){
+                aux = i;
+            }
+            i++;
+        }
+
+        seleccionado && seleccionado.classList.remove('seleccionado');
+        seleccionado = seleccionado.previousElementSibling;
+        seleccionado.classList.add('seleccionado');
+    };
 };
 
 funciones.sacarIva = (lista,tipo) => {

@@ -14,7 +14,7 @@ const URL = process.env.GESTIONURL;
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 const archivo = require('../configuracion.json');
-const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva, configAxios} = require('../helpers');
+const {apretarEnter,redondear,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verClienteValido, movimientosRecibos, mostrarHistoricaRespuesta, mostrarVentaRespues, sacarIva, configAxios, recorrerFlechas, recorrerFlechasP} = require('../helpers');
 
 //Parte Cliente
 const codigo = document.querySelector('#codigo');
@@ -107,6 +107,7 @@ const crearProducto = ()=>{
 };
 
 const traerProducto = (e) => {
+    console.log(e)
     codigoProd.value = e.target.id;
     lista.classList.add('none');
     cantidad.focus();
@@ -190,6 +191,16 @@ document.addEventListener('keydown',e=>{
         ipcRenderer.send('abrir-ventana',opciones);   
     }else if(e.keyCode === 117){
         impresion.checked = !impresion.checked;
+    }else if(e.keyCode === 40 && !lista.classList.contains('none')){
+        if (document.activeElement.id === 'codigoProd' ) {
+            document.getElementById('codigoProd').blur();
+        }
+        recorrerFlechasP(e.keyCode)
+    }else if(e.keyCode === 38 && !lista.classList.contains('none')){
+        if (document.activeElement.id === 'codigoProd' ) {
+            document.getElementById('codigoProd').blur();
+        }
+        recorrerFlechasP(e.keyCode)
     }
 });
 
@@ -240,8 +251,11 @@ codigoProd.addEventListener('keyup', async e => {
         p.innerText = elem.descripcion;
 
         lista.appendChild(p);
-    }
-})
+        seleccionado = lista.firstElementChild;
+        seleccionado.classList.add('seleccionado');console.log(1)
+    };
+
+});
 
 precioU.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
@@ -722,6 +736,11 @@ document.addEventListener('keydown',e=>{
             }
         });
     };
+
+    if (e.keyCode === 13 && seleccionado.parentNode.id === 'lista'){
+        e.target.id = seleccionado.id
+        traerProducto(e);
+    }
 });
 
 const hacerRecibo = async(numero,nro_comp,tipo)=>{
