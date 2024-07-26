@@ -64,12 +64,14 @@ const listarMovimientos = async( num ) => {
         const tdCantidad = document.createElement('td');
         const tdStock = document.createElement('td');
         const tdPrecio = document.createElement('td');
+        const pro = (await axios.get(`${URL}productos/${mov.codProd}`)).data;
+        
 
         tdCodigo.innerText = mov.codProd;
         tdDescripcion.innerText = mov.descripcion;
         tdCantidad.innerText = mov.egreso.toFixed(2);
         tdStock.innerText = mov.stock.toFixed(2);
-        tdPrecio.innerText = mov.precio_unitario.toFixed(2);
+        tdPrecio.innerText = pro.precio_venta.toFixed(2);
 
         tr.appendChild(tdCodigo);
         tr.appendChild(tdDescripcion);
