@@ -33,7 +33,6 @@ const traerListado = async(e) =>{
 
 const listarProductos = async() => {
     
-    
     for(let elem of productos){
         const tr = document.createElement('tr');
         tr.id = elem._id;
@@ -70,6 +69,32 @@ const listarProductos = async() => {
 
         tbody.appendChild(tr);
     }
+};
+
+const cambiarIva = async(e) => {
+    if(e.target.value === '')return;
+
+    if (productos.length === 0){
+        const sweet = require('sweetalert2');
+        sweet.fire({
+            title: "No trajo porductos"
+        });
+    }else{
+        for await(let elem of productos){
+            
+            elem.impuesto = parseFloat(e.target.value);
+            const costoDescuento1 = elem.costo - (elem.costo * (elem.descuento1 / 100));
+            const costoDescuento2 = costoDescuento1 - (costoDescuento1 * (elem.descuento2 / 100));
+            const costoDescuento3 = costoDescuento2 - (costoDescuento2 * (elem.descuento3 / 100));
+            const costoIva = costoDescuento3 + (costoDescuento3 * elem.impuesto / 100);
+            const costoGancancia = costoIva + (costoIva * elem.ganancia / 100);
+
+            elem.precio = costoGancancia;
+        };
+        tbody.innerHTML = "";
+        listarProductos(productos);
+    }
+
 };
 
 const actualizarCosto = async(numero) => {
@@ -193,6 +218,8 @@ datos.addEventListener('keypress', async e => {
         listarProductos();
     };
 });
+
+iva.addEventListener('change', cambiarIva);
 
 costo.addEventListener('keypress', e => {
     if (e.keyCode === 13) {
