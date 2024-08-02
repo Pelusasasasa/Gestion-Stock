@@ -247,12 +247,13 @@ codigoProd.addEventListener('keyup', async e => {
         p.classList.add('cursor-pointer');
 
         p.addEventListener('click', traerProducto);
+        
 
         p.innerText = elem.descripcion;
 
         lista.appendChild(p);
         seleccionado = lista.firstElementChild;
-        seleccionado.classList.add('seleccionado');console.log(1)
+        seleccionado.classList.add('seleccionado');
     };
 
 });
@@ -337,7 +338,6 @@ document.getElementById('tarjeta').addEventListener('change', e => {
             
             tr.children[4].innerText = (producto.precio + producto.precio * archivo.descuentoEfectivo / 100).toFixed(2);
             tr.children[5].innerText = (parseFloat(tr.children[4].innerText) * cantidad).toFixed(2)
-            console.log(cantidad)
             totalGlobal = parseFloat(redondear(totalGlobal + parseFloat(tr.children[5].innerText),2));
             total.value = totalGlobal.toFixed(2);
         }
@@ -722,7 +722,7 @@ const sumarSaldo = async(id,nuevoSaldo,venta)=>{
 };
 
 
-document.addEventListener('keydown',e=>{
+document.addEventListener('keyup',e=>{
     if (e.key === "Escape") {
         sweet.fire({
             title: "Cancelar Venta?",
@@ -737,9 +737,15 @@ document.addEventListener('keydown',e=>{
         });
     };
 
-    if (e.keyCode === 13 && seleccionado.parentNode.id === 'lista'){
-        e.target.id = seleccionado.id
-        traerProducto(e);
+    if (e.keyCode === 13){
+        if (seleccionado && seleccionado.parentNode.id === 'lista') {
+            e.target.id = seleccionado.id;
+            codigoProd.value = e.target.id;
+             
+            lista.classList.add('none');
+            seleccionado = '';
+            cantidad.focus();    
+        };
     }
 });
 
