@@ -95,7 +95,7 @@ const exportarExcel = async() => {
 
     for(let elem of movimientosAux){
         const pro = (await axios.get(`${URL}productos/${elem.codProd}`)).data;
-        elem.precio_unitario = pro.oferta ? pro.precio_oferta : pro.precio_venta;
+        elem.precio_unitario = pro.oferta ? pro.precioOferta : pro.precio_venta;
         elem.total = (elem.egreso * elem.precio_unitario);
         totalAux += parseFloat(elem.total);
     }
