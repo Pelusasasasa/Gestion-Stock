@@ -36,7 +36,7 @@ movimientoCTRL.porId = async(req,res)=>{
     res.send(movimientos)
 };
 
-movimientoCTRL.porRubro = async(req,res)=>{
+movimientoCTRL.porRubro = async(req,res) => {
     const {rubro,desde,hasta} = req.params;
     const productos = await movProducto.find({
         $and:[
@@ -47,5 +47,20 @@ movimientoCTRL.porRubro = async(req,res)=>{
     });
     res.send(productos);
 };
+
+movimientoCTRL.post = async(req, res) => {
+    const movimiento = req.body;
+
+    const now = new Date();
+    movimiento.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+
+    const movimientoAGuardar = new movProducto(movimiento);
+    await movimientoAGuardar.save();
+
+    console.log(movimientoAGuardar)
+
+    res.send( `Movimiento con el id ${movimientoAGuardar._id} de tipo ${movimientoAGuardar.tipo_comp} a la hora ${(new Date()).toLocaleString()}`);
+
+}
 
 module.exports = movimientoCTRL;
