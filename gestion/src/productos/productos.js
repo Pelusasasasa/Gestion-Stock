@@ -184,14 +184,23 @@ agregar.addEventListener('click',e=>{
     ipcRenderer.send('abrir-ventana',opciones);
 })
 
-body.addEventListener('keypress',e=>{
+body.addEventListener('keypress',async e => {
     if (e.key === "Enter" && ventanaSecundaria){    
         if (seleccionado && document.activeElement.nodeName !== "INPUT") {
-            ipcRenderer.send('enviar',{
+
+            const { isConfirmed, value } = await sweet.fire({
+                title: 'Cantidad ',
+                input: 'number'
+            });
+
+            if (isConfirmed) {
+                ipcRenderer.send('enviar',{
                         tipo:"producto",
                         informacion:seleccionado.id,
-            });
-            window.close();
+                        cantidad: value ? value : 1,
+                });
+                window.close();
+            }
         }
     }
 })

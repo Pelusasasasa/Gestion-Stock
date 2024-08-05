@@ -149,9 +149,9 @@ const crearProducto = ()=>{
 };
 
 ipcRenderer.on('recibir',(e,args)=>{
-    const {tipo ,informacion} = JSON.parse(args);
+    const {tipo ,informacion, cantidad} = JSON.parse(args);
     tipo === "cliente" && listarCliente(informacion);
-    tipo === "producto" && listarProducto(informacion);
+    tipo === "producto" && listarProducto(informacion, cantidad);
     tipo === "Ningun cliente" && nombre.focus();
 });
 
@@ -392,8 +392,9 @@ const descontarStock = async({cantidad,producto})=>{
 }
 
 //Lo que hacemos es listar el producto traido
-const listarProducto = async(id)=>{
+const listarProducto = async(id, cant = 1)=>{
         let producto = (await axios.get(`${URL}productos/${id}`)).data;//buscamos el producto por codigo
+        cantidad.value = cant;
 
         if(!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad'){
             descripcion.value = producto.descripcion;
