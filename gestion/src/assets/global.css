@@ -111,3 +111,69 @@ select{
 table tbody{
   white-space: nowrap;
 }
+
+/* margin */
+
+.mt-2{
+  margin-top: 2rem;
+}
+
+.mr-2{
+  margin-right: 2rem;
+}
+
+.ml-2{
+  margin-left: 2rem;
+}
+
+/* Padding */
+
+.p-2{
+  padding: 2rem;
+}
+
+/* Padding */
+
+ /* Flex */
+
+.flex{
+  display: flex;
+}
+
+.flex-col{
+  flex-direction: column;
+}
+
+.justify-around{
+  justify-content: space-around;
+}
+
+.items-center{
+  align-items: center;
+}
+
+.gap-2{
+  gap: 2rem;
+}
+
+/* Flex */
+
+/* Transform */
+
+  .scale-1-9{
+    transform: scale(1.9);
+  }
+
+/* Transform */
+
+/* Label */
+
+/* Label */
+
+/* font  */
+
+.text-weight-900{
+  font-weight: 900;
+}
+
+/* font  */

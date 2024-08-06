@@ -13,7 +13,7 @@ const { ipcRenderer } = require("electron");
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
-const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores } = require("../helpers");
+const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores, verificarUsuarios } = require("../helpers");
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
@@ -25,33 +25,35 @@ const seleccion = document.querySelector('#seleccion');
 const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
 const agregar = document.querySelector('.agregar');
+const ingresarMov = document.querySelector('.ingresarMov');
 const salir = document.querySelector('.salir');
 const buscador = document.querySelector('#buscarProducto');
 
-window.addEventListener('load',async e=>{
-    filtrar();
-    copiar();
-});
 
-//Vemos si llega una informacion de que se abrio desde otra ventana 
-ipcRenderer.on('informacion',(e,args)=>{
-    const botones = args.botones;
-    if(!botones){
-        const botones = document.querySelector('.botones');
-        botones.classList.add('none');
-        ventanaSecundaria = true;
-        seleccion.value = "descripcion";
-    }
-});
+const filtrar = async()=>{
+    tbody.innerHTML = '';
+    let condicion = seleccion.value;
+    if (condicion === "codigo") {
+        condicion="_id";
+    };
+    const descripcion = buscador.value !== "" ? buscador.value : "textoVacio";
+    const producto = (await axios.get(`${URL}productos/${descripcion}/${condicion}`)).data;
+    producto.length !== 0 && listar(producto);
+};
 
-ipcRenderer.on('informacion-a-ventana',(e,args)=>{
-    const producto = JSON.parse(args);
-    const trModificado = document.getElementById(producto._id);
-    trModificado.children[1].innerText = producto.descripcion;
-    trModificado.children[2].innerText = producto.precio;
-    trModificado.children[3].innerText = producto.stock;
-    trModificado.children[4].innerText = producto.marca;
-});
+const ingresarMovimiento = async(e) => {
+    const vendedor = await verificarUsuarios();
+    
+    ipcRenderer.send('abrir-ventana', {
+        path: 'productos/ingresarMovimiento.html',
+        ancho: 600,
+        altura: 700,
+        informacion: seleccionado.id,
+        vendedor: vendedor,
+        permiso: permiso
+    });
+
+};
 
 const listar = (productos)=>{
     tbody.innerHTML = "";
@@ -98,18 +100,32 @@ const listar = (productos)=>{
         
         tbody.appendChild(tr);
     }
-}
+};
 
-const filtrar = async()=>{
-    tbody.innerHTML = '';
-    let condicion = seleccion.value;
-    if (condicion === "codigo") {
-        condicion="_id";
-    };
-    const descripcion = buscador.value !== "" ? buscador.value : "textoVacio";
-    const producto = (await axios.get(`${URL}productos/${descripcion}/${condicion}`)).data;
-    producto.length !== 0 && listar(producto);
-}
+window.addEventListener('load',async e=>{
+    filtrar();
+    copiar();
+});
+
+//Vemos si llega una informacion de que se abrio desde otra ventana 
+ipcRenderer.on('informacion',(e,args)=>{
+    const botones = args.botones;
+    if(!botones){
+        const botones = document.querySelector('.botones');
+        botones.classList.add('none');
+        ventanaSecundaria = true;
+        seleccion.value = "descripcion";
+    }
+});
+
+ipcRenderer.on('informacion-a-ventana',(e,args)=>{
+    const producto = JSON.parse(args);
+    const trModificado = document.getElementById(producto._id);
+    trModificado.children[1].innerText = producto.descripcion;
+    trModificado.children[2].innerText = producto.precio ? producto.precio : trModificado.children[2].innerText;
+    trModificado.children[3].innerText = producto.stock ? producto.stock : trModificado.children[3].innerText;
+    trModificado.children[4].innerText = producto.marca ? producto.marca : trModificado.children[4].innerText;
+});
 
 buscador.addEventListener('keyup',e=>{
     if ((buscador.value === "" && e.keyCode === 40) || (buscador.value === "" && e.keyCode === 39)) {
@@ -182,7 +198,9 @@ agregar.addEventListener('click',e=>{
         vendedor:vendedor
     }
     ipcRenderer.send('abrir-ventana',opciones);
-})
+});
+
+ingresarMov.addEventListener('click', ingresarMovimiento);
 
 body.addEventListener('keypress',async e => {
     if (e.key === "Enter" && ventanaSecundaria){    
@@ -203,10 +221,6 @@ body.addEventListener('keypress',async e => {
             }
         }
     }
-})
-
-salir.addEventListener('click',e=>{
-    location.href = "../menu.html";
 });
 
 document.addEventListener("keydown",e=>{
@@ -218,3 +232,6 @@ document.addEventListener("keydown",e=>{
     recorrerFlechas(e.keyCode);
 });
 
+salir.addEventListener('click',e=>{
+    location.href = "../menu.html";
+});

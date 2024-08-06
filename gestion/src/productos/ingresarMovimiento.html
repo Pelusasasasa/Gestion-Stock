@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresar Movimiento</title>
+    <link rel="stylesheet" href="../assets/global.css">
+</head>
+<body>
+    <h1 class="text-center">Ingresar Movimiento</h1>
+
+    <section>
+        <div class="flex flex-col">
+            <label for="codigo">Codigo</label>
+            <input type="text" name="codigo" disabled id="codigo">
+        </div>
+        <div class="flex flex-col">
+            <label for="descripcion">Descripcion</label>
+            <input type="text" name="descripcion" id="descripcion" disabled>
+        </div>
+    </section>
+
+    <section class="radios">
+        <fieldset class="flex flex-col items-center gap-2">
+            <legend>Operacion</legend>
+            <div>
+                <label for="compra">Compra</label>
+                <input type="radio" name="operacion" id="compra" checked class="scale-1-9 ml-2">
+            </div>
+            <div>
+                <label for="suma">Suma</label>
+                <input type="radio" name="operacion" id="suma" class="scale-1-9 ml-2">
+            </div>
+            <div>
+                <label for="resta">Resta</label>
+                <input type="radio" name="operacion" id="resta" class="scale-1-9 ml-2">
+            </div>
+        </fieldset>
+    </section>
+
+    <section class="informacion flex flex-col items-center gap-2 mt-2">
+        <div class="flex flex-col">
+            <label for="stock">Stock</label>
+            <input type="number" disabled name="stock" id="stock">
+        </div>
+
+        <div class="flex flex-col">
+            <label for="cantidad">Cantidad</label>
+            <input type="number" name="cantidad" autofocus id="cantidad" class="text-weight-900">
+        </div>
+
+        <div class="flex flex-col">
+            <label for="nuevoStock">Nuevo Stock</label>
+            <input type="number" disabled name="nuevoStock" id="nuevoStock">
+        </div>
+
+    </section>
+
+    <section class="flex gap-2 items-center justify-around mt-2">
+        <button id="aceptar">Aceptar</button>
+        <button id="salir">Salir</button>
+    </section>
+<script src="./ingresarMovimiento.js"></script>
+</body>
+</html>
