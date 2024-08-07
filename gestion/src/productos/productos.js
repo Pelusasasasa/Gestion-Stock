@@ -42,16 +42,29 @@ const filtrar = async()=>{
 };
 
 const ingresarMovimiento = async(e) => {
+
+    if (!seleccionado) return (await sweet.fire({
+        title: "Elegir un producto"
+    }));
+
     const vendedor = await verificarUsuarios();
     
-    ipcRenderer.send('abrir-ventana', {
-        path: 'productos/ingresarMovimiento.html',
-        ancho: 600,
-        altura: 700,
-        informacion: seleccionado.id,
-        vendedor: vendedor,
-        permiso: permiso
-    });
+    if(vendedor === undefined) return;
+    
+    if (vendedor) {
+        ipcRenderer.send('abrir-ventana', {
+            path: 'productos/ingresarMovimiento.html',
+            ancho: 600,
+            altura: 700,
+            informacion: seleccionado.id,
+            vendedor: vendedor,
+            permiso: permiso
+        });
+    }else{
+        await sweet.fire({
+            title: "Contraseña Incorrecta"
+        })
+    }
 
 };
 

@@ -79,3 +79,9 @@ salir.addEventListener('click', e => {
     window.close();
 
 });
+
+document.addEventListener('keydown', e => {
+    if(e.keyCode === 27){
+        window.close();
+    }
+});
