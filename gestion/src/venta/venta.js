@@ -117,6 +117,49 @@ const crearProducto = ()=>{
     codBarra.focus();
 };
 
+const sumarSaldo = async(id,nuevoSaldo,venta)=>{
+    const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
+    cliente.listaVentas.push(venta);
+    if (facturaAnterior) {
+        cliente.saldo = (cliente.saldo - nuevoSaldo);
+    }else{
+        cliente.saldo = (cliente.saldo + nuevoSaldo - parseFloat(inputRecibo.value)).toFixed(2);
+    }
+    await axios.put(`${URL}clientes/id/${id}`,cliente);
+};
+
+const sacarIva = (lista) => {
+    let totalIva0 = 0;
+    let totalIva21= 0;
+    let gravado21 = 0; 
+    let gravado0 = 0;
+    let totalIva105= 0;
+    let gravado105 = 0;
+    lista.forEach(({producto,cantidad}) =>{
+        if (producto.impuesto === 21) {
+            gravado21 += cantidad*producto.precio/1.21;
+            totalIva21 += cantidad*producto.precio/1.21 * 21 / 100;
+        }else if(producto.impuesto === 10.5){
+            gravado105 += cantidad*producto.precio/1.105
+            totalIva105 += cantidad*producto.precio/1.105 * 10.5 / 100;
+        }else{
+            gravado0 += cantidad*producto.precio/1;
+            totalIva0 += (cantidad*producto.precio)-(producto.precio/1);
+        }
+    });
+    let cantIva = 0
+    if (gravado0 !== 0) {
+        cantIva++;
+    }
+    if (gravado21 !== 0) {
+        cantIva++;
+    }
+    if (gravado105 !== 0) {
+        cantIva++;
+    }
+    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
+};
+
 const togglePrecios = async(e) => { 
     for await(let {cantidad,producto} of listaProductos){
 
@@ -392,16 +435,8 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.cliente = cliente
     movimiento.cantidad = cantidad;
     movimiento.marca = producto.marca;
-
-    if (checkboxDolar.checked) {
-        if (lista.value === "2") {
-            movimiento.precio = producto.costo !== 0 ? (producto.costo + (producto.costo * producto.impuesto / 100))  / dolar : producto.costoDolar + (producto.costoDolar * producto.impuesto / 100);
-        }else{
-            movimiento.precio = producto.precio / dolar;
-        }
-    }else{
-        movimiento.precio = lista.value === "1" ? producto.precio : parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar));
-    }
+    
+    movimiento.precio = lista.value === "1" ? producto.precio : parseFloat(sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar));
 
     movimiento.rubro = producto.rubro;
     movimiento.nro_venta = numero;
@@ -628,48 +663,7 @@ tbody.addEventListener('click',async e=>{
     }
 });
 
-const sumarSaldo = async(id,nuevoSaldo,venta)=>{
-    const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
-    cliente.listaVentas.push(venta);
-    if (facturaAnterior) {
-        cliente.saldo = (cliente.saldo - nuevoSaldo);
-    }else{
-        cliente.saldo = (cliente.saldo + nuevoSaldo - parseFloat(inputRecibo.value)).toFixed(2);
-    }
-    await axios.put(`${URL}clientes/id/${id}`,cliente);
-};
 
-const sacarIva = (lista) => {
-    let totalIva0 = 0;
-    let totalIva21= 0;
-    let gravado21 = 0; 
-    let gravado0 = 0;
-    let totalIva105= 0;
-    let gravado105 = 0;
-    lista.forEach(({producto,cantidad}) =>{
-        if (producto.impuesto === 21) {
-            gravado21 += cantidad*producto.precio/1.21;
-            totalIva21 += cantidad*producto.precio/1.21 * 21 / 100;
-        }else if(producto.impuesto === 10.5){
-            gravado105 += cantidad*producto.precio/1.105
-            totalIva105 += cantidad*producto.precio/1.105 * 10.5 / 100;
-        }else{
-            gravado0 += cantidad*producto.precio/1;
-            totalIva0 += (cantidad*producto.precio)-(producto.precio/1);
-        }
-    });
-    let cantIva = 0
-    if (gravado0 !== 0) {
-        cantIva++;
-    }
-    if (gravado21 !== 0) {
-        cantIva++;
-    }
-    if (gravado105 !== 0) {
-        cantIva++;
-    }
-    return [parseFloat(totalIva21.toFixed(2)),parseFloat(totalIva0.toFixed(2)),parseFloat(gravado21.toFixed(2)),parseFloat(gravado0.toFixed(2)),parseFloat(totalIva105.toFixed(2)),parseFloat(gravado105.toFixed(2)),cantIva]
-};
 
 //Esta funcion genera un recibo cuando ponemos un valor distinto de 0 en el input de recibo
 async function hacerRecibo(numero){

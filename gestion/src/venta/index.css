@@ -49,7 +49,7 @@
   /* font-size: 1.8rem; */
 }
 
-.parteCliente div #saldo,.parteCliente div #codigo{
+.parteCliente div #codigo{
   width: 50%;
 }
 
@@ -232,4 +232,9 @@ footer main,footer button{
 
 .cambio main input{
   width: 50%;
+}
+
+
+#cuit{
+  width: 13rem;
 }

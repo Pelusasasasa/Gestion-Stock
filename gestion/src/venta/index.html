@@ -36,39 +36,38 @@
         </main>
       </div>
 
-    <div class="parteCliente2">
-      <div>
-        <label for="telefono">Telefono</label>
-        <input type="text" id="telefono" name="telefono">
+      <div class="parteCliente2">
+        <div>
+          <label for="telefono">Telefono</label>
+          <input type="text" id="telefono" name="telefono">
+        </div>
+
+        <div>
+          <label for="localidad">Localidad</label>
+          <input type="text" id="localidad" name="localidad">
+        </div>
+
+        <div>
+          <label for="direccion">Direccion</label>
+          <input type="text" id="direccion" name="direccion">
+        </div>
+
+        <main>
+          <label for="condicion">Condicion Iva</label>
+          <select name="condicion" id="condicion">
+            <option value="Consumidor Final">Consumidor Final</option>
+            <option value="Monotributo">Monotributo</option>
+            <option value="Responsable Inscripto">Inscripto</option>
+            <option value="Exento">Exento</option>
+          </select>
+        </main>
+
+        <main>
+          <label for="observaciones">Observaciones</label>
+          <input type="text" id="observaciones" name="observaciones">
+        </main>
+
       </div>
-
-      <div>
-        <label for="localidad">Localidad</label>
-        <input type="text" id="localidad" name="localidad">
-      </div>
-
-      <div>
-        <label for="direccion">Direccion</label>
-        <input type="text" id="direccion" name="direccion">
-      </div>
-
-      <main>
-        <label for="condicion">Condicion Iva</label>
-        <select name="condicion" id="condicion">
-          <option value="Consumidor Final">Consumidor Final</option>
-          <option value="Monotributo">Monotributo</option>
-          <option value="Responsable Inscripto">Inscripto</option>
-          <option value="Exento">Exento</option>
-        </select>
-      </main>
-
-      <main>
-        <label for="observaciones">Observaciones</label>
-        <input type="text" id="observaciones" name="observaciones">
-      </main>
-
-    </div>
-
     </header>
 
     <main class="parteProductos">
@@ -121,6 +120,7 @@
       </section>
 
     </main>
+
     <main class="totales">
 
       <main>
@@ -128,7 +128,7 @@
         <input type="number" value="0.00" name="recibo" id="recibo">
       </main>
 
-      <div class="condicionVenta">
+      <div class="condicionVenta gap-2">
         <div class="contado">
           <input type="radio" name="condicion" value="PP" id="presupuesto">
           <label for="presupuesto">Presupuesto</label>
