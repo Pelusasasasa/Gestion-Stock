@@ -13,7 +13,7 @@ const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet} = require('../helpers');
+const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -68,37 +68,6 @@ let dolar = 0;
 let listaProductos = [];
 let seleccionado;
 
-ipcRenderer.on('informacion',(e,args)=>{
-    dolar = args;
-});
-
-//Por defecto ponemos el A Consumidor Final y tambien el select
-window.addEventListener('load',async e=>{
-
-    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
-
-    if (tipoFactura === "notaCredito") {
-
-        await sweet.fire({
-            title:"Numero de Factura Anterior",
-            input:"text",
-            confirmButtonText:"Aceptar",
-            showCancelButton:true
-        }).then(({isConfirmed,value})=>{
-            console.log(isConfirmed)
-            if (isConfirmed) {
-                facturaAnterior = value.padStart(8,'0');
-            }else{
-                location.href = '../menu.html';
-            }
-        });
-    }
-    
-    listarCliente(1);//listanos los clientes
-    
-    cambiarSituacion(situacion);//
-});
-
 const crearProducto = ()=>{
     idProducto++;
     const producto = {
@@ -148,12 +117,26 @@ const crearProducto = ()=>{
     codBarra.focus();
 };
 
-ipcRenderer.on('recibir',(e,args)=>{
-    const {tipo ,informacion, cantidad} = JSON.parse(args);
-    tipo === "cliente" && listarCliente(informacion);
-    tipo === "producto" && listarProducto(informacion, cantidad);
-    tipo === "Ningun cliente" && nombre.focus();
-});
+const togglePrecios = async(e) => { 
+    for await(let {cantidad,producto} of listaProductos){
+
+        const tr = document.getElementById(`${producto.idTabla}`);
+
+        if(lista.value === "1"){
+            tr.children[5].innerText = producto.precio.toFixed(2);
+            tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText),2);
+        }else{
+            if (producto.costo !== 0) {
+                tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100),2);
+                tr.children[6].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100) * parseFloat(tr.children[1].innerText), 2);
+            }else{
+                tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar,2);
+                tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar * parseFloat(tr.children[1].innerText), 2);
+            }
+        };
+    };
+    calcularTotal();
+};
 
 //Vemos que input tipo radio esta seleccionado
 const verTipoVenta = ()=>{
@@ -166,61 +149,115 @@ const verTipoVenta = ()=>{
     return retornar;
 };
 
-facturar.addEventListener('click',async e=>{
-    if (codigo.value === "") {
-        sweet.fire({
+//Vefiricamos si la venta tiene los datos base para hacerla
+const vefiricarVenta = async() => {
+    let bandera = true;
+
+     if (codigo.value === "") {
+        await sweet.fire({
             title:"Poner un codigo de cliente"
         });
+        bandera = false;
     }else if(!verSiHayInternet() && situacion === "blanco"){
         await sweet.fire({
             title:"No se puede hacer la factura porque no hay internet"
-        })
+        });
+        bandera = false;
     }else if(cuit.value.length === 8 && condicionIva.value === "Responsable Inscripto" && archivo.condIva === "Inscripto"){
         if (tipoFactura) {
             await sweet.fire({
                 title:"No se puede hacer Nota Credito B a un Inscripto"
             });
+            bandera = false;
         }else{
             await sweet.fire({
                 title:"No se puede hacer Factura B a un Inscripto"
             });
+            bandera = false;
         }
-    }else{
-        alerta.classList.remove('none');
-        const numeros = (await axios.get(`${URL}numero`)).data;
-        const venta = {};
+    }
 
-        venta.cliente = nombre.value;
-        venta.fecha = new Date();
-        venta.idCliente = codigo.value;
-        venta.precio = parseFloat(total.value);
-        venta.descuento = descuento;
-        venta.tipo_venta = await verTipoVenta();
-        venta.listaProductos = listaProductos;
-        
-        //Ponemos propiedades para la factura electronica
-        venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
-        venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
-        venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
-        venta.cod_doc = await verCodigoDocumento(cuit.value);
-        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
-        const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
-        venta.iva21 = iva21;
-        venta.iva0 = iva0;
-        venta.gravado0 = gravado0;
-        venta.gravado21 = gravado21;
-        venta.iva105 = iva105;
-        venta.gravado105 = gravado105;
-        venta.cantIva = cantIva;
-        venta.direccion = direccion.value;
-        venta.localidad = localidad.value;
-        venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
+    return bandera;
+};
 
-        venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
-        venta.vendedor = vendedor ? vendedor : "";
+ipcRenderer.on('informacion',(e,args)=>{
+    dolar = args;
+});
+
+//Por defecto ponemos el A Consumidor Final y tambien el select
+window.addEventListener('load',async e=>{
+
+    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+
+    if (tipoFactura === "notaCredito") {
+
+        await sweet.fire({
+            title:"Numero de Factura Anterior",
+            input:"text",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(({isConfirmed,value})=>{
+            console.log(isConfirmed)
+            if (isConfirmed) {
+                facturaAnterior = value.padStart(8,'0');
+            }else{
+                location.href = '../menu.html';
+            }
+        });
+    }
+    
+    listarCliente(1);//listanos los clientes
+    
+    cambiarSituacion(situacion);//
+});
+
+ipcRenderer.on('recibir',(e,args)=>{
+    const {tipo ,informacion, cantidad} = JSON.parse(args);
+    tipo === "cliente" && listarCliente(informacion);
+    tipo === "producto" && listarProducto(informacion, cantidad);
+    tipo === "Ningun cliente" && nombre.focus();
+});
+
+facturar.addEventListener('click',async e=>{
+        let verificado = await vefiricarVenta();
+
+        if (verificado) {
+            alerta.classList.remove('none');
+            const numeros = (await axios.get(`${URL}numero`)).data;
+            const venta = {};
+
+            venta.idCliente = codigo.value;
+            venta.cliente = nombre.value;
+            venta.fecha = new Date();
+
+            venta.precio = parseFloat(total.value);
+            venta.descuento = descuento;
+            venta.tipo_venta = await verTipoVenta();
+            venta.listaProductos = listaProductos;
         
-        venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
-        if (venta.tipo_venta === "CC") {
+            //Ponemos propiedades para la factura electronica
+            venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
+            venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
+            venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
+            venta.cod_doc = await verCodigoDocumento(cuit.value);
+            venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
+            const [iva21,iva0,gravado21,gravado0,iva105,gravado105,cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
+            venta.iva21 = iva21;
+            venta.iva0 = iva0;
+            venta.gravado0 = gravado0;
+            venta.gravado21 = gravado21;
+            venta.iva105 = iva105;
+            venta.gravado105 = gravado105;
+            venta.cantIva = cantIva;
+            venta.direccion = direccion.value;
+            venta.localidad = localidad.value;
+            venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
+
+            venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+            venta.vendedor = vendedor ? vendedor : "";
+        
+            venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
+            if (venta.tipo_venta === "CC") {
             venta.numero = numeros["Cuenta Corriente"] + 1;
         }else if(venta.tipo_venta === "PP"){
             venta.numero = numeros["Presupuesto"] + 1;
@@ -295,8 +332,8 @@ facturar.addEventListener('click',async e=>{
             }finally{
                 alerta.classList.add('none');
             }
-    }
-})
+        }
+});
 
 //Lo que hacemos es listar el cliente traido
 async function listarCliente(id){
@@ -344,7 +381,7 @@ const ponerEnCuentaHistorica = async(venta,saldo)=>{
     cuenta.saldo = facturaAnterior ? saldo - venta.precio : venta.precio + saldo;
     cuenta.observaciones = observaciones.value;
     (await axios.post(`${URL}historica`,cuenta)).data;
-}
+};
 
 //Cargamos el movimiento de producto a la BD
 const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_venta,tipo_comp,caja,vendedor="")=>{
@@ -661,7 +698,6 @@ async function hacerHistoricaRecibo (numero,haber,tipo){
     (await axios.post(`${URL}historica`,cuenta)).data;
 };
 
-
 document.addEventListener('keydown',e=>{
     if (e.key === "Escape") {
         sweet.fire({
@@ -723,7 +759,7 @@ document.addEventListener('keydown',e=>{
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
 const cambiarSituacion = (situacion) =>{
     situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
-}
+};
 
 //Ver Codigo Documento
 const verCodigoDocumento = async(cuit)=>{
@@ -736,6 +772,16 @@ const verCodigoDocumento = async(cuit)=>{
     }
 
     return 99
+};
+
+const calcularTotal = async () => {
+    const trs = document.querySelectorAll('tbody tr');
+    let aux = 0;
+    for await(let tr of trs){
+        aux += parseFloat(tr.children[6].innerText);
+    };
+
+    total.value = redondear(aux,2);
 };
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
@@ -783,9 +829,6 @@ tbody.addEventListener('dblclick',async se=>{
         }
     })
 });
-
-//Cambiamos los precios si se habilita el dolar
-checkboxDolar.addEventListener('change',togglePrecios);
 
 //Buscamos un cliente, si sabemos el codigo directamente apretamos enter
 codigo.addEventListener('keypress',async e=>{
@@ -868,52 +911,6 @@ porcentaje.addEventListener('change',async e=>{
 volver.addEventListener('click',()=>{
     location.href = "../menu.html";
 });
-
-async function togglePrecios(e) { 
-    for await(let {cantidad,producto} of listaProductos){
-
-        const tr = document.getElementById(`${producto.idTabla}`);
-
-        if(lista.value === "1"){
-            if (checkboxDolar.checked) {
-                tr.children[5].innerText = redondear(producto.precio / dolar,2);
-                tr.children[6].innerText = redondear(producto.precio / dolar * parseFloat(tr.children[1].innerText),2);
-            }else{
-                tr.children[5].innerText = producto.precio.toFixed(2);
-                tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText),2);
-            }
-        }else{
-            if (checkboxDolar.checked) {
-                if (producto.costo !== 0) {
-                    tr.children[5].innerText = redondear((producto.costo + (producto.costo * producto.impuesto / 100))  / dolar , 2);
-                    tr.children[6].innerText = redondear((producto.costo + (producto.costo * producto.impuesto / 100)) / dolar * parseFloat(tr.children[1].innerText), 2);
-                }else{
-                    tr.children[5].innerText = redondear(producto.costoDolar + (producto.costoDolar * producto.impuesto / 100), 2);
-                    tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(tr.children[1].innerText), 2);
-                }
-            }else{
-                if (producto.costo !== 0) {
-                    tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100),2);
-                    tr.children[6].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100) * parseFloat(tr.children[1].innerText), 2);
-                }else{
-                    tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar,2);
-                    tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar * parseFloat(tr.children[1].innerText), 2);
-                }
-            }
-        }
-    };
-    calcularTotal();
-};
-
-async function calcularTotal() {
-    const trs = document.querySelectorAll('tbody tr');
-    let aux = 0;
-    for await(let tr of trs){
-        aux += parseFloat(tr.children[6].innerText);
-    };
-
-    total.value = redondear(aux,2);
-};
 
 nombre.addEventListener('keypress',e=>{
     apretarEnter(e,cuit);
