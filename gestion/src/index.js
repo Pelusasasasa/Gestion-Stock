@@ -79,9 +79,9 @@ ipcMain.on('enviar-ventana-principal',(e,args)=>{
 
 ipcMain.on('imprimir',(e,args)=>{
   if (args[0] === "blanco") {
-    abrirVentana("ticket/ticket.html",800,500);
+    abrirVentana("ticket/ticket.html",1000,500);
   }else{
-    abrirVentana("impresiones/imprimirComprobante.html",800,500,false,false);
+    abrirVentana("impresiones/imprimirComprobante.html",600,900,false,args[5]);
   }
   nuevaVentana.webContents.on('did-finish-load',function() {
     nuevaVentana.webContents.send('imprimir',JSON.stringify(args));

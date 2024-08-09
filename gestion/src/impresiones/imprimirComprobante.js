@@ -23,7 +23,7 @@ const cond_iva = document.getElementById('cond_iva');
 
 const tbody = document.querySelector('tbody');
 
-let dolar = 0;
+let dolar;
 
 window.addEventListener('load',e=>{
     ipcRenderer.on('imprimir',async(e,args)=>{
@@ -34,7 +34,7 @@ window.addEventListener('load',e=>{
         
         if ((auxDolar)) {
             dolar = (await axios.get(`${URL}numero/Dolar`)).data;
-        }
+        };
         
         await ponerDatosVenta(datosVenta);
         await ponerDatosClientes(datosClientes);

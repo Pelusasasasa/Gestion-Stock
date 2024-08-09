@@ -267,7 +267,7 @@ actualizar.addEventListener('click',async e=>{
 
         venta.precio = total
         
-        await ipcRenderer.send('imprimir',["negro",venta,cliente,movimientos]);
+        await ipcRenderer.send('imprimir',["negro",venta,cliente,movimientos,,true]);
 
         await sweet.fire({
             title:"Grabar Importe?",
