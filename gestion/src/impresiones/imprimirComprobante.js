@@ -1,6 +1,10 @@
 const { ipcRenderer } = require('electron');
-const sweet = require('sweetalert2');
+const axios = require('axios');
+require('dotenv').config();
+
 const { redondear } = require('../helpers');
+
+const URL = process.env.GESTIONURL;
 
 const numero = document.getElementById('numero');
 const date = document.getElementById('fecha');
@@ -19,12 +23,19 @@ const cond_iva = document.getElementById('cond_iva');
 
 const tbody = document.querySelector('tbody');
 
+let dolar = 0;
 
 window.addEventListener('load',e=>{
     ipcRenderer.on('imprimir',async(e,args)=>{
         let datosClientes = JSON.parse(args)[2];
         let datosVenta = JSON.parse(args)[1];
         let movimientos = JSON.parse(args)[3];
+        let auxDolar = JSON.parse(args)[4];
+        
+        if ((auxDolar)) {
+            dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+        }
+        
         await ponerDatosVenta(datosVenta);
         await ponerDatosClientes(datosClientes);
         await ponerDatosArticulos(movimientos);
@@ -38,15 +49,15 @@ const ponerDatosVenta = (datos)=>{
     const aux = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const fecha = aux.slice(0,10).split('-',3);
     const hora = aux.slice(11,19).split(':',3);
-    numero.innerHTML = datos.numero.toString().padStart(8,'0');
-    date.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
-    tipoPago.innerHTML = datos.tipo_venta;
-    vendedor.innerHTML = datos.vendedor;
+    numero.innerText = datos.numero.toString().padStart(8,'0');
+    date.innerText = `${fecha[2]}/${fecha[1]}/${fecha[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
+    tipoPago.innerText = datos.tipo_venta;
+    vendedor.innerText = datos.vendedor;
 
-    subTotal.innerHTML = redondear(datos.precio + datos.descuento,2);
-    descuento.innerHTML = datos.descuento.toFixed(2);
-    total.innerHTML = datos.precio.toFixed(2);
-}
+    subTotal.innerText = dolar ? ((datos.precio + datos.descuento) / dolar).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
+    descuento.innerText = datos.descuento.toFixed(2);
+    total.innerText = dolar ? (datos.precio / dolar).toFixed(2) : datos.precio.toFixed(2);
+};
 
 const ponerDatosClientes = (datos)=>{
     cliente.innerHTML = datos.nombre
@@ -59,6 +70,11 @@ const ponerDatosClientes = (datos)=>{
 
 const ponerDatosArticulos = (datos)=>{
     datos.forEach(movimiento => {
+
+        if (dolar) {
+            movimiento.precio = movimiento.precio / dolar;
+        }
+
         const tr = document.createElement('tr');
 
         const tdCantidad = document.createElement('td');
@@ -68,12 +84,12 @@ const ponerDatosArticulos = (datos)=>{
         const tdIva = document.createElement('td');
         const tdTotal = document.createElement('td');
 
-        tdCantidad.innerHTML = movimiento.unidad === "horas" ? "" : movimiento.cantidad.toFixed(2);
-        tdCodigo.innerHTML = movimiento.codProd ?  movimiento.codProd : "" ;
-        tdDescripcion.innerHTML = movimiento.producto;
-        tdIva.innerHTML = movimiento.iva.toFixed(2);
-        tdPrecio.innerHTML = movimiento.unidad === "horas" ? "" : movimiento.precio.toFixed(2);
-        tdTotal.innerHTML = redondear(movimiento.cantidad * movimiento.precio,2);
+        tdCantidad.innerText = movimiento.unidad === "horas" ? "" : movimiento.cantidad.toFixed(2);
+        tdCodigo.innerText = movimiento.codProd ?  movimiento.codProd : "" ;
+        tdDescripcion.innerText = movimiento.producto;
+        tdIva.innerText = movimiento.iva.toFixed(2);
+        tdPrecio.innerText = movimiento.unidad === "horas" ? "" : movimiento.precio.toFixed(2);
+        tdTotal.innerText = redondear(movimiento.cantidad * movimiento.precio,2);
 
         tr.appendChild(tdCantidad);
         tr.appendChild(tdCodigo);
@@ -84,4 +100,4 @@ const ponerDatosArticulos = (datos)=>{
 
         tbody.appendChild(tr);
     });
-}
+};

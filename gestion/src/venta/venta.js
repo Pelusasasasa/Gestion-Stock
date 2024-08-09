@@ -670,7 +670,7 @@ facturar.addEventListener('click',async e=>{
                 }
 
                 if (impresion.checked) {
-                    ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
+                    ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos, checkboxDolar.checked]);
                 }
 
                 location.reload();  
@@ -755,33 +755,6 @@ tbody.addEventListener('click',async e=>{
     }
 });
 
-//Por defecto ponemos el A Consumidor Final y tambien el select
-window.addEventListener('load',async e=>{
-
-    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
-
-    if (tipoFactura === "notaCredito") {
-
-        await sweet.fire({
-            title:"Numero de Factura Anterior",
-            input:"text",
-            confirmButtonText:"Aceptar",
-            showCancelButton:true
-        }).then(({isConfirmed,value})=>{
-            console.log(isConfirmed)
-            if (isConfirmed) {
-                facturaAnterior = value.padStart(8,'0');
-            }else{
-                location.href = '../menu.html';
-            }
-        });
-    }
-    
-    listarCliente(1);//listanos los clientes
-    
-    cambiarSituacion(situacion);//
-});
-
 tbody.addEventListener('dblclick',async se=>{
     await sweet.fire({
         title:"Cambio",
@@ -859,6 +832,33 @@ codBarra.addEventListener('keypress',async e=>{
 });
 
 lista.addEventListener('change',togglePrecios);
+
+//Por defecto ponemos el A Consumidor Final y tambien el select
+window.addEventListener('load',async e=>{
+
+    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+
+    if (tipoFactura === "notaCredito") {
+
+        await sweet.fire({
+            title:"Numero de Factura Anterior",
+            input:"text",
+            confirmButtonText:"Aceptar",
+            showCancelButton:true
+        }).then(({isConfirmed,value})=>{
+            console.log(isConfirmed)
+            if (isConfirmed) {
+                facturaAnterior = value.padStart(8,'0');
+            }else{
+                location.href = '../menu.html';
+            }
+        });
+    }
+    
+    listarCliente(1);//listanos los clientes
+    
+    cambiarSituacion(situacion);//
+});
 
 descripcion.addEventListener('keypress',e=>{
     if (e.keyCode === 13) {
