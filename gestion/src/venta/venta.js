@@ -517,15 +517,7 @@ const listarCliente = async(id)=>{
 const listarProducto = async(id,cant) => {
     cantidad.value = cant;
     let producto;
-    if (id.slice(0,2) === "20") {
-        const aux = id.slice(2,6);
-        const cantEnt = id.slice(6,9);
-        const cantDec = id.slice(9,12);
-        producto = (await axios.get(`${URL}productos/${aux.replace(/\//g,'%2F')}`)).data;
-        cantidad.value = parseFloat(cantEnt + "." + cantDec);
-    }else{
-        producto = (await axios.get(`${URL}productos/${id.replace(/\//g,'%2F')}`)).data;
-    };
+    producto = (await axios.get(`${URL}productos/${id.replace(/\//g,'%2F')}`)).data;
     
     producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
     producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
