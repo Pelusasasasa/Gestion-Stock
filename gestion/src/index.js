@@ -3,9 +3,9 @@ const { ipcMain } = require('electron/main');
 const path = require('path');
 const {condIva} = require('./configuracion.json');
 const { verificarUsuarios } = require('./helpers');
+const { mostrarMenu } = require('./menuSecundario/menuSecundario');
 
 var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
-
 
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
 if (process.env.NODE_ENV !== 'production') {
@@ -18,7 +18,7 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-let ventanaPrincipal;
+global.ventanaPrincipal = null;
 const createWindow = () => {
   // Create the browser window.
    ventanaPrincipal = new BrowserWindow({
@@ -150,13 +150,19 @@ ipcMain.on('informacion-a-ventana-principal',(e,args)=>{
   ventanaPrincipal.webContents.send('informacion-a-ventana-principal',JSON.stringify(args));
 });
 
+ipcMain.on('mostrar-menu',(e,{ventana, x, y}) =>{
+
+  e.preventDefault();
+  mostrarMenu(ventana, x, y);
+
+});
+
 ipcMain.handle('saveDialog',async(e,args)=>{
   const path = (await dialog.showSaveDialog()).filePath;
   return path
 });
 
 //Servicio
-
 ipcMain.on('imprimir_servicio',(e,servicio) => {
   abrirVentana('servicioTecnico/impresion.html',500,500,false,true);
   nuevaVentana.webContents.on('did-finish-load', () =>{
@@ -165,7 +171,6 @@ ipcMain.on('imprimir_servicio',(e,servicio) => {
 });
 
 //Servicio
-
 const hacerMenu = () => {
   //Hacemos el menu
 
@@ -327,4 +332,4 @@ const hacerMenu = () => {
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
-}
+};

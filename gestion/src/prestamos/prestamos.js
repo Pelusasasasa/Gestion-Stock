@@ -12,6 +12,110 @@ let seleccionado = '';
 let subSeleccionado = '';
 let prestamos = [];
 
+const cambiarObservaciones = async() => {
+    const sweet = require('sweetalert2');
+    const prestamo = (await axios.get(`${URL}prestamos/forNumber/${seleccionado.id}`)).data;
+    
+    const {isConfirmed, value} = await sweet.fire({
+        title: "Cambiar Observacion",
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar'
+    });
+
+    if (isConfirmed){
+        prestamo.observaciones = value.toUpperCase();
+        await axios.put(`${URL}prestamos/forNumber/${prestamo.nro_comp}`,prestamo);
+        seleccionado.children[4].innerText = value.toUpperCase();
+    }
+
+};
+
+const clickDerecho = async(e) => {
+    seleccionado && seleccionado.classList.remove('seleccionado');
+    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+
+    if (e.target.nodeName === 'TD'){
+        seleccionado = e.target.parentNode;
+        subSeleccionado = e.target;
+    };
+
+    subSeleccionado.classList.add('subSeleccionado');
+    seleccionado.classList.add('seleccionado');
+
+    const cordenadas = {
+        x:e.clientX,
+        y:e.clientY,
+        ventana: "VerPrestamos"
+    };
+
+    ipcRenderer.send('mostrar-menu', cordenadas);
+};
+
+const exportarExcel = async() => {
+    const prestamosAux = prestamos.filter( prestamo => prestamo.observaciones === seleccionado.children[4].innerText);
+    const movimientosAux = [];
+    let totalAux = 0;
+
+    for(let elem of prestamosAux){
+        const mov = (await axios.get(`${URL}movProductos/${elem.nro_comp}/Prestamo`)).data;
+        movimientosAux.push(...mov);
+    };
+
+    for(let elem of movimientosAux){
+        const pro = (await axios.get(`${URL}productos/${elem.codProd}`)).data;
+        elem.precio_unitario = pro.oferta ? pro.precioOferta : pro.precio_venta;
+        elem.total = (elem.egreso * elem.precio_unitario);
+        totalAux += parseFloat(elem.total);
+    }
+
+    const XLSX = require('xlsx');
+
+    if (!seleccionado) return;
+
+    let path = await ipcRenderer.invoke('saveDialog');
+    let wb = XLSX.utils.book_new();
+
+    let extencion = 'xlsx';
+    
+    let resultante = [];
+
+    movimientosAux.forEach( mov => {
+        const obj = {};
+        obj.fecha = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
+        obj.codigo = mov.codProd;
+        obj.descripcion = mov.descripcion;
+        obj.nro_comp = mov.nro_comp
+        obj.cantidad = mov.egreso.toFixed(2);
+        obj.precio = mov.precio_unitario.toFixed(2);
+        obj.total = mov.total.toFixed(2);
+        obj.vendedor = mov.vendedor;
+
+        resultante.push(obj);
+    });
+
+    resultante.push({
+        '': '',
+        '': '',
+        'TOTAL':totalAux
+    })
+
+    wb.props = {
+        Title: 'Movimientos',
+        subject: 'Movimientos',
+        Author: 'Electro Avenida'
+    };
+
+    let newWs = XLSX.utils.json_to_sheet(resultante);
+
+    XLSX.utils.book_append_sheet(wb, newWs, "Movimientos");
+
+    XLSX.writeFile(wb, path + "." + extencion);
+
+
+
+};
+
 //Funciones
 const listarPrestamos = async(lista) => {
     
@@ -81,70 +185,6 @@ const listarMovimientos = async( num ) => {
 
         tbodyMovimientos.appendChild(tr);
     };
-};
-
-const exportarExcel = async() => {
-    const prestamosAux = prestamos.filter( prestamo => prestamo.observaciones === seleccionado.children[4].innerText);
-    const movimientosAux = [];
-    let totalAux = 0;
-
-    for(let elem of prestamosAux){
-        const mov = (await axios.get(`${URL}movProductos/${elem.nro_comp}/Prestamo`)).data;
-        movimientosAux.push(...mov);
-    };
-
-    for(let elem of movimientosAux){
-        const pro = (await axios.get(`${URL}productos/${elem.codProd}`)).data;
-        elem.precio_unitario = pro.oferta ? pro.precioOferta : pro.precio_venta;
-        elem.total = (elem.egreso * elem.precio_unitario);
-        totalAux += parseFloat(elem.total);
-    }
-
-    const XLSX = require('xlsx');
-
-    if (!seleccionado) return;
-
-    let path = await ipcRenderer.invoke('saveDialog');
-    let wb = XLSX.utils.book_new();
-
-    let extencion = 'xlsx';
-    
-    let resultante = [];
-
-    movimientosAux.forEach( mov => {
-        const obj = {};
-        obj.fecha = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
-        obj.codigo = mov.codProd;
-        obj.descripcion = mov.descripcion;
-        obj.nro_comp = mov.nro_comp
-        obj.cantidad = mov.egreso.toFixed(2);
-        obj.precio = mov.precio_unitario.toFixed(2);
-        obj.total = mov.total.toFixed(2);
-        obj.vendedor = mov.vendedor;
-
-        resultante.push(obj);
-    });
-
-    resultante.push({
-        '': '',
-        '': '',
-        'TOTAL':totalAux
-    })
-
-    wb.props = {
-        Title: 'Movimientos',
-        subject: 'Movimientos',
-        Author: 'Electro Avenida'
-    };
-
-    let newWs = XLSX.utils.json_to_sheet(resultante);
-
-    XLSX.utils.book_append_sheet(wb, newWs, "Movimientos");
-
-    XLSX.writeFile(wb, path + "." + extencion);
-
-
-
 };
 
 //Eventos
@@ -235,6 +275,8 @@ tbody.addEventListener('click', e => {
 
 });
 
+tbody.addEventListener('contextmenu', clickDerecho);
+
 tbody.addEventListener('dblclick', e => {
     
     exportarExcel()
@@ -247,3 +289,5 @@ document.addEventListener('keydown', e => {
     }
 });
 
+
+ipcRenderer.on('cambiarObservacion', cambiarObservaciones);
