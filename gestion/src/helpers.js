@@ -274,6 +274,10 @@ funciones.ponerNumero = async()=>{
                     <label htmlFor="numero">Numero de Venta</label>
                     <input type="text" name="numero" id="numero" />
                 </main>
+                <main class="checkboxDolar">
+                    <label htmlFor="dolar">Dolar</label>
+                    <input type="checkbox" name="dolar" id="dolar" />
+                </main>
 
             </section>
         `,
@@ -282,6 +286,10 @@ funciones.ponerNumero = async()=>{
     }).then(async ({isConfirmed})=>{
         const tipo = document.getElementById('tipo');
         const numero = document.getElementById('numero');
+        const checkboxDolar = document.getElementById('dolar');
+
+        let dolar = (await axios.get(`${URL}numero`)).data.Dolar;
+
         let cliente;
         let movimientos;
         let venta;
@@ -303,8 +311,18 @@ funciones.ponerNumero = async()=>{
                 : (await axios.get(`${URL}clientes/id/${venta.idCliente}`)).data;
 
             movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;
+
             if (movimientos.length === 0) {
                 movimientos = (await axios.get(`${URL}movimiento/${numero.value}/T`)).data;
+            };
+
+            if (checkboxDolar.checked) {
+                
+                movimientos.forEach( mov => {
+                    mov.precio = mov.precio / dolar;
+                });
+                venta.subtotal = (venta.precio + venta.descuento) / dolar;
+                venta.precio = venta.precio / dolar;
             }
 
             movimientos = tipo.value === "RC" ? (await axios.get(`${URL}movRecibo/forNumber/${numero.value}`)).data : movimientos;
@@ -322,7 +340,7 @@ funciones.ponerNumero = async()=>{
                 }else{
                     situacion = "negro"
                 }
-            }
+            };
 
             if (recibo) {
                 ipcRenderer.send('imprimir-recibo',[recibo,cliente,movimientos,false])    

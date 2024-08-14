@@ -53,3 +53,11 @@ label{
     display: inline-block;
     width: 7rem;
 }
+
+.checkboxDolar{
+    flex-direction: row !important;
+}
+
+.checkboxDolar input{
+    transform: scale(1.5);
+}

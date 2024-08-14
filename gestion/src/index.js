@@ -1,14 +1,11 @@
-const { dialog, app, BrowserWindow,Menu, ipcRenderer } = require('electron');
+const { dialog, app, BrowserWindow,Menu } = require('electron');
 const { ipcMain } = require('electron/main');
 const path = require('path');
 const {condIva} = require('./configuracion.json');
-const { verificarUsuarios } = require('./helpers');
 const { mostrarMenu } = require('./menuSecundario/menuSecundario');
-
-var isDev = process.env.APP_DEV ? (process.env.APP_DEV.trim() == "true") : false;
-
+require('dotenv').config();
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'desarrollo') {
   require('electron-reload')(__dirname, {
       electron: path.join(__dirname, '../node_modules', '.bin', 'electron')
   })
@@ -19,6 +16,8 @@ if (require('electron-squirrel-startup')) {
 }
 
 global.ventanaPrincipal = null;
+global.nuevaVentana = null;
+
 const createWindow = () => {
   // Create the browser window.
    ventanaPrincipal = new BrowserWindow({
@@ -118,7 +117,6 @@ ipcMain.on('imprimir-historica',(e,info)=>{
   });
 });
 
-let nuevaVentana;
 const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false,show = true)=>{
   nuevaVentana = new BrowserWindow({
     height: altura,
@@ -150,6 +148,7 @@ ipcMain.on('informacion-a-ventana-principal',(e,args)=>{
   ventanaPrincipal.webContents.send('informacion-a-ventana-principal',JSON.stringify(args));
 });
 
+//mostramos en menu que se hace con el click derecho
 ipcMain.on('mostrar-menu',(e,{ventana, x, y}) =>{
 
   e.preventDefault();
@@ -327,7 +326,6 @@ const hacerMenu = () => {
         focusedWindow.toggleDevTools(); 
       }
     }
-
   ];
 
     const menu = Menu.buildFromTemplate(template);
