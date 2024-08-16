@@ -14,12 +14,32 @@ const stock = document.querySelector('#stock');
 const cantidad = document.querySelector('#cantidad');
 const nuevoStock = document.querySelector('#nuevoStock');
 
+const serie = document.querySelector('#serie');
+const provedor = document.querySelector('#provedor');
+const agregarSerie = document.querySelector('#agregarSerie');
+const tbody = document.querySelector('#tbody');
 
 const aceptar = document.getElementById('aceptar');
 const salir = document.getElementById('salir');
 
 let inputAux;
+let producto;
 let vendedor = '';
+
+const agregarSerieTabla = () => {
+    const tr = document.createElement('tr');
+
+    const tdSerie = document.createElement('td');
+    const tdProvedor = document.createElement('td');
+
+    tdSerie.innerText = serie.value;
+    tdProvedor.innerText = provedor.value.toUpperCase();
+
+    tr.appendChild(tdSerie);
+    tr.appendChild(tdProvedor);
+
+    tbody.appendChild(tr);
+}
 
 const listarProducto = ({_id, descripcion:desc, stock:sto}) => {
     codigo.value = _id;
@@ -40,15 +60,35 @@ const guardarMovimiento = async() => {
         _id: codigo.value,
         descripcion: descripcion.value,
         stock: nuevoStock.value,
-    })
+    });
+
+    //Hacemos para que se guarden numeros de series si es que los hay
+    const trs = document.querySelectorAll('#tbody tr');
+    for (let tr of trs){
+
+        const serie = {
+            provedor: tr.children[1].innerText,
+            nro_serie: tr.children[0].innerText,
+            codigo: codigo.value,
+            producto: descripcion.value,
+            marca: producto.marca
+        };
+        
+        await axios.post(`${URL}nroSerie`, serie);
+
+    }
 
     window.close();
 
 };
 
+agregarSerie.addEventListener('click', agregarSerieTabla);
+
+aceptar.addEventListener('click', guardarMovimiento);
+
 ipcRenderer.on('informacion', async (e,{informacion, vendedor:vend}) => {
     vendedor = vend.nombre;
-    const producto = (await axios.get(`${URL}productos/${informacion}`)).data;
+    producto = (await axios.get(`${URL}productos/${informacion}`)).data;
     listarProducto(producto)
 });
 
@@ -72,16 +112,16 @@ cantidad.addEventListener('keypress', e => {
     };
 });
 
-aceptar.addEventListener('click', guardarMovimiento);
-
-salir.addEventListener('click', e => {
-
-    window.close();
-
-});
-
 document.addEventListener('keydown', e => {
     if(e.keyCode === 27){
         window.close();
     }
+});
+
+serie.addEventListener('keypress', (e) => {
+    if (e.keyCode === 13) provedor.focus();
+});
+
+salir.addEventListener('click', e => {
+    window.close();
 });

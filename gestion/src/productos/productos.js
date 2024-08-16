@@ -54,7 +54,7 @@ const ingresarMovimiento = async(e) => {
     if (vendedor) {
         ipcRenderer.send('abrir-ventana', {
             path: 'productos/ingresarMovimiento.html',
-            ancho: 600,
+            ancho: 1100,
             altura: 700,
             informacion: seleccionado.id,
             vendedor: vendedor,

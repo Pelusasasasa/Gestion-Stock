@@ -114,6 +114,10 @@ table tbody{
 
 /* margin */
 
+.m-0{
+  margin: 0;
+}
+
 .mt-2{
   margin-top: 2rem;
 }
@@ -166,6 +170,14 @@ table tbody{
 
 /* Transform */
 
+/* Table */
+
+  .border-colapse{
+    border-collapse: collapse;
+  }
+
+/* Table */
+
 /* Label */
 
 /* Label */
@@ -177,3 +189,49 @@ table tbody{
 }
 
 /* font  */
+
+/* wdith */
+
+.w-full{
+  width: 100%;
+}
+
+.size-6{
+  width: 6rem;
+}
+
+/* width */
+
+/* heigth */
+  .h-20{
+    height: 20rem;
+  }
+/* heigth */
+
+
+/* background */
+
+.backgroud-white{
+  background-color: white;
+}
+
+/* background */
+
+/* border */
+.border{
+  border-width: .1rem;
+    border-style: solid;
+}
+.border-black{
+  border-color: black;
+}
+/* border */
+
+.cursor-pointer{
+  cursor: pointer;
+}
+
+.hover-scale-1-9:hover{
+  transform: scale(1.2);
+}
+

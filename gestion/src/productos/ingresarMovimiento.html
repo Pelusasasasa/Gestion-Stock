@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../assets/global.css">
 </head>
 <body>
-    <h1 class="text-center">Ingresar Movimiento</h1>
+    <h1 class="text-center m-0">Ingresar Movimiento</h1>
 
     <section>
         <div class="flex flex-col">
@@ -38,22 +38,54 @@
         </fieldset>
     </section>
 
-    <section class="informacion flex flex-col items-center gap-2 mt-2">
-        <div class="flex flex-col">
-            <label for="stock">Stock</label>
-            <input type="number" disabled name="stock" id="stock">
-        </div>
+    <section class="flex justify-around">
+        <main class="informacion flex flex-col items-center gap-2 mt-2">
+            <div class="flex flex-col">
+                <label for="stock">Stock</label>
+                <input type="number" disabled name="stock" id="stock">
+            </div>
+        
+            <div class="flex flex-col">
+                <label for="cantidad">Cantidad</label>
+                <input type="number" name="cantidad" autofocus id="cantidad" class="text-weight-900">
+            </div>
+        
+            <div class="flex flex-col">
+                <label for="nuevoStock">Nuevo Stock</label>
+                <input type="number" disabled name="nuevoStock" id="nuevoStock">
+            </div>
+        
+        </main>
 
-        <div class="flex flex-col">
-            <label for="cantidad">Cantidad</label>
-            <input type="number" name="cantidad" autofocus id="cantidad" class="text-weight-900">
-        </div>
-
-        <div class="flex flex-col">
-            <label for="nuevoStock">Nuevo Stock</label>
-            <input type="number" disabled name="nuevoStock" id="nuevoStock">
-        </div>
-
+        <main>
+            <div class="flex gap-2">
+                <div class="flex flex-col">
+                    <label for="serie">Nro Serie</label>
+                    <input type="text" name="serie" id="serie">
+                </div>
+                <div class="flex flex-col">
+                    <label for="provedor">Provedor</label>
+                    <input type="text" name="provedor" id="provedor">
+                </div>
+                <div class="cursor-pointer hover-scale-1-9" id="agregarSerie">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                        class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="h-20 backgroud-white border border-black">
+                <table class="w-full border-colapse">
+                    <thead>
+                        <tr>
+                            <th class="border border-black">Nro Serie</th>
+                            <th class="border border-black">Provedor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </main>
     </section>
 
     <section class="flex gap-2 items-center justify-around mt-2">
