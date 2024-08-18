@@ -7,6 +7,7 @@ const buscador = document.querySelector('#buscador');
 const tbody = document.querySelector('tbody');
 
 const listarSeries = (series) => {
+    tbody.innerHTML = '';
     for(let serie of series){
         const tr = document.createElement('tr');
         tr.id = serie._id;
@@ -41,9 +42,17 @@ const inicio = async () => {
 };
 
 const filtrar = async () => {
-    
+    const series = (await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`)).data;
+    listarSeries(series);
 };
 
 window.addEventListener('load', inicio);
 
 buscador.addEventListener('keyup', filtrar);
+
+document.addEventListener('keyup', e => {
+    console.log(e.keyCode)
+    if(e.keyCode === 27){
+        location.href = '../menu.html';
+    }
+})
