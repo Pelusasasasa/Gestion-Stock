@@ -1,162 +1,160 @@
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-      Arial, sans-serif;
-  
-  }
-  .buttonSeleccionado{
-    background-color: rgba(75, 75, 75, 0.9);
-    color: white;
-  }
-  html {
-    box-sizing: border-box;
-    font-size: 62.5%;
-  }
-  *,
-  *:before,
-  *:after {
-    box-sizing: inherit;
-  }
-  body {
-    font-size: 1.6rem;
-    padding: 0 2rem;
-    background-color: burlywood;
-  }
-
-.seleccionado{
-    background-color: lightgray !important; 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+.buttonSeleccionado {
+  background-color: rgba(75, 75, 75, 0.9);
+  color: white;
+}
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+body {
+  font-size: 1.6rem;
+  padding: 0 2rem;
+  background-color: burlywood;
 }
 
-.subSeleccionado{
-    background-color: gray !important;
+.seleccionado {
+  background-color: lightgray !important;
 }
 
-.botones{ 
-    display: flex;
-    justify-content: space-evenly;
-    margin-top: 2rem;
+.subSeleccionado {
+  background-color: gray !important;
 }
 
-button{
-    font-size: 1.5rem;
-    border: none;
-    padding: 1rem;
-    border-radius: 10px;
+.botones {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 2rem;
 }
 
-button:hover{
-    cursor: pointer;
-    transform: scale(1.2);
+button {
+  font-size: 1.5rem;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
 }
 
-
-.none{
-    display: none !important;
+button:hover {
+  cursor: pointer;
+  transform: scale(1.2);
 }
 
-input{
-  padding: .5rem;
+.none {
+  display: none !important;
+}
+
+input {
+  padding: 0.5rem;
   font-size: 1.5rem;
 }
 
-input:disabled{
+input:disabled {
   font-weight: 900;
   color: black;
 }
 
-.text-rigth{
+.text-rigth {
   text-align: right;
 }
 
-.text-center{
+.text-center {
   text-align: center;
 }
 
-.text-bold{
+.text-bold {
   font-weight: bold;
 }
 
-select{
+select {
   font-size: 2rem;
-  padding: .5rem;
+  padding: 0.5rem;
 }
 
-.acciones{
+.acciones {
   display: flex;
   justify-content: space-around;
   cursor: pointer;
 }
 
-.tool{
+.tool {
   position: relative;
 }
 
-.tool:hover .tooltip{
+.tool:hover .tooltip {
   display: block;
 }
 
-.tooltip{
+.tooltip {
   display: none;
   position: absolute;
   z-index: 1;
   background-color: gray;
   color: white;
-  border: .1rem solid black;
+  border: 0.1rem solid black;
 }
 
-.aclaracion{
+.aclaracion {
   margin-top: 2rem;
- text-align: center;
+  text-align: center;
 }
 
-table tbody{
+table tbody {
   white-space: nowrap;
 }
 
 /* margin */
 
-.m-0{
+.m-0 {
   margin: 0;
 }
 
-.mt-2{
+.mt-2 {
   margin-top: 2rem;
 }
 
-.mr-2{
+.mr-2 {
   margin-right: 2rem;
 }
 
-.ml-2{
+.ml-2 {
   margin-left: 2rem;
 }
 
 /* Padding */
 
-.p-2{
+.p-2 {
   padding: 2rem;
 }
 
 /* Padding */
 
- /* Flex */
+/* Flex */
 
-.flex{
+.flex {
   display: flex;
 }
 
-.flex-col{
+.flex-col {
   flex-direction: column;
 }
 
-.justify-around{
+.justify-around {
   justify-content: space-around;
 }
 
-.items-center{
+.items-center {
   align-items: center;
 }
 
-.gap-2{
+.gap-2 {
   gap: 2rem;
 }
 
@@ -164,17 +162,17 @@ table tbody{
 
 /* Transform */
 
-  .scale-1-9{
-    transform: scale(1.9);
-  }
+.scale-1-9 {
+  transform: scale(1.9);
+}
 
 /* Transform */
 
 /* Table */
 
-  .border-colapse{
-    border-collapse: collapse;
-  }
+.border-collapse {
+  border-collapse: collapse;
+}
 
 /* Table */
 
@@ -184,54 +182,60 @@ table tbody{
 
 /* font  */
 
-.text-weight-900{
+.text-weight-900 {
   font-weight: 900;
+}
+
+.text-2xl{
+  font-size: 3rem;
 }
 
 /* font  */
 
 /* wdith */
 
-.w-full{
+.w-full {
   width: 100%;
 }
 
-.size-6{
+.size-6 {
   width: 6rem;
 }
 
 /* width */
 
 /* heigth */
-  .h-20{
-    height: 20rem;
-  }
-/* heigth */
+.h-20 {
+  height: 20rem;
+}
 
+.h-50 {
+  height: 50rem;
+}
+/* heigth */
 
 /* background */
 
-.backgroud-white{
+.backgroud-white {
   background-color: white;
 }
 
 /* background */
 
 /* border */
-.border{
-  border-width: .1rem;
-    border-style: solid;
+.border {
+  border-width: 0.1rem;
+  border-style: solid;
 }
-.border-black{
+.border-black {
   border-color: black;
 }
 /* border */
 
-.cursor-pointer{
+.cursor-pointer {
   cursor: pointer;
 }
 
-.hover-scale-1-9:hover{
+.hover-scale-1-9:hover {
   transform: scale(1.2);
 }
-

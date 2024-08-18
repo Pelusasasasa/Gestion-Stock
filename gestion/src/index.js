@@ -235,21 +235,9 @@ const hacerMenu = () => {
       label: "Productos",
       submenu:[
         {
-          label:"Modificar Codigo",
-          click(){
-            abrirVentana("productos/modificarCodigo.html",500,500)
-          }
-        },
-        {
           label:"Agregar Producto",
           click(){
             abrirVentana("productos/agregarProducto.html",650,900)
-          }
-        },
-        {
-          label:"Cambio de Producto",
-          click(){
-            abrirVentana("productos/cambio.html",750,900)
           }
         },
         {
@@ -265,11 +253,30 @@ const hacerMenu = () => {
           }
         },
         {
+          label:"Cambio de Producto",
+          click(){
+            abrirVentana("productos/cambio.html",750,900)
+          }
+        },
+        {
+          label: "Listado de Nro Series",
+          click(){
+            ventanaPrincipal.loadFile('src/serie/listado.html');
+          }
+        },
+        {
           label:"Lista de Precios",
           click(){
             abrirVentana('productos/listaPrecios.html',1000,1000)
           }
+        },
+        {
+          label:"Modificar Codigo",
+          click(){
+            abrirVentana("productos/modificarCodigo.html",500,500)
+          }
         }
+        
       ]
     },
     {
