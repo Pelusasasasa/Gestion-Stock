@@ -209,6 +209,10 @@ table tbody {
   height: 20rem;
 }
 
+.h-45 {
+  height: 45rem;
+}
+
 .h-50 {
   height: 50rem;
 }

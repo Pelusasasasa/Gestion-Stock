@@ -5,7 +5,7 @@ const NroSerie = require('../models/NroSerie');
 nroSerieCTRL.get = async(req, res) => {
     const respuesta = await NroSerie.find();
     res.send(respuesta);
-}
+};
 
 nroSerieCTRL.post = async(req, res) => {
     const nroSerie = new NroSerie(req.body);
@@ -29,6 +29,12 @@ nroSerieCTRL.getForSearch = async(req, res) => {
     });
 
     res.send(respuesta);
-}
+};
+
+nroSerieCTRL.getForDelete = async(req, res) => {
+    const { id } = req.params;
+    const respuesta = await NroSerie.findByIdAndDelete(id);
+    res.send(respuesta);
+};
 
 module.exports = nroSerieCTRL;
