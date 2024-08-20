@@ -30,6 +30,54 @@ const clickEnTbody = (e) => {
     }
 };
 
+const modificarNro = async() => {
+
+    if (!seleccionado) {
+
+        await sweet.fire({
+            title: "Elegir un numero de serie a modificar"
+        });
+
+        return;
+    }
+
+    const {nombre} = await verificarUsuarios();
+
+    if (!nombre) {
+        await sweet.fire({
+            title: "No hay usuario logueado"
+        });
+        return;
+    }
+
+    const {isConfirmed} = await sweet.fire({
+        title: 'Modificar',
+        html: `
+            <div class="flex flex-col">
+                <label htmlFor="serie">Numero de Serie</label>
+                <input type="text" name="serie" id="serie" />
+            </div>
+            <div class="flex flex-col mt-2">
+                <label htmlFor="provedor">Provedor</label>
+                <input type="text" name="provedor" id="provedor" />
+            </div>
+        `,
+        confirmButtonText: "Modificar",
+        showCancelButton: true
+    });
+
+    if (isConfirmed) {
+            const serie = document.getElementById('serie').value;
+            const provedor = document.getElementById('provedor').value;
+
+            const res = (await axios.put(`${URL}nroSerie/id/${seleccionado.id}`, {nro_serie: serie, provedor})).data;
+            seleccionado.children[3].innerText = serie;
+            seleccionado.children[4].innerText = provedor.toUpperCase();
+
+            agregarMovimientoVendedores(`Modifico el numero de serie ${res.nro_serie} a ${serie} y el provedor de ${res.provedor} a ${provedor.toUpperCase()} que pertenece al producto ${seleccionado.children[2].innerText} `, nombre);
+    };
+};
+
 const eliminarNro = async () => {
 
     if(!seleccionado){
@@ -57,7 +105,7 @@ const eliminarNro = async () => {
         tbody.removeChild(seleccionado);
         seleccionado = '';
     }
-}
+};
 
 const filtrar = async () => {
     const series = (await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`)).data;
@@ -77,6 +125,20 @@ const listarSeries = (series) => {
         const tdNroSerie = document.createElement('td');
         const tdProvedor = document.createElement('td');
         const tdVendedor = document.createElement('td');
+
+        tdFecha.classList.add('border');
+        tdCodigo.classList.add('border');
+        tdProducto.classList.add('border');
+        tdNroSerie.classList.add('border');
+        tdProvedor.classList.add('border');
+        tdVendedor.classList.add('border');
+
+        tdFecha.classList.add('border-black');
+        tdCodigo.classList.add('border-black');
+        tdProducto.classList.add('border-black');
+        tdNroSerie.classList.add('border-black');
+        tdProvedor.classList.add('border-black');
+        tdVendedor.classList.add('border-black');
 
         tdFecha.innerText = serie.fecha.slice(0, 10).split('-', 3).reverse().join('/');
         tdCodigo.innerText = serie.codigo;
@@ -103,8 +165,9 @@ const inicio = async () => {
 
 };
 
-
 buscador.addEventListener('keyup', filtrar);
+
+modificar.addEventListener('click', modificarNro);
 
 eliminar.addEventListener('click', eliminarNro);
 

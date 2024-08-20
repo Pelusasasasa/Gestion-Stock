@@ -31,6 +31,14 @@ nroSerieCTRL.getForSearch = async(req, res) => {
     res.send(respuesta);
 };
 
+nroSerieCTRL.putforId = async(req, res) => {
+    const {id} = req.params;
+    
+    const respuesta = await NroSerie.findByIdAndUpdate(id, req.body);
+
+    res.send(respuesta);
+};
+
 nroSerieCTRL.getForDelete = async(req, res) => {
     const { id } = req.params;
     const respuesta = await NroSerie.findByIdAndDelete(id);
