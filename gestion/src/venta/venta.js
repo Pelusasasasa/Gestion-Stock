@@ -826,7 +826,6 @@ codBarra.addEventListener('keypress',async e=>{
     }
 
     if(e.keyCode === 37){
-        console.log("a")
         cantidad.focus();
     }
 });
@@ -942,7 +941,7 @@ observaciones.addEventListener('keypress',e=>{
 cantidad.addEventListener('keypress',async e=>{
     if (e.keyCode === 13) {
         if (eval(e.target.value)) {
-            listarProducto(codBarra.value);
+            listarProducto(codBarra.value, cantidad.value);
         }else{
             cantidad.value = "";
         };
