@@ -26,6 +26,7 @@ const salir = document.getElementById('salir');
 
 let inputAux;
 let producto;
+let acceso;
 let vendedor = '';
 
 const agregarSerieTabla = async() => {
@@ -56,6 +57,9 @@ const agregarSerieTabla = async() => {
     tr.appendChild(tdProvedor);
 
     tbody.appendChild(tr);
+
+    serie.value = "";
+    serie.focus();
 };
 
 const listarProducto = ({_id, descripcion:desc, stock:sto}) => {
@@ -107,10 +111,18 @@ const guardarMovimiento = async() => {
 
 };
 
+const verPermiso = (permiso) => {
+    if (permiso === 0) {
+        document.getElementById('series').classList.remove('none')
+    }
+}
+
 ipcRenderer.on('informacion', async (e,{informacion, vendedor:vend}) => {
     vendedor = vend.nombre;
+    acceso = vend.permiso;
     producto = (await axios.get(`${URL}productos/${informacion}`)).data;
     listarProducto(producto);
+    verPermiso(acceso);
 });
 
 agregarSerie.addEventListener('click', agregarSerieTabla);
@@ -144,7 +156,13 @@ document.addEventListener('keydown', e => {
 });
 
 serie.addEventListener('keypress', (e) => {
-    if (e.keyCode === 13) provedor.focus();
+    if (e.keyCode === 13) {
+        if (provedor.value === "") {
+            provedor.focus();
+        }else{
+            agregarSerieTabla();
+        }
+    };
 });
 
 salir.addEventListener('click', e => {
