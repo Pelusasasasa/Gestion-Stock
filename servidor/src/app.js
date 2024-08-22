@@ -35,6 +35,8 @@ app.use('/gestion/presupuesto',require('./routes/presupuesto'));
 
 app.use('/gestion/productos',require('./routes/producto'));
 
+app.use('/gestion/provedor',require('./routes/provedor'));
+
 app.use('/gestion/recibo',require('./routes/recibo'));
 
 app.use('/gestion/rubro',require('./routes/rubro'));
