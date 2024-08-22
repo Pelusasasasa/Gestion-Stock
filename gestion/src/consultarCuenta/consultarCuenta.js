@@ -8,17 +8,21 @@ const URL = process.env.GESTIONURL;
 const {cerrarVentana,apretarEnter, redondear} = require('../helpers');
 
 const buscar = document.querySelector('#buscar');
-const compensada = document.querySelector('.compensada');
-const historica = document.querySelector('.historica');
-const volver = document.querySelector('.volver');
-const borrar = document.querySelector('.borrar');
+
 const tbodyVenta = document.querySelector(".listaVentas tbody");
 const tbodyProducto = document.querySelector(".listaProductos tbody");
 const tbodyMovRecibo = document.querySelector(".listaMovRecibo tbody");
-const actualizar = document.querySelector('.actualizar');
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
+
+const actualizar = document.querySelector('.actualizar');
+const compensada = document.querySelector('.compensada');
+const historica = document.querySelector('.historica');
+const volver = document.querySelector('.volver');
+
+const borrar = document.querySelector('.borrar');
 const imprimirResumen = document.querySelector('#imprimirResumen');
+
 
 let trSeleccionado = "";
 let clienteTraido = {};
@@ -27,53 +31,6 @@ let listaHistorica = [];
 let movimientos
 
 let tipoLista = "compensada";
-
-historica.addEventListener('click',e=>{
-    historica.classList.add('none');
-    compensada.classList.remove('none');
-    tipoLista = "historica";
-
-    listarVentas(listaHistorica);
-});
-
-compensada.addEventListener('click',e=>{
-    tipoLista = "compensada";
-    historica.classList.remove('none');
-    compensada.classList.add('none');
-
-    listarVentas(listaCompensada);
-});
-
-
-buscar.addEventListener('keypress',async e=>{
-    if (e.key === "Enter") {
-        if (buscar.value !== "") {
-            clienteTraido = (await axios.get(`${URL}clientes/id/${buscar.value}`)).data;
-            saldo.value = (clienteTraido.saldo).toFixed(2);
-            clienteInput.value = clienteTraido.nombre;
-            if (clienteTraido === "") {
-                sweet.fire({title:"Cliente no encontrado"});
-                buscar.value = "";
-                buscar.focus();
-            }else{
-                listaCompensada = (await axios.get(`${URL}compensada/traerCompensadas/${clienteTraido._id}`)).data;
-                listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${clienteTraido._id}`)).data;
-                if (tipoLista === "compensada") {
-                    listarVentas(listaCompensada);
-                }else{
-                    listarVentas(listaHistorica);
-                }
-            }
-        }else{
-            const options = {
-                path: './clientes/clientes.html',
-                botones:false,
-            }
-            ipcRenderer.send('abrir-ventana',options)
-        }
-    }
-});
-
 
 //Recibimos el cliente si lo buscamos por nombre
 ipcRenderer.on('recibir',async (e,args)=>{
@@ -90,7 +47,115 @@ ipcRenderer.on('recibir',async (e,args)=>{
         listarVentas(listaCompensada)
         
     }
-})
+});
+
+const actualiarHistoricasSig = async(historica) => {
+    let cuentasHistoricasRestantes = (await axios.get(`${URL}historica/traerPorCliente/${historica.idCliente}`)).data;
+    cuentasHistoricasRestantes = cuentasHistoricasRestantes.filter(cuenta=>(cuenta.fecha > historica.fecha));
+    let saldo = historica.saldo;
+
+    for(let elem of cuentasHistoricasRestantes){
+        elem.saldo -= saldo;
+        saldo = elem.saldo;
+        (await axios.put(`${URL}historica/PorId/id/${elem.nro_venta}`, elem));
+    }
+}
+
+const agregarNumeroSerie = async(e) => {
+    if (e.target.innerHTML === "post_add") {
+            const movimientoSeleccionado = movimientos.find(movimiento => movimiento._id === parseInt(e.target.parentNode.parentNode.parentNode.id));
+            let valor = "";
+           
+            movimientoSeleccionado.series.forEach(serie=>{
+                if (valor) {
+                    valor = valor + "\n" + serie
+                }else{
+                    valor = serie
+                }
+            });
+
+            await sweet.fire({
+                title:"Series",
+                input:"textarea",
+                inputValue:valor
+                
+            })
+    };
+};
+
+//Borramos las cuenta compensada y la historica arrelando el saldo
+const borrarCuentaCompHist = async(e) => {
+    if (trSeleccionado) {
+
+        const {isConfirmed} = await sweet.fire({
+            title:"Segura que quiere borrar",
+            showCancelButton:true,
+            confirmButtonText:"Aceptar"
+        });
+        
+        if (isConfirmed) {
+            const saldoAModificar = parseFloat(trSeleccionado.children[6].innerHTML);
+            clienteTraido.saldo = (clienteTraido.saldo - saldoAModificar).toFixed(2);
+            
+            await axios.put(`${URL}clientes/id/${clienteTraido._id}`,clienteTraido);//Arreglamos el saldo de los clientes
+            await axios.delete(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`);//Eliminaos la cuenta compensada
+            const historica = (await axios.delete(`${URL}historica/PorId/id/${trSeleccionado.id}`)).data;//Eliminamos la cuneta historica
+
+            await actualiarHistoricasSig(historica);//Las cuentas historicas siguientes, arreglamos el saldo
+            await filtrarVentas(historica);
+
+            
+            trSeleccionado.remove();
+            saldo.value = clienteTraido.saldo;
+        };
+    }else{
+        await sweet.fire({
+            title:"Ninguna venta seleccionado"
+        })
+    }
+};
+
+const clickCompensada = async(e) => {
+    tipoLista = "compensada";
+    historica.classList.remove('none');
+    compensada.classList.add('none');
+    borrar.classList.toggle('none');
+
+    listarVentas(listaCompensada);
+};
+
+const clickCuenta = async(e) => {
+    if ((e.target.nodeName === "TD")) {
+        const id = e.target.parentNode.id;
+        trSeleccionado && trSeleccionado.classList.remove('seleccionado')
+        trSeleccionado = e.target.parentNode;
+        trSeleccionado.classList.add('seleccionado');
+
+        if (trSeleccionado.children[3].innerText !== "Recibo") {
+            movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
+            tbodyProducto.innerHTML = "";
+            listarProductos(movimientos);
+        }else{
+            movimientos = (await axios.get(`${URL}movRecibo/forNumber/${trSeleccionado.children[1].innerText}`)).data;
+            tbodyProducto.innerHTML = "";
+            listarMovientosRecibos(movimientos)
+        }
+    }
+};
+
+const clickHistorica = async(e) => {
+    historica.classList.add('none');
+    compensada.classList.remove('none');
+    borrar.classList.toggle('none');
+    tipoLista = "historica";
+
+    listarVentas(listaHistorica);
+};
+
+const filtrarVentas = async(cuenta) => {
+    listaCompensada = listaCompensada.filter(elem => elem.nro_venta !== cuenta.nro_venta);
+    listaHistorica = listaHistorica.filter(elem => elem.nro_venta !== cuenta.nro_venta);
+}
 
 const listarVentas = async(lista)=>{
     tbodyVenta.innerHTML = "";
@@ -200,44 +265,58 @@ const listarProductos = async(movimientos)=>{
     })
 };
 
-tbodyVenta.addEventListener('click',async e=>{
-    if ((e.target.nodeName === "TD")) {
-        const id = e.target.parentNode.id;
-        trSeleccionado && trSeleccionado.classList.remove('seleccionado')
-        trSeleccionado = e.target.parentNode;
-        trSeleccionado.classList.add('seleccionado');
+const impresionDeResumen = async() => {
+    const date = new Date();
+    const mes = date.getMonth() + 1;
+    const anio = date.getFullYear();
+    
+    await sweet.fire({
+        html:`
+            <section>
+                <input id="fechas" type="date" value=${anio}-${mes}-01 />
+            </section>
+        `,
+        confirmButtonText:"Imprimir",
+        showCancelButton:true
+    });
+    const fecha = document.getElementById('fechas').value;
 
-        if (trSeleccionado.children[3].innerText !== "Recibo") {
-            movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
-            tbodyProducto.innerHTML = "";
-            listarProductos(movimientos);
-        }else{
-            movimientos = (await axios.get(`${URL}movRecibo/forNumber/${trSeleccionado.children[1].innerText}`)).data;
-            tbodyProducto.innerHTML = "";
-            listarMovientosRecibos(movimientos)
-        }
+    const historicas = (await axios.get(`${URL}historica/forDesdeAndCliente/${fecha}/${buscar.value}`)).data;
+    const info = {
+        historicas,
+        idCliente:buscar.value
     }
-});
+    ipcRenderer.send('imprimir-historica',info);
+};
 
-tbodyProducto.addEventListener('click',e=>{
-    if (e.target.innerHTML === "post_add") {
-        const movimientoSeleccionado = movimientos.find(movimiento => movimiento._id === parseInt(e.target.parentNode.parentNode.parentNode.id));
-        let valor = "";
-        movimientoSeleccionado.series.forEach(serie=>{
-            if (valor) {
-                valor = valor + "\n" + serie
-            }else{
-                valor = serie
-            }
-        });
-        sweet.fire({
-            title:"Series",
-            input:"textarea",
-            inputValue:valor
-            
-        })
+const listarMovientosRecibos = async(movimientos) => {
+    tbodyMovRecibo.parentNode.parentNode.classList.remove('none');
+    tbodyProducto.parentNode.parentNode.classList.add('none');
+    tbodyMovRecibo.innerHTML = "";
+    for await(let mov of movimientos){
+        const tr = document.createElement('tr');
+
+        const tdFecha = document.createElement('td');
+        const tdNumero = document.createElement('td');
+        const tdImporte = document.createElement('td');
+        const tdPrecio = document.createElement('td');
+        const tdSaldo = document.createElement('td');
+    
+        tdFecha.innerText = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
+        tdNumero.innerText = mov.numero;
+        tdImporte.innerText = mov.importe.toFixed(2);
+        tdPrecio.innerText = mov.precio.toFixed(2);
+        tdSaldo.innerText = mov.saldo.toFixed(2);
+    
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdNumero);
+        tr.appendChild(tdImporte);
+        tr.appendChild(tdPrecio);
+        tr.appendChild(tdSaldo);
+    
+        tbodyMovRecibo.appendChild(tr);
     }
-});
+};
 
 //cuando tocamos actualizar una venta, actualizamos con los precios de hoy en dia
 actualizar.addEventListener('click',async e=>{
@@ -311,86 +390,50 @@ actualizar.addEventListener('click',async e=>{
     }
 });
 
-borrar.addEventListener('click', async e=>{
-    if (trSeleccionado) {
-        await sweet.fire({
-            title:"Segura que quiere borrar",
-            showCancelButton:true,
-            confirmButtonText:"Aceptar"
-        }).then(async ({isConfirmed})=>{
-            if (isConfirmed) {
-                const saldoAModificar = parseFloat(trSeleccionado.children[6].innerHTML);
-                clienteTraido.saldo =  (clienteTraido.saldo - saldoAModificar).toFixed(2);
-                await axios.put(`${URL}clientes/id/${clienteTraido._id}`,clienteTraido);
-                await axios.delete(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`);
-                trSeleccionado.remove();
-                saldo.value = clienteTraido.saldo;
+borrar.addEventListener('click', borrarCuentaCompHist);
 
+buscar.addEventListener('keypress',async e=>{
+    if (e.key === "Enter") {
+        if (buscar.value !== "") {
+            clienteTraido = (await axios.get(`${URL}clientes/id/${buscar.value}`)).data;
+            saldo.value = (clienteTraido.saldo).toFixed(2);
+            clienteInput.value = clienteTraido.nombre;
+            if (clienteTraido === "") {
+                sweet.fire({title:"Cliente no encontrado"});
+                buscar.value = "";
+                buscar.focus();
+            }else{
+                listaCompensada = (await axios.get(`${URL}compensada/traerCompensadas/${clienteTraido._id}`)).data;
+                listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${clienteTraido._id}`)).data;
+                if (tipoLista === "compensada") {
+                    listarVentas(listaCompensada);
+                }else{
+                    listarVentas(listaHistorica);
+                }
             }
-        })
-    }else{
-        await sweet.fire({
-            title:"Ninguna venta seleccionado"
-        })
+        }else{
+            const options = {
+                path: './clientes/clientes.html',
+                botones:false,
+            }
+            ipcRenderer.send('abrir-ventana',options)
+        }
     }
 });
 
-async function listarMovientosRecibos(movimientos) {
-    tbodyMovRecibo.parentNode.parentNode.classList.remove('none');
-    tbodyProducto.parentNode.parentNode.classList.add('none');
-    tbodyMovRecibo.innerHTML = "";
-    for await(let mov of movimientos){
-        const tr = document.createElement('tr');
+compensada.addEventListener('click', clickCompensada);
 
-        const tdFecha = document.createElement('td');
-        const tdNumero = document.createElement('td');
-        const tdImporte = document.createElement('td');
-        const tdPrecio = document.createElement('td');
-        const tdSaldo = document.createElement('td');
-    
-        tdFecha.innerText = mov.fecha.slice(0,10).split('-',3).reverse().join('/');
-        tdNumero.innerText = mov.numero;
-        tdImporte.innerText = mov.importe.toFixed(2);
-        tdPrecio.innerText = mov.precio.toFixed(2);
-        tdSaldo.innerText = mov.saldo.toFixed(2);
-    
-        tr.appendChild(tdFecha);
-        tr.appendChild(tdNumero);
-        tr.appendChild(tdImporte);
-        tr.appendChild(tdPrecio);
-        tr.appendChild(tdSaldo);
-    
-        tbodyMovRecibo.appendChild(tr);
-    }
-};
+historica.addEventListener('click', clickHistorica);
 
 imprimirResumen.addEventListener('click',impresionDeResumen);
 
+tbodyVenta.addEventListener('click', clickCuenta);
 
-async function impresionDeResumen() {
-    const date = new Date();
-    const mes = date.getMonth() + 1;
-    const anio = date.getFullYear();
-    
-    await sweet.fire({
-        html:`
-            <section>
-                <input id="fechas" type="date" value=${anio}-${mes}-01 />
-            </section>
-        `,
-        confirmButtonText:"Imprimir",
-        showCancelButton:true
-    });
-    const fecha = document.getElementById('fechas').value;
-
-    const historicas = (await axios.get(`${URL}historica/forDesdeAndCliente/${fecha}/${buscar.value}`)).data;
-    const info = {
-        historicas,
-        idCliente:buscar.value
-    }
-    ipcRenderer.send('imprimir-historica',info);
-}
+tbodyProducto.addEventListener('click', agregarNumeroSerie);
 
 volver.addEventListener('click',e=>{
     location.href = "../menu.html";
 });
+
+
+
