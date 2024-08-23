@@ -20,7 +20,7 @@ const Provedor = new Schema({
         default: '',
         set: ( value ) => value.toUpperCase()
     },
-    Localidad:{
+    localidad:{
         type: String,
         default: '',
         set: ( value ) => value.toUpperCase()

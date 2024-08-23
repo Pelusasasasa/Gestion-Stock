@@ -184,6 +184,31 @@ const hacerMenu = () => {
           }
         },
         {
+          label:"Provedores",
+          submenu:[
+            {
+              label:"Lista Provedores",
+              click(){
+                ventanaPrincipal.webContents.loadFile('src/provedores/listaProvedores.html');
+              }
+            },
+            {
+              label:"Saldo de Provedores",
+                click(){
+                  ventanaPrincipal.webContents.send('verificarUsuario','movVendedores');
+                  
+                }
+            },
+            {
+              label:"Emitir Pago",
+                click(){
+                  ventanaPrincipal.webContents.send('verificarUsuario','movVendedores');
+                  
+                }
+            }
+          ]
+        },
+        {
           label:"Rubros",
           click(){
             abrirVentana("rubros/rubros.html",600,900)
