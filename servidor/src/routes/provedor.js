@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-const {getProvedores, postProvedor, putProvedor, getProvedor, deleteProvedor} = require('../controllers/provedor.controllers');
+const {getProvedores, postProvedor, putProvedor, getProvedor, deleteProvedor, getProvedoresForText} = require('../controllers/provedor.controllers');
 
 
 router.route('/')
@@ -11,6 +11,8 @@ router.route('/forId/:id')
     .get(getProvedor)
     .put(putProvedor)
     .delete(deleteProvedor)
+router.route('/forText/:text')
+    .get(getProvedoresForText)
 
 
 module.exports = router;

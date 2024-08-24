@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
 
+let buscador = document.getElementById('buscador');
 let tbody = document.getElementById('tbody');
 
 //botones
@@ -52,7 +53,7 @@ const clickBody = (e) => {
 
 };
 
-const eliminarProvedor = async(e) =>{
+const eliminarProvedor = async(e) => {
 
     if (!seleccionado) return await sweet.fire('Venta no Seleccionada');
 
@@ -73,7 +74,14 @@ const eliminarProvedor = async(e) =>{
 
 };
 
+const filtrarProvedores = async(e) => {
+    const provedores = (await axios.get(`${URL}provedor/forText/${buscador.value === '' ? 'NADA' : buscador.value}`)).data;
+    listarProvedores(provedores);
+};
+
 const listarProvedores = async(lista) => {
+
+    tbody.innerHTML = '';
 
     for(let provedor of lista){
         let tr = document.createElement('tr');
@@ -137,6 +145,7 @@ const modificarProvedor = async() => {
 };
 
 agregar.addEventListener('click', agregarProvedor);
+buscador.addEventListener('keyup', filtrarProvedores);
 eliminar.addEventListener('click', eliminarProvedor);
 modificar.addEventListener('click', modificarProvedor);
 

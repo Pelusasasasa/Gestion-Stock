@@ -30,6 +30,28 @@ provedorCTRL.getProvedores = async(req, res) => {
 
 };
 
+provedorCTRL.getProvedoresForText = async(req, res) => {
+    const { text } = req.params;
+
+    let re = new RegExp(`^${text}`);
+
+    let provedores = [];
+
+    if (text === 'NADA'){
+        provedores = await Provedor.find();
+    }else{
+        provedores = await Provedor.find({
+                $or: [
+                    {codigo: {$regex: re, $options:'i'}},
+                    {nombre: {$regex: re, $options:'i'}},
+                    {cuit: {$regex: re, $options:'i'}}
+                ]
+            });
+    }    
+
+    res.send( provedores );
+};
+
 provedorCTRL.postProvedor = async(req, res) => {
 
     const provedor = new Provedor(req.body);

@@ -343,7 +343,7 @@ funciones.ponerNumero = async()=>{
             };
 
             if (recibo) {
-                ipcRenderer.send('imprimir-recibo',[recibo,cliente,movimientos,false])    
+                ipcRenderer.send('imprimir-recibo',[recibo,cliente,movimientos,true])    
             }else{
                 ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos]);
             };
