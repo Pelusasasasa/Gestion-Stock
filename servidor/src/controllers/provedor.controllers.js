@@ -53,11 +53,20 @@ provedorCTRL.getProvedoresForText = async(req, res) => {
 };
 
 provedorCTRL.postProvedor = async(req, res) => {
+    try {
+        const provedor = new Provedor(req.body);
+        await provedor.save();
 
-    const provedor = new Provedor(req.body);
-    await provedor.save();
-
-    res.send(provedor);
+        res.send({
+            ...provedor,
+            ok: true
+        });
+    } catch (error) {
+        res.send({
+            ok: false,
+            message: error.message
+        })
+    }
 
 };
 

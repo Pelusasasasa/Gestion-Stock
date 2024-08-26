@@ -88,36 +88,30 @@ const listarProvedores = async(lista) => {
         tr.id = provedor._id;
         tr.classList.add('cursor-pointer');
 
-
-        let tdCodigo = document.createElement('td');
         let tdRazon = document.createElement('td');
         let tdCuit = document.createElement('td');
         let tdDireccion = document.createElement('td');
         let tdLocalidad = document.createElement('td');
         let tdSaldo = document.createElement('td');
 
-        tdCodigo.innerText = provedor.codigo;
         tdRazon.innerText = provedor.nombre;
         tdCuit.innerText = provedor.cuit;
         tdDireccion.innerText = provedor.domicilio;
         tdLocalidad.innerText = provedor.localidad;
         tdSaldo.innerText = provedor.saldo.toFixed(2);
 
-        tdCodigo.classList.add('border');
         tdRazon.classList.add('border');
         tdCuit.classList.add('border');
         tdDireccion.classList.add('border');
         tdLocalidad.classList.add('border');
         tdSaldo.classList.add('border');
 
-        tdCodigo.classList.add('border-black');
         tdRazon.classList.add('border-black');
         tdCuit.classList.add('border-black');
         tdDireccion.classList.add('border-black');
         tdLocalidad.classList.add('border-black');
         tdSaldo.classList.add('border-black');
 
-        tr.appendChild(tdCodigo);
         tr.appendChild(tdRazon);
         tr.appendChild(tdCuit);
         tr.appendChild(tdDireccion);
@@ -154,4 +148,10 @@ window.addEventListener('load', cargarPagina);
 
 salir.addEventListener('click', () => {
     location.href = '../menu.html';
+});
+
+ipcRenderer.on('informacion', (e, provedor) => {
+    provedores.push(provedor);
+    
+    listarProvedores(provedores);
 });

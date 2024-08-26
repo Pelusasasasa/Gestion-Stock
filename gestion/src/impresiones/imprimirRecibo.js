@@ -14,14 +14,9 @@ const iva = document.getElementById('iva');
 const valores = document.getElementById('valores');
 const total = document.getElementById('total');
 
-
 const tbody = document.getElementById('tbody');
 
-
-
 ipcRenderer.on('imprimir-recibo',listar);
-
-
 
 async function listar(e,args){
     const [recibo,cliente,lista] = JSON.parse(args);
@@ -62,4 +57,4 @@ function listarcomprobantes(lista) {
             </tr>
         `
     })
-}
+};

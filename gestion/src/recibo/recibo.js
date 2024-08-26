@@ -48,13 +48,29 @@ d = d<10 ? `0${d}` : d;
 m = m<10 ? `0${m}` : m;
 m = m===13 ? 1 : m;
 
-fecha.value = `${a}-${m}-${d}`
+fecha.value = `${a}-${m}-${d}`;
 
-ipcRenderer.on('recibir',(e,args)=>{
-    const {informacion} = JSON.parse(args);
-    ponerInputs(informacion);
-});
+//Le descontamos un saldo al cliente
+const descontarSaldoCliente =async(idCliente,precio)=>{
+    const cliente = (await axios.get(`${URL}clientes/id/${idCliente}`)).data;
+    cliente.saldo = (cliente.saldo - precio).toFixed(2);
+    await axios.put(`${URL}clientes/id/${idCliente}`,cliente);
+};
 
+//Todas las compensadas que se modificaron las modificamos
+const modificarCuentaCompensadas = async()=>{
+    const trs = document.querySelectorAll('tbody tr');
+    for await(let tr of trs){
+        const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : "";
+        const compensada =  numero !== "" ? (await axios.get(`${URL}compensada/traerCompensada/id/${numero}`)).data : "";
+        console.log(compensada)
+        if (compensada !== "") {
+            compensada.pagado = parseFloat((compensada.pagado + parseFloat(tr.children[5].children[0].value)).toFixed(2));
+            compensada.saldo = parseFloat(tr.children[6].innerHTML).toFixed(2);
+            await axios.put(`${URL}compensada/traerCompensada/id/${compensada.nro_venta}`,compensada);
+        }
+    }
+};
 
 cheque.addEventListener('click',async ()=>{
     let {isConfirmed,value, isDismissed, dismiss} = await sweet.fire({
@@ -257,12 +273,14 @@ imprimir.addEventListener('click',async e=>{
         let lista = await ponerMovimientosRecibo(recibo.numero);
         await ponerEnCuentaHistorica(recibo);
         await descontarSaldoCliente(recibo.idCliente,recibo.precio);
-        await axios.post(`${URL}recibo`,recibo);
-
+        const res = (await axios.post(`${URL}recibo`,recibo)).data;
         await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
         const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
-        ipcRenderer.send('imprimir-recibo',[recibo,cliente,lista,false])
+
+        ipcRenderer.send('imprimir-recibo',[res,cliente,lista,false])
+
         location.href = "../menu.html";
+        
     }catch(error){
         console.log(error)
         await sweet.fire({
@@ -270,28 +288,6 @@ imprimir.addEventListener('click',async e=>{
         })
     }
 });
-
-//Le descontamos un saldo al cliente
-const descontarSaldoCliente =async(idCliente,precio)=>{
-    const cliente = (await axios.get(`${URL}clientes/id/${idCliente}`)).data;
-    cliente.saldo = (cliente.saldo - precio).toFixed(2);
-    await axios.put(`${URL}clientes/id/${idCliente}`,cliente);
-};
-
-//Todas las compensadas que se modificaron las modificamos
-const modificarCuentaCompensadas = async()=>{
-    const trs = document.querySelectorAll('tbody tr');
-    for await(let tr of trs){
-        const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : "";
-        const compensada =  numero !== "" ? (await axios.get(`${URL}compensada/traerCompensada/id/${numero}`)).data : "";
-        console.log(compensada)
-        if (compensada !== "") {
-            compensada.pagado = parseFloat((compensada.pagado + parseFloat(tr.children[5].children[0].value)).toFixed(2));
-            compensada.saldo = parseFloat(tr.children[6].innerHTML).toFixed(2);
-            await axios.put(`${URL}compensada/traerCompensada/id/${compensada.nro_venta}`,compensada);
-        }
-    }
-};
 
 const ponerMovimientosRecibo = async(numero,tipo)=>{
     const trs = document.querySelectorAll('tbody tr');
@@ -395,8 +391,6 @@ codigo.addEventListener('keypress', async e=>{
     }
 });
 
-
-
 observaciones.parentElement.addEventListener('dblclick',async e => {
     const {isConfirmed, value} = await sweet.fire({
         title:"Observaciones",
@@ -434,3 +428,8 @@ setInterval(() => {
         observaciones.classList.toggle('observacionesAlerta');
     };
 }, 800);
+
+ipcRenderer.on('recibir',(e,args)=>{
+    const {informacion} = JSON.parse(args);
+    ponerInputs(informacion);
+});

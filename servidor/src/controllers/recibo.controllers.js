@@ -8,7 +8,8 @@ reciboCTRL.cargarRecibo = async(req,res)=>{
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const nuevoRecibo = new Recibo(req.body);
     await nuevoRecibo.save();
-    res.send(`Recibo ${req.body.numero} cargado`)
+    console.log(`Recibo ${req.body.numero} cargado`)
+    res.send( nuevoRecibo );
 }
 
 reciboCTRL.recibosDia = async(req,res)=>{

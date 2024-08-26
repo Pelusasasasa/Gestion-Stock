@@ -1,11 +1,7 @@
 const { Schema, model } = require("mongoose");
 
 const Provedor = new Schema({
-
-    codigo:{
-        type: String,
-        required: true
-    },
+    
     nombre:{
         type: String,
         required: true,
@@ -48,8 +44,15 @@ const Provedor = new Schema({
     saldo:{
         type: Number,
         default: 0
-    }
-
+    },
+    // numero:{
+    //     type: Number,
+    //     default: 0
+    // },
+    // provedor:{
+    //     type: Number,
+    //     default: 0
+    // }
 });
 
 
