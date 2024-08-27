@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
+const { verificarUsuarios, agregarMovimientoVendedores } = require('../helpers');
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -33,6 +34,30 @@ const agregarProvedor = async() => {
 };
 
 const cargarPagina = async () => {
+    vendedor = await verificarUsuarios();
+    
+    if (!vendedor.nombre) {
+        await sweet.fire({
+            title: 'Acceso denegado',
+            text: `No existe el usuario`,
+            icon: 'error'
+        });
+
+        location.reload();
+    };
+
+    if (vendedor.permiso !== 0 && vendedor.nombre) {
+
+        await sweet.fire({
+            title: 'Acceso denegado',
+            text: `${nombre} no tiene permiso para ingresar`,
+            icon: 'error'
+        });
+
+        location.reload();
+    };
+
+
     provedores = (await axios.get(`${URL}provedor`)).data;
 
     listarProvedores(provedores);
@@ -65,7 +90,11 @@ const eliminarProvedor = async(e) => {
 
     if (isConfirmed){
         await axios.delete(`${URL}provedor/forId/${seleccionado.id}`);
+
+        agregarMovimientoVendedores(`Elimino el provedor ${seleccionado.children[0].innerText}`, vendedor.nombre);
     };
+
+    provedores = provedores.filter( provedor => provedor._id !== seleccionado.id);
 
     tbody.removeChild( seleccionado );
     seleccionado = '';
@@ -151,7 +180,14 @@ salir.addEventListener('click', () => {
 });
 
 ipcRenderer.on('informacion', (e, provedor) => {
-    provedores.push(provedor);
     
+    const provedorBuscado = provedores.findIndex( elem => elem._id === provedor._id);
+
+    if (provedorBuscado !== -1) {
+        provedores[provedorBuscado] = provedor;
+    }else{
+        provedores.push(provedor);
+    };
+
     listarProvedores(provedores);
 });

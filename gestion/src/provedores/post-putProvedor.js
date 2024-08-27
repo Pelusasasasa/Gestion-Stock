@@ -1,7 +1,7 @@
 const axios = require('axios');
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
-const { cerrarVentana } = require('../helpers');
+const { cerrarVentana, agregarMovimientoVendedores } = require('../helpers');
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -18,6 +18,9 @@ const mail = document.querySelector('#mail');
 const guardar = document.querySelector('#guardar');
 const modificar = document.querySelector('#modificar');
 const salir = document.querySelector('#salir');
+
+let vendedor = '';
+let provedor;
 
 const agregarProvedor = async() => {
 
@@ -47,6 +50,9 @@ const agregarProvedor = async() => {
     const res = (await axios.post(`${URL}provedor`, provedor)).data;
 
     if (res.ok){
+        
+        agregarMovimientoVendedores(`Agregro el provedor ${provedor.nombre}`, vendedor.nombre);
+
         await sweet.fire({
             title: `Provedor ${provedor.nombre} Cargado Correctamente`,
             icon: 'success',
@@ -62,16 +68,87 @@ const agregarProvedor = async() => {
     ipcRenderer.send('send-ventanaPrincipal', res._doc);
     
     window.close();
-}
-
-const infoTraido = (e,args) => {
-    console.log(args)
 };
 
+const cargarDatos = async( id ) => {
+
+    modificar.classList.remove('none');
+    guardar.classList.add('none');
+
+    provedor = (await axios.get(`${URL}provedor/forId/${id}`)).data;
+
+    nombre.value = provedor.nombre;
+    cuit.value = provedor.cuit;
+    domicilio.value = provedor.domicilio;
+    localidad.value = provedor.localidad;
+    codPostal.value = provedor.codPostal;
+    provincia.value = provedor.provincia;
+    telefono.value = provedor.telefono;
+    mail.value = provedor.mail;
+};
+
+const infoTraido = (e,args) => {
+    vendedor = args.vendedor;
+    provedor = args.info;
+    
+    if (provedor){
+        cargarDatos( provedor );
+    }
+};
+
+const modificarProvedor = async() => {
+
+    if (nombre.value === '') return await sweet.fire({
+        title: 'Falta Nombre',
+        icon: 'error',
+        timer: 2000
+    });
+
+    if (cuit.value === '') return await sweet.fire({
+        title: 'Falta Cuit',
+        icon: 'error',
+        timer: 2000
+    });
+
+    provedor.nombre = nombre.value.toUpperCase();
+    provedor.cuit = cuit.value;
+    provedor.domicilio = domicilio.value.toUpperCase();
+    provedor.localidad = localidad.value.toUpperCase();
+    provedor.codPostal = codPostal.value;
+    provedor.provincia = provincia.value.toUpperCase();
+    provedor.telefono = telefono.value;
+    provedor.mail = mail.value;
+
+    const res = (await axios.put(`${URL}provedor/forId/${provedor._id}`, provedor)).data;
+
+    if (res.ok) {
+        await sweet.fire({
+            title: `Provedor ${provedor.nombre} Modificado Correctamente`,
+            icon: 'success',
+            timer: 2000
+        });
+
+        agregarMovimientoVendedores(`Modifico el provedor ${provedor.nombre}`, vendedor);
+    }else{
+
+        await sweet.fire({
+            title: `Error al Modificar Provedor ${provedor.nombre}`,
+            icon: 'error',
+            timer: 2000
+        })
+
+    };
+
+    ipcRenderer.send('send-ventanaPrincipal', provedor);
+
+    window.close();
+    
+};
 
 ipcRenderer.on('informacion', infoTraido);
 
 guardar.addEventListener('click', agregarProvedor);
+modificar.addEventListener('click', modificarProvedor);
 
 
 nombre.addEventListener('keypress', e => {

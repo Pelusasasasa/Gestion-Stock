@@ -73,9 +73,20 @@ provedorCTRL.postProvedor = async(req, res) => {
 provedorCTRL.putProvedor = async(req, res) => {
     const { id } = req.params;
 
-    const provedor = await Provedor.findByIdAndUpdate(id, req.body);
+    try {
+        const provedor = await Provedor.findByIdAndUpdate(id, req.body);
 
-    res.send( provedor );
+        res.send({
+            ...provedor,
+            ok: true
+        })
+    } catch (error) {
+        console.log(error)
+        res.sned({
+            message: error.message,
+            ok: false
+        })
+    }
 };
 
 module.exports = provedorCTRL;
