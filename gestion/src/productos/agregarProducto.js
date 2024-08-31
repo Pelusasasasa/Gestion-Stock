@@ -41,7 +41,15 @@ const traerRubros = async()=>{
     }
 };
 
-traerRubros();
+const traerProvedores = async () => {
+    const provedores = (await axios.get(`${URL}provedor`)).data;
+    for await(let {nombre} of provedores){
+        const option = document.createElement('option');
+        option.text = nombre,
+        option.value = nombre;
+        provedor.appendChild(option);
+    }
+};
 
 ipcRenderer.on('informacion',(e,args)=>{
     vendedor = args.vendedor;
@@ -52,6 +60,9 @@ window.addEventListener('load',async e=>{
         costoDolar.setAttribute('disabled',"");
     }
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
+    
+    traerRubros();
+    traerProvedores();
 });
 
 guardar.addEventListener('click',async e=>{

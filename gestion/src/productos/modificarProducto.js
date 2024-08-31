@@ -34,14 +34,7 @@ const salir = document.querySelector('.salir');
 let vendedor;
 
 
-//Recibimos la informacion del producto para luego llenar los inputs
-ipcRenderer.on('informacion',async (e,args)=>{
-    if (!archivo.dolar) {
-        costoDolar.setAttribute('disabled',"");
-    }
-    dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
-    const {informacion}= args;
-    vendedor = args.vendedor;
+const traerRubros = async() => {
     const rubros = (await axios.get(`${URL}rubro`)).data;
     for await(let {rubro,numero} of rubros){
         const option = document.createElement('option');
@@ -50,6 +43,29 @@ ipcRenderer.on('informacion',async (e,args)=>{
         option.value = rubro;
         select.appendChild(option);
     }
+};
+
+const traerProvedor = async() => {
+    const provedores = (await axios.get(`${URL}provedor`)).data;
+    for await(let {nombre} of provedores){
+        const option = document.createElement('option');
+        option.text = nombre,
+        option.value = nombre;
+        provedor.appendChild(option);
+    };
+}
+
+//Recibimos la informacion del producto para luego llenar los inputs
+ipcRenderer.on('informacion',async (e,args)=>{
+    if (!archivo.dolar) {
+        costoDolar.setAttribute('disabled',"");
+    }
+    dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
+    const {informacion}= args;
+    vendedor = args.vendedor;
+    traerRubros();
+    traerProvedor();
+    
     llenarInputs(informacion);
 });
 
@@ -136,6 +152,7 @@ rubro.addEventListener('keydown',e=>{
 });
 
 provedor.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,costo);
 });
 
@@ -177,10 +194,6 @@ descripcion.addEventListener('focus',e=>{
 
 marca.addEventListener('focus',e=>{
     marca.select()
-});
-
-provedor.addEventListener('focus',e=>{
-    provedor.select()
 });
 
 stock.addEventListener('focus',e=>{
