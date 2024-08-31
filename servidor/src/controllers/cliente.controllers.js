@@ -46,10 +46,10 @@ clienteCTRL.cargarCliente = async(req,res)=>{
         console.log(error)
     };
     
-    console.log(mensaje)
     res.send(JSON.stringify({
         mensaje,
-        estado
+        estado,
+        cliente
     }))
 }
 

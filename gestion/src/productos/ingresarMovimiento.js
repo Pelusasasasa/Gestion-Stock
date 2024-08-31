@@ -62,10 +62,25 @@ const agregarSerieTabla = async() => {
     serie.focus();
 };
 
-const listarProducto = ({_id, descripcion:desc, stock:sto}) => {
+const listarProducto = ({_id, descripcion:desc, stock:sto, provedor: pro}) => {
     codigo.value = _id;
     descripcion.value = desc;
-    stock.value = sto.toFixed(2)
+    stock.value = sto.toFixed(2);
+
+    if (pro){
+        provedor.value = pro;
+    }
+};
+
+const listarProvedores = (lista) => {
+    for(let elem of lista){
+        const option = document.createElement('option');
+
+        option.value = elem.nombre;
+        option.text = elem.nombre;
+
+        provedor.appendChild(option);
+    };
 };
 
 const guardarMovimiento = async() => {
@@ -117,14 +132,6 @@ const verPermiso = (permiso) => {
     }
 }
 
-ipcRenderer.on('informacion', async (e,{informacion, vendedor:vend}) => {
-    vendedor = vend.nombre;
-    acceso = vend.permiso;
-    producto = (await axios.get(`${URL}productos/${informacion}`)).data;
-    listarProducto(producto);
-    verPermiso(acceso);
-});
-
 agregarSerie.addEventListener('click', agregarSerieTabla);
 
 aceptar.addEventListener('click', guardarMovimiento);
@@ -167,4 +174,18 @@ serie.addEventListener('keypress', (e) => {
 
 salir.addEventListener('click', e => {
     window.close();
+});
+
+ipcRenderer.on('informacion', async (e,{informacion, vendedor:vend}) => {
+    provedores = (await axios.get(`${URL}provedor`)).data;
+    
+    listarProvedores( provedores );
+
+    vendedor = vend.nombre;
+    acceso = vend.permiso;
+
+    producto = (await axios.get(`${URL}productos/${informacion}`)).data;
+    listarProducto(producto);
+    verPermiso(acceso);
+
 });

@@ -4,7 +4,8 @@ const Cliente = new mongoose.Schema({
     _id:Number,
     nombre:{
         type:String,
-        required:true
+        required:true,
+        set: (value) => value.toUpperCase()
     },
     telefono:{
         type:String,
@@ -12,11 +13,13 @@ const Cliente = new mongoose.Schema({
     },
     direccion:{
         type:String,
-        default:""
+        default:"",
+        set: (value) => value.toUpperCase()
     },
     localidad:{
         type:String,
-        default:""
+        default:"",
+        set: (value) => value.toUpperCase()
     },
     listaVentas:[],
     saldo:{
@@ -37,7 +40,8 @@ const Cliente = new mongoose.Schema({
     },
     observaciones:{
         type:String,
-        default:""
+        default:"",
+        set: (value) => value.toUpperCase()
     }
 });
 
