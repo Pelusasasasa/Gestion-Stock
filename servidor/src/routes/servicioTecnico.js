@@ -9,6 +9,7 @@ router.route('/')
 router.route('/id/:id')
     .get(getForId)
     .put(putForId)
+    .delete(deleteForId)
 router.route('/forText/:text')
     .get(getForText)
 

@@ -57,8 +57,9 @@ clienteCTRL.modificarCliente = async(req,res)=>{
     const {id} = req.params;
     let mensaje;
     let estado;
+    let cliente;
     try {
-        const cliente = await Clientes.findOneAndUpdate({_id:id},req.body);
+        cliente = await Clientes.findOneAndUpdate({_id:id},req.body);
         estado = true;
         console.log(`Cliente ${cliente.nombre} Modificado`);
         mensaje = `Cliente ${cliente.nombre} Modificado`;
@@ -69,13 +70,13 @@ clienteCTRL.modificarCliente = async(req,res)=>{
     };
 
     res.send(JSON.stringify({
-        mensaje,estado
+        mensaje,estado,cliente
     }));
 }
 
 clienteCTRL.eliminarCliente = async(req,res) =>{
     const {id} = req.params;
-    const cliente = await Clientes.findOneAndRemove({_id:id});
+    const cliente = await Clientes.findOneAndDelete({_id:id});
     console.log(`Cliente ${cliente.nombre} Eliminado`)
     res.send(`Cliente ${cliente.nombre} Eliminado`);
 }

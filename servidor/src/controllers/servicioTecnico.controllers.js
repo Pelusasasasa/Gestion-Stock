@@ -62,4 +62,12 @@ servicioCTRL.putForId = async(req, res) => {
 
 };
 
+servicioCTRL.deleteForId = async(req, res) => {
+    const {id} = req.params;
+
+    const servicio = await Servicio.findOneAndDelete({_id: id});
+
+    res.send( servicio );
+}
+
 module.exports = servicioCTRL;
