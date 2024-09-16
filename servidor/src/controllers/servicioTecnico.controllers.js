@@ -41,7 +41,7 @@ servicioCTRL.post = async(req, res)=>{
     try {
         await servicio.save();
 
-        res.send({message: `Servicio creado por el vendedor ${req.body.vendedor} a la fecha ${req.body.fecha.slice(0,10).split('-',3).reverse().join('/')}`});
+        res.send(servicio);
     } catch (error) {
         console.log(error)
         res.send(error.errors);
