@@ -522,15 +522,8 @@ const listarProducto = async(id,cant) => {
     producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;
     producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value)/100,2));
     if (producto !== "") {
-        const productoYaUsado = listaProductos.find(({producto: product})=>{
-       if (product._id === producto._id) {
-           return product
-       };
-    });
-
-
     //Lenamos los espacios
-    if(producto !== "" && !productoYaUsado){
+    if(producto !== ""){
         if (producto.stock === 0 && archivo.stockNegativo) {
             await sweet.fire({
                 title:"Producto con Stock en 0"
@@ -575,27 +568,8 @@ const listarProducto = async(id,cant) => {
     });
     total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * parseFloat(precioU.value)),2);
     totalGlobal = parseFloat(total.value);
-
-    }else if(producto !== "" && productoYaUsado){
-
-        let precio = "";
-
-        if (producto.oferta) {
-            precio = producto.precioOferta;
-        }else if(verTipoVenta() === "CD"){
-            precio = producto.precio;
-        }else{
-            precio = parseFloat(redondear(producto.precio + producto.precio * archivo.descuentoEfectivo / 100,2));
-        };
-
-        productoYaUsado.cantidad += parseFloat(cantidad.value)
-        producto.idTabla = productoYaUsado.producto.idTabla;
-        const tr = document.getElementById(producto.idTabla);
-        tr.children[0].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) + parseFloat(cantidad.value),2);
-        tr.children[5].innerHTML = redondear(parseFloat(tr.children[0].innerHTML) * precio,2);
-        total.value = redondear(parseFloat(total.value) + (parseFloat(cantidad.value) * precio),2);
-        totalGlobal = parseFloat(total.value);
     }
+
     cantidad.value = "1.00";
     codigoProd.value = "";
     precioU.value = "";

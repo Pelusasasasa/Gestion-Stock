@@ -5,8 +5,6 @@ const uri = "mongodb://127.0.0.1/morel";
 mongoose.connect(uri,{
     useUnifiedTopology:true,
     useNewUrlParser:true,
-    useCreateIndex:true,
-    useFindAndModify:false
 });
 
 const conection = mongoose.connection;
