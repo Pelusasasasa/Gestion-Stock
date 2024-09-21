@@ -218,7 +218,8 @@ const listarCliente = async(id) => {
 
 //Lo que hacemos es listar el producto traido
 const listarProducto = async(id, cant = 1)=>{
-        let producto = (await axios.get(`${URL}productos/${id}`)).data;//buscamos el producto por codigo
+        const res = id.toUpperCase().replace(/\//g, '%2F');
+        let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
         cantidad.value = cant;
 
         if(!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad'){
@@ -845,7 +846,6 @@ window.addEventListener('load',async e=>{
             confirmButtonText:"Aceptar",
             showCancelButton:true
         }).then(({isConfirmed,value})=>{
-            console.log(isConfirmed)
             if (isConfirmed) {
                 facturaAnterior = value.padStart(8,'0');
             }else{
@@ -854,7 +854,6 @@ window.addEventListener('load',async e=>{
         });
     }
     
-    listarCliente(1);//listanos los clientes
     
     cambiarSituacion(situacion);//
 });

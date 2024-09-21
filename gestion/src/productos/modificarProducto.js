@@ -69,11 +69,11 @@ ipcRenderer.on('informacion',async (e,args)=>{
     llenarInputs(informacion);
 });
 
-
 //llenamos los inputs con la informacion que tenemos
 const llenarInputs = async(codigoProducto)=>{
     codigo.value = codigoProducto;
-    const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+    const id = codigo.value.replace(/\//g,'%2F');
+    const producto = (await axios.get(`${URL}productos/${id}`)).data;
     unidad.value = producto.unidad;
     descripcion.value = producto.descripcion;
     marca.value = producto.marca;
@@ -90,7 +90,7 @@ const llenarInputs = async(codigoProducto)=>{
     }
     ganancia.value = producto.ganancia.toFixed(2);
     total.value = producto.precio.toFixed(2);    
-}
+};
 
 //al hacer click modificamos los productos con el valor de los inputs
 modificar.addEventListener('click',async e=>{
@@ -111,7 +111,7 @@ modificar.addEventListener('click',async e=>{
         producto.ganancia = parseFloat(ganancia.value).toFixed(2);
         producto.precio = parseFloat(total.value).toFixed(2);
         
-        const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id}`,producto)).data;
+        const {mensaje,estado} =  (await axios.put(`${URL}productos/${producto._id.replace(/\//g,'%2F')}`,producto)).data;
 
         await ipcRenderer.send('informacion-a-ventana',producto);
 

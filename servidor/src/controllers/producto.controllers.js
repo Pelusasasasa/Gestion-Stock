@@ -70,7 +70,6 @@ productoCTRL.modificarProducto = async(req,res)=>{
 
     const now = new Date();
     req.body.ultimaModificacion = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-
     try {
         producto = await Producto.findOneAndUpdate({_id:id},req.body);
         mensaje = `Producto ${producto.descripcion} Modificado`;
