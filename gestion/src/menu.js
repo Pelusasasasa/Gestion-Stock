@@ -23,10 +23,12 @@ const notaCredito = document.querySelector('.notaCredito');
 let verVendedores;
 
 window.addEventListener('load',async e=>{
+
     await cargarPrimerCliente();
-    verVendedores = archivo.vendedores;
+
     const vendedores = (await axios.get(`${URL}vendedores`)).data;
-    if (!vendedores.find(vendedor => vendedor.permiso === 0) && verVendedores) {
+    console.log(vendedores)
+    if (!vendedores.find(vendedor => vendedor.permiso === 0)) {
         sweet.fire({
             title:"Cargar un Vendedor con permiso en 0 inicial",
             html: await cargarVendedor(),

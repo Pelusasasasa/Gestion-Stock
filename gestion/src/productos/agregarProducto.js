@@ -139,6 +139,7 @@ rubro.addEventListener('keypress',e=>{
 });
 
 provedor.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,stock);
 })
 

@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 
 const uri = "mongodb://127.0.0.1/gestion";
 
-mongoose.connect(uri,{
-    useUnifiedTopology:true,
-    useNewUrlParser:true,
-});
+mongoose.connect(uri);
 
 const conection = mongoose.connection;
 
