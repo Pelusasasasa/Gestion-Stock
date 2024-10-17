@@ -200,6 +200,14 @@ productoCTRL.traerCosto = async(req,res)=>{
     }
 };
 
+productoCTRL.traerImpuesto = async(req, res) => {
+    const { id } = req.params;
+    const producto = await Producto.findOne({_id: id});
+
+    res.send(`${producto.impuesto}`);
+};
+
+
 productoCTRL.traerModificados = async(req,res)=>{
     const {fecha} = req.params;
     const desde = new Date(fecha + 'T00:00:00.000Z');
@@ -212,6 +220,6 @@ productoCTRL.traerModificados = async(req,res)=>{
         ]
     });
     res.send(productos);
-}
+};
 
 module.exports = productoCTRL

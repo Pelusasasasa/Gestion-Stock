@@ -116,6 +116,7 @@ const borrarCuentaCompHist = async(e) => {
 };
 
 const clickCompensada = async(e) => {
+    actualizar.removeAttribute('disabled');
     tipoLista = "compensada";
     historica.classList.remove('none');
     compensada.classList.add('none');
@@ -144,6 +145,7 @@ const clickCuenta = async(e) => {
 };
 
 const clickHistorica = async(e) => {
+    actualizar.setAttribute('disabled', true);
     historica.classList.add('none');
     compensada.classList.remove('none');
     borrar.classList.toggle('none');
@@ -338,8 +340,11 @@ actualizar.addEventListener('click',async e=>{
             if (cuentaCompensada.condicion === "Normal") {
                 precio = (await axios.get(`${URL}productos/traerPrecio/${movimiento.codProd}`)).data;
             }else{
-                precio = (await axios.get(`${URL}productos/traerCosto/${movimiento.codProd}`)).data;
-            }
+                let impuesto = (await axios.get(`${URL}productos/traerImpuesto/${movimiento.codProd}`)).data 
+                let costo = (await axios.get(`${URL}productos/traerCosto/${movimiento.codProd}`)).data ;
+                precio = parseFloat(redondear(costo + (costo * impuesto / 100), 2));
+            };
+
             movimiento.precio = precio !== "" ? precio : movimiento.precio;
             total += (movimiento.precio*movimiento.cantidad);
         };
