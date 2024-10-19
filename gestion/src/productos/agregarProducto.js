@@ -51,6 +51,16 @@ const traerProvedores = async () => {
     }
 };
 
+const traerMarcas = async () => {
+    const marcas = (await axios.get(`${URL}marca`)).data;
+    for await(let {nombre} of marcas){
+        const option = document.createElement('option');
+        option.text = nombre,
+        option.value = nombre;
+        marca.appendChild(option);
+    }
+};
+
 ipcRenderer.on('informacion',(e,args)=>{
     vendedor = args.vendedor;
 });
@@ -63,6 +73,7 @@ window.addEventListener('load',async e=>{
     
     traerRubros();
     traerProvedores();
+    traerMarcas();
 });
 
 guardar.addEventListener('click',async e=>{
@@ -128,6 +139,7 @@ unidad.addEventListener('keypress',e=>{
 });
 
 marca.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,rubro);
 });
 

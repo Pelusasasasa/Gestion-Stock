@@ -21,6 +21,8 @@ app.use('/gestion/gastos',require('./routes/gasto'));
 
 app.use('/gestion/historica',require('./routes/historica'));
 
+app.use('/gestion/marca',require('./routes/marca.route'));
+
 app.use('/gestion/movimiento',require('./routes/movProducto'));
 
 app.use('/gestion/movRecibo',require('./routes/movRecibo'));

@@ -53,7 +53,17 @@ const traerProvedor = async() => {
         option.value = nombre;
         provedor.appendChild(option);
     };
-}
+};
+
+const traerMarcas = async () => {
+    const marcas = (await axios.get(`${URL}marca`)).data;
+    for await(let {nombre} of marcas){
+        const option = document.createElement('option');
+        option.text = nombre,
+        option.value = nombre;
+        marca.appendChild(option);
+    }
+};
 
 //Recibimos la informacion del producto para luego llenar los inputs
 ipcRenderer.on('informacion',async (e,args)=>{
@@ -65,6 +75,7 @@ ipcRenderer.on('informacion',async (e,args)=>{
     vendedor = args.vendedor;
     traerRubros();
     traerProvedor();
+    traerMarcas();
     
     llenarInputs(informacion);
 });

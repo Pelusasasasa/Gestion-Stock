@@ -209,6 +209,12 @@ const hacerMenu = () => {
           ]
         },
         {
+          label: "Marca",
+          click(){
+            abrirVentana("marcas/marcas.html", 600, 900)
+          }
+        },
+        {
           label:"Rubros",
           click(){
             abrirVentana("rubros/rubros.html",600,900)
