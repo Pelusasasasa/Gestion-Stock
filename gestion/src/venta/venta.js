@@ -8,9 +8,12 @@ function getParameterByName(name) {
 let vendedor = getParameterByName('vendedor');
 
 const axios = require('axios');
-require("dotenv").config();
-const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
+require("dotenv").config();
+
+const URL = process.env.GESTIONURL;
+console.log(URL)
+
 
 const { ipcRenderer } = require('electron');
 const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos} = require('../helpers');
@@ -39,6 +42,7 @@ const total = document.querySelector('#total');
 const inputRecibo = document.querySelector('#recibo');
 const porcentaje = document.querySelector('#porcentaje');
 const radio = document.querySelectorAll('input[name="condicion"]');
+const remitoDiv = document.querySelector('.remito');
 const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
 
 //botones
@@ -81,6 +85,7 @@ const calcularTotal = async () => {
 //Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
 const cambiarSituacion = (situacion) =>{
     situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
+    situacion === "negro" ? remitoDiv.classList.remove('none') : remitoDiv.classList.add('none');
 };
 
 //Cargamos el movimiento de producto a la BD

@@ -41,6 +41,8 @@ app.use('/gestion/provedor',require('./routes/provedor'));
 
 app.use('/gestion/recibo',require('./routes/recibo'));
 
+app.use('/gestion/remitos',require('./routes/remito.route'));
+
 app.use('/gestion/rubro',require('./routes/rubro'));
 
 app.use('/gestion/ventas',require('./routes/venta'));
