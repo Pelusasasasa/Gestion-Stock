@@ -32,6 +32,11 @@ const Remito = new Schema({
         unique: true,
         required: true
     },
+    observaciones: {
+        type: String,
+        set: value => value.toUpperCase().trim(),
+        default: ""
+    },
     caja:{
         type: String,
         default: '',

@@ -182,9 +182,14 @@ table tbody {
 
 /* Transform */
 
-.scale-1-9 {
+.scale-1-5 {
+  transform: scale(1.5);
+}
+
+.scale-1-9{
   transform: scale(1.9);
 }
+
 
 /* Transform */
 
@@ -266,6 +271,10 @@ table tbody {
 
 .hover-scale-1-9:hover {
   transform: scale(1.2);
+}
+
+.hover-bg-gray:hover{
+  background-color: lightgray;
 }
 
 .overflow-scroll{

@@ -7,7 +7,15 @@ remitoCTRL.getAll = async(req, res) => {
     const remitos = await Remito.find();
 
     res.send(remitos);
-}
+};
+
+remitoCTRL.getforid = async(req, res) => {
+    const { id } = req.params;
+
+    const remito = await Remito.findOne(id);
+
+    res.send(remito);
+};
 
 
 remitoCTRL.postOne = async(req, res) => {
