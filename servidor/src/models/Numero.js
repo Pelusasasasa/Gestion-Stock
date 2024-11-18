@@ -5,6 +5,10 @@ const Numero = new mongoose.Schema({
     "Contado":Number,
     "Recibo":Number,
     "Presupuesto":Number,
+    "Remito":{
+        type: Number,
+        default: 0
+    },
     "Dolar":Number,
     "Servicio": {
         type:Number,

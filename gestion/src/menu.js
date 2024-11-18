@@ -27,7 +27,6 @@ window.addEventListener('load',async e=>{
     await cargarPrimerCliente();
 
     const vendedores = (await axios.get(`${URL}vendedores`)).data;
-    console.log(vendedores)
     if (!vendedores.find(vendedor => vendedor.permiso === 0)) {
         sweet.fire({
             title:"Cargar un Vendedor con permiso en 0 inicial",
@@ -100,6 +99,10 @@ document.addEventListener('keyup',async e=>{
         }else{
             ipcRenderer.send('abrir-ventana',opciones);
         }
+    }else if(e.keyCode === 117){
+        const usuario = await verificarUsuarios();
+
+        location.href = 'remitos/remitos.html'
     }
 });
 

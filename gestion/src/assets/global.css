@@ -154,6 +154,10 @@ table tbody {
   justify-content: space-around;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .items-center {
   align-items: center;
 }
@@ -262,4 +266,8 @@ table tbody {
 
 .hover-scale-1-9:hover {
   transform: scale(1.2);
+}
+
+.overflow-scroll{
+  overflow: scroll;
 }

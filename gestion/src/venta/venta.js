@@ -15,8 +15,8 @@ const URL = process.env.GESTIONURL;
 console.log(URL)
 
 
-const { ipcRenderer } = require('electron');
-const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos} = require('../helpers');
+const { ipcRenderer, clipboard } = require('electron');
+const {apretarEnter,redondear,sacarCosto,cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro} = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -594,7 +594,7 @@ facturar.addEventListener('click',async e=>{
         
             //Ponemos propiedades para la factura electronica
             venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
-            venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : "Comprobante";
+            venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : await verTipoComprobanteNegro(venta.tipo_venta);
             venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
             venta.cod_doc = await verCodigoDocumento(cuit.value);
             venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
@@ -614,8 +614,11 @@ facturar.addEventListener('click',async e=>{
             venta.vendedor = vendedor ? vendedor : "";
         
             venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
-            if (venta.tipo_venta === "CC") {
+
+        if (venta.tipo_venta === "CC") {
             venta.numero = numeros["Cuenta Corriente"] + 1;
+        }else if(venta.tipo_venta === "RT"){
+            venta.numero = numeros["Remito"] + 1;
         }else if(venta.tipo_venta === "PP"){
             venta.numero = numeros["Presupuesto"] + 1;
         }else if(venta.tipo_venta === "CD"){
@@ -626,6 +629,8 @@ facturar.addEventListener('click',async e=>{
             await axios.put(`${URL}numero/Cuenta Corriente`,{"Cuenta Corriente":venta.numero});
         }else if(venta.tipo_venta === "PP"){
             await axios.put(`${URL}numero/Presupuesto`,{"Presupuesto":venta.numero});
+        }else if(venta.tipo_venta === "RT"){
+            await axios.put(`${URL}numero/Remito`,{"Remito": venta.numero});
         }else{
             await axios.put(`${URL}numero/Contado`,{Contado:venta.numero});
         }
@@ -646,7 +651,8 @@ facturar.addEventListener('click',async e=>{
                     //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
                 }
 
-                venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock)
+                venta.tipo_venta !== "PP" && await axios.put(`${URL}productos/descontarStock`,descuentoStock);
+
                 await axios.post(`${URL}movimiento`,movimientos);
                 
             //sumamos al cliente el saldo y agregamos la venta a la lista de venta
@@ -671,13 +677,18 @@ facturar.addEventListener('click',async e=>{
 
                 if (venta.tipo_venta === "PP") {
                     await axios.post(`${URL}Presupuesto`,venta);
+                }else if(venta.tipo_venta === "RT"){
+                    if (!venta.vendedor){
+                        venta.vendedor = 'GONZALO';
+                    };
+                    await axios.post(`${URL}remitos`, venta);
                 }else{
                     await axios.post(`${URL}ventas`,venta);
                 }
 
                 if (impresion.checked) {
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos, checkboxDolar.checked]);
-                }
+                };
 
                 location.reload();  
             } catch (error) {

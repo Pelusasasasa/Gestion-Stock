@@ -456,7 +456,17 @@ funciones.verTipoComprobante = async(codigo)=>{
         retorno = "Nota Credito C";
     }
     return retorno
-}
+};
+
+funciones.verTipoComprobanteNegro = async(tipo) => {
+    
+    if (tipo === 'RT'){
+        return 'REMITO'
+    }else{
+        return 'COMPROBANTE'
+    };
+
+};
 
 //Funcion que sirve para sacar el costo mas iva de los productos por si lo usamos
 funciones.sacarCosto = (costo,costoDolar,impuesto=0,dolar)=>{

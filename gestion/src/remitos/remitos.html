@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remitos</title>
+    <link rel="stylesheet" href="../assets/global.css">
+</head>
+<body>
+    <section>
+        <div class="buscador flex flex-col items-center mb-2">
+            <label for="buscador text-center">Buscador</label>
+            <input type="text" name="buscador" id="buscador">
+        </div>
+    </section>
+    <section class="h-50 overflow-scroll bg-white">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr>
+                    <th class="border">Fecha</th>
+                    <th class="border">CodCliente</th>
+                    <th class="border">Cliente</th>
+                    <th class="border">Numero</th>
+                    <th class="border"></th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </section>
+</body>
+<script src="./remitos.js"></script>
+</html>
