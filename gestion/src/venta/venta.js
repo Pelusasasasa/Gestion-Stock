@@ -6,6 +6,9 @@ function getParameterByName(name) {
 }
 
 let vendedor = getParameterByName('vendedor');
+let esRemito = getParameterByName('remito');
+let remitosTraidosJSON = getParameterByName('remitos');
+let remitosTraidos = remitosTraidosJSON ? JSON.parse(remitosTraidosJSON) : '';
 
 const axios = require('axios');
 const sweet = require('sweetalert2');
@@ -110,6 +113,25 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
     movimiento.vendedor = vendedor;
     movimiento.unidad = producto.unidad;
     movimientos.push(movimiento);
+};
+
+const cargarRemito = async() => {
+    let movimientosRemitos = [];
+    let idCliente = '';
+
+    for (let elem of remitosTraidos){
+        const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
+        const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
+        movimientosRemitos.push(...mov);
+        idCliente = remito.idCliente;
+    };
+
+    for(let elem of movimientosRemitos){
+        listarProducto(elem.codProd, elem.cantidad)
+    };
+
+    listarCliente(idCliente);
+    
 };
 
 const crearProducto = ()=>{
@@ -285,7 +307,6 @@ const listarProducto = async(id, cant = 1)=>{
             }else{
                 precioU.value = lista.value === "1" ? redondear(producto.precio,2) : sacarCosto(producto.costo,producto.costoDolar,producto.impuesto,dolar);
             }
-            
             idProducto++;
             producto.idTabla = `${idProducto}`; 
 
@@ -868,8 +889,9 @@ window.addEventListener('load',async e=>{
                 location.href = '../menu.html';
             }
         });
-    }
-    
+    }else if(esRemito){
+        cargarRemito();
+    };
     
     cambiarSituacion(situacion);//
 });

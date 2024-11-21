@@ -13,7 +13,7 @@
             <input type="text" name="buscador" id="buscador">
         </div>
     </section>
-    <section class="h-50 overflow-scroll bg-white">
+    <section id="listRem" class="h-50 overflow-scroll bg-white">
         <table class="w-full border-collapse">
             <thead>
                 <tr>
@@ -28,6 +28,23 @@
             <tbody id="tbody"></tbody>
         </table>
     </section>
+
+    <section id="listMov" class="h-24 mt-1 overflow-scroll bg-white none">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr>
+                    <th class="border">Cod. Prod.</th>
+                    <th class="border">Descripcion</th>
+                    <th class="border">Marca</th>
+                    <th class="border">Precio</th>
+                    <th class="border">Cantidad</th>
+                    <th class="border">PrecioTotal</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyMov"></tbody>
+        </table>
+    </section>
+
 
     <section class="botones">
         <button id="pasarCTA">Pasar a CTA. CTE</button>
