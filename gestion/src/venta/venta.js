@@ -118,10 +118,12 @@ const cargarMovimiento = async({cantidad,producto,series},numero,cliente,tipo_ve
 const cargarRemito = async() => {
     let movimientosRemitos = [];
     let idCliente = '';
+    let textoObservaciones = '';
 
     for (let elem of remitosTraidos){
         const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
         const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
+        textoObservaciones += remito.observaciones + ' ';
         movimientosRemitos.push(...mov);
         idCliente = remito.idCliente;
     };
@@ -129,7 +131,7 @@ const cargarRemito = async() => {
     for(let elem of movimientosRemitos){
         listarProducto(elem.codProd, elem.cantidad)
     };
-
+    observaciones.value = textoObservaciones;
     listarCliente(idCliente);
     
 };

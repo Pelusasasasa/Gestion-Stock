@@ -85,8 +85,8 @@ const listarMovs = (lista) => {
 
     for(let elem of lista){
         listMov.classList.remove('none');
-        tbody.parentElement.parentElement.classList.remove('h-50');
-        tbody.parentElement.parentElement.classList.add('h-24');
+        tbody.parentElement.parentElement.classList.remove('h-80vh');
+        tbody.parentElement.parentElement.classList.add('h-30vh');
 
         const tr = document.createElement('tr');
         tr.id = elem._id;

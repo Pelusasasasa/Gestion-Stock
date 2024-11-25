@@ -242,6 +242,22 @@ table tbody {
 /* width */
 
 /* heigth */
+.h-full{
+  height: 100%;
+}
+
+.h-80vh{
+  height: 80vh;
+}
+
+.h-40vh{
+  height: 40vh;
+}
+
+.h-30vh{
+  height: 30vh;
+}
+
 .h-20 {
   height: 20rem;
 }
