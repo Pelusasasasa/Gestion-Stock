@@ -17,7 +17,6 @@ remitoCTRL.getforid = async(req, res) => {
     res.send(remito);
 };
 
-
 remitoCTRL.postOne = async(req, res) => {
     const remito = new Remito(req.body);
     try {
@@ -30,6 +29,18 @@ remitoCTRL.postOne = async(req, res) => {
             res.status(400).send({error: 'El numero ya es utilizado'});
         }
     }
+};
+
+remitoCTRL.putPasado = async(req, res) => {
+    const { id } = req.params;
+
+    const remito = await Remito.findOneAndUpdate({_id: id,},{
+        $set: {
+            pasado: true
+        }
+    });
+
+    res.send(remito);
 };
 
 module.exports = remitoCTRL;

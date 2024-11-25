@@ -612,6 +612,7 @@ facturar.addEventListener('click',async e=>{
             venta.descuento = descuento;
             venta.tipo_venta = await verTipoVenta();
             venta.listaProductos = listaProductos;
+            venta.observaciones = observaciones.value.toUpperCase();
         
             //Ponemos propiedades para la factura electronica
             venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura,cuit.value,condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
@@ -667,7 +668,7 @@ facturar.addEventListener('click',async e=>{
                 for (let producto of listaProductos){
                     await cargarMovimiento(producto,venta.numero,venta.cliente,venta.tipo_venta,venta.tipo_comp,venta.caja,venta.vendedor);
                     if (!(producto.producto.productoCreado)) {
-                        await descontarStock(producto);
+                        !esRemito && await descontarStock(producto);
                     }
                     //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
                 }
@@ -705,13 +706,20 @@ facturar.addEventListener('click',async e=>{
                     await axios.post(`${URL}remitos`, venta);
                 }else{
                     await axios.post(`${URL}ventas`,venta);
-                }
+                };
+
+                //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
+                if(remitosTraidos.length > 0){
+                    for(let elem of remitosTraidos){
+                        (await axios.put(`${URL}remitos/pasado/${elem}`));
+                    };
+                };
 
                 if (impresion.checked) {
                     ipcRenderer.send('imprimir',[situacion,venta,cliente,movimientos, checkboxDolar.checked]);
                 };
 
-                location.reload();  
+                esRemito ? location.href = '../menu.html' : location.reload();  
             } catch (error) {
                 
                 await sweet.fire({

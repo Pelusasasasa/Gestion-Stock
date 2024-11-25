@@ -7,10 +7,14 @@
     <link rel="stylesheet" href="../assets/global.css">
 </head>
 <body>
-    <section>
+    <section class="flex justify-center gap-5">
         <div class="buscador flex flex-col items-center mb-2">
             <label for="buscador text-center">Buscador</label>
             <input type="text" name="buscador" id="buscador">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="remitoC">Remitos Cancelados</label>
+            <input type="checkbox"  name="remitoC" id="remitoC" class="scale-1-5 cursor-pointer">
         </div>
     </section>
     <section id="listRem" class="h-50 overflow-scroll bg-white">

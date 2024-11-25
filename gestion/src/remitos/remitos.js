@@ -5,6 +5,7 @@ require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 const buscador = document.getElementById('buscador');
+const remitoC = document.getElementById('remitoC');
 const listRem = document.getElementById('listRem');
 const tbody = document.getElementById('tbody');
 
@@ -34,7 +35,15 @@ const apretarTecla = async(e) => {
 
 const cargarPagina = async() => {
     remitos =(await axios.get(`${URL}remitos`)).data;
-    listarRemitos(remitos)
+    listarRemitos(remitos.filter(elem => !elem.pasado));
+};
+
+const cambioTipoRemito = async(e) => {
+    if (e.target.checked){
+        listarRemitos(remitos.filter(elem => elem.pasado));
+    }else{
+        listarRemitos(remitos.filter(elem => !elem.pasado));
+    }
 };
 
 const clickTbody = async(e) => {
@@ -176,8 +185,9 @@ const pasarCuenta = async() => {
     location.href = `../venta/index.html?remito=true&remitos=${JSON.stringify(idFilas)}`;
 };
 
-window.addEventListener('load', cargarPagina);
 buscador.addEventListener('keyup', filtrarRemitos);
+document.addEventListener('keyup', apretarTecla);
+remitoC.addEventListener('change', cambioTipoRemito);
 pasarCTA.addEventListener('click', pasarCuenta);
 tbody.addEventListener('click', clickTbody);
-document.addEventListener('keyup', apretarTecla);
+window.addEventListener('load', cargarPagina);

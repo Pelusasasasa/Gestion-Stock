@@ -18,6 +18,7 @@ const productos = document.querySelector('.productos');
 const movimiento = document.querySelector('.movimiento');
 const consulta = document.querySelector('.consulta');
 const recibo = document.querySelector('.recibo');
+const remitos = document.querySelector('.remitos');
 const notaCredito = document.querySelector('.notaCredito');
 
 let verVendedores;
@@ -100,9 +101,8 @@ document.addEventListener('keyup',async e=>{
             ipcRenderer.send('abrir-ventana',opciones);
         }
     }else if(e.keyCode === 117){
-        const usuario = await verificarUsuarios();
-
-        location.href = 'remitos/remitos.html'
+        location.href = "./venta/index.html?tipoFactura=notaCredito";
+        ipcRenderer.send('sacar-cierre');
     }
 });
 
@@ -210,10 +210,14 @@ recibo.addEventListener('click',async e=>{
     }
 });
 
-notaCredito.addEventListener('click',e=>{
-    location.href = "./venta/index.html?tipoFactura=notaCredito";
-    ipcRenderer.send('sacar-cierre');
+remitos.addEventListener('click', e => {
+    location.href = './remitos/remitos.html';
 });
+
+// notaCredito.addEventListener('click',e=>{
+//     location.href = "./venta/index.html?tipoFactura=notaCredito";
+//     ipcRenderer.send('sacar-cierre');
+// });
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{

@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'desarrollo') {
 
 if (require('electron-squirrel-startup')) {
   app.quit();
-}
+};
 
 global.ventanaPrincipal = null;
 global.nuevaVentana = null;

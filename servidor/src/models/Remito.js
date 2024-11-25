@@ -46,6 +46,10 @@ const Remito = new Schema({
         type: String,
         required: true,
         set: value => value.toUpperCase().trim()
+    },
+    pasado: {
+        type: Boolean,
+        default: false
     }
 
 });
