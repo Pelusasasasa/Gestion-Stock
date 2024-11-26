@@ -26,8 +26,8 @@ const apretarTecla = async(e) => {
             location.href = '../menu.html';
         }else{
             listMov.classList.add('none');
-            listRem.classList.add('h-50');
-            listRem.classList.remove('h-24');
+            listRem.classList.add('h-80vh');
+            listRem.classList.remove('h-30vh');
         }
     }
 
@@ -62,13 +62,12 @@ const clickTbody = async(e) => {
         seleccionado && seleccionado.classList.remove('seleccionado');
         subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
 
-        seleccionado = e.target.parentNode.parentNode.parentNode;
-        subSeleccionado = e.target.parentNode.parentNode;
+        seleccionado = e.target.parentNode.parentNode;
+        subSeleccionado = e.target.parentNode;
 
         seleccionado.classList.add('seleccionado');
         subSeleccionado.classList.add('subSeleccionado');
     };
-
     let aux = remitos.find( elem => elem._id === seleccionado.id);
     
     movs = (await axios.get(`${URL}movimiento/${aux.numero}/${aux.tipoVenta}`)).data;
@@ -79,6 +78,20 @@ const filtrarRemitos = async(e) => {
     const filtro = remitos.filter(elem => elem.cliente.startsWith(buscador.value.toUpperCase()))
     listarRemitos(filtro);
 };
+
+const handleCheckbox = async(e) => {
+    const codCliente = e.target.parentNode.parentNode.children[1].innerText;
+
+    const inputs = document.querySelectorAll('td input');
+
+    for(let elem of inputs){
+        if (elem.parentNode.parentNode.children[1].innerText !== codCliente){
+            elem.disabled = !elem.disabled;
+        }
+    }
+
+
+}
 
 const listarMovs = (lista) => {
     tbodyMov.innerHTML = '';
@@ -145,6 +158,23 @@ const listarRemitos = (lista) => {
         const tdNumero = document.createElement('td');
         const tdObseraciones = document.createElement('td');
         const tdPasar = document.createElement('td');
+        const inpPasar = document.createElement('input');
+        const pPasado = document.createElement('p');
+
+        inpPasar.type = 'checkbox';
+        inpPasar.classList.add('scale-1-5');
+        inpPasar.classList.add('flex');
+        inpPasar.classList.add('justify-center');
+        inpPasar.classList.add('w-full');
+        inpPasar.name = 'pasar';
+        inpPasar.id = elem._id;
+
+        pPasado.innerText = 'PASADO';
+
+        pPasado.classList.add('m-0');
+        pPasado.classList.add('text-center');
+
+        inpPasar.addEventListener('change', handleCheckbox);
 
         tdNumero.classList.add('text-rigth');
 
@@ -160,11 +190,9 @@ const listarRemitos = (lista) => {
         tdCliente.innerText = elem.cliente;
         tdNumero.innerText = elem.numero.toString().padStart(8, '0');
         tdObseraciones.innerText = elem.observaciones;
-        tdPasar.innerHTML = `
-            <div class="flex justify-center">
-                <input type="checkbox" class="scale-1-5" name="pasar" id=${elem.id} />
-            </div>
-        `
+
+        
+        tdPasar.appendChild(remitoC.checked ? pPasado : inpPasar);
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdCodCliente);

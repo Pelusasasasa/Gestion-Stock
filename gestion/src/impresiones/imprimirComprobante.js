@@ -54,9 +54,11 @@ const ponerDatosVenta = (datos)=>{
     tipoPago.innerText = datos.tipo_venta;
     vendedor.innerText = datos.vendedor;
 
-    subTotal.innerText = dolar ? ((datos.precio + datos.descuento) / dolar).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
+    if(datos.tipo_venta !== 'RT'){
+        subTotal.innerText = dolar ? ((datos.precio + datos.descuento) / dolar).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
     descuento.innerText = datos.descuento.toFixed(2);
-    total.innerText = dolar ? (datos.precio / dolar).toFixed(2) : datos.precio.toFixed(2);
+        total.innerText = dolar ? (datos.precio / dolar).toFixed(2) : datos.precio.toFixed(2);
+    }
 };
 
 const ponerDatosClientes = (datos)=>{

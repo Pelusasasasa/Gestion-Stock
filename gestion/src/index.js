@@ -48,6 +48,12 @@ app.on('activate', () => {
   }
 });
 
+const arreglarSaldo = (e,args) => {
+  ventanaPrincipal.webContents.send('saldoArreglado', args);
+};
+
+ipcMain.on('arreglarSaldo', arreglarSaldo);
+
 ipcMain.on('enviar',(e,args)=>{
   ventanaPrincipal.webContents.send('recibir',JSON.stringify(args));
 });
@@ -346,10 +352,21 @@ const hacerMenu = () => {
       }
     },
     {
-      label: "Ver Prestamos",
-      click(){
-        ventanaPrincipal.loadFile('src/prestamos/prestamos.html')
-      }
+      label: "Iluminacion",
+      submenu: [
+        {
+          label: 'Ver Prestamos',
+          click(){
+            ventanaPrincipal.loadFile('src/prestamos/prestamos.html')
+          }
+        },
+        {
+          label: 'Ver Productos',
+          click(){
+            ventanaPrincipal.loadFile('src/productosIluminacion/productos.html');
+          }
+        }
+      ]
     },
     {
       label:"Configuracion",

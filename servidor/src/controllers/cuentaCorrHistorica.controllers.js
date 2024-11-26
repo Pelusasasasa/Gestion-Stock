@@ -35,7 +35,7 @@ historicaCTRL.modificarHistorica = async(req,res)=>{
 historicaCTRL.eliminarHistorica = async(req, res) => {
     const {id} = req.params;
 
-    const historica = await Historica.findOneAndRemove({nro_venta: id});
+    const historica = await Historica.findOneAndDelete({nro_venta: id});
 
     res.send(historica);
 };

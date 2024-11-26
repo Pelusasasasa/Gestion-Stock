@@ -3,6 +3,7 @@ const {cerrarVentana,apretarEnter, verificarUsuarios, agregarMovimientoVendedore
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
+const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
@@ -61,6 +62,7 @@ modificar.addEventListener('click',async e=>{
         cliente.saldo = saldoNuevo.value;
         (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente));
         vendedor && await agregarMovimientoVendedores(`Modifico el saldo del cliente ${cliente.nombre} de ${saldoViejo.value} a ${saldoNuevo.value}`,vendedor);
+        ipcRenderer.send('arreglarSaldo', JSON.stringify(cliente));
         window.close();
     } catch (error) {
         console.log(error)

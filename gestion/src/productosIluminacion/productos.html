@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <link rel="stylesheet" href="../assets/global.css">
+</head>
+<body>
+    <header>
+        <h1 class="text-center m-0">Lista de Productos</h1>
+    </header>
+
+    <section class="flex gap-5 justify-center mb-2">
+        <div class="flex flex-col">
+            <label for="tipo">Tipo</label>
+            <select name="tipo" id="tipo">
+                <option value="codigo">Codigo</option>
+                <option value="descripcion">Descripcion</option>
+                <option value="marca">Marca</option>
+                <!-- <option value="codigo">Codigo</option> -->
+            </select>
+        </div>
+        <div class="flex flex-col">
+            <label for="buscador">Buscador</label>
+            <input type="text" name="buscador" id="buscador" class="w-80">
+        </div>
+    </section>
+    <section class="h-80vh bg-white overflow-scroll">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr>
+                    <th class="border">Codigo</th>
+                    <th class="border">Descripcion</th>
+                    <th class="border">Marca</th>
+                    <th class="border">Stock</th>
+                    <th class="border">Precio</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </section>
+    <script src="./productos.js"></script>
+</body>
+</html>

@@ -440,5 +440,4 @@ volver.addEventListener('click',e=>{
     location.href = "../menu.html";
 });
 
-
-
+ipcRenderer.on('saldoArreglado', actualizarSaldo);
