@@ -15,7 +15,6 @@ const sweet = require('sweetalert2');
 require("dotenv").config();
 
 const URL = process.env.GESTIONURL;
-console.log(URL)
 
 
 const { ipcRenderer, clipboard } = require('electron');
@@ -123,14 +122,18 @@ const cargarRemito = async() => {
     for (let elem of remitosTraidos){
         const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
         const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
+        console.log(mov)
         textoObservaciones += remito.observaciones + ' ';
         movimientosRemitos.push(...mov);
         idCliente = remito.idCliente;
     };
 
-    for(let elem of movimientosRemitos){
-        listarProducto(elem.codProd, elem.cantidad)
+    for await(let elem of movimientosRemitos){
+        await listarProducto(elem.codProd, elem.cantidad)
+        const pro = listaProductos.find(({producto}) => producto._id === elem.codProd);
+        pro.series = elem.series;
     };
+
     observaciones.value = textoObservaciones;
     listarCliente(idCliente);
     
@@ -290,7 +293,6 @@ const listarProducto = async(id, cant = 1)=>{
                     title:"Producto con Stock menor a 0",
                 });
             }
-
             listaProductos.push({cantidad:parseFloat(cantidad.value),producto});
 
             codBarra.value = producto._id;
@@ -765,7 +767,7 @@ tbody.addEventListener('click',async e=>{
         //Traemops el producto seleccionado para ver si tiene nuemores de series ya cargados y asi mostrarlos
         const producto = listaProductos.find(({producto})=>producto.idTabla === seleccionado.id);
         let valor = "";
-
+        console.log(producto)
         if (producto.series) {
             producto.series.forEach(serie=>{
                 if (valor) {
