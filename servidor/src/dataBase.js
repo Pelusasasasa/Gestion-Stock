@@ -7,5 +7,5 @@ mongoose.connect(uri);
 const conection = mongoose.connection;
 
 conection.once('open',()=>{
-    console.log("Base de datos conectada")
-})
+    console.log("Base de datos conectada en el puerto 4000")
+});

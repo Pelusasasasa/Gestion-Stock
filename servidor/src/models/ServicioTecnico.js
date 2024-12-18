@@ -2,17 +2,18 @@ const {Schema, model} = require('mongoose');
 
 
 const Servicio = new Schema({
+    fecha:{
+        type:Date,
+        default: Date.now
+    },
     numero:{
         type:Number,
         required:true,
         unique:true
     },
-    fecha:{
-        type:Date,
-        default: Date.now
-    },
     idCliente:{
-        type:String,
+        type: Schema.Types.String,
+        ref: 'Cliente',
         required:true
     },
     cliente:{
@@ -20,33 +21,17 @@ const Servicio = new Schema({
         required:[true, 'El nombre del Cliente es Obligatorio'],
         set: (value) => value.toUpperCase().trim(),
     },
-    direccion:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-        default:""
-    },
-    telefono:{
-        type:String,
-        default:""
-    },
     codProd:{
-        type:String,
-        default:"0000"
+        type: Schema.Types.String,
+        ref: 'Producto',
+        required:true
     },
     producto:{
         type:String,
         set: (value) => value.toUpperCase().trim(),
-        required:true
     },
-    modelo:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-        default:""
-    },
-    marca:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-        default:""
+    serie: {
+        type: 'String',
     },
     problemas:{
         type:String,
@@ -66,7 +51,8 @@ const Servicio = new Schema({
         type:Date,
     },
     vendedor:{
-        type:String,
+        type: Schema.Types.ObjectId,
+        ref: 'Vendedor',
         required: true
     },
     estado:{

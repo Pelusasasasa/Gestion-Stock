@@ -49,7 +49,7 @@ app.use('/gestion/ventas',require('./routes/venta'));
 
 app.use('/gestion/pedidos',require('./routes/pedido'));
 
-app.use('/gestion/servicios',require('./routes/servicioTecnico'));
+app.use('/gestion/servicios',require('./routes/servicioTecnico.route'));
 
 app.use('/gestion/vendedores',require('./routes/vendedor'));
 

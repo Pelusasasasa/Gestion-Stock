@@ -3,7 +3,7 @@ const servicioCTRL = {};
 const Servicio = require('../models/ServicioTecnico');
 
 servicioCTRL.getAll = async(req,res)=>{
-    const servicios = await Servicio.find();
+    const servicios = await Servicio.find().populate('vendedor', ['nombre', 'permiso']);
     res.send(servicios)
 };
 
@@ -44,7 +44,10 @@ servicioCTRL.post = async(req, res)=>{
         res.send(servicio);
     } catch (error) {
         console.log(error)
-        res.send(error.errors);
+        res.status(500).send({
+            ok: false,
+            msg: 'Hable Con el Administrador'
+        });
     }
 };
 
@@ -68,6 +71,6 @@ servicioCTRL.deleteForId = async(req, res) => {
     const servicio = await Servicio.findOneAndDelete({_id: id});
 
     res.send( servicio );
-}
+};
 
 module.exports = servicioCTRL;
