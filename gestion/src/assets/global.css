@@ -51,6 +51,10 @@ button:hover {
   display: none !important;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 input {
   padding: 0.5rem;
   font-size: 1.5rem;
@@ -116,6 +120,18 @@ table tbody {
   margin: 0;
 }
 
+.m-1 {
+  margin: 1rem;
+}
+
+.m-2 {
+  margin: 2rem;
+}
+
+.mt-0 {
+  margin-top: 0;
+}
+
 .mt-1 {
   margin-top: 1rem;
 }
@@ -148,6 +164,10 @@ table tbody {
 
 .flex {
   display: flex;
+}
+
+.flex-1{
+  flex: 1;
 }
 
 .flex-col {
@@ -188,6 +208,10 @@ table tbody {
 
 .columns-3{
   grid-template-columns: repeat(3, 1fr);
+}
+
+.row-2-2fr-1fr{
+  grid-template-rows: 2fr 1fr;
 }
 
 /* Grid */
@@ -248,6 +272,14 @@ table tbody {
 /* heigth */
 .h-full{
   height: 100%;
+}
+
+.h-screen{
+  height: 100vh;
+}
+
+.h-calc-100vh-10px{
+  height: calc(100vh - 80px);
 }
 
 .h-80vh{

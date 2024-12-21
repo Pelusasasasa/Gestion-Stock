@@ -3,12 +3,18 @@ const servicioCTRL = {};
 const Servicio = require('../models/ServicioTecnico');
 
 servicioCTRL.getAll = async(req,res)=>{
-    const servicios = await Servicio.find().populate('vendedor', ['nombre', 'permiso']);
+    const servicios = await Servicio.find()
+        .populate('vendedor', ['nombre', 'permiso'])
+        .populate('idCliente', ['nombre', 'telefono', 'direccion'])
+        .populate('codProd', ['producto', 'marca', 'descripcion']);
     res.send(servicios)
 };
 
 servicioCTRL.getForId = async(req, res) => {
-    const servicio = await Servicio.findById(req.params.id);
+    const servicio = await Servicio.findById(req.params.id)
+    .populate('vendedor', ['nombre', 'permiso'])
+    .populate('idCliente', ['nombre', 'telefono', 'direccion'])
+    .populate('codProd', ['producto', 'marca', 'descripcion']);
     res.send(servicio);
 };
 
@@ -24,7 +30,11 @@ servicioCTRL.getForText = async(req, res) => {
                 {modelo:{$regex:re, $options: 'i'}},
                 {cliente:{$regex:re, $options: 'i'}},
             ]
-        });
+        })
+        .populate('vendedor', ['nombre', 'permiso'])
+        .populate('idCliente', ['nombre', 'telefono', 'direccion'])
+        .populate('codProd', ['producto', 'marca', 'descripcion']);
+
         res.send(servicios);
     }else{
         const servicios = await Servicio.find();
@@ -36,7 +46,7 @@ servicioCTRL.getForText = async(req, res) => {
 servicioCTRL.post = async(req, res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-
+    console.log("a")
     const servicio = new Servicio(req.body);
     try {
         await servicio.save();

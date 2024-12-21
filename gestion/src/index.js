@@ -370,9 +370,20 @@ const hacerMenu = () => {
     },
     {
       label:"Configuracion",
-      click(){
-        abrirVentana('configuracion/configuracion.html',700,700,false)
-      }
+      submenu: [
+        {
+          label: 'Configuracion Sistema',
+          click(){
+            abrirVentana('configuracion/configuracion.html',700,700,false)
+          }
+        },
+        {
+          label: 'Modulos',
+          click(){
+            abrirVentana('configuracion/modulos.html',700,700,false)
+          }
+        }
+      ]
     },
     {
       label:"tools",

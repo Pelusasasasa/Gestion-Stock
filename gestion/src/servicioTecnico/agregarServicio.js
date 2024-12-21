@@ -44,15 +44,21 @@ const salir = document.getElementById('salir');
 let servicio;
 let seleccionado;
 let listaProductos = []; //lista para los productos que vamos agrgar al servicio tecnico 
+let vendedorAux = {};
 
-vendedor.value = vend;
+
 
 window.addEventListener('load', async e => {
-    
+    vendedorAux = (await axios.get(`${URL}vendedores/id/${vend}`)).data;
+    vendedor.value = vendedorAux.nombre
+
     if (servicioId) {
         document.querySelector('title').innerText = 'Modificar Servicio';
-        servicio = (await axios.get(`${URL}servicios/id/${servicioId}`)).data;        
+        servicio = (await axios.get(`${URL}servicios/id/${servicioId}`)).data;     
+        console.log(servicio)   
+
         listarServicio(servicio);
+
         modificar.classList.remove('none');
         agregar.classList.add('none');
         agregarProduct.parentNode.classList.add('none');
@@ -103,21 +109,21 @@ ipcRenderer.on('recibir', async(e,args) => {
 });
 
 const listarServicio = (servicio) => {
-    cliente.value = servicio.cliente;
-    direccion.value = servicio.direccion;
-    telefono.value = servicio.telefono;
-    idCliente.value = servicio.idCliente;
+    cliente.value = servicio.idCliente.nombre;
+    direccion.value = servicio.idCliente.direccion;
+    telefono.value = servicio.idCliente.telefono;
+    idCliente.value = servicio.idCliente._id;
 
-    codProd.value = servicio.codProd;
-    producto.value = servicio.producto;
+    codProd.value = servicio.codProd._id;
+    producto.value = servicio.codProd.descripcion;
     modelo.value = servicio.modelo;
-    marca.value = servicio.marca;
+    marca.value = servicio.codProd.marca;
     problemas.value = servicio.problemas;
 
 
     soluciones.value = servicio.detalles;
     numero.value = servicio.numero;
-    vendedor.value = servicio.vendedor;
+    vendedor.value = servicio.vendedor.nombre;
     estado.value = servicio.estado;
     
 };
@@ -317,16 +323,13 @@ agregar.addEventListener('click',async e=>{
     
     servicio.idCliente = idCliente.value;
     servicio.cliente = cliente.value.toUpperCase();
-    servicio.direccion = direccion.value.toUpperCase();
-    servicio.telefono = telefono.value;
 
     servicio.codProd = elem.codProd;
     servicio.producto = elem.producto.toUpperCase();
     servicio.modelo = elem.modelo.toUpperCase();
-    servicio.marca = elem.marca.toUpperCase();
     servicio.problemas = elem.problemas.toUpperCase();
 
-    servicio.vendedor = vendedor.value;
+    servicio.vendedor = vendedorAux._id;
     servicio.estado = estado.value;
 
     info.idCliente = idCliente.value;
@@ -336,24 +339,29 @@ agregar.addEventListener('click',async e=>{
     info.vendedor = vendedor.value;
     info.numero = servicio.numero
 
-    const {cliente:cli, producto:pro, message} = (await axios.post(`${URL}servicios`,servicio)).data;
+    try {
+        (await axios.post(`${URL}servicios`,servicio)).data;
+        
+    } catch (error) {
+        const msg = error.response.data;
+
+        if(msg.errors.idCliente){
+            await sweet.fire({
+                title: msg.errors.idCliente.msg.toUpperCase(),
+                icon: 'error'
+            })
+        }else if (msg.errors.cliente){
+            await sweet.fire({
+                title: msg.errors.cliente.msg.toUpperCase(),
+                icon: 'error'
+            });
+        };
+
+        return;
+    }
     await axios.put(`${URL}numero/Servicio`, {"Servicio": servicio.numero});
     
     numero.value = parseInt(numero.value) + 1;
-    if (cli) {
-        await sweet.fire({
-            title: "El Nombre del cliente es Necesario "
-        });
-    }else if(pro){
-        await sweet.fire({
-            title: "El Producto es Necesario "
-        });
-    }else if(message){
-
-        // await sweet.fire({
-        //     title: message
-        // });
-
 
         const movVendedor = {
             descripcion: `El vendedor ${vend} Agrego el Servicio Tecnico del producto ${servicio.producto} del cliente ${servicio.cliente}`,
@@ -362,7 +370,6 @@ agregar.addEventListener('click',async e=>{
         };
 
         await axios.post(`${URL}movVendedores`, movVendedor);
-    };
    };
 
    ipcRenderer.send('imprimir_servicio', JSON.stringify([info,listaProductos]));
@@ -387,20 +394,26 @@ modificar.addEventListener('click',async e=>{
     servicioNuevo.problemas = problemas.value.toUpperCase();
     servicioNuevo.detalles = soluciones.value.toUpperCase();
 
-    servicioNuevo.vendedor = vendedor.value;
+    servicioNuevo.vendedor = vendedorAux._id;
     servicioNuevo.estado = estado.value;
+    servicioNuevo.numero = numero.value;
 
     servicioNuevo.fechaEgreso = servicioNuevo.estado === "3" ? new Date() : servicioNuevo.fechaEgreso = '';
-
     try {
-        const a = (await axios.put(`${URL}servicios/id/${servicioId}`,servicioNuevo)).data;
-        console.log(a)
-        diferenciaObjetoServicio(a,servicioNuevo)
+        const servicioActualizado = (await axios.put(`${URL}servicios/id/${servicioId}`,servicioNuevo)).data;
+
+        diferenciaObjetoServicio(servicioActualizado,servicioNuevo)
+
+
         location.href = './servicio.html';
     } catch (error) {
-        sweet.fire({
-            title:"No se pudo modificar el servicio"
-        })
+        const msg = error.response.data
+        if(msg.errors.numero){
+            await sweet.fire({
+                title: msg.errors.numero.msg,
+                icon: 'error'
+            })
+        };
     }
 });
 

@@ -91,14 +91,13 @@ const listarServicios = (lista)=>{
         }; {
             
         }
-
         tdNum.innerText = servicio.numero;
         tdFechaIngreso.innerText = `${fechaIngreso[2]}/${fechaIngreso[1]}/${fechaIngreso[0]}`;
         tdCliente.innerText = servicio.cliente;
-        tdTelefono.innerText = servicio.telefono;
-        tdDireccion.innerText = servicio.direccion;
-        tdProducto.innerText = servicio.producto;
-        tdMarca.innerText = servicio.marca;
+        tdTelefono.innerText = servicio.idCliente.telefono;
+        tdDireccion.innerText = servicio.idCliente.direccion;
+        tdProducto.innerText = servicio.codProd.descripcion;
+        tdMarca.innerText = servicio.codProd.marca;
         tdModelo.innerText = servicio.modelo;
         tdEgreso.innerText = fechaEgreso ?  `${fechaEgreso[2]}/${fechaEgreso[1]}/${fechaEgreso[0]}` : "" ;
         tdVendedor.innerText = servicio.vendedor;
@@ -201,7 +200,7 @@ agregar.addEventListener('click', async e=>{
         };
 
         await axios.post(`${URL}movVendedores`, movVendedor);
-        location.href = `agregarServicio.html?vendedor=${ven.nombre}`;
+        location.href = `agregarServicio.html?vendedor=${ven.codigo}`;
     }else{
         await sweet.fire({
             title: "Contraseña incorrecta"
@@ -211,7 +210,7 @@ agregar.addEventListener('click', async e=>{
 
 modificar.addEventListener('click', async e => {
     const ven = await verificarUsuarios();
-    location.href = `agregarServicio.html?vendedor=${ven.nombre}&id=${seleccionado.id}`;
+    location.href = `agregarServicio.html?vendedor=${ven.codigo}&id=${seleccionado.id}`;
 });
 
 salir.addEventListener('click',e=>{

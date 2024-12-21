@@ -12,7 +12,7 @@ const Servicio = new Schema({
         unique:true
     },
     idCliente:{
-        type: Schema.Types.String,
+        type: Schema.Types.Number,
         ref: 'Cliente',
         required:true
     },
@@ -29,6 +29,10 @@ const Servicio = new Schema({
     producto:{
         type:String,
         set: (value) => value.toUpperCase().trim(),
+    },
+    modelo: {
+        type: String,
+        default: ''
     },
     serie: {
         type: 'String',

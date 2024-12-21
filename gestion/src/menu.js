@@ -1,11 +1,13 @@
 const { ipcRenderer } = require("electron");
 const sweet = require('sweetalert2');
-
 const axios = require('axios');
 require("dotenv").config();
+
 const URL = process.env.GESTIONURL;
 
 const archivo = require('./configuracion.json');
+const modulos = require('./config.json');
+
 
 ipcRenderer.send('poner-cierre');
 
@@ -20,6 +22,12 @@ const consulta = document.querySelector('.consulta');
 const recibo = document.querySelector('.recibo');
 const remitos = document.querySelector('.remitos');
 const notaCredito = document.querySelector('.notaCredito');
+
+const atajoVentas = document.getElementById('atajoVentas');
+const atajoAgregarCliente = document.getElementById('atajoAgregarCliente');
+const atajoAgregarProducto = document.getElementById('atajoAgregarProducto');
+const atajoModificarProducto = document.getElementById('atajoModificarProducto');
+const atajoNotaCredito = document.getElementById('atajoNotaCredito');
 
 let verVendedores;
 
@@ -51,7 +59,37 @@ window.addEventListener('load',async e=>{
                 location.reload();
             }
         })
-    }
+    };
+
+    if(modulos.ventas){
+        ventas.classList.remove('hidden');
+        atajoVentas.classList.remove('hidden');
+        atajoNotaCredito.classList.remove('hidden');
+    };
+    if(modulos.clientes){
+        clientes.classList.remove('hidden');
+        atajoAgregarCliente.classList.remove('hidden');
+    };
+    if(modulos.productos){
+        productos.classList.remove('hidden');
+        atajoAgregarProducto.classList.remove('hidden');
+        atajoCambioProducto.classList.remove('hidden');
+    };
+    if(modulos.caja){
+        caja.classList.remove('hidden');
+    };
+    if(modulos.movimientos){
+        movimiento.classList.remove('hidden');
+    };
+    if(modulos.consultas){
+        consulta.classList.remove('hidden');
+    };
+    if(modulos.recibos){
+        recibo.classList.remove('hidden');
+    };
+    if(modulos.remitos){
+        remitos.classList.remove('hidden');
+    };
 });
 
 //Al tocar el atajo de teclado, abrimos ventanas
@@ -126,7 +164,6 @@ ventas.addEventListener('click',async e=>{
     }
 });
 
-
 clientes.addEventListener('click',async e=>{
     const vendedor = await verificarUsuarios();
     
@@ -142,7 +179,6 @@ clientes.addEventListener('click',async e=>{
     
     
 });
-
 
 productos.addEventListener('click',async e=>{
     if (verVendedores) {
