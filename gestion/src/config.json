@@ -1,11 +1,11 @@
 {
-  "ventas": false,
+  "ventas": true,
   "clientes": true,
   "productos": true,
-  "caja": false,
+  "caja": true,
   "movimientos": false,
-  "recibos": false,
+  "recibos": true,
   "consultas": false,
   "remitos": false,
-  "gastos": false
+  "gastos": true
 }

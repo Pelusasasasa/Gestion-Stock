@@ -61,6 +61,17 @@ const cargarPagina = () => {
 
 };
 
+const cerrarPagina = (e) => {
+    if(e.type === 'click'){
+        window.close();
+    }else if(e.type === 'keyup'){
+        if (e.keyCode === 27){
+            window.close();
+        };
+    };  
+
+};
+
 const updateConfig = async() => {
     const modulos = {
         ventas: venta.checked,
@@ -82,11 +93,10 @@ const updateConfig = async() => {
     });
 
     window.close();
-}
+};
 
+document.addEventListener('keyup', cerrarPagina);
 guardar.addEventListener('click', updateConfig);
-salir.addEventListener('click', () => {
-    window.close();
-});
+salir.addEventListener('click', cerrarPagina);
 window.addEventListener('load', cargarPagina);
 

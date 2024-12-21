@@ -92,3 +92,4 @@ out/
 src/img/*.ico
 
 src/imgProductos
+src/config.json

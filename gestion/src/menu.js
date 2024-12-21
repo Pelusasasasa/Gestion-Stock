@@ -1,12 +1,35 @@
-const { ipcRenderer } = require("electron");
-const sweet = require('sweetalert2');
 const axios = require('axios');
+const { ipcRenderer } = require("electron");
+const fs = require('fs');
+const path = require('path');
+const sweet = require('sweetalert2');
+
 require("dotenv").config();
 
 const URL = process.env.GESTIONURL;
 
 const archivo = require('./configuracion.json');
-const modulos = require('./config.json');
+const filePath = path.join(__dirname, 'config.json');
+let modulos = '';
+
+const moduloCreate = {
+  "ventas": true,
+  "clientes": true,
+  "productos": true,
+  "caja": true,
+  "movimientos": true,
+  "recibos": true,
+  "consultas": true,
+  "remitos": true,
+  "gastos": true
+}
+
+try {
+    modulos = require('./config.json');
+} catch (error) {
+    fs.writeFileSync(filePath, JSON.stringify(moduloCreate), 'utf-8');
+    location.reload();
+}
 
 
 ipcRenderer.send('poner-cierre');

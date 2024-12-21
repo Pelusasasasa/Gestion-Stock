@@ -380,7 +380,7 @@ const hacerMenu = () => {
         {
           label: 'Modulos',
           click(){
-            abrirVentana('configuracion/modulos.html',700,700,false)
+            abrirVentana('configuracion/modulos.html',700,700,true)
           }
         }
       ]
