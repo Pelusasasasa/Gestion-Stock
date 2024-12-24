@@ -18,6 +18,7 @@ const consultar = document.getElementById('consultar');
 const recibo = document.getElementById('recibo');
 const remito = document.getElementById('remito');
 const gasto = document.getElementById('gasto');
+const servicioTecnico = document.getElementById('servicioTecnico');
 
 const guardar = document.getElementById('guardar');
 const salir = document.getElementById('salir');
@@ -59,6 +60,10 @@ const cargarPagina = () => {
         gasto.checked = true;
     };
 
+    if (modulos.servicioTecnico){
+        servicioTecnico.checked = true;
+    };
+
 };
 
 const cerrarPagina = (e) => {
@@ -82,7 +87,8 @@ const updateConfig = async() => {
         recibos: recibo.checked,
         consultas: consultar.checked,
         remitos: remito.checked,
-        gastos: gasto.checked
+        gastos: gasto.checked,
+        servicioTecnico: servicioTecnico.checked
     };
 
     fs.writeFileSync(configPath, JSON.stringify(modulos, null, 2), 'utf-8');

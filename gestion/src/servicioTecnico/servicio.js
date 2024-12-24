@@ -1,11 +1,20 @@
-const axios = require('axios');
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}; 
+
 const { ipcRenderer } = require('electron');
-require("dotenv").config();
-const URL = process.env.GESTIONURL;
+const axios = require('axios');
 const sweet = require('sweetalert2');
+const URL = process.env.GESTIONURL;
+require("dotenv").config();
 
 const {caja,vendedores} = require('../configuracion.json');
 const { verificarUsuarios } = require('../helpers');
+
+const vend = getParameterByName('vendedor');
 
 const buscador = document.getElementById('buscador');
 
@@ -24,17 +33,8 @@ let vendedor;
 
 window.addEventListener('load',async e=>{
 
-    vendedor = await verificarUsuarios();
-
-    if (vendedores && vendedor === "") {
-        await sweet.fire({
-        title:"Contraseña incorrecta"
-        });
-        location.reload();
-        
-    }else if(vendedores && !vendedor){
-        location.href = '../menu.html';
-    };
+    vendedor = (await axios.get(`${URL}vendedores/id/${vend}`)).data;
+    console.log(vendedor)
 
     const movVendedor = {
         descripcion: `El vendedor ${vendedor.nombre} Ingreso a la lista de Servicio Tecnico`,

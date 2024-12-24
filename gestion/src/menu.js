@@ -21,7 +21,8 @@ const moduloCreate = {
   "recibos": true,
   "consultas": true,
   "remitos": true,
-  "gastos": true
+  "gastos": true,
+  "servicioTecnico": true
 }
 
 try {
@@ -45,6 +46,7 @@ const consulta = document.querySelector('.consulta');
 const recibo = document.querySelector('.recibo');
 const remitos = document.querySelector('.remitos');
 const notaCredito = document.querySelector('.notaCredito');
+const servicioTecnico = document.querySelector('.servicioTecnico');
 
 const atajoVentas = document.getElementById('atajoVentas');
 const atajoAgregarCliente = document.getElementById('atajoAgregarCliente');
@@ -112,6 +114,9 @@ window.addEventListener('load',async e=>{
     };
     if(modulos.remitos){
         remitos.classList.remove('hidden');
+    };
+    if(modulos.servicioTecnico){
+        servicioTecnico.classList.remove('hidden');
     };
 });
 
@@ -273,6 +278,12 @@ remitos.addEventListener('click', e => {
     location.href = './remitos/remitos.html';
 });
 
+servicioTecnico.addEventListener('click', async e => {
+    const user = await verificarUsuarios();
+
+    location.href = `./servicioTecnico/servicio.html?vendedor=${user.codigo}&permiso=${user.permiso}`;
+});
+
 // notaCredito.addEventListener('click',e=>{
 //     location.href = "./venta/index.html?tipoFactura=notaCredito";
 //     ipcRenderer.send('sacar-cierre');
@@ -344,4 +355,23 @@ ipcRenderer.on('verificarUsuario', async(e,args) => {
             title: "No tiene Permisos"
         })
     }
+});
+
+ipcRenderer.on('configuracionModulos', async() => {
+    const {value, isConfirmed} = await sweet.fire({
+        title: 'Ingrese Contraseña',
+        input: 'password',
+        showCancelButton: true,
+    });
+
+    if (value === '2580Repetto2580') {  
+        const options = {
+            path: 'configuracion/modulos.html',
+            altura: 700,
+            ancho: 700,
+            reinicio: true,
+        };
+
+        ipcRenderer.send('abrir-ventana', options);  
+    };
 });

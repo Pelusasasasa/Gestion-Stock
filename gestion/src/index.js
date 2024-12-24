@@ -1,8 +1,11 @@
-const { dialog, app, BrowserWindow,Menu } = require('electron');
+const { dialog, app, BrowserWindow,Menu, ipcRenderer } = require('electron');
 const { ipcMain } = require('electron/main');
-const path = require('path');
-const {condIva} = require('./configuracion.json');
 const { mostrarMenu } = require('./menuSecundario/menuSecundario');
+const {condIva} = require('./configuracion.json');
+const path = require('path');
+const modulos = require('./config.json');
+console.log(modulos)
+
 require('dotenv').config();
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
 if (process.env.NODE_ENV === 'desarrollo') {
@@ -380,7 +383,7 @@ const hacerMenu = () => {
         {
           label: 'Modulos',
           click(){
-            abrirVentana('configuracion/modulos.html',700,700,true)
+            ventanaPrincipal.webContents.send('configuracionModulos');
           }
         }
       ]
@@ -394,6 +397,12 @@ const hacerMenu = () => {
     }
   ];
 
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+  for( let elem of template){
+    if (elem.label === 'Clientes' && !modulos.cliente){
+      template.splice(template.indexOf(elem),1);
+    };
+  }
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 };
