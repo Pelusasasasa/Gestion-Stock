@@ -1,6 +1,10 @@
 const {ipcRenderer} = require('electron');
 
-const {cuit:cuitPro} = require('../configuracion.json')
+const {cuit:cuitPro} = require('../configuracion.json');
+const axios = require('axios');
+require('dotenv').config();
+
+const URL = process.env.GESTIONURL
 
 const tipoComp = document.querySelector('.tipoComp');
 const numeroComp = document.querySelector('.numeroComp');
@@ -43,17 +47,19 @@ let neto21 = 0;
 let neto105 = 0;
 let iva21 = 0;
 let iva105 = 0;
+let dolar = 0;
 
 window.addEventListener('load',e=>{
     cuitPropetiario.innerText = cuitPro; 
 });
 
-ipcRenderer.on('imprimir',(e,args)=>{
-    const [situacion,venta,cliente,listado] = JSON.parse(args);
-    listar(situacion,venta,cliente,listado);
+ipcRenderer.on('imprimir',async (e,args)=>{
+    const [situacion,venta,cliente,listado, checkDolar] = JSON.parse(args);
+    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+    listar(situacion,venta,cliente,listado, checkDolar);
 });
 
-const listar = async(situacion,venta,clienteTraido,lista)=>{
+const listar = async(situacion,venta,clienteTraido,lista, checkDolar)=>{
     let date = new Date(venta.fecha);
     let day = date.getDate();
     let month = date.getMonth() + 1;
@@ -61,13 +67,15 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
     let hour = date.getHours();
     let minuts = date.getMinutes();
     let seconds = date.getSeconds();
+
     month = month === 13 ? 1 : month;
     month = month <10 ? `0${month}` : month;
     day = day <10 ? `0${day}` : day;
     hour = hour <10 ? `0${hour}` : hour;
     minuts = minuts <10 ? `0${minuts}` : minuts;
     seconds = seconds <10 ? `0${seconds}` : seconds;
-    console.log(venta)
+
+    
     numeroComp.innerHTML = venta.F ? (venta.afip.puntoVenta.toString()).padStart(4,'0') + "-" + venta.afip.numero.toString().padStart(8,'0') :(venta.numero.toString()).padStart(8,'0');
     tipoComp.innerHTML = venta.tipo_comp;
     fecha.innerHTML = `${day}/${month}/${year}`;
@@ -106,10 +114,10 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
             listado.innerHTML += `
                 <main>
                     <p>${elem.producto.slice(0,25)}</p>
-                    <p>${(elem.precio * elem.cantidad).toFixed(2)}</p>
+                    <p>${checkDolar ? (elem.precio * elem.cantidad / dolar).toFixed(2) : (elem.precio * elem.cantidad).toFixed(2)}</p>
                 </main>
                 <main class = "linea">
-                    <p>${elem.cantidad.toFixed(2)}/${elem.precio.toFixed(2)}</p>
+                    <p>${elem.cantidad.toFixed(2)}/${checkDolar ? (elem.precio / dolar).toFixed(2) : elem.precio.toFixed(2)}</p>
                     <p>${elem.iva.toFixed(2)}</p>
                 </main>
             `   
@@ -125,7 +133,7 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
     };
 
     descuento.innerHTML = "0.00"
-    total.innerHTML = venta.precio.toFixed(2);
+    total.innerHTML = checkDolar ? (venta.precio / dolar).toFixed(2) : venta.precio.toFixed(2);
     tipoVenta.innerHTML = venta.tipo_venta === "CC" ? "Cuenta Corriente" : "Contado";
 
     if (venta.F) {
@@ -134,5 +142,5 @@ const listar = async(situacion,venta,clienteTraido,lista)=>{
         qr.src = venta.afip.QR;
 
     }
-    ipcRenderer.send('imprimir-ventana',situacion)
+    // ipcRenderer.send('imprimir-ventana',situacion)
 }
