@@ -1,6 +1,6 @@
 {
   "ventas": true,
-  "clientes": false,
+  "clientes": true,
   "productos": true,
   "caja": true,
   "movimientos": true,

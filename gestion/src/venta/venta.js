@@ -636,6 +636,8 @@ facturar.addEventListener('click',async e=>{
             venta.localidad = localidad.value;
             venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
 
+            venta.checkboxDolar = checkboxDolar.checked;
+            venta.dolar = dolar;
             venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
             venta.vendedor = vendedor ? vendedor : "";
         

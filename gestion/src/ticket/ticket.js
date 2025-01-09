@@ -31,6 +31,7 @@ const netoIva105 = document.querySelector('.netoIva105');
 const descuento = document.querySelector('.descuento');
 const total = document.querySelector('.total');
 const tipoVenta = document.querySelector('.tipoVenta');
+const valorDolar = document.getElementById('valorDolar');
 
 //afip
 const qr = document.querySelector('#qr');
@@ -133,8 +134,14 @@ const listar = async(situacion,venta,clienteTraido,lista, checkDolar)=>{
     };
 
     descuento.innerHTML = "0.00"
-    total.innerHTML = checkDolar ? (venta.precio / dolar).toFixed(2) : venta.precio.toFixed(2);
+    total.innerHTML = checkDolar ? 'U$S ' + (venta.precio / dolar).toFixed(2) : '$' + venta.precio.toFixed(2);
     tipoVenta.innerHTML = venta.tipo_venta === "CC" ? "Cuenta Corriente" : "Contado";
+
+    if (checkDolar){
+        valorDolar.innerHTML += dolar.toFixed(2);
+        valorDolar.classList.remove('none');
+    }
+    
 
     if (venta.F) {
         vencimientoCae.innerHTML = `Vencimiento Cae: ${venta.afip.vencimiento}`;
@@ -142,5 +149,6 @@ const listar = async(situacion,venta,clienteTraido,lista, checkDolar)=>{
         qr.src = venta.afip.QR;
 
     }
-    // ipcRenderer.send('imprimir-ventana',situacion)
+    
+    ipcRenderer.send('imprimir-ventana',situacion)
 }

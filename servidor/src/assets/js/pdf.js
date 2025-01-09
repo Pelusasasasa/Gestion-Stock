@@ -8,6 +8,8 @@ const path = require('path');
 
  funcion.crearPDF = async(venta)=>{
 
+    const{ dolar, checkboxDolar} = venta;
+
     let html = fs.readFileSync(path.join(__dirname,'../html/pdf.html'),'utf8');
 
     const puntoVenta = venta.afip.puntoVenta.toString().padStart(4,'0');
@@ -35,6 +37,12 @@ const path = require('path');
 
     let tr = "";
     for await(let {cantidad,producto} of venta.listaProductos){
+        
+        if(checkboxDolar){
+            producto.precio = producto.precio / dolar;
+            producto.impuesto = producto.impuesto / dolar
+        }
+
         tr = tr + `
             <tr>
                 <td>${producto._id ? producto._id : ""}</td>
@@ -55,13 +63,21 @@ const path = require('path');
     //cae
     html = html.replace('{{cae}}',venta.afip.cae);
     html = html.replace('{{fechaCae}}',venta.afip.vencimiento);
+    html = html.replace('{{tipoCambio}}',checkboxDolar ? `Tipo de Cambio: ${dolar.toFixed(2)}` : '');
 
     //total
-    html = html.replace('{{subTotal}}',venta.condicionIva === "Inscripto" ? (venta.precio - venta.iva21 - venta.iva105).toFixed(2) : venta.precio.toFixed(2)) ;
+    if(checkboxDolar){
+        venta.precio = venta.precio / dolar;
+        venta.iva21 = venta.iva21 / dolar;
+        venta.iva105 = venta.iva105 / dolar;
+        venta.descuento = venta.descuento / dolar;
+    }
+
+    html = html.replace('{{subTotal}}',venta.condicionIva === "Inscripto" ? (checkboxDolar ? 'U$S ' : '$ ') + (venta.precio - venta.iva21 - venta.iva105).toFixed(2) : (checkboxDolar ? 'U$S ' : '$ ') + venta.precio.toFixed(2)) ;
     html = html.replace('{{iva21}}',venta.condicionIva === "Inscripto" ? `IVA 21%: ${venta.iva21.toFixed(2)} `: "");
     html = html.replace('{{iva105}}',venta.condicionIva === "Inscripto" ? `IVA 10.5% ${venta.iva105.toFixed(2)} ` : "");
     html = html.replace('{{descuento}}',venta.descuento.toFixed(2));
-    html = html.replace('{{total}}',venta.precio.toFixed(2));
+    html = html.replace('{{total}}',(checkboxDolar ? 'U$S ' : '$ ') + venta.precio.toFixed(2));
     
     const config = {
         "height":"15.5in",
