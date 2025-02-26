@@ -207,7 +207,6 @@ productoCTRL.traerImpuesto = async(req, res) => {
     res.send(`${producto.impuesto}`);
 };
 
-
 productoCTRL.traerModificados = async(req,res)=>{
     const {fecha} = req.params;
     const desde = new Date(fecha + 'T00:00:00.000Z');
@@ -220,6 +219,29 @@ productoCTRL.traerModificados = async(req,res)=>{
         ]
     });
     res.send(productos);
+};
+
+productoCTRL.getProductosPorMarca = async(req, res) => {
+
+    const {marca} = req.params;
+
+    try {
+        
+        const productos = await Producto.find({marca: marca});
+        res.json({
+            ok: true,
+            productos
+        });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            ok: false,
+            msg: 'Hablar con el administrador'
+        })
+    }
+
+
 };
 
 module.exports = productoCTRL
