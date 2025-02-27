@@ -20,6 +20,8 @@ router.route('/traerImpuesto/:id')
     .get(traerImpuesto)
 router.route('/productosPorMarcas/:lista')
     .get(productosPorMarcas)
+router.route('/porMarca/:marca')
+    .get(getProductosPorMarca)
 router.route('/provedores')
     .get(traerProvedores)
     .put(putForProvedor)
@@ -33,7 +35,6 @@ router.route('/:descripcion/:condicion')
     .get(getsProductos)
 router.route('/buscar/porNombre/:nombre')
     .get(traerProductoPorNombre)
-router.route('/porMarca/:marca')
-    .get(getProductosPorMarca)
+
 module.exports = router;
     

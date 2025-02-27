@@ -4,7 +4,6 @@ const { mostrarMenu } = require('./menuSecundario/menuSecundario');
 const {condIva} = require('./configuracion.json');
 const path = require('path');
 const modulos = require('./config.json');
-console.log(modulos)
 
 require('dotenv').config();
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
@@ -291,6 +290,12 @@ const hacerMenu = () => {
           click(){
             abrirVentana('productos/aumentoPorProvedor.html',300,500,true);
           }
+        },
+        {
+          label: "Cambio de precio por lista",
+          click(){
+            abrirVentana('productos/cambioPrecioLista.html',500,500);
+          },
         },
         {
           label:"Cambio de Producto",
