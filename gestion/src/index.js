@@ -1,7 +1,7 @@
-const { dialog, app, BrowserWindow,Menu, ipcRenderer } = require('electron');
+const { dialog, app, BrowserWindow, Menu, ipcRenderer } = require('electron');
 const { ipcMain } = require('electron/main');
 const { mostrarMenu } = require('./menuSecundario/menuSecundario');
-const {condIva} = require('./configuracion.json');
+const { condIva } = require('./configuracion.json');
 const path = require('path');
 const modulos = require('./config.json');
 
@@ -9,7 +9,7 @@ require('dotenv').config();
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
 if (process.env.NODE_ENV === 'desarrollo') {
   require('electron-reload')(__dirname, {
-      electron: path.join(__dirname, '../node_modules', '.bin', 'electron')
+    electron: path.join(__dirname, '../node_modules', '.bin', 'electron')
   })
 };
 
@@ -22,9 +22,9 @@ global.nuevaVentana = null;
 
 const createWindow = () => {
   // Create the browser window.
-   ventanaPrincipal = new BrowserWindow({
-    webPreferences:{
-      nodeIntegration:true,
+  ventanaPrincipal = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
       contextIsolation: false,
     }
   });
@@ -50,97 +50,98 @@ app.on('activate', () => {
   }
 });
 
-const arreglarSaldo = (e,args) => {
+const arreglarSaldo = (e, args) => {
   ventanaPrincipal.webContents.send('saldoArreglado', args);
 };
 
 ipcMain.on('arreglarSaldo', arreglarSaldo);
 
-ipcMain.on('enviar',(e,args)=>{
-  ventanaPrincipal.webContents.send('recibir',JSON.stringify(args));
+ipcMain.on('enviar', (e, args) => {
+  ventanaPrincipal.webContents.send('recibir', JSON.stringify(args));
 });
 
-ipcMain.on('sacar-cierre',e=>{
+ipcMain.on('sacar-cierre', e => {
   ventanaPrincipal.setClosable(false);
 });
 
-ipcMain.on('poner-cierre',e=>{
+ipcMain.on('poner-cierre', e => {
   ventanaPrincipal.setClosable(true);
 });
 
 //Si necesitamos mandar informacion de una ventana secundaria a una principal usamos este metodo
-ipcMain.on('send-ventanaPrincipal',(e,args)=>{
-  ventanaPrincipal.webContents.send('informacion',args);
+ipcMain.on('send-ventanaPrincipal', (e, args) => {
+  ventanaPrincipal.webContents.send('informacion', args);
 });
 
-ipcMain.on('abrir-ventana',(e,args)=>{
-  abrirVentana(args.path,args.altura,args.ancho,args.reinicio);
-  nuevaVentana.on('ready-to-show',async()=>{
-    nuevaVentana.webContents.send('informacion',args)
+ipcMain.on('abrir-ventana', (e, args) => {
+  abrirVentana(args.path, args.altura, args.ancho, args.reinicio);
+  nuevaVentana.on('ready-to-show', async () => {
+    nuevaVentana.webContents.send('informacion', args)
   })
 });
 
-ipcMain.on('enviar-ventana-principal',(e,args)=>{
-  ventanaPrincipal.webContents.send('recibir-ventana-secundaria',JSON.stringify(args));
+ipcMain.on('enviar-ventana-principal', (e, args) => {
+  ventanaPrincipal.webContents.send('recibir-ventana-secundaria', JSON.stringify(args));
 });
 
-ipcMain.on('imprimir',(e,args)=>{
+ipcMain.on('imprimir', (e, args) => {
   if (args[0] === "blanco") {
-    abrirVentana("ticket/ticket.html",1000,500);
-  }else{
-    abrirVentana("impresiones/imprimirComprobante.html",600,900,false,args[5]);
+    abrirVentana("ticket/ticket.html", 1000, 500);
+  } else {
+    abrirVentana("impresiones/imprimirComprobante.html", 600, 900, false, args[5]);
   }
-  nuevaVentana.webContents.on('did-finish-load',function() {
-    nuevaVentana.webContents.send('imprimir',JSON.stringify(args));
+  nuevaVentana.webContents.on('did-finish-load', function () {
+    nuevaVentana.webContents.send('imprimir', JSON.stringify(args));
   });
 });
 
-ipcMain.on('imprimir-recibo',(e,args)=>{
-  const [,,,show] = args;
-  abrirVentana("impresiones/imprimirRecibo.html",800,500,false,show);
-  nuevaVentana.webContents.on('did-finish-load',function() {
-    nuevaVentana.webContents.send('imprimir-recibo',JSON.stringify(args));
+ipcMain.on('imprimir-recibo', (e, args) => {
+  const [, , , show] = args;
+  abrirVentana("impresiones/imprimirRecibo.html", 800, 500, false, show);
+  nuevaVentana.webContents.on('did-finish-load', function () {
+    nuevaVentana.webContents.send('imprimir-recibo', JSON.stringify(args));
   })
 })
 
-ipcMain.on('imprimir-ventana',(e,args)=>{
+ipcMain.on('imprimir-ventana', (e, args) => {
   const option = {};
   option.silent = false;
   option.deviceName = args === "blanco" && "SAM4S GIANT-100";
-  nuevaVentana.webContents.print(option,(success,errorType)=>{
+  nuevaVentana.webContents.print(option, (success, errorType) => {
     if (success) {
       ventanaPrincipal.focus();
       nuevaVentana.close();
-    }else{
+    } else {
       ventanaPrincipal.focus();
       nuevaVentana && nuevaVentana.close();
     };
   });
 });
 
-ipcMain.on('imprimir-historica',(e,info)=>{
-  abrirVentana('impresiones/imprimirResumen.html',800,500,false,false);
-  nuevaVentana.webContents.on('did-finish-load',function() {
-    nuevaVentana.webContents.send('imprimir-resumen',JSON.stringify(info));
+ipcMain.on('imprimir-historica', (e, info) => {
+  abrirVentana('impresiones/imprimirResumen.html', 800, 500, false, false);
+  nuevaVentana.webContents.on('did-finish-load', function () {
+    nuevaVentana.webContents.send('imprimir-resumen', JSON.stringify(info));
   });
 });
 
-const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false,show = true)=>{
+const abrirVentana = (direccion, altura = 700, ancho = 1200, reinicio = false, show = true, maximo = false) => {
   nuevaVentana = new BrowserWindow({
     height: altura,
     width: ancho,
-    modal:true,
-    parent:ventanaPrincipal,
-    show:show,
-    webPreferences:{
+    modal: true,
+    parent: ventanaPrincipal,
+    show: show,
+    webPreferences: {
       nodeIntegration: true,
-      contextIsolation:false
+      contextIsolation: false
     }
   });
   nuevaVentana.loadFile(path.join(__dirname, `${direccion}`));
   nuevaVentana.setMenuBarVisibility(false);
+  maximo && nuevaVentana.maximize()
 
-  nuevaVentana.on('close',async()=>{
+  nuevaVentana.on('close', async () => {
     if (reinicio) {
       ventanaPrincipal.reload()
     }
@@ -148,32 +149,32 @@ const abrirVentana = (direccion,altura = 700,ancho = 1200,reinicio = false,show 
   // nuevaVentana.setMenuBarVisibility(false);
 }
 
-ipcMain.on('informacion-a-ventana',(e,args)=>{
-  ventanaPrincipal.webContents.send('informacion-a-ventana',JSON.stringify(args));
+ipcMain.on('informacion-a-ventana', (e, args) => {
+  ventanaPrincipal.webContents.send('informacion-a-ventana', JSON.stringify(args));
 });
 
-ipcMain.on('informacion-a-ventana-principal',(e,args)=>{
-  ventanaPrincipal.webContents.send('informacion-a-ventana-principal',JSON.stringify(args));
+ipcMain.on('informacion-a-ventana-principal', (e, args) => {
+  ventanaPrincipal.webContents.send('informacion-a-ventana-principal', JSON.stringify(args));
 });
 
 //mostramos en menu que se hace con el click derecho
-ipcMain.on('mostrar-menu',(e,{ventana, x, y}) =>{
+ipcMain.on('mostrar-menu', (e, { ventana, x, y }) => {
 
   e.preventDefault();
   mostrarMenu(ventana, x, y);
 
 });
 
-ipcMain.handle('saveDialog',async(e,args)=>{
+ipcMain.handle('saveDialog', async (e, args) => {
   const path = (await dialog.showSaveDialog()).filePath;
   return path
 });
 
 //Servicio
-ipcMain.on('imprimir_servicio',(e,servicio) => {
-  abrirVentana('servicioTecnico/impresion.html',500,500,false,true);
-  nuevaVentana.webContents.on('did-finish-load', () =>{
-    nuevaVentana.webContents.send('recibir_servicio_impresion',servicio);
+ipcMain.on('imprimir_servicio', (e, servicio) => {
+  abrirVentana('servicioTecnico/impresion.html', 500, 500, false, true);
+  nuevaVentana.webContents.on('did-finish-load', () => {
+    nuevaVentana.webContents.send('recibir_servicio_impresion', servicio);
   });
 });
 
@@ -184,87 +185,87 @@ const hacerMenu = () => {
   const template = [
     {
       label: "Datos",
-      submenu:[
+      submenu: [
         {
-          label:"Numeros",
-          click(){
-            ventanaPrincipal.webContents.send('verificarUsuario','numeros');
+          label: "Numeros",
+          click() {
+            ventanaPrincipal.webContents.send('verificarUsuario', 'numeros');
           }
         },
         {
-          label:"Provedores",
-          submenu:[
+          label: "Provedores",
+          submenu: [
             {
-              label:"Lista Provedores",
-              click(){
+              label: "Lista Provedores",
+              click() {
                 ventanaPrincipal.webContents.loadFile('src/provedores/listaProvedores.html');
               }
             },
             {
-              label:"Saldo de Provedores",
-                click(){
-                  ventanaPrincipal.webContents.send('verificarUsuario','movVendedores');
-                  
-                }
+              label: "Saldo de Provedores",
+              click() {
+                ventanaPrincipal.webContents.send('verificarUsuario', 'movVendedores');
+
+              }
             },
             {
-              label:"Emitir Pago",
-                click(){
-                  ventanaPrincipal.webContents.send('verificarUsuario','movVendedores');
-                  
-                }
+              label: "Emitir Pago",
+              click() {
+                ventanaPrincipal.webContents.send('verificarUsuario', 'movVendedores');
+
+              }
             }
           ]
         },
         {
           label: "Marca",
-          click(){
+          click() {
             abrirVentana("marcas/marcas.html", 600, 900)
           }
         },
         {
-          label:"Rubros",
-          click(){
-            abrirVentana("rubros/rubros.html",600,900)
+          label: "Rubros",
+          click() {
+            abrirVentana("rubros/rubros.html", 600, 900)
           }
         },
         {
-          label:"Vendedores",
-          submenu:[
+          label: "Vendedores",
+          submenu: [
             {
-              label:"Informacion Vendedores",
-              click(){
-                ventanaPrincipal.webContents.send('verificarUsuario','infoVendedores');
+              label: "Informacion Vendedores",
+              click() {
+                ventanaPrincipal.webContents.send('verificarUsuario', 'infoVendedores');
               }
             },
             {
-              label:"Movimiento Vendedores",
-                click(){
-                  ventanaPrincipal.webContents.send('verificarUsuario','movVendedores');
-                  
-                }
+              label: "Movimiento Vendedores",
+              click() {
+                ventanaPrincipal.webContents.send('verificarUsuario', 'movVendedores');
+
+              }
             }
           ]
         },
         {
           label: "Cuentas",
-          click(){
+          click() {
             abrirVentana("cuentas/cuentas.html", 500, 550)
           }
         },
         {
-          label: condIva === "Inscripto" ? "Libro Ventas" :"Alicuotas",
-          click(){
+          label: condIva === "Inscripto" ? "Libro Ventas" : "Alicuotas",
+          click() {
             if (condIva === "Inscripto") {
               ventanaPrincipal.webContents.send('libroIva');
-            }else{
-              abrirVentana("alicuotas/alicuotas.html",400,500);
+            } else {
+              abrirVentana("alicuotas/alicuotas.html", 400, 500);
             }
-          }          
+          }
         },
         {
-          label:"Imprimir Venta",
-          click(){
+          label: "Imprimir Venta",
+          click() {
             ventanaPrincipal.webContents.send('poner-numero');
           }
         }
@@ -272,61 +273,61 @@ const hacerMenu = () => {
     },
     {
       label: "Productos",
-      submenu:[
+      submenu: [
         {
-          label:"Agregar Producto",
-          click(){
-            abrirVentana("productos/agregarProducto.html",650,900)
+          label: "Agregar Producto",
+          click() {
+            abrirVentana("productos/agregarProducto.html", 650, 900)
           }
         },
         {
-          label:"Aumento Por Marcas",
-          click(){
-            abrirVentana('productos/marcas.html',300,500,true);
+          label: "Aumento Por Marcas",
+          click() {
+            abrirVentana('productos/marcas.html', 300, 500, true);
           }
         },
         {
-          label:"Aumento Por Provedores",
-          click(){
-            abrirVentana('productos/aumentoPorProvedor.html',300,500,true);
+          label: "Aumento Por Provedores",
+          click() {
+            abrirVentana('productos/aumentoPorProvedor.html', 300, 500, true);
           }
         },
         {
           label: "Cambio de precio por lista",
-          click(){
-            abrirVentana('productos/cambioPrecioLista.html',500,500);
+          click() {
+            abrirVentana('productos/cambioPrecioLista.html', 500, 500, false, true, true);
           },
         },
         {
-          label:"Cambio de Producto",
-          click(){
-            abrirVentana("productos/cambio.html",750,900)
+          label: "Cambio de Producto",
+          click() {
+            abrirVentana("productos/cambio.html", 750, 900)
           }
         },
         {
           label: "Listado de Nro Series",
-          click(){
+          click() {
             ventanaPrincipal.loadFile('src/serie/listado.html');
           }
         },
         {
-          label:"Lista de Precios",
-          click(){
-            abrirVentana('productos/listaPrecios.html',1000,1000)
+          label: "Lista de Precios",
+          click() {
+            abrirVentana('productos/listaPrecios.html', 1000, 1000)
           }
         },
         {
-          label:"Modificar Codigo",
-          click(){
-            abrirVentana("productos/modificarCodigo.html",500,500)
+          label: "Modificar Codigo",
+          click() {
+            abrirVentana("productos/modificarCodigo.html", 500, 500)
           }
         }
-        
+
       ]
     },
     {
-      label:"Clientes",
-      submenu:[
+      label: "Clientes",
+      submenu: [
         // {
         //   label:"Agregar Cliente",
         //   click(){
@@ -334,28 +335,28 @@ const hacerMenu = () => {
         //   }
         // },
         {
-          label:"Listado Saldos",
-          click(){
-            abrirVentana("clientes/listadoSaldo.html",800,1200)
+          label: "Listado Saldos",
+          click() {
+            abrirVentana("clientes/listadoSaldo.html", 800, 1200)
           }
         },
         {
-          label:"Arreglar Saldo",
-          click(){
-            abrirVentana("clientes/arreglarSaldo.html",500,600)
+          label: "Arreglar Saldo",
+          click() {
+            abrirVentana("clientes/arreglarSaldo.html", 500, 600)
           }
         }
       ]
     },
     {
-      label:"Pedidos",
-      click(){
+      label: "Pedidos",
+      click() {
         ventanaPrincipal.loadFile('src/pedidos/pedidos.html')
       }
     },
     {
-      label:"Servicio Tecnico",
-      click(){
+      label: "Servicio Tecnico",
+      click() {
         ventanaPrincipal.loadFile('src/servicioTecnico/servicio.html')
       }
     },
@@ -364,47 +365,47 @@ const hacerMenu = () => {
       submenu: [
         {
           label: 'Ver Prestamos',
-          click(){
+          click() {
             ventanaPrincipal.loadFile('src/prestamos/prestamos.html')
           }
         },
         {
           label: 'Ver Productos',
-          click(){
+          click() {
             ventanaPrincipal.loadFile('src/productosIluminacion/productos.html');
           }
         }
       ]
     },
     {
-      label:"Configuracion",
+      label: "Configuracion",
       submenu: [
         {
           label: 'Configuracion Sistema',
-          click(){
-            abrirVentana('configuracion/configuracion.html',700,700,false)
+          click() {
+            abrirVentana('configuracion/configuracion.html', 700, 700, false)
           }
         },
         {
           label: 'Modulos',
-          click(){
+          click() {
             ventanaPrincipal.webContents.send('configuracionModulos');
           }
         }
       ]
     },
     {
-      label:"tools",
+      label: "tools",
       accelerator: process.platform == "darwin" ? "Comand+D" : "Ctrl+D",
-      click(item,focusedWindow){
-        focusedWindow.toggleDevTools(); 
+      click(item, focusedWindow) {
+        focusedWindow.toggleDevTools();
       }
     }
   ];
 
-  for( let elem of template){
-    if (elem.label === 'Clientes' && !modulos.cliente){
-      template.splice(template.indexOf(elem),1);
+  for (let elem of template) {
+    if (elem.label === 'Clientes' && !modulos.cliente) {
+      template.splice(template.indexOf(elem), 1);
     };
   }
 

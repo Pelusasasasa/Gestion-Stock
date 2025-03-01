@@ -41,6 +41,11 @@ archivo.addEventListener('change', (e) => {
     fileReader.readAsBinaryString(selectedFile);
 });
 
+const apretarTecla = (e) => {
+    if (e.keyCode === 27) {
+        window.close();
+    }
+}
 
 const cambiarPrecioshikvision = (datos, productos) => {
     for (let producto of productos) {
@@ -145,6 +150,8 @@ const mostrarMensaje = (e) => {
     }
 
 };
+
+document.addEventListener('keyup', apretarTecla);
 
 guardar.addEventListener('click', guardarCambios);
 
