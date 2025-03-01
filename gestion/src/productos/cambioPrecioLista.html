@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cambio de precio por lista</title>
     <link rel="stylesheet" href="../assets/global.css">
 </head>
-<body>
 
-    <main>
+<body>
+    <!-- //header -->
+    <main class="flex justify-around">
         <div>
             <label for="tipo">Tipo</label>
             <select name="tipo" id="tipo">
@@ -21,8 +23,13 @@
             <input type="file" name="archivo" id="archivo">
         </div>
     </main>
-    
-    <main id="lista" class="table">
+
+    <!-- Mensaje -->
+    <main class="bg-white text-xl">
+        <p id="mensaje" class="text-center"></p>
+    </main>
+
+    <main id="lista" class="table h-60vh bg-white mb-2">
         <table class="w-full border-collapse mb-2 mt-1">
             <thead>
                 <tr>
@@ -39,9 +46,10 @@
         </table>
     </main>
 
-    <main>
+    <main class="flex justify-around">
         <button id="guardar">Guardar Cambios</button>
     </main>
 </body>
 <script src="./cambioPrecioLista.js"></script>
+
 </html>

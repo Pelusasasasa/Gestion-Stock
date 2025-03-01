@@ -2,19 +2,23 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
 }
+
 .buttonSeleccionado {
   background-color: rgba(75, 75, 75, 0.9);
   color: white;
 }
+
 html {
   box-sizing: border-box;
   font-size: 62.5%;
 }
+
 *,
 *:before,
 *:after {
   box-sizing: inherit;
 }
+
 body {
   font-size: 1.6rem;
   padding: 0 2rem;
@@ -166,7 +170,7 @@ table tbody {
   display: flex;
 }
 
-.flex-1{
+.flex-1 {
   flex: 1;
 }
 
@@ -202,15 +206,15 @@ table tbody {
 
 /* Grid */
 
-.grid{
+.grid {
   display: grid;
 }
 
-.columns-3{
+.columns-3 {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.row-2-2fr-1fr{
+.row-2-2fr-1fr {
   grid-template-rows: 2fr 1fr;
 }
 
@@ -222,7 +226,7 @@ table tbody {
   transform: scale(1.5);
 }
 
-.scale-1-9{
+.scale-1-9 {
   transform: scale(1.9);
 }
 
@@ -247,7 +251,11 @@ table tbody {
   font-weight: 900;
 }
 
-.text-2xl{
+.text-xl {
+  font-size: 2rem;
+}
+
+.text-2xl {
   font-size: 3rem;
 }
 
@@ -259,7 +267,7 @@ table tbody {
   width: 100%;
 }
 
-.w-80{
+.w-80 {
   width: 80rem;
 }
 
@@ -270,27 +278,31 @@ table tbody {
 /* width */
 
 /* heigth */
-.h-full{
+.h-full {
   height: 100%;
 }
 
-.h-screen{
+.h-screen {
   height: 100vh;
 }
 
-.h-calc-100vh-10px{
+.h-calc-100vh-10px {
   height: calc(100vh - 80px);
 }
 
-.h-80vh{
+.h-80vh {
   height: 80vh;
 }
 
-.h-40vh{
+.h-60vh {
+  height: 60vh;
+}
+
+.h-40vh {
   height: 40vh;
 }
 
-.h-30vh{
+.h-30vh {
   height: 30vh;
 }
 
@@ -309,6 +321,7 @@ table tbody {
 .h-50 {
   height: 50rem;
 }
+
 /* heigth */
 
 /* background */
@@ -328,9 +341,11 @@ table tbody {
   border-width: 0.1rem;
   border-style: solid;
 }
+
 .border-black {
   border-color: black;
 }
+
 /* border */
 
 .cursor-pointer {
@@ -341,10 +356,10 @@ table tbody {
   transform: scale(1.2);
 }
 
-.hover-bg-gray:hover{
+.hover-bg-gray:hover {
   background-color: lightgray;
 }
 
-.overflow-scroll{
+.overflow-scroll {
   overflow: scroll;
 }
