@@ -76,8 +76,7 @@ const cambiarPrecioshikvision = (datos, productos) => {
         tdPrecioNuevo.value = utilidad.toFixed(2);
 
         const tr = document.getElementById(producto._id);
-
-        porcentaje = (producto.precio - parseFloat(tr.children[3].innerText)) / parseFloat(tr.children[3].innerText) * 100;
+        porcentaje = producto.precio !== 0 ? (producto.precio - parseFloat(tr.children[3].innerText)) / parseFloat(tr.children[3].innerText) * 100 : 0;
         tdPorcentaje.value = porcentaje.toFixed(2) + " %";
 
         tr.children[4].innerText = tdCostoNuevo.value;
@@ -125,8 +124,8 @@ const llenarLista = async (productos) => {
         tdDescripcion.textContent = producto.descripcion.slice(0, 30);
         tdCosto.textContent = producto.costoDolar !== 0 ? producto.costoDolar.toFixed(2) : producto.costo.toFixed(2);
         tdPrecio.textContent = producto.precio.toFixed(2);
-        tdCostoNuevo.textContent = '0.00';
-        tdPrecioNuevo.textContent = '0.00';
+        tdCostoNuevo.textContent = tdCosto.textContent;
+        tdPrecioNuevo.textContent = tdPrecio.textContent;
         tdPorcentaje.textContent = '0.00';
 
 
