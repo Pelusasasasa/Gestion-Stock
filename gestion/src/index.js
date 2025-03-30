@@ -403,11 +403,11 @@ const hacerMenu = () => {
     }
   ];
 
-  for (let elem of template) {
-    if (elem.label === 'Clientes' && !modulos.cliente) {
-      template.splice(template.indexOf(elem), 1);
-    };
-  }
+  // for (let elem of template) {
+  //   if (elem.label === 'Clientes' && !modulos.cliente) {
+  //     template.splice(template.indexOf(elem), 1);
+  //   };
+  // }
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);

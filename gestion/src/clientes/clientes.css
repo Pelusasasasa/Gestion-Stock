@@ -1,37 +1,36 @@
-
-h1{
+h1 {
     text-align: center;
 }
 
-.none{
+.none {
     display: none !important;
 }
 
-.seccionCliente{
+.seccionCliente {
     display: flex;
     flex-direction: column;
 }
 
-.buscador{
+.buscador {
     display: flex;
     justify-content: space-around;
 }
 
-.buscador div{
+.buscador div {
     display: flex;
     flex-direction: column;
     text-align: center;
 }
 
-.buscador div input{
+.buscador div input {
     padding: 1.2rem;
 }
 
-.buscador .buscador-nombre{
+.buscador .buscador-nombre {
     width: 50%;
 }
 
-.tabla{
+.tabla {
     overflow: scroll;
     margin-top: 1rem;
     height: 70vh;
@@ -40,86 +39,86 @@ h1{
 
 }
 
-table{
+table {
     width: 100%;
     border-collapse: collapse;
 }
 
-table thead th{
+table thead th {
     border: .1rem solid black;
 }
 
-table tbody tr{
+table tbody tr {
     text-align: center;
 }
 
-table tbody tr:hover{
+table tbody tr:hover {
     cursor: pointer;
 }
 
-table tbody tr td{
+table tbody tr td {
     border: .1rem solid black
 }
 
 /*Agregar Cliente*/
 
-.seccion-agregarCliente{
+.seccion-agregarCliente {
     display: flex;
     flex-direction: column;
 }
 
 
 
-.seccion-agregarCliente .primero{
+.seccion-agregarCliente .primero {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
 }
 
-.seccion-agregarCliente .primero div{
+.seccion-agregarCliente .primero div {
     display: flex;
     flex-direction: column;
     text-align: center;
     margin-right: 5rem;
 }
 
-.seccion-agregarCliente .primero div input{
+.seccion-agregarCliente .primero div input {
     padding: 1rem;
     font-size: 1.5rem;
 }
 
-.seccion-agregarCliente .segundo{
+.seccion-agregarCliente .segundo {
     display: flex;
     justify-content: space-evenly;
 }
 
-.seccion-agregarCliente .segundo div{
+.seccion-agregarCliente .segundo div {
     display: flex;
     flex-direction: column;
     text-align: center;
 }
 
-.seccion-agregarCliente .segundo div input{
+.seccion-agregarCliente .segundo div input {
     padding: 1rem;
     font-size: 1.5rem;
 }
 
-.seccion-agregarCliente .tercero{
+.seccion-agregarCliente .tercero {
     display: flex;
     justify-content: space-around;
 }
 
-.seccion-agregarCliente .tercero main{
+.seccion-agregarCliente .tercero main {
     display: flex;
     flex-direction: column;
     text-align: center;
 }
 
-.seccion-agregarCliente .tercero{
+.seccion-agregarCliente .tercero {
     margin: 2rem;
 
 }
 
-.seccion-agregarCliente .botones{
+.seccion-agregarCliente .botones {
     margin-top: 3rem;
 }
 
@@ -127,47 +126,47 @@ table tbody tr td{
 
 /*Modificar Cliente*/
 
-.seccion-modificarCliente .primero{
+.seccion-modificarCliente .primero {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
 
 }
 
-.seccion-modificarCliente .primero div{
+.seccion-modificarCliente .primero div {
     display: flex;
     flex-direction: column;
     margin-right: 5rem;
     text-align: center;
 }
 
-.seccion-modificarCliente .primero div input{
+.seccion-modificarCliente .primero div input {
     padding: 1rem;
     font-size: 1.5rem;
 }
 
 
-.seccion-modificarCliente .segundo{
+.seccion-modificarCliente .segundo {
     display: flex;
     justify-content: space-between;
 }
 
-.seccion-modificarCliente .segundo div{
+.seccion-modificarCliente .segundo div {
     display: flex;
     text-align: center;
     flex-direction: column;
 }
 
-.seccion-modificarCliente .segundo div input{
+.seccion-modificarCliente .segundo div input {
     font-size: 1.5rem;
     padding: 1rem;
 }
 
-.seccion-modificarCliente .tercero{
+.seccion-modificarCliente .tercero {
     display: flex;
     justify-content: space-around;
 }
 
-.seccion-modificarCliente .tercero main{
+.seccion-modificarCliente .tercero main {
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -176,23 +175,23 @@ table tbody tr td{
 /*Modificar Cliente*/
 
 /*listado Saldo*/
-.lista{
+.lista {
     background-color: white;
     height: 70vh;
     overflow-y: scroll;
 }
 
-.lista tr td{
+.lista tr td {
     border: .1rem solid black
 }
 
-.info{
+.info {
     display: flex;
     justify-content: space-around;
     margin-bottom: 1rem;
 }
 
-.info input{
+.info input {
     width: 15%;
     text-align: end;
     font-size: 2rem;
@@ -201,33 +200,150 @@ table tbody tr td{
     background-color: white;
 }
 
-.lista .negrita{
+.lista .negrita {
     font-weight: bold;
 }
 
-.lista .izquierda{
+.lista .izquierda {
     text-align: end;
 }
+
 /*listado Saldo*/
 
 /*Arreglar Saldo*/
-.arreglarSaldo .informacion{
+.arreglarSaldo .informacion {
     display: flex;
     flex-direction: column;
     /* justify-content: space-around; */
     margin: 2rem 0;
 }
 
-.arreglarSaldo .informacion #id{
+.arreglarSaldo .informacion #id {
     width: 8rem;
 }
 
-.arreglarSaldo .informacion #nombre{
+.arreglarSaldo .informacion #nombre {
     width: 40rem;
 }
 
 
-.arreglarSaldo .informacion label{
+.arreglarSaldo .informacion label {
     display: inline-block;
     width: 10rem;
+}
+
+/*Listado de saldo*/
+#saldo {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: burlywood;
+    /* Fondo marrón claro */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+#saldo .container {
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d4c4b2;
+}
+
+#saldo h1 {
+    color: #5d4037;
+    text-align: center;
+    font-size: 24px;
+    border-bottom: 2px solid #d4c4b2;
+    margin: 0;
+}
+
+#saldo .fecha_saldo {
+    display: flex;
+    justify-content: space-between;
+    gap: 5rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #5d4037;
+    padding: 5px;
+    background-color: #f0e6d6;
+    border-radius: 5px;
+}
+
+#saldo #excel {
+    font-size: 1.5rem;
+    border: none;
+    padding: 1rem 2rem;
+    /* Más padding horizontal para mejor proporción */
+    border-radius: 10px;
+    background-color: #8d6e63;
+    /* Color marrón principal */
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    /* Transición suave para todos los efectos */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra sutil */
+    margin: 0.5rem;
+    /* Espaciado exterior */
+    min-width: 200px;
+}
+
+#saldo #excel:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    /* Efecto más sutil que 1.2 */
+    background-color: #6d4c41;
+    /* Marrón más oscuro al pasar el ratón */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    /* Sombra más pronunciada al hover */
+}
+
+#saldo .fecha_saldo span {
+    padding-left: 1rem;
+}
+
+#saldo .fecha_saldo input {
+    flex: 1;
+}
+
+#saldo .lista {
+    height: 70vh;
+}
+
+#saldo table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#saldo th {
+    background-color: #8d6e63;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+#saldo td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e0d5c8;
+}
+
+#saldo tr:nth-child(even) {
+    background-color: #faf6f0;
+}
+
+#saldo tr:hover {
+    background-color: lightgray;
+}
+
+#saldo .total-saldo {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 15px;
+    color: #5d4037;
+    padding: 10px;
+    background-color: #f0e6d6;
+    border-radius: 5px;
 }
