@@ -77,3 +77,12 @@ table tbody td{
 .botones button{
     margin: 0 2rem;
 }
+
+
+.td-con-scroll{
+    max-width: 200px;
+    max-height: 100px;
+    overflow: auto;
+    word-wrap: break-word;
+    white-space: normal;
+}

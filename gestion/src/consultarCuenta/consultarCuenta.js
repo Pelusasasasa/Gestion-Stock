@@ -174,6 +174,9 @@ const listarVentas = async(lista)=>{
         const tdSaldo = document.createElement('td');   
         const tdCondicion = document.createElement('td');
 
+        console.log(tdCondicion)
+        tdCondicion.classList.add('td-con-scroll');
+
         const date = new Date(venta.fecha);
         let day = date.getDate();
         let month = date.getMonth()+1;

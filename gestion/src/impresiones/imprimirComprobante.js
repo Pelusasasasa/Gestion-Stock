@@ -10,6 +10,7 @@ const numero = document.getElementById('numero');
 const date = document.getElementById('fecha');
 const tipoPago = document.getElementById('tipoPago');
 const vendedor = document.getElementById('vendedor');
+const condicion = document.getElementById('condicion');
 const subTotal = document.getElementById('subtotal');
 const descuento = document.getElementById('descuento');
 const total = document.getElementById('total');
@@ -53,6 +54,7 @@ const ponerDatosVenta = (datos)=>{
     date.innerText = `${fecha[2]}/${fecha[1]}/${fecha[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
     tipoPago.innerText = datos.tipo_venta;
     vendedor.innerText = datos.vendedor;
+    condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
 
     if(datos.tipo_venta !== 'RT'){
         subTotal.innerText = dolar ? ((datos.precio + datos.descuento) / dolar).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
