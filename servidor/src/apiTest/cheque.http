@@ -1,0 +1,13 @@
+### Postear un cheque
+
+POST http://localhost:4000/gestion/cheque
+Content-Type: application/json
+
+{
+  "importe": 1000,
+  "f_recibido": "2023-12-25T00:00:00Z",
+  "f_cheque": "2023-12-25T00:00:00Z",
+  "numero": "123456",
+  "banco": "Macro",
+  "ent_por": "Juan Perez"
+}

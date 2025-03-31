@@ -3,6 +3,7 @@ const cors = require('cors');
 const app = express();
 const path = require('path');
 
+
 //settings
 app.set('port',4000);
 
@@ -12,6 +13,8 @@ app.use(express.json());
 
 //routes
 app.use('/gestion/clientes',require('./routes/cliente'));
+
+app.use('/gestion/cheque',require('./routes/cheque.routes'));
 
 app.use('/gestion/compensada',require('./routes/compensada'));
 
