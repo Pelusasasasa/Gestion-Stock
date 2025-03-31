@@ -1,0 +1,20 @@
+{
+  "name": "caja",
+  "version": "1.0.0",
+  "description": "Gestion de Caja",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx electron ."
+  },
+  "keywords": [
+    "electron",
+    "react.js",
+    "tailwindcss"
+  ],
+  "author": "Pelusa",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^35.1.2"
+  }
+}
