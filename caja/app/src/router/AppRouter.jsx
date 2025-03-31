@@ -1,8 +1,14 @@
 import React from 'react'
+import { Route, Routes } from 'react-router-dom'
+import { Home } from '../Home/pages/Home'
+import { Cheques } from '../cheque/Cheques'
 
 const AppRouter = () => {
     return (
-        <div className='bg-red-500'>AppRouter</div>
+        <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/cheques' element={<Cheques />} />
+        </Routes>
     )
 }
 

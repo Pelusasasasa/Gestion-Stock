@@ -3,10 +3,9 @@ const chequeCTRL = {};
 const Cheque = require('../models/Cheque');
 const { validateCheque } = require('../schemas/cheque.schema');
 
-chequeCTRL.gestAll = async(req, res) => {
+chequeCTRL.gestAll = async (req, res) => {
 
     const cheques = await Cheque.find();
-
     try {
         res.status(200).json({
             cheques,
@@ -21,13 +20,13 @@ chequeCTRL.gestAll = async(req, res) => {
 
 };
 
-chequeCTRL.postOne = async(req, res) => {
+chequeCTRL.postOne = async (req, res) => {
 
     const result = await validateCheque(req.body);
 
     console.log(result.error)
 
-    if(!result.sucess) return res.status(400).json({
+    if (!result.sucess) return res.status(400).json({
         msg: 'Error en el formato de los datos',
         errors: result.errors,
         ok: false,
@@ -50,10 +49,10 @@ chequeCTRL.postOne = async(req, res) => {
     }
 };
 
-chequeCTRL.patchOne = async(req, res) => {
+chequeCTRL.patchOne = async (req, res) => {
     const result = await validatePartialCheque(req.body)
 
-    if(!result.sucess) return res.status(400).json({
+    if (!result.sucess) return res.status(400).json({
         msg: 'Error en el formato de los datos',
         errors: result.errors,
         ok: false,
@@ -71,7 +70,7 @@ chequeCTRL.patchOne = async(req, res) => {
             ok: true,
         });
 
-        
+
 
     } catch (error) {
         res.status(500).json({
@@ -82,7 +81,7 @@ chequeCTRL.patchOne = async(req, res) => {
 
 };
 
-chequeCTRL.deleteOne = async(req, res) => {
+chequeCTRL.deleteOne = async (req, res) => {
 
     const { id } = req.params;
 
