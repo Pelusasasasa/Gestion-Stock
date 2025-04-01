@@ -14,8 +14,6 @@ app.use(express.json());
 //routes
 app.use('/gestion/clientes', require('./routes/cliente'));
 
-app.use('/gestion/cheques', require('./routes/cheque.routes'));
-
 app.use('/gestion/compensada', require('./routes/compensada'));
 
 app.use('/gestion/cuenta', require('./routes/cuenta'));
@@ -55,5 +53,11 @@ app.use('/gestion/pedidos', require('./routes/pedido'));
 app.use('/gestion/servicios', require('./routes/servicioTecnico.route'));
 
 app.use('/gestion/vendedores', require('./routes/vendedor'));
+
+//Caja
+app.use('/gestion/cheques', require('./routes/cheque.routes'));
+app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
+app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
+
 
 module.exports = app;

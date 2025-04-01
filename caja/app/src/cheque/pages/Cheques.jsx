@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
-import { useChequeStore } from '../hooks/useChequesStore'
-import { ChequeCard } from './components/ChequeCard';
 import { Link } from 'react-router-dom';
-import { useForm } from '../hooks/Useform';
+
+import { useChequeStore } from '../../hooks'
+import { ChequeCard } from '../components/ChequeCard';
+import { useForm } from '../../hooks/Useform';
 
 const initialState = {
     buscador: '',
