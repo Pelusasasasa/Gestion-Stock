@@ -1,22 +1,34 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from '../../hooks'
-import { TarjetaCard } from '../components/TarjetaCard';
 import { Link } from 'react-router-dom';
-import { useTiposTarjetasStore } from '../../hooks/UseTiposTarjetasStore';
 
-let tarjetasFiltradas = [];
+import { TarjetaCard } from '../components/TarjetaCard';
+import { TarjetaModal } from '../components/TarjetaModal';
+import { useTarjetaStore } from '../../hooks/useTarjetaStore';
+
 
 let initialState = {
     buscador: ''
 }
 
 export const Tarjetas = () => {
-    const { startGetTiposTarjetas } = useTiposTarjetasStore();
+    const { startGetTarjetas, tarjetas } = useTarjetaStore();
     const { onInputChange, buscador } = useForm(initialState);
 
+    const [modal, setModal] = useState(false);
+    const [tarjetasFiltradas, setTarjetasFiltradas] = useState(tarjetas)
+
+    const handleModal = () => {
+        setModal(true)
+    };
+
     useEffect(() => {
-        startGetTiposTarjetas()
-    }, [])
+        startGetTarjetas()
+    }, []);
+
+    useEffect(() => {
+        setTarjetasFiltradas(tarjetas);
+    }, [tarjetas])
 
     const salir = () => {
     }
@@ -41,14 +53,16 @@ export const Tarjetas = () => {
                             <th className='border'>Fecha</th>
                             <th className='border'>Nombre</th>
                             <th className='border'>Tarjeta</th>
+                            <th className='border'>Importe</th>
                             <th className='border'>Tipo</th>
                             <th className='border'>Vendedor</th>
+                            <th className='border'>Acciones</th>
 
                         </tr>
                     </thead>
                     <tbody>
                         {tarjetasFiltradas.map(elem => (
-                            <TarjetaCard {...elem} key={elem._id} />
+                            <TarjetaCard {...elem} key={elem._id} modal={setModal} />
                         ))}
                     </tbody>
                 </table>
@@ -56,13 +70,15 @@ export const Tarjetas = () => {
 
             {/* Botones */}
             <section className='mt-5 flex justify-around'>
-                <button className='bg-green-400'>Agregar</button>
+                <button className='bg-green-400' onClick={handleModal}>Agregar</button>
                 <Link to='/' >
                     <button type='button' className='text-black' onClick={salir}>
                         Salir
                     </button>
                 </Link>
             </section>
+
+            {modal && <TarjetaModal cerrar={setModal} />}
         </div>
     )
 }

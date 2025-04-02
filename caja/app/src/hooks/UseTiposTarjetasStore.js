@@ -10,8 +10,6 @@ export const useTiposTarjetasStore = () => {
     const startGetTiposTarjetas = async () => {
         const { data } = await gestorApi.get('tipoTarjeta');
 
-        console.log(data);
-
         dispatch(getTiposTarjetas(data.tipos))
     }
 

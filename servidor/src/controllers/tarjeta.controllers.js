@@ -7,7 +7,6 @@ tarjetaCTRL.postOne = async (req, res) => {
     try {
 
         const result = await validateTarjeta(req.body);
-        console.log(result);
         if (!result.success) return res.status(400).json({
             ok: false,
             msg: JSON.parse(result.error)
@@ -17,9 +16,11 @@ tarjetaCTRL.postOne = async (req, res) => {
 
         await tarjeta.save();
 
+        const tarjetaConDatos = await Tarjeta.findById(tarjeta._id).populate('tarjeta');
+
         res.status(201).json({
             ok: true,
-            tarjeta
+            tarjeta: tarjetaConDatos
         })
     } catch (error) {
         console.log(error);
@@ -32,7 +33,7 @@ tarjetaCTRL.postOne = async (req, res) => {
 
 tarjetaCTRL.getAll = async (req, res) => {
     try {
-        const tarjetas = await Tarjeta.find();
+        const tarjetas = await Tarjeta.find().populate('tarjeta');
 
         res.status(200).json({
             ok: true,
@@ -77,7 +78,7 @@ tarjetaCTRL.deleteOne = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deleteTarjeta = await Tarjeta.findOneAndDelete(id);
+        const deleteTarjeta = await Tarjeta.findOneAndDelete({ _id: id });
 
         res.status(200).json({
             ok: true,

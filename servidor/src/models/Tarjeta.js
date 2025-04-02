@@ -18,15 +18,18 @@ const Tarjeta = new Schema({
     },
     tarjeta: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'TipoTarjeta'
     },
     tipo: {
         type: String,
-        default: ''
+        default: '',
+        set: value => value.toUpperCase()
     },
     vendedor: {
         type: String,
-        required: true
+        required: true,
+        set: value => value.toUpperCase()
     },
     pc: {
         type: String,

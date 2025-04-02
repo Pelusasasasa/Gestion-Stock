@@ -21,6 +21,7 @@ const tarjetaSchema = z.object({
         invalid_type_error: 'El tarjeta debe ser un String',
         required_error: 'El tarjeta es obligatorio'
     }),
+    tipo: z.string(),
 });
 
 
