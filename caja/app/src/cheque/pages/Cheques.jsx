@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom';
 
+import { IoIosAdd } from "react-icons/io";
+
 import { useChequeStore } from '../../hooks'
 import { ChequeCard } from '../components/ChequeCard';
 import { useForm } from '../../hooks/Useform';
@@ -26,6 +28,7 @@ export const Cheques = () => {
     // cada vez que se busca en el input o se toca un radio los cheques filtrados se muestran segun ese buscador
     useEffect(() => {
         chequesFiltrados = cheques.filter(elem => elem[buscado].toString().toUpperCase().startsWith(buscador.toUpperCase()));
+        console.log(buscado);
     }, [formState])
 
     //Cada vez que cambia el state de cheques se reinicia el buscador
@@ -33,72 +36,59 @@ export const Cheques = () => {
         chequesFiltrados = cheques;
     }, [cheques])
 
-    const salir = () => {
-        startEmptyCheques();
-    };
 
     return (
 
-        <div className=' bg-amber-700 w-screen h-screen'>
+        <section className=' w-screen h-screen'>
+            <h3 className='text-3xl'>Gestion De Cheques</h3>
 
-            {/* Buscador */}
-            <section className='flex gap-2 justify-around items-center'>
-                <div className='flex p-2 flex-col gap-2 w-xl'>
-                    <label htmlFor="buscador" className='text-white text-2xl text-center'>Buscador</label>
-                    <input className='bg-white border p-2' type="text" onChange={onInputChange} placeholder='Buscador...' name="buscador" id="buscador" />
-                </div>
-                <div className='flex gap-5'>
-                    <div className='flex flex-col gap-2'>
-                        <label htmlFor="numero" className='text-xl text-white'>Por Numero</label>
-                        <input className='scale-150' type="radio" onChange={onInputChange} name="buscado" id="numero" checked={buscado === 'numero'} />
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                        <label htmlFor="razonSocial" className='text-xl text-white'>Por Razon Social</label>
-                        <input className='scale-150' type="radio" onChange={onInputChange} name="buscado" id="ent_por" />
-                    </div>
-                    <div className='flex flex-col gap-2'>
-                        <label htmlFor="importe" className='text-xl text-white'>Por Importe</label>
-                        <input className='scale-150' type="radio" onChange={onInputChange} name="buscado" id="importe" />
-                    </div>
-                </div>
-            </section>
+            <div className='bg-gray-300 flex-col flex'>
 
-            {/* Listado de Cheques */}
-            <section className='bg-white h-96 overflow-scroll'>
-                <table className='w-full'>
-                    <thead>
-                        <tr>
-                            <th className='border'>F_Entrega</th>
-                            <th className='border'>Numero</th>
-                            <th className='border'>Banco</th>
-                            <th className='border'>F_Cheque</th>
-                            <th className='border'>Importe</th>
-                            <th className='border'>Entr. Por</th>
-                            <th className='border'>Entr. A</th>
-                            <th className='border'>Domicilio</th>
-                            <th className='border'>Telefono</th>
-                            <th className='border'>Modificar</th>
-                            <th className='border'>Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {chequesFiltrados.map(elem => (
+                {/* Buscador y Agregar nuevo */}
+                <div className='bg-white mt-5 pt-5 mx-5 rounded-t-xl'>
+                    <form action="" className='flex justify-around'>
+                        <div className='flex flex-col gap-2'>
+                            <label htmlFor="buscador">Buscador</label>
+                            <input type="text" name="buscador" id="buscador" className='border border-gray-400 rounded-sm' onChange={onInputChange} value={buscador} />
+                        </div>
+
+                        <div className='flex justify-around gap-5'>
+                            <div className='flex-col flex'>
+                                <label htmlFor="numero">Por Numero</label>
+                                <input type="radio" name="buscado" id="numero" checked={buscado === 'numero'} onChange={onInputChange} className='scale-150 mt-2' />
+                            </div>
+                            <div className='flex-col flex'>
+                                <label htmlFor="ent_por">Razon</label>
+                                <input type="radio" name="buscado" id="ent_por" onChange={onInputChange} className='scale-150 mt-2' />
+                            </div>
+                            <div className='flex-col flex'>
+                                <label htmlFor="importe">Importe</label>
+                                <input type="radio" name="buscado" id="importe" onChange={onInputChange} className='scale-150 mt-2' />
+                            </div>
+                        </div>
+
+
+                        <button type='submit' className='flex gap-2 bg-black items-center hover:opacity-80 text-white'>
+                            <IoIosAdd size={20} />
+                            Nuevo Cheque
+                        </button>
+
+                    </form>
+                </div>
+
+                {/* Listado */}
+                <div className='gap-2 flex flex-col py-5 mb-5 mx-5 bg-white rounded-b-xl'>
+                    {
+                        chequesFiltrados.map(elem => (
                             <ChequeCard {...elem} key={elem._id} />
-                        ))}
-                    </tbody>
-                </table>
-            </section>
+                        ))
+                    }
+                </div>
+            </div>
 
-            {/* Botones */}
-            <section className='mt-5 flex justify-around'>
-                <button className='bg-green-400'>Agregar</button>
-                <Link to='/' >
-                    <button type='button' className='text-black' onClick={salir}>
-                        Salir
-                    </button>
-                </Link>
-            </section>
-        </div>
+
+
+        </section>
 
     )
 }
