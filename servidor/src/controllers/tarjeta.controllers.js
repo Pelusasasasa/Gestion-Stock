@@ -61,9 +61,11 @@ tarjetaCTRL.patchOne = async (req, res) => {
     try {
         const tarjetaUpdate = await Tarjeta.findByIdAndUpdate(id, result.data, { new: true });
 
+        const tarjetaConDatos = await Tarjeta.findById(tarjetaUpdate._id).populate('tarjeta');
+
         res.status(200).json({
             ok: true,
-            tarjeta: tarjetaUpdate
+            tarjeta: tarjetaConDatos
         })
     } catch (error) {
         console.log(error);

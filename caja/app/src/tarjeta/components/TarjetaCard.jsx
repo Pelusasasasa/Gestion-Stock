@@ -2,12 +2,13 @@ import React from 'react';
 import { MdDelete } from "react-icons/md";
 import { RiPencilFill } from "react-icons/ri";
 import { useTarjetaStore } from '../../hooks/useTarjetaStore';
+
 import Swal from 'sweetalert2';
 
 
 export const TarjetaCard = ({ _id, fecha, nombre, tarjeta, importe, tipo, vendedor, modal }) => {
 
-    const { startDeleteTarjeta, startUpdateTarjeta } = useTarjetaStore();
+    const { startDeleteTarjeta, startSetActiveTarjeta } = useTarjetaStore();
 
     const handleDelete = async () => {
 
@@ -25,7 +26,7 @@ export const TarjetaCard = ({ _id, fecha, nombre, tarjeta, importe, tipo, vended
     };
 
     const handleUpdate = async () => {
-        startUpdateTarjeta(_id);
+        startSetActiveTarjeta(_id);
         modal(true)
     };
 

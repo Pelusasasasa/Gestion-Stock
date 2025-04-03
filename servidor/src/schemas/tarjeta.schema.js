@@ -30,7 +30,7 @@ async function validateTarjeta(input) {
 };
 
 function validatePartialTarjeta(input) {
-    return movieSchema.partial().safeParse(input)
+    return tarjetaSchema.partial().safeParse(input)
 };
 
 module.exports = {

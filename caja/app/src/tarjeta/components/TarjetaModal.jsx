@@ -9,7 +9,7 @@ export const TarjetaModal = ({ cerrar }) => {
 
 
     const { tiposTarjetas, startGetTiposTarjetas } = useTiposTarjetasStore();
-    const { tarjetaActive, startPostTarjeta, emptyActiveTarjeta } = useTarjetaStore();
+    const { tarjetaActive, startPostTarjeta, emptyActiveTarjeta, startUpdateTarjeta } = useTarjetaStore();
     const { nombre, importe, tipo, tarjeta, vendedor, fecha, onInputChange, formState } = useForm(tarjetaActive);
 
     useEffect(() => {
@@ -28,10 +28,11 @@ export const TarjetaModal = ({ cerrar }) => {
     };
 
     const handlePutTarjeta = () => {
-        if (!verificarDatosTarjeta(formState));
-        formState.importe = (formState.importe.toString());
+        if (!verificarDatosTarjeta(formState)) return;
 
-        console.log(formState);
+        startUpdateTarjeta(formState)
+
+        cerrar(false)
     };
 
     const cerrarModal = () => {
