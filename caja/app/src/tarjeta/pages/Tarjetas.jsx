@@ -30,47 +30,47 @@ export const Tarjetas = () => {
     useEffect(() => {
         setTarjetasFiltradas(tarjetas);
     }, [tarjetas]);
-    
+
     useEffect(() => {
-        setTarjetasFiltradas(tarjetas.filter(elem => elem?.tarjeta?.nombre.startsWith( buscador.toUpperCase() ) ));
+        setTarjetasFiltradas(tarjetas.filter(elem => elem?.tarjeta?.nombre.startsWith(buscador.toUpperCase())));
     }, [formState])
 
     return (
-                <section className=' w-screen h-screen'>
-                    <h3 className='text-3xl p-5'>Gestion De Tajetas</h3>
-        
-                    <div className='bg-gray-300 flex-col flex'>
-        
-                        {/* Buscador y Agregar nuevo */}
-                        <div className='bg-white mt-5 pt-5 mx-5 rounded-t-xl'>
-                            <form action="" className='flex justify-around'>
-                                <div className='flex flex-col gap-2 w-80'>
-                                    <label htmlFor="buscador">Buscador</label>
-                                    <input type="text" name="buscador" id="buscador" className='border p-1 border-gray-400 rounded-sm' onChange={onInputChange} value={buscador} />
-                                </div>
-        
-        
-                                <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 text-white' onClick={handleModal}>
-                                    <IoIosAdd size={20} />
-                                    Nuevo Tarjeta
-                                </button>
-        
-                            </form>
+        <section className='  w-[calc(100vw-5rem)] h-screen'>
+            <h3 className='text-3xl p-5'>Gestion De Tajetas</h3>
+
+            <div className='bg-gray-300 flex-col flex'>
+
+                {/* Buscador y Agregar nuevo */}
+                <div className='bg-white mt-5 pt-5 mx-5 rounded-t-xl'>
+                    <form action="" className='flex justify-around'>
+                        <div className='flex flex-col gap-2 w-80'>
+                            <label htmlFor="buscador">Buscador</label>
+                            <input type="text" name="buscador" id="buscador" className='border p-1 border-gray-400 rounded-sm' onChange={onInputChange} value={buscador} />
                         </div>
-        
-                        {/* Listado */}
-                        <div className='gap-2 flex flex-col py-5 mb-5 mx-5 bg-white rounded-b-xl'>
-                            {
-                                tarjetasFiltradas.map(elem => (
-                                    <TarjetaCard {...elem} key={elem._id} modal={handleModal} />
-                                ))
-                            }
-                        </div>
-                    </div>
-        
-                            {modal && <TarjetaModal cerrar={setModal} />}
-        
-                </section>
-        
+
+
+                        <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 text-white' onClick={handleModal}>
+                            <IoIosAdd size={20} />
+                            Nuevo Tarjeta
+                        </button>
+
+                    </form>
+                </div>
+
+                {/* Listado */}
+                <div className='gap-2 flex flex-col py-5 mb-5 mx-5 bg-white rounded-b-xl'>
+                    {
+                        tarjetasFiltradas.map(elem => (
+                            <TarjetaCard {...elem} key={elem._id} modal={handleModal} />
+                        ))
+                    }
+                </div>
+            </div>
+
+            {modal && <TarjetaModal cerrar={setModal} />}
+
+        </section>
+
     )
 }

@@ -16,7 +16,7 @@ const Cheque = new Schema({
         set: value => value.toUpperCase(),
         trim: true
     },
-    f_cheque:{
+    f_cheque: {
         type: Date,
         default: Date.now
     },
@@ -27,7 +27,7 @@ const Cheque = new Schema({
     ent_por: {
         type: String,
         set: value => value.toUpperCase(),
-        trim: truem,
+        trim: true,
         default: ""
     },
     ent_a: {

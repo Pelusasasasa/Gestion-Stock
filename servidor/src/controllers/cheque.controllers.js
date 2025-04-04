@@ -1,7 +1,7 @@
 const chequeCTRL = {};
 
 const Cheque = require('../models/Cheque');
-const { validateCheque } = require('../schemas/cheque.schema');
+const { validateCheque, validatePartialCheque } = require('../schemas/cheque.schema');
 
 chequeCTRL.gestAll = async (req, res) => {
 
@@ -53,9 +53,8 @@ chequeCTRL.postOne = async (req, res) => {
 chequeCTRL.patchOne = async (req, res) => {
     const result = await validatePartialCheque(req.body)
 
-    if (!result.sucess) return res.status(400).json({
-        msg: 'Error en el formato de los datos',
-        errors: result.errors,
+    if (!result.success) return res.status(400).json({
+        msg: result.error,
         ok: false,
     });
 

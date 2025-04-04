@@ -1,4 +1,4 @@
-const {z} = require('zod');
+const { z } = require('zod');
 
 const chequeSchema = z.object({
     f_recibido: z.string({
@@ -20,24 +20,23 @@ const chequeSchema = z.object({
     importe: z.number({
         invalid_type_error: 'El importe debe ser un numero',
     }),
-    ent_por: z.string(),
-    // ent_a: z.string(),
-    // domicilio: z.string(),
-    // telefono: z.string(),
-    // tipo: z.string(),
-    // fechaPago: z.string(),
-    // vendedor: z.string(),
-    // pc: z.string()
+    ent_por: z.string().optional().default(''),
+    ent_a: z.string().optional().default(''),
+    domicilio: z.string().optional().default(''),
+    telefono: z.string().optional().default(''),
+    tipo: z.string().optional().default(''),
+    fechaPago: z.string().optional().default(''),
+    vendedor: z.string().optional().default(''),
+    pc: z.string().optional().default('')
 });
 
 async function validateCheque(input) {
-    console.log(input)
     return await chequeSchema.safeParseAsync(input);
 };
 
 
-function validatePartialCheque(input){
-  return movieSchema.partial().safeParse(input)
+function validatePartialCheque(input) {
+    return chequeSchema.partial().safeParse(input)
 };
 
 module.exports = {

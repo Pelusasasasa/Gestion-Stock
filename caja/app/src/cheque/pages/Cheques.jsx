@@ -42,15 +42,15 @@ export const Cheques = () => {
 
     return (
 
-        <section className=' w-screen h-screen'>
-            <h3 className='text-3xl'>Gestion De Cheques</h3>
+        <section className=' w-[calc(100vw-5rem)] h-screen'>
+            <h3 className='text-3xl p-5'>Gestion De Cheques</h3>
 
             <div className='bg-gray-300 flex-col flex'>
 
                 {/* Buscador y Agregar nuevo */}
                 <div className='bg-white mt-5 pt-5 mx-5 rounded-t-xl'>
                     <form action="" className='flex justify-around'>
-                        <div className='flex flex-col gap-2'>
+                        <div className='flex flex-col gap-2 w-80'>
                             <label htmlFor="buscador">Buscador</label>
                             <input type="text" name="buscador" id="buscador" className='border border-gray-400 rounded-sm' onChange={onInputChange} value={buscador} />
                         </div>
@@ -83,13 +83,13 @@ export const Cheques = () => {
                 <div className='gap-2 flex flex-col py-5 mb-5 mx-5 bg-white rounded-b-xl'>
                     {
                         chequesFiltrados.map(elem => (
-                            <ChequeCard {...elem} key={elem._id} />
+                            <ChequeCard {...elem} key={elem._id} modal={setModal} />
                         ))
                     }
                 </div>
             </div>
 
-                    {modal && <ChequeModal cerrar={setModal}/>}
+            {modal && <ChequeModal cerrar={setModal} />}
 
         </section>
 
