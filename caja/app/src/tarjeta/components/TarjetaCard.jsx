@@ -27,24 +27,31 @@ export const TarjetaCard = ({ _id, fecha, nombre, tarjeta, importe, tipo, vended
 
     const handleUpdate = async () => {
         startSetActiveTarjeta(_id);
-        modal(true)
+        modal(true);
     };
 
 
     return (
-        <tr className='hover:bg-gray-400 hover:cursor-pointer' id={_id}>
-            <td className='border'>{fecha.slice(0, 10).split('-', 3).reverse().join('/')}</td>
-            <td className='border'>{nombre}</td>
-            <td className='border'>{tarjeta.nombre}</td>
-            <td className='border text-right'>{importe.toFixed(2)}</td>
-            <td className='border'>{tipo}</td>
-            <td className='border'>{vendedor}</td>
-            <td className='border'>
-                <div className='flex gap-2 justify-around'>
-                    <RiPencilFill size={25} onClick={handleUpdate} />
-                    <MdDelete size={25} onClick={handleDelete} />
+        <div className='mx-20 p-5 border border-gray-300 rounded-xl'>
+                    <div className='flex justify-between'>
+                        <p className='font-bold'>Cliente: {nombre}</p>
+                        <p className='font-bold'>${importe.toFixed(2)}</p>
+                    </div>
+                    <div className='flex justify-between font-extralight'>
+                        <p>Tarjeta: {tarjeta.nombre}</p>
+                        <p>{tipo}</p>
+                    </div>
+                    <div className='flex justify-between font-extralight mt-2'>
+                        <div>
+                            <p>{fecha.slice(0, 10).split('-', 3).reverse().join('/')}</p>
+                            <p>Vendedor: {vendedor}</p>
+                        </div>
+                        <div className='flex gap-5'>
+                            <RiPencilFill onClick={handleUpdate} size={30} className='cursor-pointer border border-gray-200 p-1 rounded-sm hover:bg-gray-300' />
+                            <MdDelete onClick={handleDelete} size={30} className='cursor-pointer text-red-600 p-1 border border-gray-200 rounded-sm hover:bg-red-100' />
+                        </div>
+                    </div>
+        
                 </div>
-            </td>
-        </tr>
     )
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 
 import { IoIosAdd } from "react-icons/io";
@@ -6,19 +6,22 @@ import { IoIosAdd } from "react-icons/io";
 import { useChequeStore } from '../../hooks'
 import { ChequeCard } from '../components/ChequeCard';
 import { useForm } from '../../hooks/Useform';
+import { ChequeModal } from '../components/ChequeModal';
 
 const initialState = {
     buscador: '',
     buscado: 'numero'
 };
 
-let chequesFiltrados = [];
 
 export const Cheques = () => {
 
-    const { cheques, startEmptyCheques, startGetAllCheques } = useChequeStore();
+    const { cheques, startGetAllCheques } = useChequeStore();
+
+    const [chequesFiltrados, setChequesFiltrados] = useState(cheques);
 
     const { onInputChange, buscador, buscado, formState } = useForm(initialState);
+    const [modal, setModal] = useState(false);
 
 
     useEffect(() => {
@@ -27,14 +30,14 @@ export const Cheques = () => {
 
     // cada vez que se busca en el input o se toca un radio los cheques filtrados se muestran segun ese buscador
     useEffect(() => {
-        chequesFiltrados = cheques.filter(elem => elem[buscado].toString().toUpperCase().startsWith(buscador.toUpperCase()));
-        console.log(buscado);
+        setChequesFiltrados(cheques.filter(elem => elem[buscado].toString().toUpperCase().startsWith(buscador.toUpperCase())));
     }, [formState])
 
     //Cada vez que cambia el state de cheques se reinicia el buscador
     useEffect(() => {
-        chequesFiltrados = cheques;
-    }, [cheques])
+        setChequesFiltrados(cheques);
+    }, [cheques]);
+
 
 
     return (
@@ -68,7 +71,7 @@ export const Cheques = () => {
                         </div>
 
 
-                        <button type='submit' className='flex gap-2 bg-black items-center hover:opacity-80 text-white'>
+                        <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 text-white' onClick={() => setModal(true)}>
                             <IoIosAdd size={20} />
                             Nuevo Cheque
                         </button>
@@ -86,7 +89,7 @@ export const Cheques = () => {
                 </div>
             </div>
 
-
+                    {modal && <ChequeModal cerrar={setModal}/>}
 
         </section>
 

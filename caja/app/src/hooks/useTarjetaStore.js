@@ -19,6 +19,12 @@ export const useTarjetaStore = () => {
     const startGetTarjetas = async () => {
         const { data } = await gestorApi.get('tarjetas');
 
+        data.tarjetas.sort((a, b) => {
+            if(a.tarjeta.nombre > b.tarjeta.nombre) return 1;
+            if(a.tarjeta.nombre < b.tarjeta.nombre) return -1;
+            return 0;
+        });
+
         dispatch(getTarjetas(data.tarjetas))
     };
 

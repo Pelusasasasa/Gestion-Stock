@@ -13,6 +13,9 @@ export const useChequeStore = () => {
     };
 
     const startPostOne = async (cheque) => {
+
+        cheque.importe = parseFloat(cheque.importe);
+        console.log(cheque)
         const { data } = await gestorApi.post('/cheques', cheque);
 
         dispatch(postCheque(data.cheque));

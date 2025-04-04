@@ -12,7 +12,9 @@ const Cheque = new Schema({
     },
     banco: {
         type: String,
-        required: true
+        required: true,
+        set: value => value.toUpperCase(),
+        trim: true
     },
     f_cheque:{
         type: Date,
@@ -24,14 +26,20 @@ const Cheque = new Schema({
     },
     ent_por: {
         type: String,
+        set: value => value.toUpperCase(),
+        trim: truem,
         default: ""
     },
     ent_a: {
         type: String,
+        set: value => value.toUpperCase(),
+        trim: true,
         default: ""
     },
     domicilio: {
         type: String,
+        set: value => value.toUpperCase(),
+        trim: true,
         default: ""
     },
     telefono: {

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { TarjetaCard } from '../components/TarjetaCard';
 import { TarjetaModal } from '../components/TarjetaModal';
 import { useTarjetaStore } from '../../hooks/useTarjetaStore';
+import { IoIosAdd } from 'react-icons/io';
 
 
 let initialState = {
@@ -13,10 +14,10 @@ let initialState = {
 
 export const Tarjetas = () => {
     const { startGetTarjetas, tarjetas } = useTarjetaStore();
-    const { onInputChange, buscador } = useForm(initialState);
+    const { onInputChange, buscador, formState } = useForm(initialState);
 
     const [modal, setModal] = useState(false);
-    const [tarjetasFiltradas, setTarjetasFiltradas] = useState(tarjetas)
+    const [tarjetasFiltradas, setTarjetasFiltradas] = useState(tarjetas);
 
     const handleModal = () => {
         setModal(true)
@@ -28,57 +29,48 @@ export const Tarjetas = () => {
 
     useEffect(() => {
         setTarjetasFiltradas(tarjetas);
-    }, [tarjetas])
-
-    const salir = () => {
-    }
-
+    }, [tarjetas]);
+    
+    useEffect(() => {
+        setTarjetasFiltradas(tarjetas.filter(elem => elem?.tarjeta?.nombre.startsWith( buscador.toUpperCase() ) ));
+    }, [formState])
 
     return (
-        <div className=' bg-amber-700 w-screen h-screen'>
-
-            {/* Buscador */}
-            <section className='flex gap-2 justify-around items-center'>
-                <div className='flex p-2 flex-col gap-2 w-xl'>
-                    <label htmlFor="buscador" className='text-white text-2xl text-center'>Buscador</label>
-                    <input className='bg-white border p-2' type="text" value={buscador} onChange={onInputChange} placeholder='Buscador...' name="buscador" id="buscador" />
-                </div>
-            </section>
-
-            {/* Listado de Cheques */}
-            <section className='bg-white h-96 overflow-scroll'>
-                <table className='w-full'>
-                    <thead>
-                        <tr>
-                            <th className='border'>Fecha</th>
-                            <th className='border'>Nombre</th>
-                            <th className='border'>Tarjeta</th>
-                            <th className='border'>Importe</th>
-                            <th className='border'>Tipo</th>
-                            <th className='border'>Vendedor</th>
-                            <th className='border'>Acciones</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tarjetasFiltradas.map(elem => (
-                            <TarjetaCard {...elem} key={elem._id} modal={setModal} />
-                        ))}
-                    </tbody>
-                </table>
-            </section>
-
-            {/* Botones */}
-            <section className='mt-5 flex justify-around'>
-                <button className='bg-green-400' onClick={handleModal}>Agregar</button>
-                <Link to='/' >
-                    <button type='button' className='text-black' onClick={salir}>
-                        Salir
-                    </button>
-                </Link>
-            </section>
-
-            {modal && <TarjetaModal cerrar={setModal} />}
-        </div>
+                <section className=' w-screen h-screen'>
+                    <h3 className='text-3xl p-5'>Gestion De Tajetas</h3>
+        
+                    <div className='bg-gray-300 flex-col flex'>
+        
+                        {/* Buscador y Agregar nuevo */}
+                        <div className='bg-white mt-5 pt-5 mx-5 rounded-t-xl'>
+                            <form action="" className='flex justify-around'>
+                                <div className='flex flex-col gap-2 w-80'>
+                                    <label htmlFor="buscador">Buscador</label>
+                                    <input type="text" name="buscador" id="buscador" className='border p-1 border-gray-400 rounded-sm' onChange={onInputChange} value={buscador} />
+                                </div>
+        
+        
+                                <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 text-white' onClick={handleModal}>
+                                    <IoIosAdd size={20} />
+                                    Nuevo Tarjeta
+                                </button>
+        
+                            </form>
+                        </div>
+        
+                        {/* Listado */}
+                        <div className='gap-2 flex flex-col py-5 mb-5 mx-5 bg-white rounded-b-xl'>
+                            {
+                                tarjetasFiltradas.map(elem => (
+                                    <TarjetaCard {...elem} key={elem._id} modal={handleModal} />
+                                ))
+                            }
+                        </div>
+                    </div>
+        
+                            {modal && <TarjetaModal cerrar={setModal} />}
+        
+                </section>
+        
     )
 }
