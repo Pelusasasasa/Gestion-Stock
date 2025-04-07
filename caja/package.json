@@ -5,7 +5,8 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "npx electron ."
+    "start": "npx electron .",
+    "empacar": "electron-packager . --platform=win32 --arch=x64"
   },
   "keywords": [
     "electron",

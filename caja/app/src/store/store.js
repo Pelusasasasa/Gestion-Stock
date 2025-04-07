@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { chequeSlice } from "./cheque/chequeSlice";
 import { tarjetaSlice } from "./tarjeta/tarjetaSlice";
 import { tipoTarjetaSlice } from "./tipoTarjeta/tipoTarjetaSlice";
+import { valorSlice } from "./valor/valorSlice";
 
 
 export const store = configureStore({
@@ -9,5 +10,6 @@ export const store = configureStore({
         cheques: chequeSlice.reducer,
         tarjeta: tarjetaSlice.reducer,
         tipoTarjetas: tipoTarjetaSlice.reducer,
+        valores: valorSlice.reducer
     }
 })
