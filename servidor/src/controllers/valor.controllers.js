@@ -10,7 +10,7 @@ valorCTRL.deleteOne = async(req, res) => {
 
         const deleteValor = await Valor.findByIdAndDelete(id);
 
-        res.status({
+        res.status(200).json({
             ok: true,
             deleteValor
         });
@@ -66,7 +66,7 @@ valorCTRL.patchOne = async(req, res) => {
 };
 
 valorCTRL.postOne = async(req, res) => {
-    const {nombre, importe, icono, vendedor, pc} = req.body;
+    const {nombre, importe, icono = '', vendedor, pc} = req.body;
 
 
     try {

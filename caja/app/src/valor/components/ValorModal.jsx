@@ -4,15 +4,20 @@ import { useForm } from '../../hooks/Useform';
 
 export const ValorModal = ({ cerrar }) => {
 
-    const { valorActive } = useValoresStore();
-    const { importe, nombre, vendedor, onInputChange, formState } = useForm();
+    const { valorActive, startPostOne, startPatchOne } = useValoresStore();
+    const { importe, nombre, vendedor, onInputChange, formState } = useForm(valorActive);
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+
+        e.preventDefault();
+        startPostOne(formState);
+        cerrar(false);  
 
     };
 
     const handlePatchValor = () => {
-
+        startPatchOne(formState);
+        cerrar(false);
     };
 
     const cerrarModal = () => {
@@ -28,18 +33,18 @@ export const ValorModal = ({ cerrar }) => {
 
                     {/* Campo Nombre */}
                     <div className='mb-4'>
-                        <label htmlFor="nombre" className='block text-sm font-medium text-gray-700'>Nombre</label>
-                        <input onChange={onInputChange} name='nombre' type="text" value={nombre?.slice(0, 10)} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <label htmlFor="nombre" className='block text-sm font-medium text-gray-700'>Nombre*</label>
+                        <input onChange={onInputChange} name='nombre' type="text" value={nombre} id="nombre" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     <div className='mb-4'>
                         <label htmlFor="importe" className='block text-sm font-medium text-gray-700'>Importe</label>
-                        <input onChange={onInputChange} name='importe' type="number" value={importe?.slice(0, 10)} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <input onChange={onInputChange} name='importe' type="number" value={importe} id="importe" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     <div className='mb-4'>
-                        <label htmlFor="vendedor" className='block text-sm font-medium text-gray-700'>Vendedor</label>
-                        <input onChange={onInputChange} name='vendedor' type="text" value={vendedor?.slice(0, 10)} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <label htmlFor="vendedor" className='block text-sm font-medium text-gray-700'>Vendedor*</label>
+                        <input onChange={onInputChange} name='vendedor' type="text" value={vendedor} id="vendedor" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     {/* Botones */}

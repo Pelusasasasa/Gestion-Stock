@@ -71,7 +71,7 @@ export const Cheques = () => {
                         </div>
 
 
-                        <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 text-white' onClick={() => setModal(true)}>
+                        <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 rounded-lg p-2 text-white' onClick={() => setModal(true)}>
                             <IoIosAdd size={20} />
                             Nuevo Cheque
                         </button>

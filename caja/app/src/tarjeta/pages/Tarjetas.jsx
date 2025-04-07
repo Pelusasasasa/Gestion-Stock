@@ -50,7 +50,7 @@ export const Tarjetas = () => {
                         </div>
 
 
-                        <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 text-white' onClick={handleModal}>
+                        <button type='button' className='flex gap-2 rounded-lg p-2 bg-black items-center hover:opacity-80 text-white' onClick={handleModal}>
                             <IoIosAdd size={20} />
                             Nuevo Tarjeta
                         </button>

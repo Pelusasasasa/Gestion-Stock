@@ -14,7 +14,10 @@ const Valor = new Schema({
     },
     icon: {
         type: { String },
-        default: 'icon'
+        default: {
+            text: '',
+            style: ''
+        }
     },
     vendedor: {
         type: String,

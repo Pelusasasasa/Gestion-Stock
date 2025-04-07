@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"
-import { deleteValor, isSaving, postValor, putValor, setValores } from "../store/valor/valorSlice";
+import { deleteValor, isSaving, postValor, putValor, setValorActive, setValores } from "../store/valor/valorSlice";
 import gestorApi from "../api/gestionApi";
 
 export const useValoresStore = () => {
@@ -9,10 +9,18 @@ export const useValoresStore = () => {
 
     //TODO Active
 
+    const startActive = (id) => {
+
+        const active = valores.find(elem => elem._id === id);
+        if (!active) return;
+
+        dispatch(setValorActive(active));
+    }
+
     const startDeleteOne = async (id) => {
         dispatch(isSaving());
-
         const { data } = await gestorApi.delete(`valores/forId/${id}`);
+        
 
         dispatch(deleteValor(data.deleteValor._id));
 
@@ -36,6 +44,7 @@ export const useValoresStore = () => {
         dispatch(isSaving());
 
         const { data } = await gestorApi.patch(`valores/forId/${valor._id}`, valor);
+        
 
         dispatch(putValor(data.updateValor));
     };
@@ -48,6 +57,7 @@ export const useValoresStore = () => {
         valorIsSaving,
 
         //Metdos
+        startActive,
         startDeleteOne,
         startGetAll,
         startPatchOne,
