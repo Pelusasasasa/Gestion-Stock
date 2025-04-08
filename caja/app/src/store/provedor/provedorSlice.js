@@ -3,7 +3,24 @@ import { createSlice } from '@reduxjs/toolkit';
 export const provedorSlice = createSlice({
     name: 'provedor',
     initialState: {
-        provedores: [],
+        provedores: [
+            {
+                nombre: "Distribuidora Tecnológica S.A.",
+                direccion: "Av. Rivadavia 1234, CABA",
+                telefono: "+54 11 4567-8901",
+                email: "contacto@distritec.com.ar",
+                saldo: 15750.00,
+                iva: "Responsable Inscripto"
+            },
+            {
+                nombre: "Distribuidora Tecnológica S.A.",
+                direccion: "Av. Rivadavia 1234, CABA",
+                telefono: "+54 11 4567-8901",
+                email: "contacto@distritec.com.ar",
+                saldo: 15750.00,
+                iva: "Responsable Inscripto"
+            }
+        ],
         provedorActive: {},
         provedorIsSaving: false,
         messageErrorProvedor: undefined

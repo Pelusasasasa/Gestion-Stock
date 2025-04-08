@@ -4,6 +4,7 @@ import { Home } from '../Home/pages/Home'
 import { Cheques } from '../cheque/pages/Cheques'
 import { Tarjetas } from '../tarjeta/pages/Tarjetas'
 import { Valores } from '../valor/pages/Valores'
+import { Provedor } from '../provedor/Pages/Provedor'
 
 const AppRouter = () => {
     return (
@@ -12,6 +13,7 @@ const AppRouter = () => {
             <Route path='/valores' element={<Valores />} />
             <Route path='/cheques' element={<Cheques />} />
             <Route path='/tarjetas' element={<Tarjetas />} />
+            <Route path='/provedores' element={<Provedor />} />
         </Routes>
     )
 }
