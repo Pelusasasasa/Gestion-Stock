@@ -1,58 +1,54 @@
 const { Schema, model } = require("mongoose");
 
 const Provedor = new Schema({
-    
-    nombre:{
+
+    nombre: {
         type: String,
         required: true,
-        set: ( value ) => value.toUpperCase()
+        set: (value) => value.toUpperCase()
     },
-    cuit:{
+    iva: {
         type: String,
         required: true
     },
-    domicilio:{
+    cuit: {
+        type: String,
+        required: true
+    },
+    domicilio: {
+        type: String,
+        required: true,
+        set: (value) => value.toUpperCase()
+    },
+    localidad: {
+        type: String,
+        required: true,
+        set: (value) => value.toUpperCase()
+    },
+    codPostal: {
         type: String,
         default: '',
-        set: ( value ) => value.toUpperCase()
+        set: (value) => value.toUpperCase()
     },
-    localidad:{
+    provincia: {
         type: String,
         default: '',
-        set: ( value ) => value.toUpperCase()
+        set: (value) => value.toUpperCase()
     },
-    codPostal:{
+    telefono: {
         type: String,
         default: '',
-        set: ( value ) => value.toUpperCase()
+        set: (value) => value.toUpperCase()
     },
-    provincia:{
+    mail: {
         type: String,
         default: '',
-        set: ( value ) => value.toUpperCase()
+        set: (value) => value.toUpperCase()
     },
-    telefono:{
-        type: String,
-        default: '',
-        set: ( value ) => value.toUpperCase()
-    },
-    mail:{
-        type: String,
-        default: '',
-        set: ( value ) => value.toUpperCase()
-    },
-    saldo:{
+    saldo: {
         type: Number,
         default: 0
-    },
-    // numero:{
-    //     type: Number,
-    //     default: 0
-    // },
-    // provedor:{
-    //     type: Number,
-    //     default: 0
-    // }
+    }
 });
 
 

@@ -3,24 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const provedorSlice = createSlice({
     name: 'provedor',
     initialState: {
-        provedores: [
-            {
-                nombre: "Distribuidora Tecnológica S.A.",
-                direccion: "Av. Rivadavia 1234, CABA",
-                telefono: "+54 11 4567-8901",
-                email: "contacto@distritec.com.ar",
-                saldo: 15750.00,
-                iva: "Responsable Inscripto"
-            },
-            {
-                nombre: "Distribuidora Tecnológica S.A.",
-                direccion: "Av. Rivadavia 1234, CABA",
-                telefono: "+54 11 4567-8901",
-                email: "contacto@distritec.com.ar",
-                saldo: 15750.00,
-                iva: "Responsable Inscripto"
-            }
-        ],
+        provedores: [],
         provedorActive: {},
         provedorIsSaving: false,
         messageErrorProvedor: undefined
@@ -32,6 +15,7 @@ export const provedorSlice = createSlice({
             state.provedorIsSaving = false;
         },
         deleteProvedor: (state, { payload }) => {
+            console.log(payload);
             state.provedores = state.provedores.filter(elem => elem._id !== payload);
             state.provedorActive = {};
             state.provedorIsSaving = false;
@@ -39,13 +23,13 @@ export const provedorSlice = createSlice({
         isSaving: (state) => {
             state.provedorIsSaving = true;
         },
-        postProvedor: (state, {payload}) => {
+        postProvedor: (state, { payload }) => {
             state.provedores.push(payload);
             state.provedorIsSaving = false;
         },
         putValor: (state, { payload }) => {
             state.provedores = state.provedores.map(elem => {
-                if (elem._id === payload._id){
+                if (elem._id === payload._id) {
                     return payload;
                 };
 
@@ -54,7 +38,7 @@ export const provedorSlice = createSlice({
             state.provedorActive = {};
             state.provedorIsSaving = false;
         },
-        setMensageError: (state, { payload}) => {
+        setMensageError: (state, { payload }) => {
             state.messageErrorProvedor = payload;
         },
         setProvedorActive: (state, { payload }) => {

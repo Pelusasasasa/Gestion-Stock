@@ -50,3 +50,28 @@ export const verificarDatosCheque = async ({ f_recibido, banco, numero, importe,
     }
 
 };
+
+export const vefiricarDatosProvedor = async ({ nombre, cuit, iva, domicilio, localidad }) => {
+    if (!nombre) {
+        await Swal.fire('Error al cargar Provedor', 'El nombre es obligatorio', 'error');
+        return false;
+    };
+    if (!cuit) {
+        await Swal.fire('Error al cargar Provedor', 'El cuit es obligatorio', 'error');
+        return false;
+    };
+    if (!iva) {
+        await Swal.fire('Error al cargar Provedor', 'La condicion de iva es obligatorio', 'error');
+        return false;
+    };
+    if (!domicilio) {
+        await Swal.fire('Error al cargar Provedor', 'El domicilio es obligatorio', 'error');
+        return false;
+    };
+    if (!localidad) {
+        await Swal.fire('Error al cargar Provedor', 'la localidad es obligatoria', 'error');
+        return false;
+    };
+
+    return true;
+};

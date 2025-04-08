@@ -11,7 +11,7 @@ export const ValorModal = ({ cerrar }) => {
 
         e.preventDefault();
         startPostOne(formState);
-        cerrar(false);  
+        cerrar(false);
 
     };
 
@@ -55,6 +55,8 @@ export const ValorModal = ({ cerrar }) => {
                     </div>
                 </form>
             </div>
+
+
         </div>
     )
 }

@@ -54,7 +54,7 @@ app.use('/gestion/vendedores', require('./routes/vendedor'));
 
 //Caja
 app.use('/gestion/cheques', require('./routes/cheque.routes'));
-app.use('/gestion/provedor', require('./routes/provedor.routes'));
+app.use('/gestion/provedores', require('./routes/provedor.routes'));
 app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
 app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
 app.use('/gestion/valores', require('./routes/valor.route'));
