@@ -7,8 +7,6 @@ export const useValoresStore = () => {
     const dispatch = useDispatch();
     const { valores, valorActive, valorIsSaving } = useSelector(state => state.valores);
 
-    //TODO Active
-
     const startActive = (id) => {
 
         const active = valores.find(elem => elem._id === id);

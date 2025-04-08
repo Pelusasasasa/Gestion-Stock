@@ -6,10 +6,19 @@ provedorCTRL.deleteProvedor = async(req, res) => {
 
     const { id } = req.params;
 
-    const provedor = await Provedor.findByIdAndDelete(id);
+    try {
+        const provedorDelete = await Provedor.findByIdAndDelete(id);
 
-    res.send( provedor );
-
+        res.status(200).josn({
+            ok: true,
+            provedorDelete
+        })
+    } catch (error) {
+        res.status({
+            ok: false,
+            msg: error.message
+        })
+    }
 };
 
 provedorCTRL.getProvedor = async(req, res) => {
@@ -23,10 +32,21 @@ provedorCTRL.getProvedor = async(req, res) => {
 };
 
 provedorCTRL.getProvedores = async(req, res) => {
+    try {
 
-    const provedores = await Provedor.find();
+        const provedores = await Provedor.find();
 
-    res.send(provedores);
+        res.status(200).json({
+            ok: true,
+            provedores
+        })
+        
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        })
+    }
 
 };
 
@@ -57,33 +77,34 @@ provedorCTRL.postProvedor = async(req, res) => {
         const provedor = new Provedor(req.body);
         await provedor.save();
 
-        res.send({
-            ...provedor,
+        res.status(201).json({
+            provedor,
             ok: true
-        });
+        })
+        
     } catch (error) {
-        res.send({
+        res.status(500).json({
             ok: false,
-            message: error.message
+            msg: 'Hable con el administrador'
         })
     }
 
 };
 
-provedorCTRL.putProvedor = async(req, res) => {
+provedorCTRL.patchProvedor = async(req, res) => {
     const { id } = req.params;
 
     try {
-        const provedor = await Provedor.findByIdAndUpdate(id, req.body);
+        const updateProvedor = await Provedor.findByIdAndUpdate(id, req.body);
 
-        res.send({
-            ...provedor,
-            ok: true
+        res.status(200).json({
+            ok: true,
+            updateProvedor
         })
     } catch (error) {
         console.log(error)
-        res.sned({
-            message: error.message,
+        res.send({
+            msg: error.message,
             ok: false
         })
     }

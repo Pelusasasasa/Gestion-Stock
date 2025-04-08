@@ -38,8 +38,6 @@ app.use('/gestion/presupuesto', require('./routes/presupuesto'));
 
 app.use('/gestion/productos', require('./routes/producto'));
 
-app.use('/gestion/provedor', require('./routes/provedor'));
-
 app.use('/gestion/recibo', require('./routes/recibo'));
 
 app.use('/gestion/remitos', require('./routes/remito.route'));
@@ -56,6 +54,7 @@ app.use('/gestion/vendedores', require('./routes/vendedor'));
 
 //Caja
 app.use('/gestion/cheques', require('./routes/cheque.routes'));
+app.use('/gestion/provedor', require('./routes/provedor.routes'));
 app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
 app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
 app.use('/gestion/valores', require('./routes/valor.route'));

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from '../../hooks'
-import { Link } from 'react-router-dom';
 
 import { TarjetaCard } from '../components/TarjetaCard';
 import { TarjetaModal } from '../components/TarjetaModal';
-import { useTarjetaStore } from '../../hooks/useTarjetaStore';
+import { useTarjetaStore } from '../../hooks';
 import { IoIosAdd } from 'react-icons/io';
 
 

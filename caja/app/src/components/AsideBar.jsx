@@ -5,6 +5,8 @@ import { CiMoneyCheck1 } from "react-icons/ci";
 import { IoIosClose } from "react-icons/io";
 import { FiMenu } from "react-icons/fi";
 import { AsideCard } from './AsideCard';
+import { BsPeople } from "react-icons/bs";
+
 
 const secciones = [
     {
@@ -19,6 +21,10 @@ const secciones = [
         text: 'Tarjetas',
         icon: CiCreditCard1
     },
+    {
+        text: 'Provedores',
+        icon: BsPeople
+    }
 ];
 
 
