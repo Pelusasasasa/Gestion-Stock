@@ -1,6 +1,7 @@
 const provedorCTRL = {};
 
 const Provedor = require('../models/Provedor');
+const { validateProvedor } = require('../schemas/provedores.schema');
 
 provedorCTRL.deleteProvedor = async (req, res) => {
 
@@ -73,8 +74,16 @@ provedorCTRL.getProvedoresForText = async (req, res) => {
 };
 
 provedorCTRL.postProvedor = async (req, res) => {
+
+    const result = await validateProvedor(req.body);
+
+    if (!result.success) return res.status(400).json({
+        ok: false,
+        msg: result.error
+    });
+
     try {
-        const provedor = new Provedor(req.body);
+        const provedor = new Provedor(result.data);
         await provedor.save();
 
         res.status(201).json({
