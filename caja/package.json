@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Gestion de Caja",
   "main": "main.js",
-  "type": "module",
   "scripts": {
     "start": "npx electron .",
     "empacar": "electron-packager . --platform=win32 --arch=x64"
@@ -17,6 +16,10 @@
   "license": "ISC",
   "dependencies": {
     "electron": "^35.1.2",
-    "sweetalert2": "^11.17.2"
+    "sweetalert2": "^11.17.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron-reload": "^2.0.0-alpha.1"
   }
 }

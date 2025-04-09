@@ -27,6 +27,12 @@ export const useProvedorStore = () => {
     const startGetAll = async () => {
         const { data } = await gestorApi.get('/provedores');
 
+        data.provedores.sort((a, b) => {
+            if (a.nombre > b.nombre) return 1;
+            if (a.nombre < b.nombre) return -1;
+            return 0
+        })
+
         dispatch(setProvedores(data.provedores));
     };
 
