@@ -23,7 +23,7 @@ export const Provedor = () => {
     }, []);
 
     useEffect(() => {
-        setProvedoresFilter(provedores.filter(elem => elem.nombre.toUpperCase().startsWith(buscador.toUpperCase())));
+        setProvedoresFilter(provedores.filter(elem => elem.nombre.toUpperCase().startsWith(buscador?.toUpperCase())));
     }, [formState]);
 
     useEffect(() => {

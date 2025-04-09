@@ -8,8 +8,8 @@ export const valorSlice = createSlice({
         valorIsSaving: false
     },
     reducers: {
-        emptyState: (state) => {
-            state.valor = [];
+        emptyStateValor: (state) => {
+            state.valores = [];
             state.valorActive = {};
             state.valorIsSaving = false;
         },
@@ -50,4 +50,4 @@ export const valorSlice = createSlice({
 
 
 // Action creators are generated for each case reducer function
-export const { deleteValor, emptyState, isSaving, postValor, putValor, setValorActive, setValores } = valorSlice.actions;
+export const { deleteValor, emptyStateValor, isSaving, postValor, putValor, setValorActive, setValores } = valorSlice.actions;

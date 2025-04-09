@@ -4,3 +4,4 @@ export * from './UseTiposTarjetasStore';
 export * from './useTarjetaStore';
 export * from './useValoresStore';
 export * from './useProvedorStore';
+export * from './useVendedorStore';

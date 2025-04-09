@@ -5,17 +5,40 @@ import { MdAttachMoney } from 'react-icons/md';
 import { useValoresStore } from '../../hooks/useValoresStore';
 import { IoIosAdd } from 'react-icons/io';
 import { ValorModal } from '../components/ValorModal';
+import Swal from 'sweetalert2';
+import { useVendedorStore } from '../../hooks/useVendedorStore';
 
 
 export const Valores = () => {
 
+    const { permiso, startSetValores } = useVendedorStore()
     const { startGetAll, valores } = useValoresStore();
     const [modal, setModal] = useState(false);
     const [total, setTotal] = useState('$0.00');
 
+    const verPermiso = async () => {
+
+        const { isConfirmed, value } = await Swal.fire({
+            title: 'Ingresar Contraseña',
+            input: 'password',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar'
+        });
+
+        if (isConfirmed) {
+            startSetValores(value)
+        };
+    };
+
     useEffect(() => {
-        startGetAll();
+        verPermiso()
     }, []);
+
+    useEffect(() => {
+        if (permiso === 0) {
+            startGetAll()
+        }
+    }, [permiso])
 
     useEffect(() => {
         let totalAux = 0;
@@ -44,7 +67,7 @@ export const Valores = () => {
             </div>
 
 
-            {   valores.length === 0 ? 
+            {valores.length === 0 ?
                 <div className='h-screen w-[calc(100vw-5rem)] flex justify-center items-center'><p className='text-2xl font-bold'>Nada que mostrar</p></div>
                 :
                 <div className='p-5 bg-gray-200 h-screen grid grid-cols-2 md:grid-cols-3'>
@@ -55,7 +78,7 @@ export const Valores = () => {
                         ))
                     }
                 </div>
-                
+
             }
             {
                 modal && <ValorModal cerrar={setModal} />
