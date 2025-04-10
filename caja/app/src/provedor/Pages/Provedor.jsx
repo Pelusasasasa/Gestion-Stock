@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { AiOutlineDownload } from "react-icons/ai";
 import { IoIosAdd } from 'react-icons/io';
 
@@ -7,7 +8,7 @@ import { ProvedorCard } from '../Components/ProvedorCard';
 import { ProvedorModal } from '../Components/ProvedorModal';
 import { useState } from 'react';
 import { useForm } from '../../hooks/Useform';
-import Swal from 'sweetalert2';
+
 
 
 export const Provedor = () => {

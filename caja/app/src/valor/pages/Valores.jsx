@@ -1,44 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+
 import { ValorCard } from '../components/ValorCard';
 import { CiCreditCard1, CiMoneyCheck1 } from 'react-icons/ci';
 import { MdAttachMoney } from 'react-icons/md';
 import { useValoresStore } from '../../hooks/useValoresStore';
 import { IoIosAdd } from 'react-icons/io';
 import { ValorModal } from '../components/ValorModal';
-import Swal from 'sweetalert2';
-import { useVendedorStore } from '../../hooks/useVendedorStore';
+
 
 
 export const Valores = () => {
 
-    const { permiso, startSetValores } = useVendedorStore()
     const { startGetAll, valores } = useValoresStore();
     const [modal, setModal] = useState(false);
     const [total, setTotal] = useState('$0.00');
 
-    const verPermiso = async () => {
-
-        const { isConfirmed, value } = await Swal.fire({
-            title: 'Ingresar Contraseña',
-            input: 'password',
-            showCancelButton: true,
-            confirmButtonText: 'Aceptar'
-        });
-
-        if (isConfirmed) {
-            startSetValores(value)
-        };
-    };
 
     useEffect(() => {
-        verPermiso()
-    }, []);
-
-    useEffect(() => {
-        if (permiso === 0) {
-            startGetAll()
-        }
-    }, [permiso])
+        startGetAll()
+    }, [])
 
     useEffect(() => {
         let totalAux = 0;

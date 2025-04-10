@@ -26,6 +26,7 @@ export const useValoresStore = () => {
 
     const startGetAll = async () => {
         const { data } = await gestorApi.get('valores');
+        console.log("AQUII")
         dispatch(setValores(data.valores));
 
     }
