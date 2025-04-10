@@ -26,12 +26,13 @@ const createMainWindow = () => {
     });
 
     mainWindow.maximize();
+    mainWindow.setMenu(null); // ✅ Esto oculta completamente el menú
     //Cargamos la url del domuneot html que se va acargar
     if (isDev) {
         mainWindow.webContents.openDevTools();
         mainWindow.loadURL("http://localhost:5173");
     } else {
-        mainWindow.loadURL(`file://${__dirname}/app/build/index.html`);
+        mainWindow.loadURL(`file://${__dirname}/app/dist/index.html`);
     }
 
 };
@@ -62,6 +63,16 @@ ipcMain.handle('save-file-dialog', async (_, content, defaultFileName) => {
 
         return { success: true, path: filePath };
     }
-})
+});
+
+
 //Cuando al aplicacion este lista que luego cree la ventana
 app.whenReady().then(createMainWindow);
+
+
+
+
+//Cierra la aplicacion luego de cerrar las ventanas
+app.on('window-all-closed', () => {
+    app.quit();
+});
