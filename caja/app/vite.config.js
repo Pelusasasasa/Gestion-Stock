@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite';
-console.log(process.env);
 // https://vite.dev/config/
 export default defineConfig({
   base: './', //Se utiliza para el archivo dist
