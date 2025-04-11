@@ -13,6 +13,19 @@ if (isDev) {
 
 //Funcion para crear la ventana principal del proyecto
 const createMainWindow = () => {
+
+    const splashWindow = new BrowserWindow({
+        width: 400,
+        height: 300,
+        frame: false,
+        transparent: true,
+        alwaysOnTop: true,
+        resizable: false,
+        skipTaskbar: true,
+    })
+
+    splashWindow.loadFile(path.join(__dirname, 'splash.html'));
+
     const mainWindow = new BrowserWindow({
         title: 'Caja',
         width: 1000,
@@ -39,6 +52,11 @@ const createMainWindow = () => {
     ipcMain.handle('get-system-env', () => {
         return { VITE_API_GESTIONURL: process.env.GESTIONURL };
     });
+
+    mainWindow.webContents.on('did-finish-load', () => {
+        if (splashWindow) splashWindow.close();
+        mainWindow.show();
+    })
 };
 
 
