@@ -1,10 +1,14 @@
 import axios from 'axios';
 import { getEnvVariables } from '../helpers/getEnvVariables';
 
-const { VITE_API_GESTIONURL } = getEnvVariables();
+const gestorApi = async () => {
 
-const gestorApi = axios.create({
-    baseURL: VITE_API_GESTIONURL
-});
+    const { VITE_API_GESTIONURL } = await getEnvVariables();
+
+    return axios.create({
+        baseURL: VITE_API_GESTIONURL
+    });
+}
+
 
 export default gestorApi;

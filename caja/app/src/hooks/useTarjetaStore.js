@@ -17,11 +17,12 @@ export const useTarjetaStore = () => {
     };
 
     const startGetTarjetas = async () => {
-        const { data } = await gestorApi.get('tarjetas');
+        const api = await gestorApi();
+        const { data } = await api.get('tarjetas');
 
         data.tarjetas.sort((a, b) => {
-            if(a.tarjeta.nombre > b.tarjeta.nombre) return 1;
-            if(a.tarjeta.nombre < b.tarjeta.nombre) return -1;
+            if (a.tarjeta.nombre > b.tarjeta.nombre) return 1;
+            if (a.tarjeta.nombre < b.tarjeta.nombre) return -1;
             return 0;
         });
 
@@ -29,8 +30,10 @@ export const useTarjetaStore = () => {
     };
 
     const startPostTarjeta = async (tarjeta) => {
-        console.log(tarjeta);
-        const { data } = await gestorApi.post('tarjetas', tarjeta);
+
+
+        const api = await gestorApi();
+        const { data } = await api.post('tarjetas', tarjeta);
 
         dispatch(setTarjeta(data.tarjeta))
     };
@@ -38,7 +41,8 @@ export const useTarjetaStore = () => {
     const startDeleteTarjeta = async (id) => {
         dispatch(saving());
 
-        const { data } = await gestorApi.delete(`tarjetas/forId/${id}`);
+        const api = await gestorApi();
+        const { data } = await api.delete(`tarjetas/forId/${id}`);
         dispatch(deleteTarjeta(data.deleteTarjeta))
     };
 
@@ -51,7 +55,8 @@ export const useTarjetaStore = () => {
         tarjeta.tarjeta = tarjeta.tarjeta._id ? tarjeta.tarjeta._id : tarjeta.tarjeta;
 
         try {
-            const { data } = await gestorApi.patch(`tarjetas/forId/${tarjeta._id}`, tarjeta);
+            const api = await gestorApi();
+            const { data } = await api.patch(`tarjetas/forId/${tarjeta._id}`, tarjeta);
 
             dispatch(updateTarjeta(data.tarjeta));
 

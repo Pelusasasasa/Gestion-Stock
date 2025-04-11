@@ -11,15 +11,17 @@ export const useChequeStore = () => {
     };
 
     const startGetAllCheques = async () => {
-        const { data } = await gestorApi.get('cheques');
+        const api = await gestorApi();
+        const { data } = await api.get('cheques');
 
         dispatch(setCheques(data.cheques))
     };
 
     const startPostOne = async (cheque) => {
-
         cheque.importe = parseFloat(cheque.importe);
-        const { data } = await gestorApi.post('/cheques', cheque);
+
+        const api = await gestorApi();
+        const { data } = await api.post('/cheques', cheque);
 
         dispatch(postCheque(data.cheque));
     };
@@ -28,7 +30,8 @@ export const useChequeStore = () => {
         dispatch(isSaving());
         cheque.importe = parseFloat(cheque.importe);
 
-        const { data } = await gestorApi.patch(`/cheques/forId/${cheque._id}`, cheque);
+        const api = await gestorApi();
+        const { data } = await api.patch(`/cheques/forId/${cheque._id}`, cheque);
 
         dispatch(updateCheque(data.chequeUpdate));
     };
@@ -40,7 +43,8 @@ export const useChequeStore = () => {
     const startDeleteCheque = async (id) => {
         dispatch(isSaving());
 
-        const { data } = await gestorApi.delete(`/cheques/forId/${id}`);
+        const api = await gestorApi();
+        const { data } = await api.delete(`/cheques/forId/${id}`);
 
         dispatch(deleteCheque(data.chequeDelete._id));
     };

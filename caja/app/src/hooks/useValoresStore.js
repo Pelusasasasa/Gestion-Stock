@@ -17,33 +17,34 @@ export const useValoresStore = () => {
 
     const startDeleteOne = async (id) => {
         dispatch(isSaving());
-        const { data } = await gestorApi.delete(`valores/forId/${id}`);
-        
+
+        const api = await gestorApi();
+        const { data } = await api.delete(`valores/forId/${id}`);
 
         dispatch(deleteValor(data.deleteValor._id));
 
     };
 
     const startGetAll = async () => {
-        const { data } = await gestorApi.get('valores');
-        console.log("AQUII")
+        const api = await gestorApi()
+        const { data } = await api.get('valores');
         dispatch(setValores(data.valores));
 
     }
 
     const startPostOne = async (valor) => {
         dispatch(isSaving());
-
-        const { data } = await gestorApi.post('valores', valor);
+        const api = await gestorApi();
+        const { data } = await api.post('valores', valor);
 
         dispatch(postValor(data.valor));
     };
 
     const startPatchOne = async (valor) => {
         dispatch(isSaving());
+        const api = await gestorApi();
+        const { data } = await api.patch(`valores/forId/${valor._id}`, valor);
 
-        const { data } = await gestorApi.patch(`valores/forId/${valor._id}`, valor);
-        
 
         dispatch(putValor(data.updateValor));
     };

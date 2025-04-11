@@ -16,7 +16,8 @@ export const useProvedorStore = () => {
     }
 
     const startDeleteProvedor = async (id) => {
-        const { data } = await gestorApi.delete(`/provedores/forId/${id}`);
+        const api = await gestorApi();
+        const { data } = await api.delete(`/provedores/forId/${id}`);
         if (data.ok) {
             dispatch(deleteProvedor(data.provedorDelete._id));
         } else {
@@ -25,7 +26,9 @@ export const useProvedorStore = () => {
     };
 
     const startGetAll = async () => {
-        const { data } = await gestorApi.get('/provedores');
+        const api = await gestorApi();
+        const { data } = await api.get('/provedores');
+        console.log(data);
 
         data.provedores.sort((a, b) => {
             if (a.nombre > b.nombre) return 1;
@@ -37,8 +40,8 @@ export const useProvedorStore = () => {
     };
 
     const startPostOne = async (provedor) => {
-
-        const { data } = await gestorApi.post('/provedores', provedor);
+        const api = await gestorApi();
+        const { data } = await api.post('/provedores', provedor);
 
         if (data.ok) {
             dispatch(postProvedor(data.provedor))
@@ -49,7 +52,9 @@ export const useProvedorStore = () => {
     };
 
     const startPatchOne = async (provedor) => {
-        const { data } = await gestorApi.patch(`/provedores/forId/${provedor._id}`, provedor);
+        const api = await gestorApi();
+
+        const { data } = await api.patch(`/provedores/forId/${provedor._id}`, provedor);
         if (data.ok) {
             dispatch(putValor(data.updateProvedor))
         } else {

@@ -8,8 +8,8 @@ export const useVendedorStore = () => {
     const dispatch = useDispatch();
 
     const startSetValores = async (codigo) => {
-
-        const { data } = await gestorApi(`vendedores/id/${codigo}`);
+        const api = await gestorApi();
+        const { data } = await api.get(`vendedores/id/${codigo}`);
 
         dispatch(
             setValores({

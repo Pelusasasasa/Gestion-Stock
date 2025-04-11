@@ -1,7 +1,13 @@
-export const getEnvVariables = () => {
-    const env = import.meta.env;
-    console.log(env);
-    return {
-        ...env
-    }
+import { getSystemEnv } from "./getSystemEnv";
+
+export const getEnvVariables = async () => {
+
+    const systemEnv = await getSystemEnv();
+
+
+    const env = {
+        ...systemEnv,
+        ...import.meta.env
+    };
+    return env
 };

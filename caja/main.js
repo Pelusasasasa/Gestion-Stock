@@ -26,15 +26,19 @@ const createMainWindow = () => {
     });
 
     mainWindow.maximize();
-    mainWindow.setMenu(null); // ✅ Esto oculta completamente el menú
+
     //Cargamos la url del domuneot html que se va acargar
     if (isDev) {
         mainWindow.webContents.openDevTools();
         mainWindow.loadURL("http://localhost:5173");
     } else {
+        // mainWindow.setMenu(null); // ✅ Esto oculta completamente el menú
         mainWindow.loadURL(`file://${__dirname}/app/dist/index.html`);
     }
 
+    ipcMain.handle('get-system-env', () => {
+        return { VITE_API_GESTIONURL: process.env.GESTIONURL };
+    });
 };
 
 
