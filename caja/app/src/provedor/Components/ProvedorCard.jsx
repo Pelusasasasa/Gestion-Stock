@@ -29,7 +29,7 @@ export const ProvedorCard = ({ _id, nombre, domicilio, localidad, codPostal, tel
   };
 
   return (
-    <tr className='border-b border-gray-300 hover:bg-gray-100 hover:cursor-pointer'>
+    <tr className='border-b border-gray-300 hover:bg-gray-200 hover:cursor-pointer'>
       <td className='font-bold py-5 pl-5'>{nombre}</td>
       <td className='text-sm p-1  w-auto max-w-full break-words whitespace-normal'>{domicilio} {localidad} {codPostal}</td>
       <td>{telefono}</td>

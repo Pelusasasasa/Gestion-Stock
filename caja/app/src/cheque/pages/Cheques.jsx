@@ -43,9 +43,9 @@ export const Cheques = () => {
     return (
 
         <section className=' w-[calc(100vw-5rem)] h-screen'>
-            <h3 className='text-3xl p-5'>Gestion De Cheques</h3>
+            <h3 className='text-3xl font-bold p-5'>Gestion De Cheques</h3>
 
-            <div className='bg-gray-300 flex-col flex'>
+            <div className='bg-gray-100 h-[calc(100vh-5rem)] flex-col flex'>
 
                 {/* Buscador y Agregar nuevo */}
                 <div className='bg-white mt-5 pt-5 mx-5 rounded-t-xl'>
@@ -71,7 +71,7 @@ export const Cheques = () => {
                         </div>
 
 
-                        <button type='button' className='flex gap-2 bg-black items-center hover:opacity-80 rounded-lg p-2 text-white' onClick={() => setModal(true)}>
+                        <button type='button' className='self-end flex gap-2 bg-black items-center hover:opacity-80 rounded-lg p-2 text-white' onClick={() => setModal(true)}>
                             <IoIosAdd size={20} />
                             Nuevo Cheque
                         </button>

@@ -47,11 +47,11 @@ export const Provedor = () => {
 
 
     return (
-        <div className='h-screen w-[calc(100vw-5rem)] bg-gray-200'>
+        <div className='h-screen w-[calc(100vw-5rem)] bg-gray-100'>
             <div className='flex justify-between px-10 bg-white py-10 mt-0'>
-                <div className='flex flex-col'>
+                <div className='flex items-start gap-5'>
                     <h3 className='text-3xl font-bold'>Gestion de Provedores</h3>
-                    <input type="text" name="buscador" onChange={onInputChange} id="buscador" className='border border-gray-200 rounded-lg mt-5 p-2 w-96' />
+                    <input type="text" name="buscador" onChange={onInputChange} id="buscador" className='border border-gray-600 rounded-lg mt-5 p-2 w-96' />
                 </div>
 
                 <div className='flex gap-5 items-start'>
@@ -69,7 +69,7 @@ export const Provedor = () => {
 
             {
                 provedores.length > 0
-                    ? <main className='bg-white mx-5 overflow-auto mt-10 border-b border-gray-300 rounded-lg'>
+                    ? <main className='bg-white mx-5 h-[calc(100vh-13rem)] overflow-y-scroll mt-10 border-b border-gray-300 rounded-lg'>
 
                         <table className='w-full border-collapse'>
                             <thead>
