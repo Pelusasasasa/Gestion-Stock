@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./imprimirComprobante.css">
+  </head>
+  <body class="bodyImprimir">
+    <div class="imprimir">
+        <section class="empresa">
+            <main class="titulo">
+                <h3>ELECTRO AVENIDA</h3>
+                <p class="tipoFactura">X</p>
+                <p class="numeroVenta">N°: <span id="numero"></span></p>
+            </main>
+
+            <main class="datosEmpresa">
+                <p class="nombre">De Paccot,Carla</p>
+                <p class="presupuesto">Comprobante no valido como factura</p>
+                <p>CUIT: 27-34015023-1</p>
+            </main>
+
+            <main class="contactoEmpresa">
+                <p>Av. Alem 2196 Tel: 3456-593374</p>
+
+                <div>
+                    <p>Fecha: <span id="fecha"></span></p>
+                </div>
+            </main>
+
+            <main class="direccionEmpresa">
+                <p>(3228) - CHAJARI (Entre Rios)</p>
+            </main>
+
+            <main class="iva">
+                <p class="tipoIva">IVA: Responsable Inscripto</p>
+
+                <p id="tipoPago"></p>
+
+                <p id="vendedor"></p>
+                
+                <p id="condicion"></p>
+            </main>
+        </section>
+
+        <section class="informacionCliente">
+            <main class="nombre">
+                <p><b>Señor(es): </b><span id="cliente"></span></p>
+
+                <p id="idCliente"></p>
+            </main>
+            <main class="cuit">
+                <p>C.U.I.T.: <span id="cuit"></span></p>
+            </cuit>
+            <main class="domicilio">
+                <p class="calle">Domicilio: <span id="direccion"></span></p>
+                <p id="localidad"></p>
+                <p>Cond I.V.A.: <span id="cond_iva"></span></p>
+            </main>
+        </section>
+
+      <div class="tabla">
+        <table>
+            <thead>
+                <tr class="thead">
+                    <td>Cantidad</td>
+                    <td>Codigo</td>
+                    <td>Descripcion</td>
+                    <td>Precio</td>
+                    <td>Iva %</td>
+                    <td>Total</td>
+                  </tr>
+            </thead>
+          
+          <tbody class="tbody"></tbody>
+        </table>
+      </div>
+        <section class="total">
+            <main class="subTotal">
+                <p>Subtotal: <span id="subtotal"></span></p>
+            </main>
+
+            <main class="flex-center">
+                <p>Descuento: <span id="descuento"></span></p>
+            </main>
+
+            <main class="todo">
+                <p>Total: <span id="total"></span></p>
+            </main>
+        </section>
+    </div>
+    <script src="./imprimirComprobante.js"></script>
+  </body>
+</html>

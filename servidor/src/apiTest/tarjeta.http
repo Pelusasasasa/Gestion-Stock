@@ -1,0 +1,16 @@
+### Get All Tarjetas
+GET http://localhost:4000/gestion/tarjetas
+
+
+###Post One Tarjeta
+POST http://localhost:4000/gestion/tarjetas
+Content-Type: application/json
+
+{
+  "importe": 1000,
+  "fecha": "{{$datetime iso8601}}",
+  "nombre": "Agustin Lorenzatto",
+  "tarjeta": "Visa",
+  "vendedor": "Carla"
+}
+
