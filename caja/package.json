@@ -5,21 +5,60 @@
   "main": "main.js",
   "scripts": {
     "start": "npx electron .",
-    "empacar": "electron-packager . --platform=win32 --arch=x64 --icon=LogoCaja.ico"
+    "empacar": "electron-packager . --platform=win32 --arch=x64 --icon=LogoCaja.ico",
+    "dev": "vite",
+    "build": "vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "npm run build && electron-builder"
   },
   "keywords": [
     "electron",
     "react.js",
     "tailwindcss"
   ],
+  "build": {
+    "appId": "com.pelusasasasa.gestioncaja",
+    "productName": "Gestion de Caja",
+    "files": [
+      "app/dist/**/*",
+      "!**/node_modules/*/{README.md,README,readme.md,readme}",
+      "!**/.gitkeep",
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "index.html"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
   "author": "Pelusa",
   "license": "ISC",
   "dependencies": {
     "electron": "^35.1.2",
     "sweetalert2": "^11.17.2",
+    "vite": "^6.2.6",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "electron-builder": "^26.0.12",
     "electron-reload": "^2.0.0-alpha.1"
-  }
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "Pelusasasasa",
+      "repo": "Gestion-Stock"
+    }
+  ]
 }

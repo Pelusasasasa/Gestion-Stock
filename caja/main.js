@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { autoUpdater } = require('electron-builder');
 const url = require('url');
 const path = require('path');
 
@@ -30,15 +31,14 @@ const createMainWindow = () => {
         title: 'Caja',
         width: 1000,
         height: 600,
-
+        show: false,
+        backgroundColor: '#1e1e2f',
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: true,
             preload: path.join(__dirname, 'preload.js')
         }
     });
-
-    mainWindow.maximize();
 
     //Cargamos la url del domuneot html que se va acargar
     if (isDev) {
@@ -54,8 +54,12 @@ const createMainWindow = () => {
     });
 
     mainWindow.webContents.on('did-finish-load', () => {
-        if (splashWindow) splashWindow.close();
-        mainWindow.show();
+        setTimeout(() => { // opcional: darle tiempo al CSS del renderer
+            splashWindow.destroy();   // cerrar splash
+            mainWindow.show();
+            mainWindow.maximize();
+            mainWindow.focus();
+        }, 300);
     })
 };
 
@@ -89,7 +93,13 @@ ipcMain.handle('save-file-dialog', async (_, content, defaultFileName) => {
 
 
 //Cuando al aplicacion este lista que luego cree la ventana
-app.whenReady().then(createMainWindow);
+app.whenReady().then(() => {
+    createMainWindow();
+
+
+    //chequea updates
+    autoUpdater.checkForUpdatesAndNotify();
+});
 
 
 
