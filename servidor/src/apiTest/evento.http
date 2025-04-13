@@ -1,0 +1,12 @@
+###POST ONE
+POST http://localhost:4000/gestion/evento
+Content-Type: application/json
+
+{
+    "title": "buscar a chico",
+    "description": "Buscar a chicho a al escuela",
+    "all_day": false,
+    "category": "67fb098ee2d0fd012f2168a5",
+    "start_date": "2025-04-12",
+    "end_date": "2025-04-13"
+}

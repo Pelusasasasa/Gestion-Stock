@@ -1,0 +1,22 @@
+#POST One
+POST http://localhost:4000/gestion/categoriaEvento
+Content-Type: application/json
+
+{
+    "nombre": "Gastos",
+    "color": "E7D40A"
+}
+
+###GEST One
+GET http://localhost:4000/gestion/categoriaEvento
+
+###Delete One
+DELETE http://localhost:4000/gestion/categoriaEvento/67fb098ee2d0fd012f2168a5
+
+###Patch One
+PATCH http://localhost:4000/gestion/categoriaEvento/67fb098ee2d0fd012f2168a5
+Content-Type:  application/json
+
+{
+    "nombre": "Impuestos"
+}
