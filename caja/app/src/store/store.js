@@ -6,10 +6,12 @@ import { valorSlice } from "./valor/valorSlice";
 import { provedorSlice } from "./provedor/provedorSlice";
 import { vendedorSlice } from "./vendedor/vendedorSlice";
 import { eventoSlice } from "./evento/eventoSlice";
+import { categoriaEventoSlice } from "./categoriaEvento/categoriaEventoSlice";
 
 
 export const store = configureStore({
     reducer: {
+        categoriaEvento: categoriaEventoSlice.reducer,
         cheques: chequeSlice.reducer,
         tarjeta: tarjetaSlice.reducer,
         tipoTarjetas: tipoTarjetaSlice.reducer,

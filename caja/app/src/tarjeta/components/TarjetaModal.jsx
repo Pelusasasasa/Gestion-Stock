@@ -60,7 +60,7 @@ export const TarjetaModal = ({ cerrar }) => {
                         <input onChange={onInputChange} name='nombre' value={nombre} id="nombre" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
-                    {/* Campo Password */}
+                    {/* Campo TipoTarjeta */}
                     <div className='mb-4'>
                         <label htmlFor="password" className='block text-sm font-medium text-gray-700'>Tarjeta</label>
                         <select name="tarjeta" id="tarjeta" value={tarjeta?._id} onChange={onInputChange} className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>

@@ -25,7 +25,7 @@ const Evento = new Schema({
         required: true,
         validate: {
             validator: function (value) {
-                return value > this.start_date
+                return value >= this.start_date
             },
             message: 'La fecha de finalizacion debe ser posterior a la de inicio'
         }
@@ -35,7 +35,7 @@ const Evento = new Schema({
         default: false,
     },
     category: {
-        type: Schema.Types.String,
+        type: Schema.Types.ObjectId,
         ref: 'CategoryEvento',
         required: true
     }

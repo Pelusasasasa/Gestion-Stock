@@ -23,9 +23,33 @@ export const Home = () => {
     const daysNames = [
         "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"
     ];
+
+    const monthNames = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+    ];
+
     const [days, setDays] = useState([]);
-    const [modal, setModal] = useState(true);
+    const [modal, setModal] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date())
+
+    const prevMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, currentMonth.getDate()));
+    };
+
+    const nextMonth = () => {
+        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, currentMonth.getDate()));
+    };
 
     const renderCalendar = () => {
         const year = currentMonth.getFullYear();
@@ -35,20 +59,6 @@ export const Home = () => {
 
         let daysAux = [];
 
-        const monthNames = [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre",
-        ];
 
         for (let i = 0; i < firstDayOfMonth; i++) {
             daysAux.push(null);
@@ -58,13 +68,17 @@ export const Home = () => {
             daysAux.push(i);
         }
         setDays([...daysAux]);
-        console.log(days);
     };
 
     useEffect(() => {
         renderCalendar()
         startGetEventos()
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        renderCalendar();
+        startGetEventos(currentMonth.getMonth(), currentMonth.getFullYear());
+    }, [currentMonth])
 
     return (
         <div className='h-[calc(100vw-150rem] w-[calc(100vw-5rem)] bg-gray-100'>
@@ -75,13 +89,13 @@ export const Home = () => {
             <main className='bg-white mt-5 flex flex-col mx-5'>
                 <div className='flex justify-between'>
                     <div className='flex gap-5 text-3xl items-center ml-10 font-bold text-gray-600'>
-                        <p>Abril</p>
-                        <p>2025</p>
+                        <p>{monthNames[currentMonth.getMonth()]}</p>
+                        <p>{currentMonth.getFullYear()}</p>
                     </div>
                     <div className='flex gap-10 items-center my-5'>
-                        <IoIosArrowBack size={50} className='border border-gray-300 rounded-sm p-3 cursor-pointer hover:bg-gray-200' />
-                        <IoIosArrowForward size={50} className='border border-gray-300 rounded-sm p-3 cursor-pointer hover:bg-gray-200' />
-                        <button className='flex  bg-black text-white rounded-md py-2 px-5 mr-5 justify-center items-center hover:opacity-80 cursor-pointer'>
+                        <IoIosArrowBack onClick={prevMonth} size={50} className='border border-gray-300 rounded-sm p-3 cursor-pointer hover:bg-gray-200' />
+                        <IoIosArrowForward onClick={nextMonth} size={50} className='border border-gray-300 rounded-sm p-3 cursor-pointer hover:bg-gray-200' />
+                        <button onClick={() => setModal(true)} className='flex bg-black text-white rounded-md py-2 px-5 mr-5 justify-center items-center hover:opacity-80 cursor-pointer'>
                             <IoIosAdd size={30} />
                             Nuevo Evento
                         </button>
@@ -102,13 +116,13 @@ export const Home = () => {
                 <div className='grid grid-cols-7 gap-1 mx-5'>
                     {
                         days.map((day, index) => (
-                            <DayCard key={index} day={day} />
+                            <DayCard key={index} day={day} openModal={setModal} currentMonth={currentMonth} />
                         ))
                     }
                 </div>
             </main>
             {
-                modal && <EventoModal cerrarModal={setModal} />
+                modal && <EventoModal cerrar={setModal} mes={currentMonth} />
             }
         </div>
     )

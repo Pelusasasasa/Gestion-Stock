@@ -33,11 +33,11 @@ categoryEventCTRL.deleteOne = async (req, res) => {
 categoryEventCTRL.getAll = async (req, res) => {
 
     try {
-        const eventos = await CategoryEvento.find();
+        const categoriaEventos = await CategoryEvento.find();
 
         res.status(200).json({
             ok: true,
-            eventos
+            categoriaEventos
         });
 
     } catch (error) {

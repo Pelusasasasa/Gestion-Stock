@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { postOne, deleteOne, getForMonth } = require('../controllers/evento.controllers');
+const { postOne, deleteOne, getForMonth, patchOne } = require('../controllers/evento.controllers');
 
 const router = Router();
 
@@ -7,7 +7,7 @@ router.route('/')
     .post(postOne)
 router.route('/:id')
     .delete(deleteOne)
-    .patch()
+    .patch(patchOne)
 router.route('/forMonthAndYear/:month/:year')
     .get(getForMonth)
 

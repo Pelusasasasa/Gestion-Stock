@@ -13,34 +13,14 @@ const eventoSchema = z.object({
         required_error: 'La categoria es obligaoria',
         invalid_type_error: 'La categoria debe ser un string'
     })
-}).refine(data => data.end_date > data.start_date, {
-    message: 'La fecha del fin debe ser posterior  a la de inicio',
-    path: ['end_date']
-}).transform(data => {
-    if (data.all_day) {
-        const toStartOfDay = (date) => {
-            const newDate = new Date(date);
-            newDate.setHours(0, 0, 0, 0);
-            return newDate;
-        };
-
-        return {
-            ...data,
-            start_date: toStartOfDay(data.start_date),
-            end_date: toStartOfDay(data.end_date)
-        };
-    }
-
-    return data;
-
-
 });
 
 async function validateEvento(input) {
     return await eventoSchema.safeParseAsync(input);
 };
-async function validatePartialEvento(input) {
-    return await eventoSchema.partial().safeParseAsync(input);
+
+function validatePartialEvento(input) {
+    return eventoSchema.partial().safeParse(input);
 };
 
 module.exports = {

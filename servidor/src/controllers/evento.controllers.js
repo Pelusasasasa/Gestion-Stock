@@ -34,8 +34,8 @@ eventoCTRL.getForMonth = async (req, res) => {
 
     try {
 
-        const startOfMonth = new Date(year, month - 1, 1);
-        const endOfMonth = new Date(year, month, 1);
+        const startOfMonth = new Date(year, month, 1);
+        const endOfMonth = new Date(year, parseFloat(month) + 1, 1);
 
         const eventos = await Evento.find({
             start_date: {
@@ -61,7 +61,6 @@ eventoCTRL.getForMonth = async (req, res) => {
 
 eventoCTRL.patchOne = async (req, res) => {
     const { id } = req.params;
-
     try {
         const result = await validatePartialEvento(req.body);
 
@@ -71,12 +70,14 @@ eventoCTRL.patchOne = async (req, res) => {
             errors: result.error
         });
 
-        const updateEvento = await Evento.findByIdAndUpdate(id, result.data, { new: true });
+        const returnEvento = await Evento.findByIdAndUpdate(id, result.data, { new: true });
 
-        if (!updateEvento) return res.status(404).json({
+        if (!returnEvento) return res.status(404).json({
             ok: false,
             msg: 'No existe evento con ese id'
         });
+
+        const updateEvento = await Evento.findOne({ _id: returnEvento._id }).populate('category', ['nombre', 'color']);
 
         res.status(200).json({
             ok: true,
@@ -103,8 +104,10 @@ eventoCTRL.postOne = async (req, res) => {
             errors: result.error
         });
 
-        const evento = new Evento(result.data);
-        await evento.save();
+        const eventoAux = new Evento(result.data);
+        await eventoAux.save();
+
+        const evento = await Evento.findOne({ _id: eventoAux._id }).populate('category', ['nombre', 'color']);
 
         res.status(201).json({
             ok: true,
