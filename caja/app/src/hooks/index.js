@@ -5,3 +5,4 @@ export * from './useTarjetaStore';
 export * from './useValoresStore';
 export * from './useProvedorStore';
 export * from './useVendedorStore';
+export * from './useEventoStore';

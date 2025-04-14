@@ -42,7 +42,7 @@ eventoCTRL.getForMonth = async (req, res) => {
                 $gte: startOfMonth,
                 $lt: endOfMonth
             }
-        });
+        }).populate('category', ['nombre', 'color']);
 
         res.status(200).json({
             ok: true,

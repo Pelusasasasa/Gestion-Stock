@@ -5,6 +5,7 @@ import { tipoTarjetaSlice } from "./tipoTarjeta/tipoTarjetaSlice";
 import { valorSlice } from "./valor/valorSlice";
 import { provedorSlice } from "./provedor/provedorSlice";
 import { vendedorSlice } from "./vendedor/vendedorSlice";
+import { eventoSlice } from "./evento/eventoSlice";
 
 
 export const store = configureStore({
@@ -15,5 +16,6 @@ export const store = configureStore({
         valores: valorSlice.reducer,
         provedor: provedorSlice.reducer,
         vendedor: vendedorSlice.reducer,
+        evento: eventoSlice.reducer
     }
 })

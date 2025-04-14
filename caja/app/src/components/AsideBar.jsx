@@ -6,9 +6,16 @@ import { IoIosClose } from "react-icons/io";
 import { FiMenu } from "react-icons/fi";
 import { AsideCard } from './AsideCard';
 import { BsPeople } from "react-icons/bs";
+import { IoCalendarClearOutline } from "react-icons/io5";
+
 
 
 const secciones = [
+    {
+        text: "",
+        icon: IoCalendarClearOutline
+
+    },
     {
         text: 'Resumen de valores',
         icon: VscGraph
