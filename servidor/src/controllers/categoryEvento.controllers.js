@@ -33,7 +33,7 @@ categoryEventCTRL.deleteOne = async (req, res) => {
 categoryEventCTRL.getAll = async (req, res) => {
 
     try {
-        const categoriaEventos = await CategoryEvento.find();
+        const categoriaEventos = await CategoryEvento.find().sort({ nombre: 1 });
 
         res.status(200).json({
             ok: true,
@@ -54,8 +54,14 @@ categoryEventCTRL.patchOne = async (req, res) => {
 
     const { id } = req.params;
 
-    console.log(id);
     try {
+
+        const categoria = await CategoryEvento.findOne({ _id: id });
+
+        if (categoria) return res.status(400).json({
+            ok: false,
+            msg: 'Ya existe un evento con ese nombre'
+        });
 
         const updateCategoria = await CategoryEvento.findOneAndUpdate({ _id: id }, req.body, { new: true });
 

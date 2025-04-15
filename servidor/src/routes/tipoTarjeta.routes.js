@@ -7,7 +7,7 @@ const { postOne, getAll, patchOne, deleteOne } = require('../controllers/tipoTar
 router.route('/')
     .get(getAll)
     .post(postOne)
-router.route('/forId/:id')
+router.route('/:id')
     .patch(patchOne)
     .delete(deleteOne)
 

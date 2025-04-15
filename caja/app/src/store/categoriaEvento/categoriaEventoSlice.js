@@ -8,6 +8,10 @@ export const categoriaEventoSlice = createSlice({
         isSavingCategoriaEvento: false
     },
     reducers: {
+        deleteCategoria: (state, { payload }) => {
+            state.categoriaEventos = state.categoriaEventos.filter(elem => elem._id !== payload);
+            state.isSavingCategoriaEvento = false
+        },
         savingCategoriaEvento: (state) => {
             state.isSavingCategoriaEvento = true
         },
@@ -18,12 +22,22 @@ export const categoriaEventoSlice = createSlice({
             state.categoriaEventos = payload;
             state.isSavingCategoriaEvento = false
         },
+        patchCategoriaEvento: (state, { payload }) => {
+            state.categoriaEventos = state.categoriaEventos.map(elem => {
+                if (elem._id === payload._id) {
+                    return payload;
+                };
+                return elem;
+            });
+            state.isSavingCategoriaEvento = false;
+        },
         postCategoriaEvento: (state, { payload }) => {
             state.categoriaEventos.push(payload);
+            state.isSavingCategoriaEvento = false;
         }
     }
 });
 
 
 // Action creators are generated for each case reducer function
-export const { savingCategoriaEvento, setActiveCategoriaEvento, setCategorias, postCategoriaEvento } = categoriaEventoSlice.actions;
+export const { deleteCategoria, savingCategoriaEvento, setActiveCategoriaEvento, setCategorias, patchCategoriaEvento, postCategoriaEvento } = categoriaEventoSlice.actions;

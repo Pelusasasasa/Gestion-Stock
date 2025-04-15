@@ -59,7 +59,7 @@ const EventoModal = ({ cerrar, mes }) => {
 
                     <div className='mb-4'>
                         <label htmlFor="category" className='block text-sm font-medium text-gray-700'>Categoria*</label>
-                        <select name="category" id="category" value={category?._id || ''} onChange={onInputChange} className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
+                        <select name="category" id="category" value={category || ''} onChange={onInputChange} className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
                             <option value=" ">---Seleccionar---</option>
                             {
                                 categoriaEventos.map((elem) => (

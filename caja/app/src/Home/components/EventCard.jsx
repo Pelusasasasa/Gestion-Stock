@@ -14,7 +14,7 @@ export const EventCard = ({ _id, title, category, openModal }) => {
             background: category.color
         }}
             onClick={handleActive}
-            className={`text-black font-bold text-sm whitespace-nowrap px-2 truncate cursor-pointer `}>
+            className={`text-gray-700 border-b-2 border-gray-200 font-bold text-sm whitespace-nowrap px-2 truncate cursor-pointer `}>
             {title}
         </p>
     )

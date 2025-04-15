@@ -25,7 +25,7 @@ tipoTarjetaCTRL.postOne = async (req, res) => {
 tipoTarjetaCTRL.getAll = async (req, res) => {
 
     try {
-        const tipos = await TipoTarjeta.find();
+        const tipos = await TipoTarjeta.find().sort({ nombre: 1 });
         res.status(200).json({
             ok: true,
             tipos
@@ -43,9 +43,17 @@ tipoTarjetaCTRL.getAll = async (req, res) => {
 
 tipoTarjetaCTRL.patchOne = async (req, res) => {
     const { id } = req.params;
-    console.log(id);
     const { nombre } = req.body;
+
     try {
+
+        const tipo = await TipoTarjeta.findOne({ nombre: nombre });
+
+        if (tipo) return res.status(400).json({
+            ok: false,
+            msg: ' Ya existe un tipo de tarjeta con ese nombre'
+        })
+
         const updateTipo = await TipoTarjeta.findByIdAndUpdate(id, { nombre }, { new: true });
 
         res.status(200).json({
@@ -56,7 +64,8 @@ tipoTarjetaCTRL.patchOne = async (req, res) => {
         console.log(error);
         res.status(500).json({
             ok: false,
-            msg: 'Hable con el administrador'
+            msg: 'Hable con el administrador',
+            error: error.errmsg
         })
     }
 };
