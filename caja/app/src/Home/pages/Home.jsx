@@ -81,7 +81,7 @@ export const Home = () => {
     }, [currentMonth])
 
     return (
-        <div className='h-[calc(100vw-150rem] w-[calc(100vw-5rem)] bg-gray-100'>
+        <div className='h-[calc(100vw-150rem] w-screen bg-gray-100 ml-8'>
             <div className='flex bg-white '>
                 <h3 className='text-3xl text-gray-600 pl-10 font-bold text-left my-5 '>Calendario de Eventos</h3>
             </div>

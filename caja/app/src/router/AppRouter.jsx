@@ -5,7 +5,6 @@ import { Cheques } from '../cheque/pages/Cheques'
 import { Tarjetas } from '../tarjeta/pages/Tarjetas'
 import { Valores } from '../valor/pages/Valores'
 import { Provedor } from '../provedor/Pages/Provedor'
-import Swal from 'sweetalert2'
 
 const AppRouter = () => {
 

@@ -47,7 +47,7 @@ export const Provedor = () => {
 
 
     return (
-        <div className='h-screen w-[calc(100vw-5rem)] bg-gray-100'>
+        <div className='h-screen w-screen ml-8 bg-gray-100'>
             <div className='flex justify-between px-10 bg-white py-10 mt-0'>
                 <div className='flex items-start gap-5'>
                     <h3 className='text-3xl font-bold'>Gestion de Provedores</h3>

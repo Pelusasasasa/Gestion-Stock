@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-export const AsideCard = ({ elem, asideView }) => {
+export const AsideCard = ({ elem, asideView, style }) => {
     return (
-        <Link to={`/${elem.text === 'Resumen de valores' ? 'valores' : elem.text}`} >
-            <div className='flex gap-2 text-white items-center pl-3 cursor-pointer hover:bg-gray-600 py-2'>
+        <Link to={`/${elem.text === 'Resumen de valores' ? 'valores' : elem.text}`} className={`${style}`} >
+            <div className={'flex gap-2 text-white items-center pl-3 cursor-pointer hover:bg-gray-600 py-2 '}>
                 <elem.icon />
                 {
                     asideView && <p>{elem.text}</p>

@@ -7,6 +7,8 @@ import { FiMenu } from "react-icons/fi";
 import { AsideCard } from './AsideCard';
 import { BsPeople } from "react-icons/bs";
 import { IoCalendarClearOutline } from "react-icons/io5";
+import { AiOutlineSetting } from "react-icons/ai";
+
 
 
 
@@ -31,6 +33,11 @@ const secciones = [
     {
         text: 'Provedores',
         icon: BsPeople
+    },
+    {
+        text: 'Configuracion',
+        icon: AiOutlineSetting,
+        style: 'mt-auto'
     }
 ];
 
@@ -40,7 +47,7 @@ export const AsideBar = () => {
     const [asideView, setAsideView] = useState(false);
 
     return (
-        <aside className='bg-gray-700 text-white max-w-fit'>
+        <aside className='bg-gray-700 text-white max-w-full pb-5 fixed'>
 
             {asideView ?
                 <div className='flex justify-around items-center gap-10 p-5'>
@@ -54,9 +61,9 @@ export const AsideBar = () => {
             }
 
             <hr className='text-gray-500' />
-            <div className='mt-5'>
+            <div className='mt-5 flex flex-col h-[calc(100vh-7rem)]'>
                 {secciones.map(elem => (
-                    <AsideCard elem={elem} key={elem.text} asideView={asideView} />
+                    <AsideCard elem={elem} key={elem.text} asideView={asideView} style={elem.style} />
                 ))}
             </div>
         </aside>

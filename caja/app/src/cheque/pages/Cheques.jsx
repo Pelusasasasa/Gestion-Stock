@@ -42,8 +42,10 @@ export const Cheques = () => {
 
     return (
 
-        <section className=' w-[calc(100vw-5rem)] h-screen'>
-            <h3 className='text-3xl font-bold p-5'>Gestion De Cheques</h3>
+        <section className=' w-screen ml-8 bg-gray-100 h-screen'>
+            <div className='flex bg-white'>
+                <h3 className='text-3xl font-bold pl-10 my-5 text-gray-600'>Gestion De Cheques</h3>
+            </div>
 
             <div className='bg-gray-100 h-[calc(100vh-5rem)] flex-col flex'>
 

@@ -32,12 +32,12 @@ export const Valores = () => {
     }, [valores]);
 
     return (
-        <div className='h-screen w-[calc(100vw-5rem)]'>
-            <div className='flex justify-around my-5'>
-                <h3 className='text-3xl p-5'>Resumen de Valores</h3>
+        <div className='h-screen w-screen bg-white'>
+            <div className='flex justify-around my-2 '>
+                <h3 className='text-3xl p-5 font-bold text-gray-700'>Resumen de Valores</h3>
                 <div className='self-end flex gap-5'>
                     <div>
-                        <label htmlFor="total">Total: </label>
+                        <label htmlFor="total" className='font-bold text-xl'>Total: </label>
                         <input type="text" disabled value={total} name="total" id="total" className='border p-2 w-3/4 rounded-lg border-gray-300 text-right font-bold' />
                     </div>
                     <button className='flex border p-2 rounded-lg bg-black text-white justify-center gap-2 items-center hover:opacity-80' onClick={() => setModal(true)}>

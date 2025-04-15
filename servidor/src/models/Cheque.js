@@ -62,6 +62,11 @@ const Cheque = new Schema({
         type: String,
         trim: true,
         default: ""
+    },
+    observacion: {
+        type: String,
+        trim: true,
+        default: ''
     }
 });
 
