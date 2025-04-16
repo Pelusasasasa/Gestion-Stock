@@ -1,0 +1,26 @@
+###POST One 
+POST http://localhost:4000/gestion/movCaja
+Content-Type: application/json
+
+{
+    "fecha": "2025-04-16",
+    "description": "Prueba 1",
+    "tipo": "67ffadd4b75c7982ba4d4d4f",
+    "importe": 500,
+    "vendedor": "639dbc31dfdb8a1d243d19c2"
+}
+
+###GET
+GET http://localhost:4000/gestion/movCaja/forDate/2025-04-15/2025-04-16/E
+
+
+###Delete One
+DELETE http://localhost:4000/gestion/movCaja/67fff65563b37f52c35ae152
+
+###UPDATEONE
+PATCH http://localhost:4000/gestion/movCaja/67fff65563b37f52c35ae152
+Content-Type: application/json
+
+{
+    "descripcion": "Prueba 2"
+}

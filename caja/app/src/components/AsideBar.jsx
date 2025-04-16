@@ -8,13 +8,15 @@ import { AsideCard } from './AsideCard';
 import { BsPeople } from "react-icons/bs";
 import { IoCalendarClearOutline } from "react-icons/io5";
 import { AiOutlineSetting } from "react-icons/ai";
+import { FiDollarSign } from "react-icons/fi";
+
 
 
 
 
 const secciones = [
     {
-        text: "",
+        text: "Calendario",
         icon: IoCalendarClearOutline
 
     },
@@ -29,6 +31,10 @@ const secciones = [
     {
         text: 'Tarjetas',
         icon: CiCreditCard1
+    },
+    {
+        text: 'Movimientos',
+        icon: FiDollarSign
     },
     {
         text: 'Provedores',

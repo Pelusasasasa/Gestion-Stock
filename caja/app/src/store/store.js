@@ -8,6 +8,7 @@ import { vendedorSlice } from "./vendedor/vendedorSlice";
 import { eventoSlice } from "./evento/eventoSlice";
 import { categoriaEventoSlice } from "./categoriaEvento/categoriaEventoSlice";
 import { tipoCuentaSlice } from "./tipoCuenta/tipoCuentaSlice";
+import { movimientoSlice } from "./movimientos/movimientoSlice";
 
 
 export const store = configureStore({
@@ -15,6 +16,7 @@ export const store = configureStore({
         categoriaEvento: categoriaEventoSlice.reducer,
         cheques: chequeSlice.reducer,
         evento: eventoSlice.reducer,
+        movimiento: movimientoSlice.reducer,
         provedor: provedorSlice.reducer,
         tarjeta: tarjetaSlice.reducer,
         tipoCuenta: tipoCuentaSlice.reducer,
