@@ -5,9 +5,7 @@ import { verificarDatosCheque } from '../../helpers/verificarDatos';
 export const ChequeModal = ({ cerrar }) => {
 
     const { chequeActive, emptyActiveCheque, startPostOne, startUpdateOne } = useChequeStore();
-    const { onInputChange, formState, f_recibido, numero, banco, importe, f_cheque, ent_por, ent_a, domicilio, telefono } = useForm(chequeActive);
-
-
+    const { onInputChange, formState, f_recibido, numero, banco, importe, observacion, f_cheque, ent_por, ent_a, domicilio, telefono } = useForm(chequeActive);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -78,6 +76,12 @@ export const ChequeModal = ({ cerrar }) => {
                         <div className='mb-4'>
                             <label htmlFor="telefono" className='block  font-medium text-gray-700'>Telefono</label>
                             <input onChange={onInputChange} name='telefono' type="text" value={telefono} id="telefono" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        </div>
+
+                        <div className='mb-4'>
+                            <label htmlFor="observacion" className='block  font-medium text-gray-700'>Observaciones</label>
+                            <textarea onChange={onInputChange} name='observacion' type="text" value={observacion} id="telefono" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
+                            </textarea>
                         </div>
                     </div>
                     <hr className='text-gray-400' />
