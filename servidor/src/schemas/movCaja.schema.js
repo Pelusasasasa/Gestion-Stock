@@ -4,6 +4,8 @@ const { z } = require("zod");
 const movCajaSchema = z.object({
     fecha: z.coerce.date(),
     descripcion: z.string().optional(),
+    puntoVenta: z.string().optional(),
+    numero: z.string().optional(),
     tipo: z.string({
         required_error: 'El tipo de cuenta es  obligatorio',
         invalid_type_error: 'El tipo debe ser un objectId'

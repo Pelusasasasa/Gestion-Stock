@@ -23,6 +23,14 @@ export const useTipoCuentaStore = () => {
         dispatch(setTipoCuentas(data.tipoCuentas));
     };
 
+    const startGetsTiposCuentasFilter = async (tipo = 'A') => {
+        const api = await gestorApi();
+
+        const { data } = await api.get(`tipoCuenta/type/${tipo}`);
+
+        dispatch(setTipoCuentas(data.tipoCuentas))
+    }
+
     const startPatchTipoCuenta = async (tipoCuenta) => {
         const api = await gestorApi();
         try {
@@ -52,6 +60,7 @@ export const useTipoCuentaStore = () => {
         //Metodos
         startDeleteTipoCuenta,
         startGetsTiposCuentas,
+        startGetsTiposCuentasFilter,
         startPatchTipoCuenta,
         startPostTipoCuenta
 

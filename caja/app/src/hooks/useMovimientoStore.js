@@ -1,12 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
 import gestorApi from '../api/gestionApi';
 import { deleteMovimiento, patchMovimiento, postMovimiento, setMovimientos } from '../store/movimientos/movimientoSlice';
+import Swal from 'sweetalert2';
 
 export const useMovimientoStore = () => {
     const dispatch = useDispatch();
     const { movimientos, movimientoActive, isSavingMovimiento } = useSelector(state => state.movimiento);
 
-    const startDeleteOne = async (id) => {
+    const startDeleteOneMov = async (id) => {
         const api = await gestorApi();
 
         try {
@@ -18,7 +19,7 @@ export const useMovimientoStore = () => {
         }
     }
 
-    const startGetall = async (desde, hasta, tipo) => {
+    const startGetallMov = async (desde, hasta, tipo) => {
 
         const api = await gestorApi();
 
@@ -31,21 +32,21 @@ export const useMovimientoStore = () => {
 
     };
 
-    const startPostOne = async (mov) => {
+    const startPostOneMov = async (mov) => {
         const api = await gestorApi();
-
+        console.log(mov);
         try {
             const { data } = await api.post('movCaja', mov);
 
             dispatch(postMovimiento(data.mov));
         } catch (error) {
-            console.log(error.response.data.msg);
-
-        }
+            await Swal.fire('No se pudo cargar El movimiento', error.response.data.msg, 'error');
+            console.log(error.response.data.error);
+        };
 
     };
 
-    const startPatchOne = async (mov) => {
+    const startPatchOneMov = async (mov) => {
         const api = await gestorApi();
 
         try {
@@ -64,10 +65,10 @@ export const useMovimientoStore = () => {
         movimientos,
 
         //Metodos
-        startDeleteOne,
-        startGetall,
-        startPatchOne,
-        startPostOne
+        startDeleteOneMov,
+        startGetallMov,
+        startPatchOneMov,
+        startPostOneMov
 
     }
 

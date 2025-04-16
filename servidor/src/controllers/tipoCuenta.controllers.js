@@ -39,6 +39,26 @@ tipoCuentaCTRL.getAll = async (req, res) => {
 
 };
 
+tipoCuentaCTRL.getForType = async (req, res) => {
+    const { tipo } = req.params;
+
+    try {
+        const tipoCuentas = await TipoCuenta.find({ tipo });
+
+        res.status(200).json({
+            ok: true,
+            tipoCuentas
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se puede obtener los tipos de cuentas, hable con el administrador',
+            error: error
+        })
+    }
+};
+
 tipoCuentaCTRL.patchOne = async (req, res) => {
 
     const { id } = req.params;

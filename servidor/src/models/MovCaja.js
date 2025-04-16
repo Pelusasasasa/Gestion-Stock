@@ -11,6 +11,17 @@ const MovCaja = new Schema({
         default: '',
         set: value => value.toUpperCase(),
     },
+    puntoVenta: {
+        type: String,
+        default: '0000',
+        trim: true
+    },
+    numero: {
+        type: String,
+        default: '00000000',
+        trim: true
+    },
+
     tipo: {
         type: Schema.Types.ObjectId,
         required: true,

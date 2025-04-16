@@ -5,10 +5,10 @@ import { useMovimientoStore } from '../../hooks/useMovimientoStore';
 
 export const IngresoPage = ({ section, desde, hasta }) => {
 
-    const { movimientos, startGetall } = useMovimientoStore();
+    const { movimientos, startGetallMov } = useMovimientoStore();
 
     useEffect(() => {
-        startGetall(desde, hasta, section === 'Ingreso' ? 'I' : 'E');
+        startGetallMov(desde, hasta, section === 'Ingreso' ? 'I' : 'E');
     }, [])
 
     return (

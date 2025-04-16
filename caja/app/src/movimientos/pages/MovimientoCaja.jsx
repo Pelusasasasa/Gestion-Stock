@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { IoArrowDownCircleOutline, IoArrowUpCircleOutline, IoSearchOutline } from "react-icons/io5";
 import { IngresoPage } from './IngresoPage';
 import { useForm } from '../../hooks/Useform';
+import MovCajaModal from '../components/MovCajaModal';
 const date = new Date();
 
 const day = date.getDate();
@@ -18,6 +19,7 @@ export const MovimientoCaja = () => {
 
     const [sectionMov, setSectionMov] = useState('Ingreso');
     const { desde, hasta, onInputChange } = useForm(initialState);
+    const [modal, setModal] = useState(true);
 
     return (
         <section className='w-screen ml-8 h-screen bg-gray-100'>
@@ -33,7 +35,7 @@ export const MovimientoCaja = () => {
                         onClick={() => setSectionMov('Ingreso')}
                         className={`flex gap-2 p-2 justify-center items-center cursor-pointer ${sectionMov === 'Ingreso' ? 'text-green-500 border-b-green-500 border-b' : 'hover:opacity-50'}`}>
                         <IoArrowUpCircleOutline size={20} />
-                        Egresos
+                        Ingresos
                     </button>
 
                     <button
@@ -55,7 +57,11 @@ export const MovimientoCaja = () => {
                         <input type="date" name="hasta" id="hasta" value={hasta} onChange={onInputChange} className='border bg-white rounded-lg p-2 text-lg border-gray-300 w-full' />
                     </div>
 
-                    <button className='bg-gray-700 self-end text-white flex  gap-5 items-center justify-around px-5 py-2 rounded-lg  cursor-pointer hover:opacity-80'>
+                    <button
+                        onClick={() => setModal(true)}
+                        className='bg-gray-700 self-end text-white flex 
+                                    gap-5 items-center justify-around px-5 py-2 rounded-lg  cursor-pointer hover:opacity-80'
+                    >
                         <IoSearchOutline />
                         Buscar
                     </button>
@@ -70,6 +76,8 @@ export const MovimientoCaja = () => {
                 }
 
             </div>
+
+            {modal && <MovCajaModal cerrar={setModal} />}
 
         </section>
 
