@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { TipoTarjetas } from '../components/TipoTarjetas';
 import { TipoEvento } from '../components/TipoEvento';
+import { TipoCuenta } from './TipoCuenta';
 
 export const Configuracion = () => {
 
-    const [sectionConfiguration, setSectionConfiguration] = useState('Eventos');
+    const [sectionConfiguration, setSectionConfiguration] = useState('Cuentas');
 
     return (
         <section className='h-screen w-screen ml-8 bg-gray-100'>
@@ -29,6 +30,7 @@ export const Configuracion = () => {
             <main className='ml-15 bg-white'>
                 {sectionConfiguration === "Tarjetas" && <TipoTarjetas />}
                 {sectionConfiguration === "Eventos" && <TipoEvento />}
+                {sectionConfiguration === "Cuentas" && <TipoCuenta />}
             </main>
         </section >
     )

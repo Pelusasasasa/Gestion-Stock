@@ -6,3 +6,4 @@ export * from './useValoresStore';
 export * from './useProvedorStore';
 export * from './useVendedorStore';
 export * from './useEventoStore';
+export * from './useTipoCuentaStore';

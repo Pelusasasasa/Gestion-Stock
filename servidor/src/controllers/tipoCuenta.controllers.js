@@ -46,12 +46,12 @@ tipoCuentaCTRL.patchOne = async (req, res) => {
 
     try {
 
-        const tipoUsado = await Tipo.findOne({ _id: id });
+        const tipoUsado = await TipoCuenta.findOne({ _id: id });
 
         if (tipoUsado) return res.status({
             ok: false,
             msg: 'Ya existe un tipo de cuenta con ese nombre'
-        })
+        });
 
         const updateTipoCuenta = await TipoCuenta.findByIdAndUpdate(id, { nombre, tipo }, { new: true });
 
