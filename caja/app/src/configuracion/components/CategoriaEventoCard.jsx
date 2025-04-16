@@ -60,7 +60,7 @@ export const CategoriaEventoCard = ({ _id, nombre, color }) => {
 
         <tr>
             <td className='px-2 py-2'>{nombre}</td>
-            <td className='flex items-center gap-2'>
+            <td className='flex px-2 py-2 items-center gap-2'>
                 <div
                     style={{ backgroundColor: color }}
                     className='rounded-full h-5 w-5'></div>

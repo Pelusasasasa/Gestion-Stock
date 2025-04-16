@@ -5,10 +5,6 @@ import { savingTipoCuenta } from '../../store/tipoCuenta/tipoCuentaSlice';
 import { useDispatch } from 'react-redux';
 import { TipocuentaCard } from '../components/tipocuentaCard';
 
-// import { useForm } from '../../hooks/Useform';
-// import { useDispatch } from 'react-redux';
-
-
 
 const initialState = {
     nombre: '',
@@ -17,7 +13,7 @@ const initialState = {
 
 export const TipoCuenta = () => {
     const dispatch = useDispatch();
-    const { startGetsTiposCuentas, startPostTipoCuenta, tipoCuentas} = useTipoCuentaStore()
+    const { startGetsTiposCuentas, startPostTipoCuenta, tipoCuentas } = useTipoCuentaStore()
     const { onInputChange, nombre, tipo, formState, onResetForm } = useForm(initialState);
 
 
@@ -27,8 +23,8 @@ export const TipoCuenta = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        dispatch(savingTipoCuenta())
-        startPostTipoCuenta(formState)
+        dispatch(savingTipoCuenta());
+        startPostTipoCuenta(formState);
 
         onResetForm();
     };
