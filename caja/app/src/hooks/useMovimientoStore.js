@@ -1,23 +1,33 @@
 import { useDispatch, useSelector } from 'react-redux';
 import gestorApi from '../api/gestionApi';
-import { deleteMovimiento, patchMovimiento, postMovimiento, setMovimientos } from '../store/movimientos/movimientoSlice';
+import { deleteMovimiento, patchMovimiento, postMovimiento, setMovimientoActive, setMovimientos } from '../store/movimientos/movimientoSlice';
 import Swal from 'sweetalert2';
 
 export const useMovimientoStore = () => {
     const dispatch = useDispatch();
     const { movimientos, movimientoActive, isSavingMovimiento } = useSelector(state => state.movimiento);
 
+    const startActiveMovCaja = (_id) => {
+        const movAux = movimientos.find(elem => elem._id === _id);
+
+        const mov = {
+            ...movAux,
+            condicion: movAux.tipo.tipo
+        }
+
+        dispatch(setMovimientoActive(mov));
+    }
+
     const startDeleteOneMov = async (id) => {
         const api = await gestorApi();
 
         try {
             const { data } = await api.delete(`movCaja/${id}`);
-
-            dispatch(deleteMovimiento(data.deleteMov._id));
+            dispatch(deleteMovimiento(data.deleteMovCaja._id));
         } catch (error) {
             console.log(error.response.data.msg);
         }
-    }
+    };
 
     const startGetallMov = async (desde, hasta, tipo) => {
 
@@ -34,7 +44,7 @@ export const useMovimientoStore = () => {
 
     const startPostOneMov = async (mov) => {
         const api = await gestorApi();
-        console.log(mov);
+
         try {
             const { data } = await api.post('movCaja', mov);
 
@@ -46,14 +56,21 @@ export const useMovimientoStore = () => {
 
     };
 
-    const startPatchOneMov = async (mov) => {
-        const api = await gestorApi();
+    const startPatchOneMov = async (movAux) => {
+        const mov = {
+            ...movAux,
+        };
 
+        mov.tipo = movAux.tipo._id ? movAux.tipo._id : movAux.tipo;
+
+        const api = await gestorApi();
+        
         try {
-            const { data } = api.patch(`movCaja/${mov._id}`, mov);
-            dispatch(patchMovimiento(data.updateMov));
+            const { data } = await api.patch(`movCaja/${mov._id}`, mov);
+            
+            dispatch(patchMovimiento(data.updateMovCaja));
         } catch (error) {
-            console.log(error.response.data.msg);
+            console.log(error);
         }
     };
 
@@ -65,6 +82,7 @@ export const useMovimientoStore = () => {
         movimientos,
 
         //Metodos
+        startActiveMovCaja,
         startDeleteOneMov,
         startGetallMov,
         startPatchOneMov,

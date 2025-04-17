@@ -10,8 +10,8 @@ export const DayCard = ({ day, currentMonth, openModal }) => {
     const habilityDay = new Date();
 
     return (
-        <div className='border border-gray-300 rounded-sm h-30 mb-5'>
-            <div className={`justify-end pr-5 font-bold text-xl flex ${(!day || currentMonth.getMonth() < habilityDay.getMonth() || (currentMonth.getMonth() === habilityDay.getMonth() && habilityDay.getDate() > day)) && 'bg-gray-200 w-full h-full'}`}>
+        <div className={`border border-gray-300 rounded-sm h-30 mb-5 ${(!day || currentMonth.getMonth() < habilityDay.getMonth() || (currentMonth.getMonth() === habilityDay.getMonth() && habilityDay.getDate() > day)) && 'bg-gray-200 '}`}>
+            <div className={`justify-end pr-5 font-bold text-xl flex `}>
                 <p>{day ? day : ''}</p>
             </div>
 

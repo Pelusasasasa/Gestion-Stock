@@ -2,14 +2,15 @@ import React, { useEffect } from 'react';
 import { useForm } from "../../hooks/Useform";
 import { useMovimientoStore } from "../../hooks/useMovimientoStore";
 import { useTipoCuentaStore } from "../../hooks/useTipoCuentaStore";
+import { useDispatch } from 'react-redux';
+import { savingMovimiento, setEmptyActive } from '../../store/movimientos/movimientoSlice';
 
 
 
 const MovCajaModal = ({ cerrar }) => {
-
-    const { movimientoActive, startPostOneMov } = useMovimientoStore();
+    const dispatch = useDispatch();
+    const { isSavingMovimiento, movimientoActive, startPatchOneMov, startPostOneMov } = useMovimientoStore();
     const { tipoCuentas, startGetsTiposCuentas, startGetsTiposCuentasFilter } = useTipoCuentaStore();
-
     const { onInputChange, fecha, descripcion, condicion, tipo, puntoVenta, numero, importe, vendedor, formState } = useForm(movimientoActive);
 
     useEffect(() => {
@@ -23,15 +24,20 @@ const MovCajaModal = ({ cerrar }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        dispatch(savingMovimiento());
         startPostOneMov(formState);
+        cerrar(false);
     };
 
     const handlePutEvento = () => {
-
-    }
+        dispatch(savingMovimiento());
+        startPatchOneMov(formState);
+        cerrar(false);
+    };
 
     const cerrarModal = () => {
         //TODO DE EMPTYMOVIMIENTOS
+        dispatch(setEmptyActive());
 
         cerrar(false);
     }
@@ -45,7 +51,7 @@ const MovCajaModal = ({ cerrar }) => {
                     {/* Campo Titulo */}
                     <div className='mb-4'>
                         <label htmlFor="title" className='block text-sm font-medium text-gray-700'>Fecha*</label>
-                        <input onChange={onInputChange} name='fecha' type="date" value={fecha || ''} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <input onChange={onInputChange} name='fecha' type="date" value={fecha?.slice(0,10) || ''} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     <div className='mb-4'>
@@ -72,7 +78,7 @@ const MovCajaModal = ({ cerrar }) => {
 
                     <div className='mb-4'>
                         <label htmlFor="tipo" className='block text-sm font-medium text-gray-700'>Cuenta*</label>
-                        <select name="tipo" id="tipo" value={tipo || ''} onChange={onInputChange} className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
+                        <select name="tipo" id="tipo" value={tipo?._id ? tipo._id : tipo || ''} onChange={onInputChange} className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
                             <option value=" ">---Seleccionar---</option>
                             {
                                 tipoCuentas.map((elem) => (
@@ -86,7 +92,10 @@ const MovCajaModal = ({ cerrar }) => {
 
                     <div className='mb-4'>
                         <label htmlFor="importe" className='block text-sm font-medium text-gray-700'>Importe</label>
-                        <input onChange={onInputChange} name='importe' type="number" value={importe || ''} id="importe" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <input 
+                        onChange={onInputChange} name='importe' type="number" 
+                        value={(typeof importe === 'string' ? importe : importe?.toFixed(2)) || ''} 
+                        id="importe" className='mt-1 text-right block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     <div className='mb-4'>
@@ -97,9 +106,10 @@ const MovCajaModal = ({ cerrar }) => {
 
                     {/* Botones */}
                     <div className='flex justify-end gap-4'>
-                        <button type='button' onClick={cerrarModal} className='text-black border-gray-400 border rounded-lg cursor-pointer px-4 py-2 hover:bg-gray-200 hover:text-gray-800 focus:outline-none'>Cancelar</button>
-                        {!movimientoActive._id && <button type='submit' className='text-white cursor-pointer px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>Agregar</button>}
-                        {movimientoActive._id && <button type='button' onClick={handlePutEvento} className='text-white cursor-pointer px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>Modificar</button>}
+                        {isSavingMovimiento && <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500'></div>}
+                        <button type='button' onClick={cerrarModal} disabled={isSavingMovimiento} className='text-black border-gray-400 border rounded-lg cursor-pointer px-4 py-2 hover:bg-gray-200 hover:text-gray-800 focus:outline-none'>Cancelar</button>
+                        {!movimientoActive._id && <button type='submit' disabled={isSavingMovimiento} className='text-white cursor-pointer px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>Agregar</button>}
+                        {movimientoActive._id && <button type='button' disabled={isSavingMovimiento} onClick={handlePutEvento} className='text-white cursor-pointer px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>Modificar</button>}
                     </div>
                 </form>
             </div>

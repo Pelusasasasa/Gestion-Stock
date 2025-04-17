@@ -15,7 +15,10 @@ export const movimientoSlice = createSlice({
             state.movimientos = state.movimientos.filter(elem => elem._id !== payload);
             state.isSavingMovimiento = false;
         },
-        setMovimientoAcite: (state, { payload }) => {
+        setEmptyActive: (state) => {
+            state.movimientoActive = {};
+        },
+        setMovimientoActive: (state, { payload }) => {
             state.movimientoActive = payload;
         },
         setMovimientos: (state, { payload }) => {
@@ -45,7 +48,8 @@ export const movimientoSlice = createSlice({
 export const {
     savingMovimiento,
     deleteMovimiento,
-    setMovimientoAcite,
+    setEmptyActive,
+    setMovimientoActive,
     setMovimientos,
     patchMovimiento,
     postMovimiento

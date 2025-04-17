@@ -1,16 +1,27 @@
 import React from 'react';
 import { MdDelete } from 'react-icons/md';
 import { RiPencilFill } from 'react-icons/ri';
+import { useDispatch } from 'react-redux';
+import { savingMovimiento } from '../../store/movimientos/movimientoSlice';
+import { useMovimientoStore } from '../../hooks/useMovimientoStore';
 
-const handleUpdate = () => {
 
-};
 
-const handleDelete = () => {
+export const IngresoCard = ({ _id, descripcion, fecha, tipo, importe, setModal }) => {
+    const dispatch = useDispatch();
+    const { startActiveMovCaja, startDeleteOneMov } = useMovimientoStore();
+    
+    const handleUpdate = () => {
+        startActiveMovCaja(_id);
+        setModal(true);
+    };
 
-};
+    const handleDelete = () => {
+        dispatch(savingMovimiento())
 
-export const IngresoCard = ({ descripcion, fecha, tipo, importe }) => {
+        startDeleteOneMov(_id);
+    };
+
     return (
 
         <tr className='text-center hover:bg-gray-100 cursor-pointer'>

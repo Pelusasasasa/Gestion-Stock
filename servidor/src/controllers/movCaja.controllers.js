@@ -69,21 +69,23 @@ movCajaCTRL.patchOne = async (req, res) => {
     });
 
     try {
-        const updateMovCaja = await MovCaja.findOneAndUpdate({ _id: id }, result.data, { new: true });
+        const updateMovCajaAux = await MovCaja.findOneAndUpdate({ _id: id }, result.data, { new: true });
+
+        const updateMovCaja = await MovCaja.findById(updateMovCajaAux._id).populate('tipo', ['nombre', 'tipo']);
 
         res.status(200).json({
             ok: true,
             updateMovCaja
         })
     } catch (error) {
-        console.log(erorr);
+        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puedo modificar el movimiento de caja, hable con el administador',
             error: error
         })
     }
-}
+};
 
 movCajaCTRL.postOne = async (req, res) => {
 

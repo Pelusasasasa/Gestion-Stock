@@ -5,9 +5,9 @@ Content-Type: application/json
 {
     "fecha": "2025-04-16",
     "description": "Prueba 1",
-    "tipo": "67ffadd4b75c7982ba4d4d4f",
+    "tipo": "6800e36b9853a5583ed5fb1a",
     "importe": 500,
-    "vendedor": "639dbc31dfdb8a1d243d19c2"
+    "vendedor": "63a9a526f6db323454c2d5a8"
 }
 
 ###GET
