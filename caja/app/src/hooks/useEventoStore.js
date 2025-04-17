@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { isSaving, patchEvent, postEvento, setActiveEvento, setEventos } from "../store/evento/eventoSlice";
+import { deleleEvent, isSaving, patchEvent, popEvento, postEvento, setActiveEvento, setEventos } from "../store/evento/eventoSlice";
 import gestorApi from "../api/gestionApi";
 
 export const useEventoStore = () => {
@@ -9,8 +9,20 @@ export const useEventoStore = () => {
 
     const activeEvento = (id) => {
         const evento = eventos.find(elem => elem._id === id);
-        console.log(evento);
         dispatch(setActiveEvento(evento))
+    };
+
+    const startDeleteEvento = async (id) => {
+        const api = await gestorApi();
+
+        try {
+            const { data } = await api.delete(`evento/${id}`);
+
+            dispatch(deleleEvent(data.deleteEvento._id))
+        } catch (error) {
+            console.log(error);
+        }
+
     };
 
     const startSaving = () => {
@@ -36,6 +48,8 @@ export const useEventoStore = () => {
 
         if (mes.getMonth() + 1 === parseFloat(data.updateEvento.start_date.slice(5, 7))) {
             dispatch(patchEvent(data.updateEvento));
+        } else {
+            dispatch(popEvento(evento._id))
         }
     };
 
@@ -59,6 +73,7 @@ export const useEventoStore = () => {
 
         //Metodos
         activeEvento,
+        startDeleteEvento,
         startGetEventos,
         startSaving,
         startPatchEvento,

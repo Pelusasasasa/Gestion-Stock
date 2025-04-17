@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
 import { IngresoCard } from '../components/IngresoCard';
 import { useMovimientoStore } from '../../hooks/useMovimientoStore';
@@ -6,10 +6,16 @@ import { useMovimientoStore } from '../../hooks/useMovimientoStore';
 export const IngresoPage = ({ section, desde, hasta, setModal }) => {
 
     const { movimientos, startGetallMov } = useMovimientoStore();
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         startGetallMov(desde, hasta, section === 'Ingreso' ? 'I' : 'E');
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        const sum = movimientos.reduce((acc, elem) => acc + elem.importe, 0);
+        setTotal(sum);
+    }, [movimientos]);
 
     return (
         <main className='py-2'>
@@ -21,12 +27,13 @@ export const IngresoPage = ({ section, desde, hasta, setModal }) => {
                 </button>
             </div>
 
-            <div className='mx-5'>
+            <div className='mx-5 h-64 overflow-y-scroll'>
                 <table className='w-full'>
                     <thead className='border-b border-b-gray-400 bg-gray-100'>
                         <tr>
                             <th className='text-gray-600'>Fecha</th>
                             <th className='text-gray-600'>Descripcion</th>
+                            <th className='text-gray-600'>Nro_Comp.</th>
                             <th className='text-gray-600'>Tipo</th>
                             <th className='text-gray-600'>Importe</th>
                             <th className='text-gray-600'>Acciones</th>
@@ -35,11 +42,16 @@ export const IngresoPage = ({ section, desde, hasta, setModal }) => {
                     <tbody>
                         {
                             movimientos.map(elem => (
-                                <IngresoCard {...elem} key={elem._id} setModal={setModal}/>
+                                <IngresoCard {...elem} key={elem._id} setModal={setModal} />
                             ))
                         }
                     </tbody>
                 </table>
+            </div>
+
+            <div className='flex justify-center gap-20'>
+                <p className='text-2xl text-gray-600'>Total: </p>
+                <p className='text-2xl text-gray-600'>{total.toFixed(2)}</p>
             </div>
         </main>
     )

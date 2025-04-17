@@ -3,6 +3,7 @@ import { IoArrowDownCircleOutline, IoArrowUpCircleOutline, IoSearchOutline } fro
 import { IngresoPage } from './IngresoPage';
 import { useForm } from '../../hooks/Useform';
 import MovCajaModal from '../components/MovCajaModal';
+import { useMovimientoStore } from '../../hooks/useMovimientoStore';
 const date = new Date();
 
 const day = date.getDate();
@@ -19,7 +20,13 @@ export const MovimientoCaja = () => {
 
     const [sectionMov, setSectionMov] = useState('Ingreso');
     const { desde, hasta, onInputChange } = useForm(initialState);
+    const { startGetallMov } = useMovimientoStore();
     const [modal, setModal] = useState(false);
+
+
+    const handleSearch = () => {
+        startGetallMov(desde, hasta, sectionMov === 'Ingreso' ? 'I' : 'E')
+    };
 
     return (
         <section className='w-screen ml-8 h-screen bg-gray-100'>
@@ -58,6 +65,7 @@ export const MovimientoCaja = () => {
                     </div>
 
                     <button
+                        onClick={handleSearch}
                         className='bg-gray-700 self-end text-white flex 
                                     gap-5 items-center justify-around px-5 py-2 rounded-lg  cursor-pointer hover:opacity-80'
                     >
@@ -76,7 +84,7 @@ export const MovimientoCaja = () => {
 
             </div>
 
-            {modal && <MovCajaModal cerrar={setModal} />}
+            {modal && <MovCajaModal cerrar={setModal} desde={desde} hasta={hasta} />}
 
         </section>
 

@@ -14,12 +14,14 @@ const MovCaja = new Schema({
     puntoVenta: {
         type: String,
         default: '0000',
-        trim: true
+        trim: true,
+        set: value => value.padStart(4, '0')
     },
     numero: {
         type: String,
         default: '00000000',
-        trim: true
+        trim: true,
+        set: value => value.padStart(8, '0')
     },
 
     tipo: {

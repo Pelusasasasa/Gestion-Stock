@@ -53,10 +53,10 @@ categoryEventCTRL.getAll = async (req, res) => {
 categoryEventCTRL.patchOne = async (req, res) => {
 
     const { id } = req.params;
-
+    const { nombre, color } = req.body;
     try {
 
-        const categoria = await CategoryEvento.findOne({ _id: id });
+        const categoria = await CategoryEvento.findOne({ nombre, color });
 
         if (categoria) return res.status(400).json({
             ok: false,

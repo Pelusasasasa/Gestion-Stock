@@ -4,10 +4,11 @@ import { useMovimientoStore } from "../../hooks/useMovimientoStore";
 import { useTipoCuentaStore } from "../../hooks/useTipoCuentaStore";
 import { useDispatch } from 'react-redux';
 import { savingMovimiento, setEmptyActive } from '../../store/movimientos/movimientoSlice';
+import { Spinner } from '../../components/Spinner';
 
 
 
-const MovCajaModal = ({ cerrar }) => {
+const MovCajaModal = ({ cerrar, desde, hasta }) => {
     const dispatch = useDispatch();
     const { isSavingMovimiento, movimientoActive, startPatchOneMov, startPostOneMov } = useMovimientoStore();
     const { tipoCuentas, startGetsTiposCuentas, startGetsTiposCuentasFilter } = useTipoCuentaStore();
@@ -25,7 +26,7 @@ const MovCajaModal = ({ cerrar }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         dispatch(savingMovimiento());
-        startPostOneMov(formState);
+        startPostOneMov(formState, desde, hasta);
         cerrar(false);
     };
 
@@ -51,7 +52,7 @@ const MovCajaModal = ({ cerrar }) => {
                     {/* Campo Titulo */}
                     <div className='mb-4'>
                         <label htmlFor="title" className='block text-sm font-medium text-gray-700'>Fecha*</label>
-                        <input onChange={onInputChange} name='fecha' type="date" value={fecha?.slice(0,10) || ''} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <input onChange={onInputChange} name='fecha' type="date" value={fecha?.slice(0, 10) || ''} id="fecha" className='mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     <div className='mb-4'>
@@ -92,10 +93,10 @@ const MovCajaModal = ({ cerrar }) => {
 
                     <div className='mb-4'>
                         <label htmlFor="importe" className='block text-sm font-medium text-gray-700'>Importe</label>
-                        <input 
-                        onChange={onInputChange} name='importe' type="number" 
-                        value={(typeof importe === 'string' ? importe : importe?.toFixed(2)) || ''} 
-                        id="importe" className='mt-1 text-right block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                        <input
+                            onChange={onInputChange} name='importe' type="number"
+                            value={(typeof importe === 'string' ? importe : importe?.toFixed(2)) || ''}
+                            id="importe" className='mt-1 text-right block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                     </div>
 
                     <div className='mb-4'>
@@ -106,7 +107,7 @@ const MovCajaModal = ({ cerrar }) => {
 
                     {/* Botones */}
                     <div className='flex justify-end gap-4'>
-                        {isSavingMovimiento && <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500'></div>}
+                        {isSavingMovimiento && <Spinner />}
                         <button type='button' onClick={cerrarModal} disabled={isSavingMovimiento} className='text-black border-gray-400 border rounded-lg cursor-pointer px-4 py-2 hover:bg-gray-200 hover:text-gray-800 focus:outline-none'>Cancelar</button>
                         {!movimientoActive._id && <button type='submit' disabled={isSavingMovimiento} className='text-white cursor-pointer px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>Agregar</button>}
                         {movimientoActive._id && <button type='button' disabled={isSavingMovimiento} onClick={handlePutEvento} className='text-white cursor-pointer px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>Modificar</button>}

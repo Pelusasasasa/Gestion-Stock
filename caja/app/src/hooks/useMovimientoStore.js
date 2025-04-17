@@ -42,13 +42,15 @@ export const useMovimientoStore = () => {
 
     };
 
-    const startPostOneMov = async (mov) => {
+    const startPostOneMov = async (mov, desde, hasta) => {
         const api = await gestorApi();
 
         try {
             const { data } = await api.post('movCaja', mov);
+            if (data.mov.fecha >= desde && data.mov.fecha <= hasta) {
+                dispatch(postMovimiento(data.mov));
+            }
 
-            dispatch(postMovimiento(data.mov));
         } catch (error) {
             await Swal.fire('No se pudo cargar El movimiento', error.response.data.msg, 'error');
             console.log(error.response.data.error);
@@ -64,10 +66,10 @@ export const useMovimientoStore = () => {
         mov.tipo = movAux.tipo._id ? movAux.tipo._id : movAux.tipo;
 
         const api = await gestorApi();
-        
+
         try {
             const { data } = await api.patch(`movCaja/${mov._id}`, mov);
-            
+
             dispatch(patchMovimiento(data.updateMovCaja));
         } catch (error) {
             console.log(error);

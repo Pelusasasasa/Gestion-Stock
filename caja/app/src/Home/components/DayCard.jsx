@@ -5,7 +5,7 @@ import { EventCard } from './EventCard';
 
 export const DayCard = ({ day, currentMonth, openModal }) => {
     const { eventos } = useEventoStore();
-    const eventosFilter = eventos.filter(evento => evento.start_date.slice(8, 10) == day);
+    const eventosFilter = eventos.filter(evento => (evento.start_date.slice(8, 10) == day && evento.start_date.slice(5, 7) == currentMonth.getMonth() + 1));
 
     const habilityDay = new Date();
 

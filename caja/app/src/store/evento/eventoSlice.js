@@ -9,11 +9,15 @@ export const eventoSlice = createSlice({
         messageErrorEvento: undefined
     },
     reducers: {
+        deleleEvent: (state, { payload }) => {
+            state.eventos = state.eventos.filter(elem => elem._id !== payload);
+            state.isSavingEvento = false
+        },
         emptyEventoActive: (state) => {
             state.eventoActive = {}
         },
         isSaving: (state) => {
-            state.isSavingEvento = true
+            state.isSavingEvento = true;
         },
         setActiveEvento: (state, { payload }) => {
             state.eventoActive = payload;
@@ -35,6 +39,10 @@ export const eventoSlice = createSlice({
             state.isSavingEvento = false;
             state.eventoActive = {};
         },
+        popEvento: (state, { payload }) => {
+            state.eventos = state.eventos.filter(elem => elem._id !== payload);
+            state.isSavingEvento = false;
+        },
         postEvento: (state, { payload }) => {
             state.eventos.push(payload);
             state.isSavingEvento = false;
@@ -44,4 +52,4 @@ export const eventoSlice = createSlice({
 
 
 // Action creators are generated for each case reducer function
-export const { emptyEventoActive, isSaving, setActiveEvento, setEventos, patchEvent, postEvento } = eventoSlice.actions;
+export const { deleleEvent, emptyEventoActive, isSaving, setActiveEvento, setEventos, patchEvent, popEvento, postEvento } = eventoSlice.actions;

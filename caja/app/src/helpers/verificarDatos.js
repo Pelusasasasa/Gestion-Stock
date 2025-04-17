@@ -75,3 +75,26 @@ export const vefiricarDatosProvedor = async ({ nombre, cuit, iva, domicilio, loc
 
     return true;
 };
+
+export const verificarDatosEvento = async ({ title, start_date, end_date, category }) => {
+    if (!title) {
+        await Swal.fire('Error al cargar Evento', 'El titulo debe ser obligatorio', 'error');
+        return false;
+    };
+
+    if (!start_date) {
+        await Swal.fire('Error al cargar Evento', 'La la fecha de inicio debe ser obligatorio', 'error');
+        return false;
+    };
+
+    if (!end_date) {
+        await Swal.fire('Error al cargar Evento', 'La fecha de fin debe ser obligatoria', 'error');
+        return false;
+    };
+    if (!category) {
+        await Swal.fire('Error al cargar Evento', 'La Categoria debe ser obligaroia', 'error');
+        return false;
+    };
+
+    return true;
+};
