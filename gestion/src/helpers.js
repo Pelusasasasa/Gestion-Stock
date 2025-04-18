@@ -536,4 +536,22 @@ funciones.diferenciaObjetoServicio = async(objeto1, objeto2) => {
     };
 };
 
+funciones.cargarMovCaja = async(descripcion, puntoVenta, numero, tipo, importe, vendedor) => {
+    const cuenta = {};
+
+    cuenta.fecha = new Date();
+    cuenta.descripcion = descripcion;
+    cuenta.puntoVenta = puntoVenta ;
+    cuenta.numero = numero;
+    cuenta.tipo = tipo;
+    cuenta.importe = importe;
+    cuenta.vendedor = vendedor;
+    
+    try {
+        await axios.post(`${URL}movCaja`, cuenta);
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 module.exports = funciones;

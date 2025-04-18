@@ -35,7 +35,7 @@ const MovCaja = new Schema({
     },
     vendedor: {
         type: Schema.Types.ObjectId,
-        required: true,
+        // required: true,
         ref: 'Vendedor'
     }
 }

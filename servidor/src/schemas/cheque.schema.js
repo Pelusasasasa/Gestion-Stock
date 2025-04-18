@@ -17,7 +17,7 @@ const chequeSchema = z.object({
         // invalid_type_error: 'La fecha del cheque es obligatoria',
         required_error: 'La fecha del cheque es obligatoria'
     }),
-    importe: z.number({
+    importe: z.coerce.number({
         invalid_type_error: 'El importe debe ser un numero',
     }),
     ent_por: z.string().optional().default(''),

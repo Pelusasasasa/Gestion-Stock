@@ -5,7 +5,7 @@ const movCajaSchema = z.object({
     fecha: z.coerce.date(),
     descripcion: z.string().optional(),
     puntoVenta: z.string().optional(),
-    numero: z.string().optional(),
+    numero: z.coerce.string().optional(),
     tipo: z.string({
         required_error: 'El tipo de cuenta es  obligatorio',
         invalid_type_error: 'El tipo debe ser un objectId'
@@ -18,7 +18,7 @@ const movCajaSchema = z.object({
     vendedor: z.string({
         required_error: 'El vendedor es obligatorio',
         invalid_type_error: 'El vendedor debe ser un ObjectId'
-    })
+    }).optional()
 });
 
 

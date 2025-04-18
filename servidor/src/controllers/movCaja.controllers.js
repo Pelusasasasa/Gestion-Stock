@@ -87,9 +87,12 @@ movCajaCTRL.patchOne = async (req, res) => {
     }
 };
 
-movCajaCTRL.postOne = async (req, res) => {
-
+movCajaCTRL.postOne = async (req, res) => { 
+    
     const result = await validateMovCajaSchema(req.body);
+
+    console.log(result.error)
+    
 
     if (!result.success) return res.status(400).json({
         ok: false,

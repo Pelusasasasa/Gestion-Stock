@@ -14,7 +14,7 @@ require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
-const {apretarEnter, cargarFactura, redondear} = require('../helpers');
+const {apretarEnter, cargarFactura, redondear, cargarMovCaja} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
@@ -50,6 +50,17 @@ m = m===13 ? 1 : m;
 
 fecha.value = `${a}-${m}-${d}`;
 
+ipcRenderer.on('recibir-ventana-secundaria', (e, args) => {
+    const [res, cliente, lista] = JSON.parse(JSON.parse(args).informacion);
+    
+    if(res){
+
+        ipcRenderer.send('imprimir-recibo',[res,cliente,lista,false]);
+    };
+
+    location.href = "../menu.html";
+})
+
 //Le descontamos un saldo al cliente
 const descontarSaldoCliente =async(idCliente,precio)=>{
     const cliente = (await axios.get(`${URL}clientes/id/${idCliente}`)).data;
@@ -71,25 +82,6 @@ const modificarCuentaCompensadas = async()=>{
         }
     }
 };
-
-cheque.addEventListener('click',async ()=>{
-    let {isConfirmed,value, isDismissed, dismiss} = await sweet.fire({
-        title:"Numero Cheque",
-        input:"text",
-        confirmButtonText:"Guardar",
-        showCancelButton:true,
-        inputValue:nroCheque
-    });
-    if (isConfirmed) {
-        nroCheque = value;
-    };
-
-    if (isDismissed && dismiss === 'cancel'){
-        nroCheque = "";
-        cheque.checked = false;
-    }
-
-})
 
 //Pnemos los valores del cliente traido
 const ponerInputs = async(id)=>{
@@ -270,22 +262,44 @@ imprimir.addEventListener('click',async e=>{
         }
         cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
         await modificarCuentaCompensadas();
-        let lista = await ponerMovimientosRecibo(recibo.numero);
         await ponerEnCuentaHistorica(recibo);
         await descontarSaldoCliente(recibo.idCliente,recibo.precio);
-        const res = (await axios.post(`${URL}recibo`,recibo)).data;
+        
         await axios.put(`${URL}numero/Recibo`,{Recibo:recibo.numero});
-        const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
+        
 
-        ipcRenderer.send('imprimir-recibo',[res,cliente,lista,false])
-
-        location.href = "../menu.html";
         
     }catch(error){
         console.log(error)
         await sweet.fire({
             title:"No se pudo generar la venta"
         })
+    };
+
+
+    try {
+        const {data} = await axios.get(`${URL}tipoCuenta/forText/Recibo`);
+        await cargarMovCaja(recibo.cliente, '000R', recibo.numero, data.tipo._id, recibo.precio, "639dbc31dfdb8a1d243d19c2");
+    } catch (error) {
+        console.log(error)
+    }
+
+    let lista = await ponerMovimientosRecibo(recibo.numero);
+    const res = (await axios.post(`${URL}recibo`,recibo)).data;
+    const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
+
+    if(cheque.checked){
+        await ipcRenderer.send('abrir-ventana', {
+            path: './cheque/agregarCheque.html',
+            altura: 1000,
+            ancho: 600,
+            reinicio: false,
+            informacion: JSON.stringify([res,cliente,lista,false])
+        });
+    }else{
+        ipcRenderer.send('imprimir-recibo',[res,cliente,lista,false]);
+
+        location.href = "../menu.html";
     }
 });
 
@@ -335,7 +349,7 @@ const crearCompensadaAFavor = async (saldo)=>{
     compensada.pagado = 0;
     compensada.saldo = -1*saldo;
     return compensada;
-}
+};
 //creamos una compensda para cuando se haga el recibo y quede saldo a favor
 const crearCuentaCompensada = async(cuenta)=>{
     const numero = (await axios.get(`${URL}numero`)).data["Cuenta Corriente"];
@@ -349,7 +363,7 @@ const crearCuentaCompensada = async(cuenta)=>{
             title:"No se puede generar la venta"
         })
     }
-}
+};
 
 
 entregado.addEventListener('focus',e=>{

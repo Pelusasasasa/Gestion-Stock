@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Cheque</title>
+    <link rel="stylesheet" href="../assets/global.css">
+</head>
+<body class="h-screen">
+    <section class="grid columns-2 h-80vh gap-2">
+        <div class="flex flex-col">
+            <label for="fecha">Fecha</label>
+            <input type="date" name="fecha" id="fecha">
+        </div>
+        <div class="flex flex-col">
+            <label for="numero">Numero</label>
+            <input type="text" name="numero" id="numero">
+        </div>
+        <div class="flex flex-col">
+            <label for="banco">Banco</label>
+            <input type="text" name="banco" id="banco">
+        </div>
+        <div class="flex flex-col">
+            <label for="importe">Importe</label>
+            <input type="number" name="importe" id="importe">
+        </div>
+        <div class="flex flex-col">
+            <label for="fecha_cheque">Fecha Cheque</label>
+            <input type="date" name="fecha_cheque" id="fecha_cheque">
+        </div>
+        <div class="flex flex-col">
+            <label for="entregado_por">Entregado Por</label>
+            <input type="text" name="entregado_por" id="entregado_por">
+        </div>
+        <div class="flex flex-col">
+            <label for="entregado_a">Entregado A</label>
+            <input type="text" name="entregado_a" id="entregado_a">
+        </div>
+        <div class="flex flex-col">
+            <label for="domicilio">Domicilio</label>
+            <input type="text" name="domicilio" id="domicilio">
+        </div>
+        <div class="flex flex-col">
+            <label for="telefono">Telefono</label>
+            <input type="text" name="telefono" id="telefono">
+        </div>
+        <div class="flex flex-col">
+            <label for="observaciones">Observaciones</label>
+            <input type="text" name="observaciones" id="observaciones">
+        </div>
+    </section>
+    <hr>
+    <section>
+        <button id="cancelar">Cancelar</button>
+        <button id="agregar">Agregar</button>
+    </section>
+</body>
+<script src="./agregarCheque.js"></script>
+</html>
