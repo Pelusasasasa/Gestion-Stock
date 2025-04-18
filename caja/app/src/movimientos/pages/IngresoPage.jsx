@@ -27,7 +27,7 @@ export const IngresoPage = ({ section, desde, hasta, setModal }) => {
                 </button>
             </div>
 
-            <div className='mx-5 h-64 overflow-y-scroll'>
+            <div className='mx-5 h-[calc(45vh)] overflow-y-scroll'>
                 <table className='w-full'>
                     <thead className='border-b border-b-gray-400 bg-gray-100'>
                         <tr>
