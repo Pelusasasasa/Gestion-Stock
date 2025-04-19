@@ -9,17 +9,17 @@ const tarjetaSchema = z.object({
         invalid_type_error: 'El nombre debe ser un string',
         required_error: 'El nombre es obligatorio'
     }),
-    importe: z.number({
+    importe: z.coerce.number({
         invalid_type_error: 'El importe debe ser un number',
         required_error: 'El importe es obligatorio'
     }),
     vendedor: z.string({
         invalid_type_error: 'El vendedor debe ser un String',
         required_error: 'El vendedor es obligatorio'
-    }),
+    }).optional(),
     tarjeta: z.string({
         invalid_type_error: 'El tarjeta debe ser un String',
-        required_error: 'El tarjeta es obligatorio'
+        required_error: 'La tarjeta es obligatorio'
     }),
     tipo: z.string(),
 });

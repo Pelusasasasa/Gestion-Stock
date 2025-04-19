@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../assets/global.css">
+    <title>Agregar Tarjeta</title>
+</head>
+
+<body class="h-80vh">
+    <section class="grid gap-2 h-80vh">
+        <div class="flex flex-col">
+            <label for="fecha">Fecha</label>
+            <input type="date" name="fecha" id="fecha">
+        </div>
+        <div class="flex flex-col">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre">
+        </div>
+        <div class="flex flex-col">
+            <label for="tarjeta">Tarjeta</label>
+            <select name="tarjeta" id="tarjeta">
+                <option value="">---Seleccionar Opcion---</option>
+            </select>
+        </div>
+        <div class="flex flex-col">
+            <label for="tipo">Tipo</label>
+            <input type="text" name="tipo" id="tipo">
+        </div>
+        <div class="flex flex-col">
+            <label for="importe">Importe</label>
+            <input type="number" class="text-rigth" name="importe" id="importe">
+        </div>
+    </section>
+    <hr>
+    <section>
+        <button id="agregar">Agregar</button>
+        <button id="cancelar">Cancelar</button>
+    </section>
+
+</body>
+<script src="./agregarTarjeta.js"></script>
+
+</html>

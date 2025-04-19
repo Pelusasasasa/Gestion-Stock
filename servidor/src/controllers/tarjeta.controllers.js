@@ -5,7 +5,6 @@ const { validateTarjeta, validatePartialTarjeta } = require('../schemas/tarjeta.
 
 tarjetaCTRL.postOne = async (req, res) => {
     try {
-
         const result = await validateTarjeta(req.body);
         if (!result.success) return res.status(400).json({
             ok: false,

@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Cheque</title>
     <link rel="stylesheet" href="../assets/global.css">
 </head>
-<body class="h-screen">
+
+<body class="h-80vh">
     <section class="grid columns-2 h-80vh gap-2">
         <div class="flex flex-col">
-            <label for="fecha">Fecha</label>
+            <label for="fecha">Fecha*</label>
             <input type="date" name="fecha" id="fecha">
         </div>
         <div class="flex flex-col">
-            <label for="numero">Numero</label>
-            <input type="text" name="numero" id="numero">
+            <label for="numero">Numero*</label>
+            <input type="text" autofocus name="numero" id="numero">
         </div>
         <div class="flex flex-col">
-            <label for="banco">Banco</label>
+            <label for="banco">Banco*</label>
             <input type="text" name="banco" id="banco">
         </div>
         <div class="flex flex-col">
-            <label for="importe">Importe</label>
+            <label for="importe">Importe*</label>
             <input type="number" name="importe" id="importe">
         </div>
         <div class="flex flex-col">
-            <label for="fecha_cheque">Fecha Cheque</label>
+            <label for="fecha_cheque">Fecha Cheque*</label>
             <input type="date" name="fecha_cheque" id="fecha_cheque">
         </div>
         <div class="flex flex-col">
-            <label for="entregado_por">Entregado Por</label>
+            <label for="entregado_por">Entregado Por*</label>
             <input type="text" name="entregado_por" id="entregado_por">
         </div>
         <div class="flex flex-col">
@@ -56,4 +58,5 @@
     </section>
 </body>
 <script src="./agregarCheque.js"></script>
+
 </html>

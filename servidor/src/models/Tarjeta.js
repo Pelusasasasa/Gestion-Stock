@@ -28,7 +28,7 @@ const Tarjeta = new Schema({
     },
     vendedor: {
         type: String,
-        required: true,
+        // required: true,
         set: value => value.toUpperCase()
     },
     pc: {
