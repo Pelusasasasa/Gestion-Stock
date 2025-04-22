@@ -437,6 +437,13 @@ const ponerEnCuentaCompensada = async (venta) => {
     cuenta.tipo_comp = venta.tipo_comp;
     cuenta.saldo = venta.precio - parseFloat(inputRecibo.value);
     cuenta.observaciones = observaciones.value;
+
+    //Si es una Factura Agregamos para que se pueda guarar el numero de factura
+    if (venta.F) {
+        cuenta.nro_factura = `${venta.afip.puntoVenta.padStart(4, '0')}-${(venta.afip.numero).toString().padStart(8, '0')}`;
+    };
+
+
     await axios.post(`${URL}compensada`, cuenta);
 };
 

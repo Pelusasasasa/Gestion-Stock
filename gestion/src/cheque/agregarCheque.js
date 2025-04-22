@@ -49,10 +49,20 @@ const guardar = async () => {
 
     const { data } = await axios.post(`${URL}cheques`, cheque);
 
-    if (data.ok) {
-        ipcRenderer.send('enviar-ventana-principal', informacion);
-        window.close();
-    };
+    const { isConfirmed } = await Swal.fire({
+        title: 'Agregar otro cheque',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+    });
+
+    if (isConfirmed) {
+        location.reload()
+    } else {
+        if (data.ok) {
+            ipcRenderer.send('enviar-ventana-principal', informacion);
+            window.close();
+        };
+    }
 };
 
 const validarDatos = async () => {

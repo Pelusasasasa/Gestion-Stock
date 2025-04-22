@@ -143,7 +143,7 @@ const ponerVenta = async (cuenta) => {
 
     tdFecha.innerHTML = `${dia}/${mes}/${anio}`;
     tdNumero.innerHTML = cuenta.nro_venta;
-    tdTipoComp.innerHTML = cuenta.tipo_comp;
+    tdTipoComp.innerHTML = `${cuenta.tipo_comp} ${cuenta.nro_factura}`;
     tdImporte.innerHTML = cuenta.tipo_comp === "Nota Credito C" ? redondear(cuenta.importe * -1, 2) : redondear(cuenta.importe, 2);
     tdPagado.innerHTML = redondear(cuenta.pagado, 2);
     tdSaldo.innerHTML = cuenta.tipo_comp === "Nota Credito C" ? redondear(cuenta.saldo * -1, 2) : redondear(cuenta.saldo, 2);
