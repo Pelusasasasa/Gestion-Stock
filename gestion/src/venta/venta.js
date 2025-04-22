@@ -78,18 +78,18 @@ let cuentas = [];
 
 const arreglarSaldo = async (id) => {
     let saldoADescontar = 0;
-    console.log(cuentas);
+
     for (let elem of cuentas) {
+
         const { data: compensada } = await axios.get(`${URL}compensada/traerCompensada/id/${elem}`);
-        console.log(compensada);
+
         saldoADescontar += compensada.importe;
     };
 
     const { data: cliente } = await axios.get(`${URL}clientes/id/${id}`);
-
     cliente.saldo = (cliente.saldo - saldoADescontar).toFixed(2);
-    console.log(cliente);
-    // await axios.put(`${URL}clientes/id/${id}`, cliente);
+
+    await axios.put(`${URL}clientes/id/${id}`, cliente);
 };
 
 const calcularTotal = async () => {
@@ -279,9 +279,10 @@ const listarCliente = async (id) => {
 };
 
 //Lo que hacemos es listar el producto traido
-const listarProducto = async (id, cant = 1) => {
+const listarProducto = async (id, cant = 1, series = []) => {
     const res = id.toUpperCase().replace(/\//g, '%2F');
     let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+
     cantidad.value = cant;
 
     if (!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad') {
@@ -296,12 +297,13 @@ const listarProducto = async (id, cant = 1) => {
         codBarra.value = "";
         codBarra.focus();
         return;
-    }
+    };
 
     producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;//buscamos el producto por descripcion
-
     //ponemos el precio del producto con un descuento si es que hay
     producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value) / 100, 2));
+
+
     //Buscamos si el produto ya esta cargado
     if (producto !== "") {
         const productoYaUsado = listaProductos.find(({ producto: product }) => {
@@ -322,7 +324,7 @@ const listarProducto = async (id, cant = 1) => {
                     title: "Producto con Stock menor a 0",
                 });
             }
-            listaProductos.push({ cantidad: parseFloat(cantidad.value), producto });
+            listaProductos.push({ cantidad: parseFloat(cantidad.value), producto, series });
 
             codBarra.value = producto._id;
 
@@ -408,7 +410,7 @@ const listarProducto = async (id, cant = 1) => {
 
             }
             totalGlobal = parseFloat(total.value);
-        }
+        };
 
         cantidad.value = "1.00";
         codBarra.value = "";
@@ -468,25 +470,43 @@ const sumarSaldo = async (id, nuevoSaldo, venta) => {
     }
 };
 
-const sacarIva = (lista) => {
+const sacarIva = (lista, condicion) => {
     let totalIva0 = 0;
     let totalIva21 = 0;
     let gravado21 = 0;
     let gravado0 = 0;
     let totalIva105 = 0;
     let gravado105 = 0;
-    lista.forEach(({ producto, cantidad }) => {
-        if (producto.impuesto === 21) {
-            gravado21 += cantidad * producto.precio / 1.21;
-            totalIva21 += cantidad * producto.precio / 1.21 * 21 / 100;
-        } else if (producto.impuesto === 10.5) {
-            gravado105 += cantidad * producto.precio / 1.105
-            totalIva105 += cantidad * producto.precio / 1.105 * 10.5 / 100;
-        } else {
-            gravado0 += cantidad * producto.precio / 1;
-            totalIva0 += (cantidad * producto.precio) - (producto.precio / 1);
-        }
-    });
+    if (condicion === '1') {
+        lista.forEach(({ producto, cantidad }) => {
+            if (producto.impuesto === 21) {
+                gravado21 += cantidad * producto.precio / 1.21;
+                totalIva21 += cantidad * producto.precio / 1.21 * 21 / 100;
+            } else if (producto.impuesto === 10.5) {
+                gravado105 += cantidad * producto.precio / 1.105
+                totalIva105 += cantidad * producto.precio / 1.105 * 10.5 / 100;
+            } else {
+                gravado0 += cantidad * producto.precio / 1;
+                totalIva0 += (cantidad * producto.precio) - (producto.precio / 1);
+            }
+        });
+    } else {
+        lista.forEach(({ producto, cantidad }) => {
+            let auxCosto = producto.costoDolar === 0 ? producto.costo * producto.impuesto / 100 : producto.costoDolar * dolar;
+            let auxCostoIva = auxCosto + (auxCosto * producto.impuesto / 100);
+            if (producto.impuesto === 21) {
+                gravado21 += cantidad * auxCostoIva / 1.21;
+                totalIva21 += cantidad * auxCostoIva / 1.21 * 21 / 100;
+            } else if (producto.impuesto === 10.5) {
+                gravado105 += cantidad * auxCostoIva / 1.105
+                totalIva105 += cantidad * auxCostoIva / 1.105 * 10.5 / 100;
+            } else {
+                gravado0 += cantidad * auxCostoIva / 1;
+                totalIva0 += (cantidad * auxCostoIva) - (auxCostoIva / 1);
+            }
+        });
+    }
+
     let cantIva = 0
     if (gravado0 !== 0) {
         cantIva++;
@@ -657,8 +677,9 @@ facturar.addEventListener('click', async e => {
         venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : await verTipoComprobanteNegro(venta.tipo_venta);
         venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
         venta.cod_doc = await verCodigoDocumento(cuit.value);
-        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value
-        const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos); //sacamos el iva de los productos
+        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value;
+
+        const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, lista.value); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
         venta.gravado0 = gravado0;
@@ -666,6 +687,7 @@ facturar.addEventListener('click', async e => {
         venta.iva105 = iva105;
         venta.gravado105 = gravado105;
         venta.cantIva = cantIva;
+
         venta.direccion = direccion.value;
         venta.localidad = localidad.value;
         venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
@@ -797,9 +819,8 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
 
     for (let elem of cuentas) {
         const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
-
         for await (let mov of movs) {
-            listarProducto(mov.codProd, mov.cantidad)
+            listarProducto(mov.codProd, mov.cantidad, mov.series);
         };
     };
 });
@@ -831,7 +852,7 @@ tbody.addEventListener('click', async e => {
         //Traemops el producto seleccionado para ver si tiene nuemores de series ya cargados y asi mostrarlos
         const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
         let valor = "";
-        console.log(producto)
+
         if (producto.series) {
             producto.series.forEach(serie => {
                 if (valor) {

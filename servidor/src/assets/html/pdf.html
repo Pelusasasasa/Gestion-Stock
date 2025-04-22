@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,132 +9,138 @@
     <title>Document</title>
     <style>
         body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-        Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+                Arial, sans-serif;
         }
 
-        .none{
+        .none {
             display: none;
         }
 
         html {
-        box-sizing: border-box;
-        font-size: 62.5%;
+            box-sizing: border-box;
+            font-size: 62.5%;
         }
 
         *,
         *:before,
         *:after {
-        box-sizing: inherit;
+            box-sizing: inherit;
         }
 
         body {
-        font-size: 1.6rem;
-        padding: 0 2rem;
+            font-size: 1.6rem;
+            padding: 0 2rem;
         }
 
-        .dueño{
+        .dueño {
             display: -webkit-box;
             -webkit-box-pack: justify;
             /* display: flex; */
             /* justify-content: space-between; */
         }
 
-        .dueño{
+        .dueño {
             padding: 2rem;
             margin-top: 2rem;
             font-weight: bold;
             border: .3rem solid black;
         }
 
-        .dueño span{
+        .dueño span {
             font-weight: 400;
         }
 
-        .dueño main main p{
+        .dueño main main p {
             margin: 0;
         }
 
-        .tipoFactura div{
+        .tipoFactura div {
             border: .5rem solid black;
             text-align: center;
             padding: .55rem;
             margin-top: 2rem;
         }
 
-        .tipoFactura p{
+        .tipoFactura p {
             margin: 0;
         }
 
-        .letra{
+        .letra {
             font-size: 5rem;
             font-weight: bold;
         }
 
-        .cliente{
+        .cliente {
             border: .3rem solid black;
             padding: 0 2rem;
         }
 
-        .cliente .nombre p,.cliente .domicilio p{
+        .cliente .nombre p,
+        .cliente .domicilio p {
             width: 550px;
         }
 
-        .cliente main{
+        .cliente main {
             display: -webkit-box;
             -webkit-box-pack: justify;
         }
-        .cliente p,.final p{
+
+        .cliente p,
+        .final p {
             font-weight: bold;
         }
 
-        .cliente span,.final span{
+        .cliente span,
+        .final span {
             font-weight: 400;
         }
 
-        .d-flex{
+        .d-flex {
             display: -webkit-box;
             -webkit-box-pack: justify;
         }
-        .productos{
+
+        .productos {
             height: auto;
             min-height: 60rem;
         }
-        table{
+
+        table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        table thead th{
+        table thead th {
             border: .1rem solid black;
         }
 
-        table td{
+        table td {
             text-align: end;
             vertical-align: top;
         }
-        table .tdDescripcion{
+
+        table .tdDescripcion {
             width: 500px;
             word-wrap: break-word;
         }
 
 
-        img{
+        img {
             width: 15rem;
         }
 
-        .text-left{
+        .text-left {
             text-align: left;
         }
 
-        .final{
+        .final {
             margin: 1rem;
             border: .1rem solid black;
         }
-
-
     </style>
 </head>
+
 <body>
     <section class="dueño">
         <main>
@@ -142,10 +149,10 @@
             <p>Domicilio Comercial:<span> Av Alem 2196 - Chajari, Entre Rios</span></p>
             <p>Codicion frente al IVA:<span> Responsable Inscripto</span></p>
         </main>
-        <main  class="tipoFactura">
+        <main class="tipoFactura">
             <div>
                 <p class="letra">{{letra}}</p>
-            <p class="codigo">{{codigo}}</p>
+                <p class="codigo">{{codigo}}</p>
             </div>
         </main>
         <main>
@@ -193,7 +200,7 @@
             </tbody>
         </table>
     </section>
-    
+
     <section class="final d-flex">
         <main class="qr">
             <img src={{qr}} alt="">
@@ -209,7 +216,9 @@
             <p class="iva105">{{iva105}}</p>
             <p>Descuento: <span class="descuento">{{descuento}}</span></p>
             <p>Importe Total: <span>{{total}}</span></p>
+            <p>Son pesos argentinos: <span>{{pesosArgentinos}}</span></p>
         </main>
     </section>
 </body>
+
 </html>
