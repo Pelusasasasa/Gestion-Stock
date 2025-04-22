@@ -19,8 +19,8 @@ const total = document.querySelector('#total');
 const guardar = document.querySelector('.guardar');
 const salir = document.querySelector('.salir');
 
-const sweet  = require('sweetalert2');
-const {cerrarVentana,apretarEnter, redondear, agregarMovimientoVendedores, verificarDatos} = require('../helpers');
+const sweet = require('sweetalert2');
+const { cerrarVentana, apretarEnter, redondear, agregarMovimientoVendedores, verificarDatos } = require('../helpers');
 
 const archivo = require('../configuracion.json');
 
@@ -31,52 +31,52 @@ const URL = process.env.GESTIONURL;
 
 let vendedor;
 //Funciones
-const traerRubros = async()=>{
-    const rubros =  (await axios.get(`${URL}rubro`)).data;
-    for await(let {numero,rubro} of rubros){
+const traerRubros = async () => {
+    const rubros = (await axios.get(`${URL}rubro`)).data;
+    for await (let { numero, rubro } of rubros) {
         const option = document.createElement('option');
         option.text = numero + " - " + rubro,
-        option.value = rubro;
+            option.value = rubro;
         select.appendChild(option)
     }
 };
 
 const traerProvedores = async () => {
-    const provedores = (await axios.get(`${URL}provedor`)).data;
-    for await(let {nombre} of provedores){
+    const { data } = (await axios.get(`${URL}provedores`));
+    for await (let { nombre } of data.provedores) {
         const option = document.createElement('option');
         option.text = nombre,
-        option.value = nombre;
+            option.value = nombre;
         provedor.appendChild(option);
     }
 };
 
 const traerMarcas = async () => {
     const marcas = (await axios.get(`${URL}marca`)).data;
-    for await(let {nombre} of marcas){
+    for await (let { nombre } of marcas) {
         const option = document.createElement('option');
         option.text = nombre,
-        option.value = nombre;
+            option.value = nombre;
         marca.appendChild(option);
     }
 };
 
-ipcRenderer.on('informacion',(e,args)=>{
+ipcRenderer.on('informacion', (e, args) => {
     vendedor = args.vendedor;
 });
 
-window.addEventListener('load',async e=>{
+window.addEventListener('load', async e => {
     if (!archivo.dolar) {
-        costoDolar.setAttribute('disabled',"");
+        costoDolar.setAttribute('disabled', "");
     }
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
-    
+
     traerRubros();
     traerProvedores();
     traerMarcas();
 });
 
-guardar.addEventListener('click',async e=>{
+guardar.addEventListener('click', async e => {
     const producto = {};
     e.preventDefault();
     const verificacion = await verificarDatos();
@@ -95,159 +95,159 @@ guardar.addEventListener('click',async e=>{
         producto.precio = total.value;
         producto.unidad = unidad.value;
 
-        const {estado,mensaje} = (await axios.post(`${URL}productos`,producto)).data;
+        const { estado, mensaje } = (await axios.post(`${URL}productos`, producto)).data;
 
         await sweet.fire({
-            title:mensaje,
+            title: mensaje,
             icon: "success",
-            confirmButtonText:"Aceptar"
+            confirmButtonText: "Aceptar"
         });
-        
+
         //Si el estado es true de que se guardo el producto salimos de la pagina Y guaradmos el movimineto del vendeor si esta activado
         if (estado) {
-            await ipcRenderer.send('informacion-a-ventana-principal',producto);
-            vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`,vendedor);
+            await ipcRenderer.send('informacion-a-ventana-principal', producto);
+            vendedor && await agregarMovimientoVendedores(`Cargo el producto ${producto.descripcion} con el precio ${producto.precio}`, vendedor);
             window.close();
         };
     }
 });
 
-codigo.addEventListener('keypress',async e=>{
+codigo.addEventListener('keypress', async e => {
     if (e.keyCode === 13) {
         if (codigo.value !== "") {
             const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
             if (producto) {
                 await sweet.fire({
-                    title:"Codigo Ya utilizado por " + producto.descripcion
+                    title: "Codigo Ya utilizado por " + producto.descripcion
                 });
                 codigo.value = "";
                 codigo.focus();
-            }else{
-                apretarEnter(e,descripcion);
+            } else {
+                apretarEnter(e, descripcion);
             }
         }
     }
 });
 
-descripcion.addEventListener('keypress',e=>{
-    apretarEnter(e,unidad);
+descripcion.addEventListener('keypress', e => {
+    apretarEnter(e, unidad);
 });
 
-unidad.addEventListener('keypress',e=>{
+unidad.addEventListener('keypress', e => {
     e.preventDefault();
-    apretarEnter(e,marca);
+    apretarEnter(e, marca);
 });
 
-marca.addEventListener('keypress',e=>{
+marca.addEventListener('keypress', e => {
     e.preventDefault();
-    apretarEnter(e,rubro);
+    apretarEnter(e, rubro);
 });
 
-rubro.addEventListener('keypress',e=>{
+rubro.addEventListener('keypress', e => {
     if (e.key === "Enter") {
         e.preventDefault();
         provedor.focus();
     }
 });
 
-provedor.addEventListener('keypress',e=>{
+provedor.addEventListener('keypress', e => {
     e.preventDefault();
-    apretarEnter(e,stock);
+    apretarEnter(e, stock);
 })
 
-stock.addEventListener('keypress',e=>{
-    apretarEnter(e,costo);
+stock.addEventListener('keypress', e => {
+    apretarEnter(e, costo);
 })
 
-costo.addEventListener('keypress',e=>{
+costo.addEventListener('keypress', e => {
     if (costoDolar.hasAttribute('disabled')) {
-        apretarEnter(e,impuesto);
-    }else{
-        apretarEnter(e,costoDolar);
+        apretarEnter(e, impuesto);
+    } else {
+        apretarEnter(e, costoDolar);
     }
 });
 
-costoDolar.addEventListener('keypress',e=>{
-    apretarEnter(e,impuesto);
+costoDolar.addEventListener('keypress', e => {
+    apretarEnter(e, impuesto);
 });
 
-impuesto.addEventListener('keypress',e=>{
-    apretarEnter(e,costoIva);
+impuesto.addEventListener('keypress', e => {
+    apretarEnter(e, costoIva);
 })
 
-costoIva.addEventListener('keypress',e=>{
-    apretarEnter(e,ganancia);
+costoIva.addEventListener('keypress', e => {
+    apretarEnter(e, ganancia);
 })
 
-ganancia.addEventListener('keypress',e=>{
-    apretarEnter(e,total);
+ganancia.addEventListener('keypress', e => {
+    apretarEnter(e, total);
 })
 
-total.addEventListener('keypress',e=>{
-    apretarEnter(e,guardar);
+total.addEventListener('keypress', e => {
+    apretarEnter(e, guardar);
 })
 
-salir.addEventListener('click',e=>{
+salir.addEventListener('click', e => {
     window.close();
 })
 
-document.addEventListener('keydown',e=>{
+document.addEventListener('keydown', e => {
     cerrarVentana(e)
 });
 
-codigo.addEventListener('focus',e=>{
+codigo.addEventListener('focus', e => {
     codigo.select();
 });
 
-descripcion.addEventListener('focus',async e=>{
+descripcion.addEventListener('focus', async e => {
     descripcion.select();
 });
 
-marca.addEventListener('focus',e=>{
+marca.addEventListener('focus', e => {
     marca.select();
 });
 
-provedor.addEventListener('focus',e=>{
+provedor.addEventListener('focus', e => {
     provedor.select();
 });
 
-stock.addEventListener('focus',e=>{
+stock.addEventListener('focus', e => {
     stock.select();
 });
 
-costo.addEventListener('focus',e=>{
+costo.addEventListener('focus', e => {
     costo.select();
 });
 
-costoDolar.addEventListener('focus',e=>{
+costoDolar.addEventListener('focus', e => {
     costoDolar.select();
 });
 
-impuesto.addEventListener('focus',e=>{
+impuesto.addEventListener('focus', e => {
     impuesto.select();
 });
 
-costoIva.addEventListener('focus',e=>{
+costoIva.addEventListener('focus', e => {
     costoIva.select();
 });
 
-ganancia.addEventListener('focus',e=>{
+ganancia.addEventListener('focus', e => {
     ganancia.select();
 });
 
-total.addEventListener('focus',e=>{
+total.addEventListener('focus', e => {
     total.select();
 });
 
-impuesto.addEventListener('blur',e=>{
+impuesto.addEventListener('blur', e => {
     impuesto.value = impuesto.value === "" ? 0 : impuesto.value;
     if (parseFloat(costoDolar.value) !== 0) {
-        costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoDolar.value)/100) + parseFloat(costoDolar.value)) * parseFloat(dolar.value),2)
-    }else{
-        costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costo.value)/100) + parseFloat(costo.value)).toFixed(2);
+        costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoDolar.value) / 100) + parseFloat(costoDolar.value)) * parseFloat(dolar.value), 2)
+    } else {
+        costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costo.value) / 100) + parseFloat(costo.value)).toFixed(2);
     }
 });
 
-total.addEventListener('focus',e=>{
+total.addEventListener('focus', e => {
     total.value = (parseFloat(costoIva.value) + (parseFloat(costoIva.value) * parseFloat(ganancia.value) / 100)).toFixed(2);
 });

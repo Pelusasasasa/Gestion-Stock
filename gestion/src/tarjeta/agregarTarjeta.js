@@ -4,7 +4,6 @@ const { ipcRenderer } = require('electron');
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
-
 const fecha = document.getElementById('fecha');
 const nombre = document.getElementById('nombre');
 const tarjeta = document.getElementById('tarjeta');
@@ -31,6 +30,9 @@ const cargarPagina = async () => {
 };
 
 const guardar = async () => {
+
+    if (!await validarDatos()) return;
+
     const tarj = {};
 
     tarj.fecha = fecha.value;
@@ -53,6 +55,27 @@ const guardar = async () => {
 const salir = () => {
     ipcRenderer.send('enviar-ventana-principal', informacion);
     window.close();
+};
+
+const validarDatos = async () => {
+    if (fecha.value === "") {
+        await Swal.fire('No se puede cargar la tarjeta', 'Falta la fecha', 'error');
+        return false;
+    };
+    if (nombre.value === "") {
+        await Swal.fire('No se puede cargar la tarjeta', 'Falta el nombre del cliente', 'error');
+        return false;
+    };
+    if (tarjeta.value === "") {
+        await Swal.fire('No se puede cargar la tarjeta', 'Falta la tarjeta', 'error');
+        return false;
+    };
+    if (importe.value === "") {
+        await Swal.fire('No se puede cargar la tarjeta', 'Falta el importe', 'error');
+        return false;
+    };
+
+    return true
 };
 
 ipcRenderer.on('informacion', (e, args) => {

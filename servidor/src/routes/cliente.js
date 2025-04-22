@@ -1,7 +1,7 @@
-const {Router} = require('express');
+const { Router } = require('express');
 const router = Router();
 
-const {getsClientes,cargarCliente,id,getClienteId,eliminarCliente,modificarCliente,traerClienteConSaldo} = require('../controllers/cliente.controllers');
+const { getsClientes, cargarCliente, id, getClienteId, eliminarCliente, modificarCliente, traerClienteConSaldo } = require('../controllers/cliente.controllers');
 
 router.route('/')
     .get(id)

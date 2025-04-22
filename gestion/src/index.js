@@ -60,6 +60,14 @@ ipcMain.on('enviar', (e, args) => {
   ventanaPrincipal.webContents.send('recibir', JSON.stringify(args));
 });
 
+ipcMain.on('facturarVarios', (e, args) => {
+  abrirVentana('venta/index.html', 1000, 1000, false, true);
+
+  nuevaVentana.on('ready-to-show', () => {
+    nuevaVentana.send('facturarVarios', args)
+  })
+});
+
 ipcMain.on('sacar-cierre', e => {
   ventanaPrincipal.setClosable(false);
 });

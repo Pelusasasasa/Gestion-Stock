@@ -22,7 +22,7 @@ const salir = document.querySelector('#salir');
 let vendedor = '';
 let provedor;
 
-const agregarProvedor = async() => {
+const agregarProvedor = async () => {
 
     if (nombre.value === '') return await sweet.fire({
         title: 'Falta Nombre',
@@ -47,10 +47,10 @@ const agregarProvedor = async() => {
     provedor.telefono = telefono.value;
     provedor.mail = mail.value;
 
-    const res = (await axios.post(`${URL}provedor`, provedor)).data;
+    const res = (await axios.post(`${URL}provedores`, provedor)).data;
 
-    if (res.ok){
-        
+    if (res.ok) {
+
         agregarMovimientoVendedores(`Agregro el provedor ${provedor.nombre}`, vendedor.nombre);
 
         await sweet.fire({
@@ -58,7 +58,7 @@ const agregarProvedor = async() => {
             icon: 'success',
             timer: 2000
         })
-    }else{
+    } else {
         await sweet.fire({
             title: `Error al Cargar Provedor ${provedor.nombre}`,
             icon: 'error',
@@ -66,16 +66,16 @@ const agregarProvedor = async() => {
         })
     };
     ipcRenderer.send('send-ventanaPrincipal', res._doc);
-    
+
     window.close();
 };
 
-const cargarDatos = async( id ) => {
+const cargarDatos = async (id) => {
 
     modificar.classList.remove('none');
     guardar.classList.add('none');
 
-    provedor = (await axios.get(`${URL}provedor/forId/${id}`)).data;
+    provedor = (await axios.get(`${URL}provedores/forId/${id}`)).data;
 
     nombre.value = provedor.nombre;
     cuit.value = provedor.cuit;
@@ -87,16 +87,16 @@ const cargarDatos = async( id ) => {
     mail.value = provedor.mail;
 };
 
-const infoTraido = (e,args) => {
+const infoTraido = (e, args) => {
     vendedor = args.vendedor;
     provedor = args.info;
-    
-    if (provedor){
-        cargarDatos( provedor );
+
+    if (provedor) {
+        cargarDatos(provedor);
     }
 };
 
-const modificarProvedor = async() => {
+const modificarProvedor = async () => {
 
     if (nombre.value === '') return await sweet.fire({
         title: 'Falta Nombre',
@@ -119,7 +119,7 @@ const modificarProvedor = async() => {
     provedor.telefono = telefono.value;
     provedor.mail = mail.value;
 
-    const res = (await axios.put(`${URL}provedor/forId/${provedor._id}`, provedor)).data;
+    const res = (await axios.put(`${URL}provedores/forId/${provedor._id}`, provedor)).data;
 
     if (res.ok) {
         await sweet.fire({
@@ -129,7 +129,7 @@ const modificarProvedor = async() => {
         });
 
         agregarMovimientoVendedores(`Modifico el provedor ${provedor.nombre}`, vendedor);
-    }else{
+    } else {
 
         await sweet.fire({
             title: `Error al Modificar Provedor ${provedor.nombre}`,
@@ -142,7 +142,7 @@ const modificarProvedor = async() => {
     ipcRenderer.send('send-ventanaPrincipal', provedor);
 
     window.close();
-    
+
 };
 
 ipcRenderer.on('informacion', infoTraido);

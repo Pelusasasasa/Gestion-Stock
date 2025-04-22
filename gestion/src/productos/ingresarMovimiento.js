@@ -29,16 +29,16 @@ let producto;
 let acceso;
 let vendedor = '';
 
-const agregarSerieTabla = async() => {
-    
-    if (serie.value === ""){
+const agregarSerieTabla = async () => {
+
+    if (serie.value === "") {
         await sweet.fire({
             title: 'Falta poner un numero de serie'
         });
         return;
     };
 
-    if (provedor.value === ""){
+    if (provedor.value === "") {
         await sweet.fire({
             title: 'Falta poner un provedor'
         });
@@ -62,18 +62,18 @@ const agregarSerieTabla = async() => {
     serie.focus();
 };
 
-const listarProducto = ({_id, descripcion:desc, stock:sto, provedor: pro}) => {
+const listarProducto = ({ _id, descripcion: desc, stock: sto, provedor: pro }) => {
     codigo.value = _id;
     descripcion.value = desc;
     stock.value = sto.toFixed(2);
 
-    if (pro){
+    if (pro) {
         provedor.value = pro;
     }
 };
 
 const listarProvedores = (lista) => {
-    for(let elem of lista){
+    for (let elem of lista) {
         const option = document.createElement('option');
 
         option.value = elem.nombre;
@@ -83,7 +83,7 @@ const listarProvedores = (lista) => {
     };
 };
 
-const guardarMovimiento = async() => {
+const guardarMovimiento = async () => {
 
     if (cantidad.value === "") {
         await sweet.fire({
@@ -95,7 +95,7 @@ const guardarMovimiento = async() => {
     const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
     producto.stock = nuevoStock.value;
 
-    (await axios.put(`${URL}productos/descontarStock`,[producto]));
+    (await axios.put(`${URL}productos/descontarStock`, [producto]));
 
     await agregarMovimientoVendedores(inputAux.id === 'resta' ? `Resto el stock de ${stock.value} a ${nuevoStock.value} del producto ${descripcion.value}` : `Sumo el stock de ${stock.value} a ${nuevoStock.value}  del producto ${descripcion.value}`, vendedor);
 
@@ -107,7 +107,7 @@ const guardarMovimiento = async() => {
 
     //Hacemos para que se guarden numeros de series si es que los hay
     const trs = document.querySelectorAll('#tbody tr');
-    for (let tr of trs){
+    for (let tr of trs) {
 
         const serie = {
             provedor: tr.children[1].innerText,
@@ -117,7 +117,7 @@ const guardarMovimiento = async() => {
             marca: producto.marca,
             vendedor: vendedor
         };
-        
+
         await axios.post(`${URL}nroSerie`, serie);
 
     }
@@ -139,16 +139,16 @@ aceptar.addEventListener('click', guardarMovimiento);
 cantidad.addEventListener('keypress', e => {
     if (e.keyCode === 13) {
         cantidad.value = parseFloat(cantidad.value).toFixed(2);
-        
-        inputs.forEach( input => {
-            if( input.checked ) {
+
+        inputs.forEach(input => {
+            if (input.checked) {
                 inputAux = input;
             }
         });
 
-        if(inputAux.id === "resta"){
+        if (inputAux.id === "resta") {
             nuevoStock.value = (parseFloat(stock.value) - parseFloat(cantidad.value)).toFixed(2);
-        }else{
+        } else {
             nuevoStock.value = (parseFloat(stock.value) + parseFloat(cantidad.value)).toFixed(2);
         };
 
@@ -157,7 +157,7 @@ cantidad.addEventListener('keypress', e => {
 });
 
 document.addEventListener('keydown', e => {
-    if(e.keyCode === 27){
+    if (e.keyCode === 27) {
         window.close();
     }
 });
@@ -166,7 +166,7 @@ serie.addEventListener('keypress', (e) => {
     if (e.keyCode === 13) {
         if (provedor.value === "") {
             provedor.focus();
-        }else{
+        } else {
             agregarSerieTabla();
         }
     };
@@ -176,10 +176,11 @@ salir.addEventListener('click', e => {
     window.close();
 });
 
-ipcRenderer.on('informacion', async (e,{informacion, vendedor:vend}) => {
-    provedores = (await axios.get(`${URL}provedor`)).data;
-    
-    listarProvedores( provedores );
+ipcRenderer.on('informacion', async (e, { informacion, vendedor: vend }) => {
+    const { data } = (await axios.get(`${URL}provedores`));
+    provedores = data.provedores;
+
+    listarProvedores(provedores);
 
     vendedor = vend.nombre;
     acceso = vend.permiso;
