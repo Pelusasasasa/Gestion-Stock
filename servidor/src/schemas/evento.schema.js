@@ -8,11 +8,12 @@ const eventoSchema = z.object({
     description: z.string().optional(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
-    all_day: z.boolean().default(false),
     category: z.string({
         required_error: 'La categoria es obligaoria',
         invalid_type_error: 'La categoria debe ser un string'
-    })
+    }),
+    relatedModel: z.string().optional(),
+    relatedId: z.string().optional()
 });
 
 async function validateEvento(input) {

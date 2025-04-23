@@ -35,52 +35,52 @@ export const ChequeModal = ({ cerrar }) => {
                     <div className='grid grid-cols-2 gap-5'>
                         <div className='mb-4'>
                             <label htmlFor="f_recibido" className='block text-sm font-medium text-gray-700'>Fecha*</label>
-                            <input onChange={onInputChange} name='f_recibido' type="date" value={f_recibido?.slice(0, 10)} id="f_recibido" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='f_recibido' type="date" value={f_recibido?.slice(0, 10) || ''} id="f_recibido" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="numero" className='block text-sm font-normal text-gray-700'>Numero*</label>
-                            <input onChange={onInputChange} name='numero' type="text" value={numero} id="numero" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='numero' type="text" value={numero || ''} id="numero" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="banco" className='block text-sm font-medium text-gray-700'>Banco*</label>
-                            <input onChange={onInputChange} name='banco' type="text" value={banco} id="banco" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='banco' type="text" value={banco || ''} id="banco" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="importe" className='block text-sm font-medium text-gray-700'>Importe*</label>
-                            <input onChange={onInputChange} name='importe' type="number" value={importe} id="importe" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='importe' type="number" value={importe || ''} id="importe" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="f_cheque" className='block text-sm font-medium text-gray-700'>Fecha Cheque*</label>
-                            <input onChange={onInputChange} name='f_cheque' type="date" value={f_cheque?.slice(0, 10)} id="f_cheque" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='f_cheque' type="date" value={f_cheque?.slice(0, 10) || ''} id="f_cheque" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="ent_por" className='block text-sm font-medium text-gray-700'>Entregado Por*</label>
-                            <input onChange={onInputChange} name='ent_por' type="text" value={ent_por} id="ent_por" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='ent_por' type="text" value={ent_por || ''} id="ent_por" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="ent_a" className='block font-medium text-gray-700'>Entregado A</label>
-                            <input onChange={onInputChange} name='ent_a' type="text" value={ent_a} id="ent_a" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='ent_a' type="text" value={ent_a || ''} id="ent_a" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="domicilio" className='block  font-medium text-gray-700'>Domicilio</label>
-                            <input onChange={onInputChange} name='domicilio' type="text" value={domicilio} id="domicilio" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='domicilio' type="text" value={domicilio || ''} id="domicilio" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="telefono" className='block  font-medium text-gray-700'>Telefono</label>
-                            <input onChange={onInputChange} name='telefono' type="text" value={telefono} id="telefono" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
+                            <input onChange={onInputChange} name='telefono' type="text" value={telefono || ''} id="telefono" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500' />
                         </div>
 
                         <div className='mb-4'>
                             <label htmlFor="observacion" className='block  font-medium text-gray-700'>Observaciones</label>
-                            <textarea onChange={onInputChange} name='observacion' type="text" value={observacion} id="telefono" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
+                            <textarea onChange={onInputChange} name='observacion' type="text" value={observacion || ''} id="telefono" className=' block w-full px-4 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none fcous:ring-2 focus:ring-blue-500 focus:border-blue-500'>
                             </textarea>
                         </div>
                     </div>

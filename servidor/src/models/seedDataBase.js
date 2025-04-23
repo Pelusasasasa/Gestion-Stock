@@ -1,16 +1,17 @@
-const {  Schema, model } = require("mongoose");
+const { Schema, model } = require("mongoose");
 const TipoCuenta = require('../models/TipoCuenta');
-const seedTipoCuenta = async() => {
+const CategoryEvento = require('../models/CategoryEvento')
+const seedTipoCuenta = async () => {
 
     const Migration = model('Migration', new Schema({
         name: String,
-        executedAt: { type: Date, default: Date.now}
+        executedAt: { type: Date, default: Date.now }
     }));
 
     const migrationName = 'inicial_tipo_cuenta';
-    const alreadyExecuted = await Migration.findOne({name: migrationName});
+    const alreadyExecuted = await Migration.findOne({ name: migrationName });
 
-    if(!alreadyExecuted){
+    if (!alreadyExecuted) {
         await TipoCuenta.create({
             nombre: 'Factura A',
             tipo: 'I'
@@ -35,6 +36,11 @@ const seedTipoCuenta = async() => {
             nombre: 'Presupuesto',
             tipo: 'I'
         });
+
+        await CategoryEvento.create({
+            nombre: 'Pago Cheque',
+            color: '#4FCFE8'
+        })
 
         await Migration.create({
             name: migrationName

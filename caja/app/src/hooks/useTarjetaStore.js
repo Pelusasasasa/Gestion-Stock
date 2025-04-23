@@ -21,8 +21,8 @@ export const useTarjetaStore = () => {
         const { data } = await api.get('tarjetas');
 
         data.tarjetas.sort((a, b) => {
-            if (a.tarjeta.nombre > b.tarjeta.nombre) return 1;
-            if (a.tarjeta.nombre < b.tarjeta.nombre) return -1;
+            if (a.nombre > b.nombre) return 1;
+            if (a.nombre < b.nombre) return -1;
             return 0;
         });
 

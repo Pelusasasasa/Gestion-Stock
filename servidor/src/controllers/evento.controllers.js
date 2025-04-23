@@ -29,6 +29,33 @@ eventoCTRL.deleteOne = async (req, res) => {
     }
 };
 
+eventoCTRL.deleteForRelatedIdModel = async (req, res) => {
+    const { id, model } = req.params;
+
+    try {
+        const deleteEvento = await Evento.findOneAndDelete({ relatedId: id, relatedModel: model });
+
+        if (!deleteEvento) {
+            res.status(400).json({
+                ok: false,
+                msg: 'No se pudo Eliminar el evento'
+            });
+        };
+
+        res.status(200).json({
+            ok: true,
+            deleteEvento
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo eliminar el evento, hable con el administrador',
+            error
+        })
+    }
+};
+
 eventoCTRL.getForMonth = async (req, res) => {
     const { month, year } = req.params;
 
@@ -57,6 +84,32 @@ eventoCTRL.getForMonth = async (req, res) => {
         })
     }
 
+};
+
+eventoCTRL.getForRelatedIdModel = async (req, res) => {
+    const { id, model } = req.params;
+
+    try {
+        const evento = await Evento.findOne({ relatedModel: model, relatedId: id });
+
+        if (!evento) return res.status(400).json({
+            ok: false,
+            msg: 'No se encotron un evento'
+        });
+
+        res.status(200).json({
+            ok: true,
+            evento
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo obtener los eventos por id y modelo, hable con el administrador',
+            error
+        })
+
+    }
 };
 
 eventoCTRL.patchOne = async (req, res) => {

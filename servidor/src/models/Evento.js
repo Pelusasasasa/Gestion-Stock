@@ -30,14 +30,18 @@ const Evento = new Schema({
             message: 'La fecha de finalizacion debe ser posterior a la de inicio'
         }
     },
-    all_day: {
-        type: Boolean,
-        default: false,
-    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'CategoryEvento',
         required: true
+    },
+    relatedModel: {
+        type: String,
+        default: null
+    },
+    relatedId: {
+        type: Schema.Types.ObjectId,
+        default: null
     }
 });
 

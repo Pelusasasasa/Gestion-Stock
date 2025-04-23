@@ -50,6 +50,33 @@ categoryEventCTRL.getAll = async (req, res) => {
 
 };
 
+categoryEventCTRL.getOneForName = async (req, res) => {
+    const { nombre } = req.params;
+
+    try {
+
+        const category = await CategoryEvento.findOne({ nombre });
+
+        if (!category) return res.status(400).json({
+            ok: false,
+            msg: 'No se encontro categoria con ese nombre'
+        });
+
+        res.status(200).json({
+            ok: true,
+            category
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se puede obtener la categoria, hable con el administrador',
+            error
+        });
+    }
+};
+
 categoryEventCTRL.patchOne = async (req, res) => {
 
     const { id } = req.params;
