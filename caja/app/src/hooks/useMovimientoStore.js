@@ -47,7 +47,8 @@ export const useMovimientoStore = () => {
 
         try {
             const { data } = await api.post('movCaja', mov);
-            if (data.mov.fecha >= desde && data.mov.fecha <= hasta) {
+            if (data.mov.fecha >= (desde + 'T00:00:00.000Z') && data.mov.fecha <= (hasta + 'T23:59:59.000Z')) {
+                console.log(data.mov);
                 dispatch(postMovimiento(data.mov));
             }
 

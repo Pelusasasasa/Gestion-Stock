@@ -39,7 +39,6 @@ movCajaCTRL.getForDates = async (req, res) => {
                 { fecha: { $lt: new Date(hasta + "T23:59:59.000Z") } }
             ]
         }).populate('tipo', ['nombre', 'tipo']);
-        console.log(movimientos);
         const movs = movimientos.filter(elem => elem.tipo.tipo === tipo);
 
         res.status(200).json({
@@ -102,13 +101,14 @@ movCajaCTRL.postOne = async (req, res) => {
 
 
     try {
-        const mov = new MovCaja(result.data);
-        await mov.save();
+        const newMov = new MovCaja(result.data);
+        await newMov.save();
 
+        const mov = await MovCaja.findOne({_id: newMov._id}).populate('tipo', ['nombre', 'tipo']);
         res.status(201).json({
             ok: true,
             mov
-        })
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({

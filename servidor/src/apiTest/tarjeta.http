@@ -10,7 +10,8 @@ Content-Type: application/json
   "importe": 1000,
   "fecha": "{{$datetime iso8601}}",
   "nombre": "Agustin Lorenzatto",
-  "tarjeta": "Visa",
+  "tipo": "Factura B",
+  "tarjeta": "67fe7c8d0687af5006608744",
   "vendedor": "Carla"
 }
 

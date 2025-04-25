@@ -18,7 +18,7 @@ export const useEventoStore = () => {
         try {
             const { data } = await api.delete(`evento/${id}`);
 
-            dispatch(deleleEvent(data.deleteEvento._id))
+            dispatch(deleleEvent(data.deleteEvento._id));
         } catch (error) {
             console.log(error);
         }
@@ -58,7 +58,7 @@ export const useEventoStore = () => {
         const { data } = await api.post('/evento', evento);
 
         if (mes.getMonth() + 1 === parseFloat(data.evento.start_date.slice(5, 7))) {
-            dispatch(postEvento(data.evento))
+            dispatch(postEvento(data.evento));
         }
     };
 

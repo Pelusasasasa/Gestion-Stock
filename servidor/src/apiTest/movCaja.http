@@ -3,9 +3,9 @@ POST http://localhost:4000/gestion/movCaja
 Content-Type: application/json
 
 {
-    "fecha": "2025-04-17",
+    "fecha": "2025-04-25",
     "description": "Prueba 1",
-    "tipo": "67ffb67ed31067f94ed74c0d",
+    "tipo": "6808f818be9e94b1ce8270a3",
     "importe": 500,
     "vendedor": "639dbc31dfdb8a1d243d19c2"
 }

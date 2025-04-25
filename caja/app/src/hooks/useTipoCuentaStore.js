@@ -29,7 +29,7 @@ export const useTipoCuentaStore = () => {
         const { data } = await api.get(`tipoCuenta/type/${tipo}`);
 
         dispatch(setTipoCuentas(data.tipoCuentas))
-    }
+    };
 
     const startPatchTipoCuenta = async (tipoCuenta) => {
         const api = await gestorApi();

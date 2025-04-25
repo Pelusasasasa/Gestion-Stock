@@ -22,7 +22,6 @@ const EventoModal = ({ cerrar, mes }) => {
         e.preventDefault();
         if (!await verificarDatosEvento(formState)) return;
         dispatch(isSaving());
-
         startPostEvento(formState, mes);
         cerrar(false);
     };

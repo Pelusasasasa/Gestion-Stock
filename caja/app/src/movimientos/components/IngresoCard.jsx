@@ -4,6 +4,7 @@ import { RiPencilFill } from 'react-icons/ri';
 import { useDispatch } from 'react-redux';
 import { savingMovimiento } from '../../store/movimientos/movimientoSlice';
 import { useMovimientoStore } from '../../hooks/useMovimientoStore';
+import Swal from 'sweetalert2';
 
 
 
@@ -16,10 +17,21 @@ export const IngresoCard = ({ _id, descripcion, fecha, tipo, puntoVenta, numero,
         setModal(true);
     };
 
-    const handleDelete = () => {
-        dispatch(savingMovimiento())
+    const handleDelete = async() => {
+        const { isConfirmed } = await Swal.fire({
+            title: `Eliminar ${tipo.tipo === 'I' ? 'Ingreso' : 'Egreso'}`,
+            text: `Quiere eliminar ${descripcion}`,
+            confirmButtonText: 'Aceptar',
+            showCancelButton: true
+        });
 
-        startDeleteOneMov(_id);
+        if( isConfirmed ){
+            dispatch(savingMovimiento());
+
+            startDeleteOneMov(_id);
+        }
+
+        
     };
 
     return (

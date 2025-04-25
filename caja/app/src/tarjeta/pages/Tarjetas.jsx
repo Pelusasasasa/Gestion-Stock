@@ -17,6 +17,7 @@ export const Tarjetas = () => {
 
     const [modal, setModal] = useState(false);
     const [tarjetasFiltradas, setTarjetasFiltradas] = useState(tarjetas);
+    const [total, setTotal] = useState(0);
 
     const handleModal = () => {
         setModal(true)
@@ -28,6 +29,10 @@ export const Tarjetas = () => {
 
     useEffect(() => {
         setTarjetasFiltradas(tarjetas);
+        
+        const sum = tarjetasFiltradas.reduce((acc, elem) => acc + elem.importe, 0);
+        console.log(sum);
+        setTotal(sum);
     }, [tarjetas]);
 
     useEffect(() => {
@@ -60,14 +65,20 @@ export const Tarjetas = () => {
                 </div>
 
                 {/* Listado */}
-                <div className='gap-2 flex flex-col py-5 mb-5 mx-5 bg-white rounded-b-xl'>
+                <div className='gap-2 flex flex-col pt-5  mx-5 bg-white rounded-b-xl overflow-y-scroll h-[calc(70vh)]'>
                     {
                         tarjetasFiltradas.map(elem => (
                             <TarjetaCard {...elem} key={elem._id} modal={handleModal} />
                         ))
                     }
                 </div>
+
+                <div className='flex justify-center bg-white pb-5'>
+                    <p className='text-2xl text-gray-600'>Total: $<span>{total.toFixed(2)}</span></p>
+                </div>
             </div>
+
+            
 
             {modal && <TarjetaModal cerrar={setModal} />}
 
