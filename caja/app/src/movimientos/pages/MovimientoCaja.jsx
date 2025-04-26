@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { IoArrowDownCircleOutline, IoArrowUpCircleOutline, IoSearchOutline } from "react-icons/io5";
+import { HiOutlineDocumentCurrencyDollar } from "react-icons/hi2";
 import { IngresoPage } from './IngresoPage';
+import { LibroContablePage} from './LibroContablePage'; 
 import { useForm } from '../../hooks/Useform';
 import MovCajaModal from '../components/MovCajaModal';
 import { useMovimientoStore } from '../../hooks/useMovimientoStore';
@@ -52,6 +54,13 @@ export const MovimientoCaja = () => {
                         Egresos
                     </button>
 
+                    <button
+                        onClick={() => setSectionMov('LibroContable')}
+                        className={`flex gap-2 p-2 justify-center items-center cursor-pointer ${sectionMov === 'LibroContable' ? 'text-red-500 border-b-red-500 border-b' : 'hover:opacity-50'}`}>
+                        <HiOutlineDocumentCurrencyDollar />
+                        Libro Contable
+                    </button>
+
                 </div>
 
                 <div className='grid grid-cols-[4fr_4fr_1fr] w-full gap-2 px-2 py-4 bg-gray-50'>
@@ -80,6 +89,10 @@ export const MovimientoCaja = () => {
 
                 {
                     sectionMov === 'Egreso' && <IngresoPage section={sectionMov} setModal={setModal} desde={desde} hasta={hasta} />
+                }
+
+                {
+                    sectionMov === 'LibroContable' && <LibroContablePage section={sectionMov} setModal={setModal} desde={desde} hasta={hasta} />
                 }
 
             </div>

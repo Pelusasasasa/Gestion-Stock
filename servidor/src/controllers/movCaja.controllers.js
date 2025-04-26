@@ -30,7 +30,7 @@ movCajaCTRL.deleteOne = async (req, res) => {
 
 movCajaCTRL.getForDates = async (req, res) => {
     const { desde, hasta, tipo } = req.params;
-
+    let movs = [];
     try {
 
         const movimientos = await MovCaja.find({
@@ -39,7 +39,14 @@ movCajaCTRL.getForDates = async (req, res) => {
                 { fecha: { $lt: new Date(hasta + "T23:59:59.000Z") } }
             ]
         }).populate('tipo', ['nombre', 'tipo']);
-        const movs = movimientos.filter(elem => elem.tipo.tipo === tipo);
+        
+
+        if(tipo !== 'all'){
+            movs = movimientos.filter(elem => elem.tipo.tipo === tipo);
+        }else{
+            movs = movimientos;
+        };
+        
 
         res.status(200).json({
             movs,
