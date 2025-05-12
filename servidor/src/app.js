@@ -59,6 +59,7 @@ app.use('/gestion/evento', require('./routes/evento.routes'));
 app.use('/gestion/movCaja', require('./routes/movCaja.routes'));
 
 app.use('/gestion/provedores', require('./routes/provedor.routes'));
+app.use('/gestion/saldoMensual', require('./routes/saldoMensual.routes'));
 app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
 app.use('/gestion/tipoCuenta', require('./routes/tipoCuenta.routes'));
 app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
