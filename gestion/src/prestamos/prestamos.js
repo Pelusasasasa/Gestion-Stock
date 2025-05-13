@@ -5,12 +5,14 @@ const URL = process.env.URL;
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
+const buscador = document.getElementById('buscador');
 
 const tbodyMovimientos = document.querySelector('#tbody-movimientos');
 
 let seleccionado = '';
 let subSeleccionado = '';
 let prestamos = [];
+
 
 const cambiarObservaciones = async() => {
     const sweet = require('sweetalert2');
@@ -116,6 +118,17 @@ const exportarExcel = async() => {
 
 };
 
+const filtrarPrestamos = (e) => {
+    let prestamosAux = prestamos.filter(elem => elem.observaciones.startsWith(buscador.value.toUpperCase()));
+    tbody.innerHTML = '';
+    if(!buscador.value){
+        listarPrestamos(prestamos);
+        return;
+    };
+     
+    listarPrestamos(prestamosAux);
+};
+
 //Funciones
 const listarPrestamos = async(lista) => {
     
@@ -187,10 +200,12 @@ const listarMovimientos = async( num ) => {
     };
 };
 
-//Eventos
-window.addEventListener('load', async () => {
-    prestamos = (await axios.get(`${URL}prestamos/noAnulados`)).data.filter(prestamo => prestamo.codigo === "L083");
-    listarPrestamos(prestamos);
+buscador.addEventListener('keyup', filtrarPrestamos);
+
+document.addEventListener('keydown', e => {
+    if (e.keyCode === 27) {
+        window.location = `../menu.html`;
+    }
 });
 
 thead.addEventListener('click',e => {
@@ -283,10 +298,10 @@ tbody.addEventListener('dblclick', e => {
     
 });
 
-document.addEventListener('keydown', e => {
-    if (e.keyCode === 27) {
-        window.location = `../menu.html`;
-    }
+//Eventos
+window.addEventListener('load', async () => {
+    prestamos = (await axios.get(`${URL}prestamos/noAnulados`)).data.filter(prestamo => prestamo.codigo === "L083");
+    listarPrestamos(prestamos);
 });
 
 
