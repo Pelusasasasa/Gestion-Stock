@@ -38,7 +38,7 @@
         </fieldset>
     </section>
 
-    <section class="flex justify-around">
+    <section class="flex justify-around gap-2">
         <main class="informacion flex flex-col items-center gap-2 mt-2">
             <div class="flex flex-col">
                 <label for="stock">Stock</label>
@@ -58,7 +58,7 @@
         </main>
 
         <main id="series" class="none">
-            <div class="flex gap-2">
+            <div class="flex gap-2  mb-1">
                 <div class="flex flex-col">
                     <label for="serie">Nro Serie</label>
                     <input type="text" name="serie" id="serie">
@@ -67,9 +67,13 @@
                     <label for="provedor">Provedor</label>
                     <select type="text" name="provedor" id="provedor"></select>
                 </div>
-                <div class="cursor-pointer hover-scale-1-9" id="agregarSerie">
+                <div class="flex flex-col">
+                    <label for="factura">Numero de Factura</label>
+                    <input type="text" name="factura" id="factura">
+                </div>
+                <div class="cursor-pointer hover-scale-1-2 flex" id="agregarSerie">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        class="size-6">
+                        class="w-5 self-center">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                 </div>
@@ -80,6 +84,7 @@
                         <tr>
                             <th class="border border-black">Nro Serie</th>
                             <th class="border border-black">Provedor</th>
+                            <th class="border border-black">Numero Factura</th>
                         </tr>
                     </thead>
                     <tbody id="tbody"></tbody>

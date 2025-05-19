@@ -174,9 +174,7 @@ document.addEventListener('keyup',async e=>{
 
 
 ventas.addEventListener('click',async e=>{
-    if (verVendedores) {
         const vendedor = await verificarUsuarios();
-        console.log(vendedor)
         if (vendedor) {
             location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
             ipcRenderer.send('sacar-cierre');
@@ -185,11 +183,7 @@ ventas.addEventListener('click',async e=>{
                 title:"Contraseña incorrecta"
             })
             ventas.click()
-        }
-    }else{
-        location.href = "./venta/index.html";
-        ipcRenderer.send('sacar-cierre');
-    }
+        };
 });
 
 clientes.addEventListener('click',async e=>{

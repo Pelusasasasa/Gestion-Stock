@@ -156,6 +156,10 @@ table tbody {
   margin-bottom: 2rem;
 }
 
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
 /* Padding */
 
 .p-2 {
@@ -188,6 +192,10 @@ table tbody {
 
 .items-center {
   align-items: center;
+}
+
+.self-center {
+  align-self: 'center';
 }
 
 .gap-1 {
@@ -275,6 +283,14 @@ table tbody {
   width: 80rem;
 }
 
+.w-50 {
+  width: 50rem;
+}
+
+.w-5 {
+  width: 5rem;
+}
+
 .size-6 {
   width: 6rem;
 }
@@ -356,7 +372,7 @@ table tbody {
   cursor: pointer;
 }
 
-.hover-scale-1-9:hover {
+.hover-scale-1-2:hover {
   transform: scale(1.2);
 }
 

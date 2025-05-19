@@ -17,6 +17,7 @@ const cantidad = document.querySelector('#cantidad');
 const nuevoStock = document.querySelector('#nuevoStock');
 
 const serie = document.querySelector('#serie');
+const factura = document.querySelector('#factura');
 const provedor = document.querySelector('#provedor');
 const agregarSerie = document.querySelector('#agregarSerie');
 const tbody = document.querySelector('#tbody');
@@ -48,13 +49,16 @@ const agregarSerieTabla = async () => {
     const tr = document.createElement('tr');
 
     const tdSerie = document.createElement('td');
+    const tdFactura = document.createElement('td');
     const tdProvedor = document.createElement('td');
 
     tdSerie.innerText = serie.value;
+    tdFactura.innerText = factura.value;
     tdProvedor.innerText = provedor.value.toUpperCase();
 
     tr.appendChild(tdSerie);
     tr.appendChild(tdProvedor);
+    tr.appendChild(tdFactura);
 
     tbody.appendChild(tr);
 
@@ -77,7 +81,7 @@ const listarProvedores = (lista) => {
         const option = document.createElement('option');
 
         option.value = elem.nombre;
-        option.text = elem.nombre;
+        option.text = elem.nombre.slice(0,15);
 
         provedor.appendChild(option);
     };
@@ -110,7 +114,8 @@ const guardarMovimiento = async () => {
     for (let tr of trs) {
 
         const serie = {
-            provedor: tr.children[1].innerText,
+            provedor: tr.children[2].innerText,
+            factura: tr.children[1].innerText,
             nro_serie: tr.children[0].innerText,
             codigo: codigo.value,
             producto: descripcion.value,

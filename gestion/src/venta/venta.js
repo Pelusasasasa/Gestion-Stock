@@ -18,7 +18,7 @@ const URL = process.env.GESTIONURL;
 
 
 const { ipcRenderer, clipboard } = require('electron');
-const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro } = require('../helpers');
+const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro, agregarMovimientoVendedores } = require('../helpers');
 const archivo = require('../configuracion.json');
 
 //Parte Cliente
@@ -327,21 +327,9 @@ const listarProducto = async (id, cant = 1, series = []) => {
             listaProductos.push({ cantidad: parseFloat(cantidad.value), producto, series });
 
             codBarra.value = producto._id;
-
-            //ponemos en el input el precio de el producto ya se para consumidor final o para instalador
-            if (checkboxDolar.checked) {
-                if (lista.value === "1") {
-                    precioU.value = redondear(producto.precio / dolar, 2);
-                } else {
-                    if (producto.costo !== 0) {
-                        precioU.value = redondear((producto.costo + producto.costo * producto.impuesto / 100) / dolar, 2);
-                    } else {
-                        precioU.value = redondear(producto.costoDolar + producto.costoDolar * producto.impuesto / 100, 2);
-                    }
-                }
-            } else {
-                precioU.value = lista.value === "1" ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolar);
-            }
+            
+            precioU.value = lista.value === "1" ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolar);
+            
             idProducto++;
             producto.idTabla = `${idProducto}`;
 
@@ -781,6 +769,7 @@ facturar.addEventListener('click', async e => {
                 await axios.post(`${URL}ventas`, venta);
             };
 
+
             //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
             if (remitosTraidos.length > 0) {
                 for (let elem of remitosTraidos) {
@@ -792,12 +781,13 @@ facturar.addEventListener('click', async e => {
                 ipcRenderer.send('imprimir', [situacion, venta, cliente, movimientos, checkboxDolar.checked]);
             };
 
-
             if (facturaVarios) {
                 await arreglarSaldo(codigo.value);
                 await eliminarCuentas();
+            };
 
-            }
+            //Agregar movimiento de los vendedores
+            await agregarMovimientoVendedores(`Hizo una venta al cliente ${cliente.nombre}`, vendedor);
 
             facturaVarios && window.close();
             esRemito ? location.href = '../menu.html' : location.reload();
