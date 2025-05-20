@@ -86,6 +86,35 @@ productoCTRL.modificarProducto = async (req, res) => {
 
 };
 
+productoCTRL.updateProducto = async(req, res) => {
+
+    const { codigo } = req.params;
+
+    try {
+        const productUpdate = await Producto.findOneAndUpdate({_id: codigo}, req.body, { new: true });
+
+        if(!productUpdate) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Producto no encontrado'
+            });
+        };
+
+        res.status(200).json({
+            ok: true,
+            productUpdate
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se puedo modificar el producto',
+            error
+        })
+    }
+};
+
 productoCTRL.cargarProducto = async (req, res) => {
     let producto;
     let mensaje;

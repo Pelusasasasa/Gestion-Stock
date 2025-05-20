@@ -124,6 +124,7 @@ const listarSeries = (series) => {
         const tdProducto = document.createElement('td');
         const tdNroSerie = document.createElement('td');
         const tdProvedor = document.createElement('td');
+        const tdFactura = document.createElement('td');
         const tdVendedor = document.createElement('td');
 
         tdFecha.classList.add('border');
@@ -131,6 +132,7 @@ const listarSeries = (series) => {
         tdProducto.classList.add('border');
         tdNroSerie.classList.add('border');
         tdProvedor.classList.add('border');
+        tdFactura.classList.add('border');
         tdVendedor.classList.add('border');
 
         tdFecha.classList.add('border-black');
@@ -138,6 +140,7 @@ const listarSeries = (series) => {
         tdProducto.classList.add('border-black');
         tdNroSerie.classList.add('border-black');
         tdProvedor.classList.add('border-black');
+        tdFactura.classList.add('border-black');
         tdVendedor.classList.add('border-black');
 
         tdFecha.innerText = serie.fecha.slice(0, 10).split('-', 3).reverse().join('/');
@@ -145,6 +148,7 @@ const listarSeries = (series) => {
         tdProducto.innerText = serie.producto;
         tdNroSerie.innerText = serie.nro_serie;
         tdProvedor.innerText = serie.provedor;
+        tdFactura.innerText = serie.factura;
         tdVendedor.innerText = serie.vendedor;
 
         tr.appendChild(tdFecha);
@@ -152,6 +156,7 @@ const listarSeries = (series) => {
         tr.appendChild(tdProducto);
         tr.appendChild(tdNroSerie);
         tr.appendChild(tdProvedor);
+        tr.appendChild(tdFactura);
         tr.appendChild(tdVendedor);
 
         tbody.appendChild(tr);

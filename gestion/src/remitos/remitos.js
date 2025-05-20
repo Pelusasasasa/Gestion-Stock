@@ -1,5 +1,7 @@
 const axios = require('axios');
+const Swal = require('sweetalert2')
 const { ipcRenderer } = require('electron');
+const { getParameterByName } = require('../helpers');
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -18,6 +20,8 @@ let remitos = [];
 let movs = [];
 let seleccionado = '';
 let subSeleccionado = '';
+
+const vendedor = getParameterByName('vendedor');
 
 const apretarTecla = async(e) => {
 
@@ -91,7 +95,7 @@ const handleCheckbox = async(e) => {
     }
 
 
-}
+};
 
 const listarMovs = (lista) => {
     tbodyMov.innerHTML = '';
@@ -110,6 +114,7 @@ const listarMovs = (lista) => {
         const tdPrecio = document.createElement('td');
         const tdCant = document.createElement('td');
         const tdTotal = document.createElement('td');
+        const tdAcciones = document.createElement('td');
 
         tdCod.classList.add('border');
         tdDesc.classList.add('border');
@@ -117,6 +122,13 @@ const listarMovs = (lista) => {
         tdPrecio.classList.add('border');
         tdCant.classList.add('border');
         tdTotal.classList.add('border');
+        tdAcciones.classList.add('border');
+
+        tdAcciones.classList.add('flex');
+
+        tdAcciones.classList.add('justify-center');
+        
+        tdAcciones.classList.add('cursor-pointer');
 
         tdPrecio.classList.add('text-rigth');
         tdCant.classList.add('text-rigth');
@@ -128,6 +140,14 @@ const listarMovs = (lista) => {
         tdPrecio.innerText = elem.precio.toFixed(2);
         tdCant.innerText = elem.cantidad.toFixed(2);
         tdTotal.innerText = (elem.precio * elem.cantidad).toFixed(2);
+        tdAcciones.innerHTML = `
+            <div class=tool'>
+                <span class=material-icons>edit</span>
+                <p class=tooltip>Modificar</p>
+            </div>
+        `
+
+        tdAcciones.addEventListener('click', modificarMovs);
 
         tr.appendChild(tdCod);
         tr.appendChild(tdDesc);
@@ -135,6 +155,7 @@ const listarMovs = (lista) => {
         tr.appendChild(tdPrecio);
         tr.appendChild(tdCant);
         tr.appendChild(tdTotal);
+        tr.appendChild(tdAcciones);
 
         tbodyMov.appendChild(tr);
     }
@@ -205,12 +226,60 @@ const listarRemitos = (lista) => {
     };
 };
 
+const modificarMovs = async(e) => {
+    let id = '';
+    if( e.target.nodeName === 'TD') id = e.target.parentNode.id;
+    if( e.target.nodeName === 'DIV') id = e.target.parentNode.parentNode.id;
+    if( e.target.nodeName === 'SPAN') id = e.target.parentNode.parentNode.parentNode.id;
+
+    const tr = document.getElementById(`${id}`);
+    const precio = parseFloat(tr.children[3].innerText);
+    const cantidad = tr.children[4].innerText
+    
+
+    const {isConfirmed, value} = await Swal.fire({
+        title: 'Modificar Movimiento',
+        text: 'Cantidad',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        input: 'number',
+        inputValue: cantidad 
+    });
+
+    if(isConfirmed){
+        const { data } = await axios.put(`${URL}movimiento`, [{
+            _id: id,
+            cantidad: value ? value : cantidad,
+            precio: value ? value * precio : cantidad * precio
+        }]);
+
+        const updateMov  = data.movs.find(elem => elem._id == id);
+
+        if(data.ok){
+            const {data: producto} = await axios.get(`${URL}productos/${updateMov.codProd}`);
+            const {data: updateProduct} = await axios.patch(`${URL}productos/codProd/${updateMov.codProd}`, {
+                stock: parseFloat(producto.stock) + parseFloat(cantidad) - updateMov.cantidad
+            });
+        };
+
+        
+        tr.children[4].innerText = updateMov.cantidad.toFixed(2);
+        tr.children[5].innerText = updateMov.precio.toFixed(2);
+
+
+        
+        
+    };
+
+    
+};
+
 const pasarCuenta = async() => {
     const trSeleccinados = document.querySelectorAll('tr input[type="checkbox"]:checked');
     const filasSeleccionadas = Array.from(trSeleccinados).map(checkbox => checkbox.closest('tr'));
     const idFilas = filasSeleccionadas.map(elem => elem.id);
     
-    location.href = `../venta/index.html?remito=true&remitos=${JSON.stringify(idFilas)}`;
+    location.href = `../venta/index.html?remito=true&remitos=${JSON.stringify(idFilas)}&vendedor=${vendedor}`;
 };
 
 buscador.addEventListener('keyup', filtrarRemitos);

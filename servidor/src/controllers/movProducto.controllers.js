@@ -26,11 +26,25 @@ movimientoCTRL.deleteForIdAndTipo = async (req, res) => {
 
 movimientoCTRL.modificarVarios = async (req, res) => {
     const arreglo = req.body;
-    for await (let movimiento of arreglo) {
-        await movProducto.findByIdAndUpdate({ _id: movimiento._id }, movimiento);
-        console.log(`movimiento con el ID: ${movimiento._id} Modificado`);
+    let movs = [];
+    try {
+        for await (let movimiento of arreglo) {
+            const mov = await movProducto.findByIdAndUpdate({ _id: movimiento._id }, movimiento, {new: true});
+            console.log(`movimiento con el ID: ${movimiento._id} Modificado`);
+            movs.push(mov);
+        };
+        res.status(200).json({
+            ok: true,
+            movs
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: true,
+            msg: 'No se pudo modificar los movimientos',
+            error
+        })
     }
-    res.send("moviemientos modificados");
 };
 
 movimientoCTRL.cargar = async (req, res) => {

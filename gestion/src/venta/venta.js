@@ -1,25 +1,18 @@
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+const axios = require('axios');
+const sweet = require('sweetalert2');
+require("dotenv").config();
+
+const { ipcRenderer, clipboard } = require('electron');
+const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
+const archivo = require('../configuracion.json');
+
+const URL = process.env.GESTIONURL;
+
 
 let vendedor = getParameterByName('vendedor');
 let esRemito = getParameterByName('remito');
 let remitosTraidosJSON = getParameterByName('remitos');
 let remitosTraidos = remitosTraidosJSON ? JSON.parse(remitosTraidosJSON) : '';
-
-const axios = require('axios');
-const sweet = require('sweetalert2');
-require("dotenv").config();
-
-const URL = process.env.GESTIONURL;
-
-
-const { ipcRenderer, clipboard } = require('electron');
-const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro, agregarMovimientoVendedores } = require('../helpers');
-const archivo = require('../configuracion.json');
 
 //Parte Cliente
 const codigo = document.querySelector('#codigo');
@@ -140,14 +133,27 @@ const cargarRemito = async () => {
     for (let elem of remitosTraidos) {
         const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
         const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
-        console.log(mov)
         textoObservaciones += remito.observaciones + ' ';
         movimientosRemitos.push(...mov);
         idCliente = remito.idCliente;
     };
 
     for await (let elem of movimientosRemitos) {
-        await listarProducto(elem.codProd, elem.cantidad)
+        let producto
+        const res = elem.codProd.toUpperCase().replace(/\//g, '%2F');
+        if(res) {
+            producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+        }else{
+            producto = {};
+            producto._id = elem.codProd;
+            producto.descripcion = elem.producto;
+            producto.precio = elem.precio;
+            producto.marca = elem.marca;
+            producto.impuesto = elem.iva;
+        }
+        console.log(producto);
+        
+        await listarProducto(producto, elem.cantidad)
         const pro = listaProductos.find(({ producto }) => producto._id === elem.codProd);
         pro.series = elem.series;
     };
@@ -279,9 +285,7 @@ const listarCliente = async (id) => {
 };
 
 //Lo que hacemos es listar el producto traido
-const listarProducto = async (id, cant = 1, series = []) => {
-    const res = id.toUpperCase().replace(/\//g, '%2F');
-    let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+const listarProducto = async (producto, cant = 1, series = []) => {
 
     cantidad.value = cant;
 
@@ -299,7 +303,7 @@ const listarProducto = async (id, cant = 1, series = []) => {
         return;
     };
 
-    producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${id}`)).data : producto;//buscamos el producto por descripcion
+    producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${producto}`)).data : producto;//buscamos el producto por descripcion
     //ponemos el precio del producto con un descuento si es que hay
     producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value) / 100, 2));
 
@@ -817,16 +821,24 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
     for (let elem of cuentas) {
         const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
         for await (let mov of movs) {
-            listarProducto(mov.codProd, mov.cantidad, mov.series);
+            const res = mov.codProd.toUpperCase().replace(/\//g, '%2F');
+            let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            listarProducto(producto, mov.cantidad, mov.series);
         };
     };
 });
 
-ipcRenderer.on('recibir', (e, args) => {
+ipcRenderer.on('recibir', async(e, args) => {
     const { tipo, informacion, cantidad } = JSON.parse(args);
+
     tipo === "cliente" && listarCliente(informacion);
-    tipo === "producto" && listarProducto(informacion, cantidad);
     tipo === "Ningun cliente" && nombre.focus();
+
+    if(tipo === "producto"){
+        const res = informacion.toUpperCase().replace(/\//g, '%2F');
+        let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+        listarProducto(producto, cantidad);
+    }
 });
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
@@ -1072,7 +1084,9 @@ observaciones.addEventListener('keypress', e => {
 cantidad.addEventListener('keypress', async e => {
     if (e.keyCode === 13) {
         if (eval(e.target.value)) {
-            listarProducto(codBarra.value, cantidad.value);
+            const res = codBarra.value.toUpperCase().replace(/\//g, '%2F');
+            let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            listarProducto(producto, cantidad.value);
         } else {
             cantidad.value = "";
         };

@@ -268,8 +268,16 @@ recibo.addEventListener('click',async e=>{
     }
 });
 
-remitos.addEventListener('click', e => {
-    location.href = './remitos/remitos.html';
+remitos.addEventListener('click', async e => {
+    const vendedor = await verificarUsuarios();
+    if(vendedor){
+        location.href = `./remitos/remitos.html?vendedor=${vendedor.nombre}`;
+    }else{
+        await sweet.fire({
+            title:"Contraseña incorrecta"
+        })
+        remitos.click();
+    };
 });
 
 servicioTecnico.addEventListener('click', async e => {
