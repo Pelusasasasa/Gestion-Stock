@@ -101,6 +101,7 @@ const listarMovs = (lista) => {
     tbodyMov.innerHTML = '';
 
     for(let elem of lista){
+        console.log(elem);
         listMov.classList.remove('none');
         tbody.parentElement.parentElement.classList.remove('h-80vh');
         tbody.parentElement.parentElement.classList.add('h-30vh');
@@ -115,6 +116,9 @@ const listarMovs = (lista) => {
         const tdCant = document.createElement('td');
         const tdTotal = document.createElement('td');
         const tdAcciones = document.createElement('td');
+        const tdSerie = document.createElement('td');
+
+        const textAreaSerie = document.createElement('textarea');
 
         tdCod.classList.add('border');
         tdDesc.classList.add('border');
@@ -123,16 +127,17 @@ const listarMovs = (lista) => {
         tdCant.classList.add('border');
         tdTotal.classList.add('border');
         tdAcciones.classList.add('border');
+        tdSerie.classList.add('border');
 
-        tdAcciones.classList.add('flex');
-
-        tdAcciones.classList.add('justify-center');
-        
-        tdAcciones.classList.add('cursor-pointer');
+        // tdAcciones.classList.add('flex');
+        // tdAcciones.classList.add('justify-center');
+        // tdAcciones.classList.add('cursor-pointer');
 
         tdPrecio.classList.add('text-rigth');
         tdCant.classList.add('text-rigth');
         tdTotal.classList.add('text-rigth');
+
+        textAreaSerie.classList.add('w-full')
 
         tdCod.innerText = elem.codProd;
         tdDesc.innerText = elem.producto;
@@ -141,11 +146,17 @@ const listarMovs = (lista) => {
         tdCant.innerText = elem.cantidad.toFixed(2);
         tdTotal.innerText = (elem.precio * elem.cantidad).toFixed(2);
         tdAcciones.innerHTML = `
-            <div class=tool'>
-                <span class=material-icons>edit</span>
-                <p class=tooltip>Modificar</p>
+            <div class="flex justify-center cursor-pointer">
+                <div class=tool'>
+                    <span class=material-icons>edit</span>
+                    <p class=tooltip>Modificar</p>
+                </div>
             </div>
-        `
+        `;
+        textAreaSerie.innerText = elem.series;
+
+
+        tdSerie.appendChild(textAreaSerie);
 
         tdAcciones.addEventListener('click', modificarMovs);
 
@@ -156,6 +167,7 @@ const listarMovs = (lista) => {
         tr.appendChild(tdCant);
         tr.appendChild(tdTotal);
         tr.appendChild(tdAcciones);
+        tr.appendChild(tdSerie);
 
         tbodyMov.appendChild(tr);
     }
@@ -228,9 +240,10 @@ const listarRemitos = (lista) => {
 
 const modificarMovs = async(e) => {
     let id = '';
+    console.log(e.target.nodeName);
     if( e.target.nodeName === 'TD') id = e.target.parentNode.id;
     if( e.target.nodeName === 'DIV') id = e.target.parentNode.parentNode.id;
-    if( e.target.nodeName === 'SPAN') id = e.target.parentNode.parentNode.parentNode.id;
+    if( e.target.nodeName === 'SPAN') id = e.target.parentNode.parentNode.parentNode.parentNode.id;
 
     const tr = document.getElementById(`${id}`);
     const precio = parseFloat(tr.children[3].innerText);
