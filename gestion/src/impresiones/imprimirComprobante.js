@@ -32,6 +32,7 @@ window.addEventListener('load',e=>{
         let datosVenta = JSON.parse(args)[1];
         let movimientos = JSON.parse(args)[3];
         let auxDolar = JSON.parse(args)[4];
+
         
         if ((auxDolar)) {
             dolar = (await axios.get(`${URL}numero/Dolar`)).data;
@@ -52,13 +53,12 @@ const ponerDatosVenta = (datos)=>{
     const hora = aux.slice(11,19).split(':',3);
     numero.innerText = datos.numero.toString().padStart(8,'0');
     date.innerText = `${fecha[2]}/${fecha[1]}/${fecha[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
-    tipoPago.innerText = datos.tipo_venta;
+    tipoPago.innerText = datos.tipoVenta ?? datos.tipo_venta;
     vendedor.innerText = datos.vendedor;
     condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
-
-    if(datos.tipo_venta !== 'RT'){
+    if(datos.tipo_venta !== 'RT' && datos.tipoVenta !== 'RT'){
         subTotal.innerText = dolar ? ((datos.precio + datos.descuento) / dolar).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
-    descuento.innerText = datos.descuento.toFixed(2);
+        descuento.innerText = datos?.descuento?.toFixed(2);
         total.innerText = dolar ? (datos.precio / dolar).toFixed(2) : datos.precio.toFixed(2);
     }
 };

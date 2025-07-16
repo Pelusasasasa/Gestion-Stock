@@ -160,6 +160,16 @@ table tbody {
   margin-bottom: 1rem;
 }
 
+.my-1{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.my-2{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 /* Padding */
 
 .p-2 {

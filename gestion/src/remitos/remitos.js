@@ -51,6 +51,17 @@ const cambioTipoRemito = async(e) => {
 };
 
 const clickTbody = async(e) => {
+    if (e.target.nodeName === 'BUTTON'){
+        seleccionado && seleccionado.classList.remove('seleccionado');
+        subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+        
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+        subSeleccionado = e.target;
+
+        seleccionado.classList.add('seleccionado');
+        subSeleccionado.classList.add('subSeleccionado');
+    };
+
     if (e.target.nodeName === 'TD'){
         seleccionado && seleccionado.classList.remove('seleccionado');
         subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
@@ -97,11 +108,21 @@ const handleCheckbox = async(e) => {
 
 };
 
+const imprimirRemito = async(e) => {
+    
+    if(e.target.nodeName === 'BUTTON'){
+        const id = e.target.parentNode.parentNode.parentNode.id
+        const {data} = await axios.get(`${URL}remitos/forId/${id}`)
+        const { data: cliente} = await axios.get(`${URL}clientes/id/${data.idCliente}`);
+        const { data: movs } = await axios.get(`${URL}movimiento/${data.numero}/RT`);
+        ipcRenderer.send('imprimir', ['negro', data, cliente, movs, false]);
+    }
+}
+
 const listarMovs = (lista) => {
     tbodyMov.innerHTML = '';
 
     for(let elem of lista){
-        console.log(elem);
         listMov.classList.remove('none');
         tbody.parentElement.parentElement.classList.remove('h-80vh');
         tbody.parentElement.parentElement.classList.add('h-30vh');
@@ -193,6 +214,9 @@ const listarRemitos = (lista) => {
         const tdPasar = document.createElement('td');
         const inpPasar = document.createElement('input');
         const pPasado = document.createElement('p');
+        const tdReimprimir = document.createElement('td');
+
+        tdReimprimir.addEventListener('click', imprimirRemito);
 
         inpPasar.type = 'checkbox';
         inpPasar.classList.add('scale-1-5');
@@ -217,12 +241,19 @@ const listarRemitos = (lista) => {
         tdNumero.classList.add('border');
         tdObseraciones.classList.add('border');
         tdPasar.classList.add('border');
+        tdReimprimir.classList.add('border');
 
         tdFecha.innerText = elem.fecha.slice(0,10).split('-', 3).reverse().join('/  ');
         tdCodCliente.innerText = elem.idCliente;
         tdCliente.innerText = elem.cliente;
         tdNumero.innerText = elem.numero.toString().padStart(8, '0');
         tdObseraciones.innerText = elem.observaciones;
+        tdReimprimir.innerHTML = 
+        `
+            <div class="flex justify-center my-1">
+                <button>Re imprimir</button>
+            </div>
+        `
 
         
         tdPasar.appendChild(remitoC.checked ? pPasado : inpPasar);
@@ -233,6 +264,7 @@ const listarRemitos = (lista) => {
         tr.appendChild(tdNumero);
         tr.appendChild(tdObseraciones);
         tr.appendChild(tdPasar);
+        tr.appendChild(tdReimprimir);
 
         tbody.appendChild(tr);
     };
@@ -240,7 +272,6 @@ const listarRemitos = (lista) => {
 
 const modificarMovs = async(e) => {
     let id = '';
-    console.log(e.target.nodeName);
     if( e.target.nodeName === 'TD') id = e.target.parentNode.id;
     if( e.target.nodeName === 'DIV') id = e.target.parentNode.parentNode.id;
     if( e.target.nodeName === 'SPAN') id = e.target.parentNode.parentNode.parentNode.parentNode.id;
