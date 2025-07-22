@@ -80,6 +80,7 @@ const ponerDatosArticulos = (datos)=>{
         }
 
         const tr = document.createElement('tr');
+        console.log(movimiento);
 
         const tdCantidad = document.createElement('td');
         const tdCodigo = document.createElement('td');
@@ -91,9 +92,9 @@ const ponerDatosArticulos = (datos)=>{
         tdCantidad.innerText = movimiento.unidad === "horas" ? "" : movimiento.cantidad.toFixed(2);
         tdCodigo.innerText = movimiento.codProd ?  movimiento.codProd : "" ;
         tdDescripcion.innerText = movimiento.producto;
-        tdIva.innerText = movimiento.iva.toFixed(2);
-        tdPrecio.innerText = movimiento.unidad === "horas" ? "" : movimiento.precio.toFixed(2);
-        tdTotal.innerText = redondear(movimiento.cantidad * movimiento.precio,2);
+        tdPrecio.innerText = movimiento.tipo_venta !== 'RT' ? (movimiento.unidad === "horas" ? "" : movimiento.precio.toFixed(2)) : '';
+        tdIva.innerText = movimiento.tipo_venta === 'RT' ? '' : movimiento.iva.toFixed(2);
+        tdTotal.innerText = movimiento.tipo_venta === 'RT' ? '' : redondear(movimiento.cantidad * movimiento.precio,2);
 
         tr.appendChild(tdCantidad);
         tr.appendChild(tdCodigo);

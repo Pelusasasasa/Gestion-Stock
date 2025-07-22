@@ -5,6 +5,7 @@ require("dotenv").config();
 const { ipcRenderer, clipboard } = require('electron');
 const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
 const archivo = require('../configuracion.json');
+const { default: Swal } = require('sweetalert2');
 
 const URL = process.env.GESTIONURL;
 
@@ -129,6 +130,7 @@ const cargarRemito = async () => {
     let movimientosRemitos = [];
     let idCliente = '';
     let textoObservaciones = '';
+    let aux = 0;
 
     for (let elem of remitosTraidos) {
         const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
@@ -139,8 +141,9 @@ const cargarRemito = async () => {
     };
 
     for await (let elem of movimientosRemitos) {
-        let producto
+        let producto;
         const res = elem.codProd.toUpperCase().replace(/\//g, '%2F');
+        
         if(res) {
             producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
         }else{
@@ -151,7 +154,8 @@ const cargarRemito = async () => {
             producto.marca = elem.marca;
             producto.impuesto = elem.iva;
         }
-        console.log(producto);
+        producto.idTabla = aux;
+        aux++;
         
         await listarProducto(producto, elem.cantidad)
         const pro = listaProductos.find(({ producto }) => producto._id === elem.codProd);
@@ -286,8 +290,10 @@ const listarCliente = async (id) => {
 
 //Lo que hacemos es listar el producto traido
 const listarProducto = async (producto, cant = 1, series = []) => {
+    if(!producto) return await Swal.fire('Producto no encontrado', `No se encontro producto con el codigo ${codBarra.value}`, 'error');
 
     cantidad.value = cant;
+    
 
     if (!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad') {
         descripcion.value = producto.descripcion;
@@ -311,9 +317,12 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     //Buscamos si el produto ya esta cargado
     if (producto !== "") {
         const productoYaUsado = listaProductos.find(({ producto: product }) => {
-            if (product._id === producto._id) {
+            if(product._id === '' && (product.idTabla === producto.idTabla)){
+                return product
+            }else if (product._id !== '' && (product._id === producto._id)) {
                 return product
             };
+            
         });
 
         //Esto sucede si el producto No esta cargado
@@ -376,6 +385,7 @@ const listarProducto = async (producto, cant = 1, series = []) => {
             let precio = tr.children[6];
 
             const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
+            if(parseFloat(cantidadNueva) === 0) tbody.removeChild(tr);
             //si lista es 1 entonces redondeamos para el precio comun simplemente
             if (lista.value === "1") {
                 if (checkboxDolar.checked) {
