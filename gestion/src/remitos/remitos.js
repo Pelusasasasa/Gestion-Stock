@@ -136,7 +136,6 @@ const listarMovs = (lista) => {
         const tdPrecio = document.createElement('td');
         const tdCant = document.createElement('td');
         const tdTotal = document.createElement('td');
-        const tdAcciones = document.createElement('td');
         const tdSerie = document.createElement('td');
 
         const textAreaSerie = document.createElement('textarea');
@@ -147,7 +146,6 @@ const listarMovs = (lista) => {
         tdPrecio.classList.add('border');
         tdCant.classList.add('border');
         tdTotal.classList.add('border');
-        tdAcciones.classList.add('border');
         tdSerie.classList.add('border');
 
         // tdAcciones.classList.add('flex');
@@ -166,20 +164,10 @@ const listarMovs = (lista) => {
         tdPrecio.innerText = elem.precio.toFixed(2);
         tdCant.innerText = elem.cantidad.toFixed(2);
         tdTotal.innerText = (elem.precio * elem.cantidad).toFixed(2);
-        tdAcciones.innerHTML = `
-            <div class="flex justify-center cursor-pointer">
-                <div class=tool'>
-                    <span class=material-icons>edit</span>
-                    <p class=tooltip>Modificar</p>
-                </div>
-            </div>
-        `;
         textAreaSerie.innerText = elem.series;
 
 
         tdSerie.appendChild(textAreaSerie);
-
-        tdAcciones.addEventListener('click', modificarMovs);
 
         tr.appendChild(tdCod);
         tr.appendChild(tdDesc);
@@ -187,7 +175,6 @@ const listarMovs = (lista) => {
         tr.appendChild(tdPrecio);
         tr.appendChild(tdCant);
         tr.appendChild(tdTotal);
-        tr.appendChild(tdAcciones);
         tr.appendChild(tdSerie);
 
         tbodyMov.appendChild(tr);
@@ -250,8 +237,8 @@ const listarRemitos = (lista) => {
         tdObseraciones.innerText = elem.observaciones;
         tdReimprimir.innerHTML = 
         `
-            <div class="flex justify-center my-1">
-                <button>Re imprimir</button>
+            <div class="flex justify-center">
+                <button class="border">Re imprimir</button>
             </div>
         `
 
@@ -270,53 +257,6 @@ const listarRemitos = (lista) => {
     };
 };
 
-const modificarMovs = async(e) => {
-    let id = '';
-    if( e.target.nodeName === 'TD') id = e.target.parentNode.id;
-    if( e.target.nodeName === 'DIV') id = e.target.parentNode.parentNode.id;
-    if( e.target.nodeName === 'SPAN') id = e.target.parentNode.parentNode.parentNode.parentNode.id;
-
-    const tr = document.getElementById(`${id}`);
-    const precio = parseFloat(tr.children[3].innerText);
-    const cantidad = tr.children[4].innerText
-    
-
-    const {isConfirmed, value} = await Swal.fire({
-        title: 'Modificar Movimiento',
-        text: 'Cantidad',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        input: 'number',
-        inputValue: cantidad 
-    });
-
-    if(isConfirmed){
-        const { data } = await axios.put(`${URL}movimiento`, [{
-            _id: id,
-            cantidad: value ? value : cantidad,
-            precio: value ? value * precio : cantidad * precio
-        }]);
-
-        const updateMov  = data.movs.find(elem => elem._id == id);
-
-        if(data.ok){
-            const {data: producto} = await axios.get(`${URL}productos/${updateMov.codProd}`);
-            const {data: updateProduct} = await axios.patch(`${URL}productos/codProd/${updateMov.codProd}`, {
-                stock: parseFloat(producto.stock) + parseFloat(cantidad) - updateMov.cantidad
-            });
-        };
-
-        
-        tr.children[4].innerText = updateMov.cantidad.toFixed(2);
-        tr.children[5].innerText = updateMov.precio.toFixed(2);
-
-
-        
-        
-    };
-
-    
-};
 
 const pasarCuenta = async() => {
     const trSeleccinados = document.querySelectorAll('tr input[type="checkbox"]:checked');

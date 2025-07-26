@@ -910,7 +910,7 @@ tbody.addEventListener('click', async e => {
 });
 
 tbody.addEventListener('dblclick', async se => {
-    await sweet.fire({
+    sweet.fire({
         title: "Cambio",
         html: `
             <section class=cambio>
@@ -933,15 +933,16 @@ tbody.addEventListener('dblclick', async se => {
     }).then(async ({ isConfirmed }) => {
         if (isConfirmed) {
             const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
+            //Borramos el total anterior
             totalGlobal = parseFloat(redondear(totalGlobal - (producto.producto.precio * producto.cantidad), 2));
 
             producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
             producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
-            producto.producto.precio = lista.value === 0 ? parseFloat(document.getElementById('precioCambio').value) : producto.producto.precio;
+            producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
 
             seleccionado.children[1].innerHTML = producto.cantidad.toFixed(2);
             seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
-            seleccionado.children[5].innerHTML = lista.value === 0 ? producto.producto.precio.toFixed(2) : togglePrecios();
+            seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
             seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad, 2);
 
             totalGlobal = parseFloat(redondear(totalGlobal + (producto.producto.precio * producto.cantidad), 2));
