@@ -10,6 +10,10 @@ const Numero = new mongoose.Schema({
         default: 0
     },
     "Dolar":Number,
+    "dolarInstalador": {
+        type: Number,
+        default: 0
+    },
     "Servicio": {
         type:Number,
         default:0

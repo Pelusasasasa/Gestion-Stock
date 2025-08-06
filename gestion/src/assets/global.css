@@ -48,7 +48,7 @@ button {
 
 button:hover {
   cursor: pointer;
-  transform: scale(1.2);
+  opacity: 0.7;
 }
 
 .none {
@@ -67,6 +67,10 @@ input {
 input:disabled {
   font-weight: 900;
   color: black;
+}
+
+.text-white{
+  color: white;
 }
 
 .text-rigth {
@@ -116,6 +120,10 @@ select {
 
 table tbody {
   white-space: nowrap;
+}
+
+.font-bold{
+  font-weight: bold;
 }
 
 /* margin */
@@ -172,6 +180,10 @@ table tbody {
 
 /* Padding */
 
+.p-1 {
+  padding: 1rem;
+}
+
 .p-2 {
   padding: 2rem;
 }
@@ -194,6 +206,10 @@ table tbody {
 
 .justify-around {
   justify-content: space-around;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .justify-center {
@@ -297,6 +313,10 @@ table tbody {
   width: 50rem;
 }
 
+.w-20 {
+  width: 20rem;
+}
+
 .w-5 {
   width: 5rem;
 }
@@ -304,6 +324,7 @@ table tbody {
 .size-6 {
   width: 6rem;
 }
+
 
 /* width */
 
@@ -363,6 +384,9 @@ table tbody {
 .bg-white {
   background-color: white;
 }
+.bg-black {
+  background-color: black;
+}
 
 /* background */
 
@@ -374,6 +398,10 @@ table tbody {
 
 .border-black {
   border-color: black;
+}
+
+.border-gray-400{
+  border-color: oklch(70.4% 0.04 256.788)
 }
 
 /* border */
@@ -392,4 +420,16 @@ table tbody {
 
 .overflow-scroll {
   overflow: scroll;
+}
+
+#delete{
+  color: red;
+}
+
+#edit{
+  color: rgb(85, 85, 85)
+}
+
+.azul{
+  color: #155ddf
 }

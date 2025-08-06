@@ -15,13 +15,16 @@ ipcRenderer.on('informacion',(e,{informacion,vendedor:vende})=>{
 
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');
+const cuit = document.querySelector('#cuit');
 const localidad = document.querySelector('#localidad');
 const telefono = document.querySelector('#telefono');
 const direccion = document.querySelector('#direccion');
-const cuit = document.querySelector('#cuit');
-const condicionIva = document.querySelector('#condicion');
 const condicionFacturacion = document.querySelector('#condicionFacturacion');
+const condicionIva = document.querySelector('#condicion');
+const tipoCuenta = document.querySelector('#tipoCuenta');
 const observaciones = document.querySelector('#observaciones');
+
+
 const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
@@ -29,21 +32,56 @@ const ponerInputs = async(id)=>{
     codigo.value = id;
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
     nombre.value = cliente.nombre;
+    cuit.value = cliente.cuit ? cliente.cuit : "";
     localidad.value = cliente.localidad;
     direccion.value = cliente.direccion;
     telefono.value = cliente.telefono;
-    cuit.value = cliente.cuit ? cliente.cuit : "";
     condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
     condicionFacturacion.value = cliente.condicionFacturacion;
+    tipoCuenta.value = cliente.tipoCuenta
     observaciones.value = cliente.observaciones;
-}
+};
 
-nombre.addEventListener('keypress',e=>{
-    apretarEnter(e,condicionFacturacion);
+modificar.addEventListener('click',async e=>{
+
+    if(tipoCuenta.value === '') return await sweet.fire('El campo tipo de cuenta es obligatorio', 'No se pudo cargar el cliente', 'error');
+    if(nombre.value === '') return await sweet.fire('El campo nombre es obligatorio', 'No se pudo cargar el cliente', 'error');
+    
+    const cliente = {};
+    cliente._id = codigo.value;
+    cliente.nombre = nombre.value.toUpperCase();
+    cliente.cuit = cuit.value;
+    cliente.localidad = localidad.value.toUpperCase();
+    cliente.telefono = telefono.value;
+    cliente.direccion = direccion.value.toUpperCase();
+    cliente.condicionFacturacion = condicionFacturacion.value;
+    cliente.condicionIva = condicionIva.value;
+    cliente.tipoCuenta = tipoCuenta.value;
+    cliente.observaciones = observaciones.value.toUpperCase();
+    
+        try {
+            const {data} = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente));
+    
+            if (data.ok) {
+                vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
+                await sweet.fire('Cliente modificado', `Se modifico el cliente ${data.cliente.nombre} correctamente`, 'success');
+                ipcRenderer.send('enviar-ventana-principal',cliente);
+                window.close();
+            }else{
+                await sweet.fire('No se pudo modificar el cliente', data?.msg, 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            await sweet.fire('No se pudo modificar el cliente', error.response?.data?.msg, 'error');
+        }
 });
 
-condicionFacturacion.addEventListener('keypress',e=>{
-    e.preventDefault();
+
+nombre.addEventListener('keypress',e=>{
+    apretarEnter(e,cuit);
+});
+
+cuit.addEventListener('keypress',e=>{
     apretarEnter(e,localidad);
 });
 
@@ -56,14 +94,20 @@ telefono.addEventListener('keypress',e=>{
 });
 
 direccion.addEventListener('keypress',e=>{
-    apretarEnter(e,cuit);
+    apretarEnter(e,condicionFacturacion);
 });
 
-cuit.addEventListener('keypress',e=>{
+condicionFacturacion.addEventListener('keypress',e=>{
+    e.preventDefault();
     apretarEnter(e,condicionIva);
 });
 
 condicionIva.addEventListener('keypress',e=>{
+    e.preventDefault();
+    apretarEnter(e,tipoCuenta);
+});
+
+tipoCuenta.addEventListener('keypress',e=>{
     e.preventDefault();
     apretarEnter(e,observaciones);
 });
@@ -97,28 +141,6 @@ observaciones.addEventListener('focus',e=>{
     observaciones.select();
 });
 
-
-modificar.addEventListener('click',async e=>{
-    const cliente = {};
-    cliente._id = codigo.value;
-    cliente.nombre = nombre.value.toUpperCase();
-    cliente.localidad = localidad.value.toUpperCase();
-    cliente.telefono = telefono.value;
-    cliente.direccion = direccion.value.toUpperCase();
-    cliente.condicionFacturacion = condicionFacturacion.value;
-    cliente.cuit = cuit.value;
-    cliente.condicionIva = condicionIva.value;
-    cliente.observaciones = observaciones.value.toUpperCase();
-    
-    const {mensaje,estado} = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente)).data;
-    console.log(mensaje)
-        if (estado) {
-            vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
-            await sweet.fire({title:mensaje});
-            ipcRenderer.send('enviar-ventana-principal',cliente);
-            window.close();
-        }
-})
 
 document.addEventListener('keydown',e=>{
     cerrarVentana(e);

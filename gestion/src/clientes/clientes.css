@@ -13,13 +13,11 @@ h1 {
 
 .buscador {
     display: flex;
-    justify-content: space-around;
 }
 
 .buscador div {
     display: flex;
     flex-direction: column;
-    text-align: center;
 }
 
 .buscador div input {
@@ -67,11 +65,9 @@ table tbody tr td {
     flex-direction: column;
 }
 
-
-
 .seccion-agregarCliente .primero {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr 2fr;
 }
 
 .seccion-agregarCliente .primero div {
@@ -84,6 +80,9 @@ table tbody tr td {
 .seccion-agregarCliente .primero div input {
     padding: 1rem;
     font-size: 1.5rem;
+
+    border-radius: 0.5rem;
+    border-style: none;
 }
 
 .seccion-agregarCliente .segundo {
@@ -100,6 +99,8 @@ table tbody tr td {
 .seccion-agregarCliente .segundo div input {
     padding: 1rem;
     font-size: 1.5rem;
+    border-radius: 0.5rem;
+    border-style: none;
 }
 
 .seccion-agregarCliente .tercero {
@@ -128,8 +129,7 @@ table tbody tr td {
 
 .seccion-modificarCliente .primero {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-
+    grid-template-columns: 1fr 2fr;
 }
 
 .seccion-modificarCliente .primero div {
@@ -142,6 +142,8 @@ table tbody tr td {
 .seccion-modificarCliente .primero div input {
     padding: 1rem;
     font-size: 1.5rem;
+    border-radius: 0.5rem;
+    border-style: none;
 }
 
 
@@ -159,6 +161,8 @@ table tbody tr td {
 .seccion-modificarCliente .segundo div input {
     font-size: 1.5rem;
     padding: 1rem;
+    border-radius: 0.5rem;
+    border-style: none;
 }
 
 .seccion-modificarCliente .tercero {
@@ -170,6 +174,11 @@ table tbody tr td {
     display: flex;
     flex-direction: column;
     text-align: center;
+}
+
+.seccion-modificarCliente .tercero main select{
+    border-radius: 0.5rem;
+    border-style: none;
 }
 
 /*Modificar Cliente*/
@@ -214,7 +223,6 @@ table tbody tr td {
 .arreglarSaldo .informacion {
     display: flex;
     flex-direction: column;
-    /* justify-content: space-around; */
     margin: 2rem 0;
 }
 
@@ -225,7 +233,6 @@ table tbody tr td {
 .arreglarSaldo .informacion #nombre {
     width: 40rem;
 }
-
 
 .arreglarSaldo .informacion label {
     display: inline-block;

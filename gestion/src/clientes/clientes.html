@@ -10,10 +10,30 @@
     <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
 </head>
 <body class="seccionCliente">
+    <header class="flex justify-between">
+
+        <div class="flex items-center mt-2 gap-2">
+            <p class="material-icons-outlined m-0 azul">person</p>
+            <p class="m-0 text-2xl font-bold">Gestion de Clientes</p>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <button class="agregar items-center flex gap-2 p-1 bg-black text-white">
+                <span class="material-icons-outlined">add</span>
+                <span>Agregar Cliente</span>
+            </button>
+
+            <button class="salir items-center flex gap-2 p-1 border border-gray-400">
+                <span class="material-icons-outlined">close</span>
+                <span>Salir</span>
+            </button>
+        </div>
+    </header>
+
     <section class="buscador">
 
         <div class="buscador-nombre">
-            <label for="nombre">Nombre</label>
+            <label for="nombre" class="text-2xl">Nombre</label>
             <input type="text" name="nombre" autofocus id="nombre" placeholder="Nombre Cliente">
         </div>
 
@@ -39,10 +59,6 @@
         </table>
     </section>
 
-    <section class="botones">
-        <button class="agregar">Agregar Cliente</button>
-        <button class="salir">Salir</button>
-    </section>
     <script src="./clientes.js"></script>
 </body>
 </html>
