@@ -10,6 +10,7 @@ const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB, agregarMovimientoVen
 const { ipcRenderer } = require('electron');
 
 const dolar = document.querySelector('#dolar');
+const dolarInstalador = document.querySelector('#dolarInstalador');
 const contado = document.querySelector('#contado');
 const cuentaCorriente = document.querySelector('#cuentaCorriente');
 const presupuesto = document.querySelector('#presupuesto');
@@ -78,6 +79,7 @@ window.addEventListener('load',async e=>{
         id = numeros._id;
         dolarTraido = numeros.Dolar;
         dolar.value = numeros.Dolar.toFixed(2);
+        dolarInstalador.value = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
         presupuesto.value = numeros.Presupuesto.toString().padStart(8,'0');
         contado.value = numeros.Contado.toString().padStart(8,'0');
         recibo.value = numeros.Recibo.toString().padStart(8,'0');
@@ -107,6 +109,7 @@ modificar.addEventListener('click',e=>{
     modificar.classList.add('none');
     guardar.classList.remove('none');
     dolar.removeAttribute('disabled');
+    dolarInstalador.removeAttribute('disabled');
 });
 
 //Aca cuando modificamos los numeros despues los guardamos
@@ -117,6 +120,7 @@ guardar.addEventListener('click',async e=>{
     numero.Recibo = parseInt(recibo.value);
     numero["Cuenta Corriente"] = parseInt(cuentaCorriente.value);
     numero.Dolar = dolar.value;
+    numero.dolarInstalador = dolarInstalador.value;
 
     if (dolarTraido !== parseFloat(dolar.value)) {
         await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);

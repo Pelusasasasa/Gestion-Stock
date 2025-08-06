@@ -96,12 +96,10 @@ const listarClientes = async(clientes)=>{
         
         tdAcciones.innerHTML = `
             <div class=tool ${(permiso !== 0 || permiso !== 1) && 'none'}>
-                <span class=material-icons>edit</span>
-                <p class=tooltip>Modificar</p>
+                <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
             </div>
             <div class="tool ${permiso !== 0 && "none"}">
-                <span class=material-icons>delete</span>
-                <p class=tooltip>Eliminar</p>
+                <span class='material-icons-outlined' title='Eliminar' id='delete'>delete</span>
             </div>
         `
         tr.appendChild(tdId);
@@ -211,7 +209,7 @@ ipcRenderer.on('recibir-ventana-secundaria',(e,args)=>{
     const tr = document.getElementById(`${clienteModificado._id}`);
     tr.children[0].innerHTML = clienteModificado._id;
     tr.children[1].innerHTML = clienteModificado.nombre;
-    tr.children[2].innerHTML = clienteModificado.direccion;
+    tr.children[2].innerHTML = `${clienteModificado.direccion} - ${clienteModificado.localidad}`;
     tr.children[3].innerHTML = clienteModificado.telefono;
     tr.children[4].innerHTML = clienteModificado.cuit;
     tr.children[5].innerHTML = clienteModificado.condicionIva;

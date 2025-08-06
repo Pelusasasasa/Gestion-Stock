@@ -275,13 +275,14 @@ const listarCliente = async (id) => {
     if (cliente !== "") {
         nombre.value = cliente.nombre;
         saldo.value = cliente.saldo;
+        cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         telefono.value = cliente.telefono;
         localidad.value = cliente.localidad;
         direccion.value = cliente.direccion;
-        cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
+        cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none');
+        lista.value = cliente.tipoCuenta === 'NORMAL' ? 1 : 2;
         codBarra.focus();
-        cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none')
     } else {
         codigo.value = "";
         codigo.focus();

@@ -11,6 +11,7 @@
 <body class="seccion-agregarCliente">
 
     <h1>Agregar Cliente</h1>
+
     <section class="primero">
         <div>
             <label for="codigo">Codigo</label>
@@ -22,37 +23,41 @@
             <input type="text" name="nombre" id="nombre" autofocus>
         </div>
 
+    </section>
+
+    <section class="segundo">
         <div>
+            <label for="cuit">Cuit</label>
+            <input type="text" name="cuit" id="cuit">
+        </div>
+
+        <div>
+            <label for="localidad">Localidad</label>
+            <input type="text" name="localidad" id="localidad">
+        </div>
+
+        <div>
+            <label for="telefono">Telefono</label>
+            <input type="text" name="telefono" id="telefono">
+        </div>
+
+        <div>
+            <label for="direccion">Direccion</label>
+            <input type="text" name="direccion" id="direccion">
+        </div>
+
+    </section>
+
+    <section class="tercero">
+
+        <main>
             <label for="nombre">Condicion Facturacion</label>
             <select name="condicionFacturacion" id="condicionFacturacion">
                 <option value="1">1.Cta Cte</option>
                 <option value="2">2.Contado</option>
             </select>
-        </div>
-
-    </section>
-
-    <section class="segundo">
-        <div>
-            <label for="localidad">Localidad</label>
-            <input type="text" name="localidad" id="localidad">
-        </div>
-        <div>
-            <label for="telefono">Telefono</label>
-            <input type="text" name="telefono" id="telefono">
-        </div>
-        <div>
-            <label for="direccion">Direccion</label>
-            <input type="text" name="direccion" id="direccion">
-        </div>
-    </section>
-
-    <section class="tercero">
-        <main>
-            <label for="cuit">Cuit</label>
-            <input type="text" name="cuit" id="cuit">
         </main>
-
+        
         <main>
             <label for="condicion">Condicion IVA</label>
             <select name="condicion" id="condicion">
@@ -62,12 +67,20 @@
                 <option value="Exento">Exento</option>
             </select>
         </main>
-
+        
+        <main>
+            <label for="tipoCuenta">Tipo Cuenta *</label>
+            <select name="tipoCuenta" id="tipoCuenta">
+                <option value="">---Seleccinar Una Opcion---</option>
+                <option value="NORMAL">1.Normal</option>
+                <option value="INSTALADOR">2.Instalador</option>
+            </select>
+        </main>
+        
         <main>
             <label for="observaciones">Observaciones</label>
             <input type="text" name="observaciones" id="observaciones">
         </main>
-
     </section>
 
     <section class="botones">

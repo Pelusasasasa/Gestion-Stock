@@ -31,48 +31,53 @@ clienteCTRL.getClienteId = async (req, res) => {
 }
 
 clienteCTRL.cargarCliente = async (req, res) => {
-    let cliente;
-    let mensaje;
-    let estado;
-
     try {
-        cliente = new Clientes(req.body);
+        const cliente = new Clientes(req.body);
         await cliente.save();
-        mensaje = (`Cliente ${cliente.nombre} Cargado`);
-        estado = true;
-    } catch (error) {
-        estado = false;
-        mensaje = (`Cliente ${cliente.nombre} No Fue Cargado`)
-        console.log(error)
-    };
 
-    res.send(JSON.stringify({
-        mensaje,
-        estado,
-        cliente
-    }))
+        if(!cliente)return res.status(404).json({
+            ok: false,
+            msg: 'No se pudo cargar el cliente'
+        });
+
+
+        res.status(201).json({
+            ok: true,
+            cliente
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo cargar el cliente, Hable con el administrador'
+        });
+    };
 }
 
 clienteCTRL.modificarCliente = async (req, res) => {
     const { id } = req.params;
-    let mensaje;
-    let estado;
-    let cliente;
     try {
-        cliente = await Clientes.findOneAndUpdate({ _id: id }, req.body);
-        estado = true;
-        console.log(`Cliente ${cliente.nombre} Modificado`);
-        mensaje = `Cliente ${cliente.nombre} Modificado`;
-    } catch (error) {
-        estado = false;
-        mensaje = `Cliente No fue Modificado`;
-        console.log(error);
-    };
+        let cliente = await Clientes.findOneAndUpdate({ _id: id }, req.body, {new: true});
 
-    res.send(JSON.stringify({
-        mensaje, estado, cliente
-    }));
-}
+        if(!cliente)return res.status(404).json({
+            ok: false,
+            msg: 'No se existe el cliente'
+        });
+
+        console.log(`Cliente ${cliente.nombre} Modificado`);
+        res.status(200).json({
+            ok: true,
+            cliente
+        });
+        
+    } catch (error) {      
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo modificar el cliente, Hable con el administrador'
+        });
+    };
+};
 
 clienteCTRL.eliminarCliente = async (req, res) => {
     const { id } = req.params;
