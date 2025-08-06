@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
@@ -130,6 +132,10 @@ table tbody {
 
 .m-2 {
   margin: 2rem;
+}
+
+.mt-auto {
+  margin-top: auto;
 }
 
 .mt-0 {
@@ -308,6 +314,10 @@ table tbody {
 /* width */
 
 /* heigth */
+.h-auto {
+  height: auto;
+}
+
 .h-full {
   height: 100%;
 }
@@ -316,7 +326,7 @@ table tbody {
   height: 100vh;
 }
 
-.h-calc-100vh-10px {
+.h-calc-100vh-10px{
   height: calc(100vh - 80px);
 }
 

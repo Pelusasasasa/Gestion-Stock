@@ -17,7 +17,6 @@ const moduloCreate = {
   "clientes": true,
   "productos": true,
   "caja": true,
-  "movimientos": true,
   "recibos": true,
   "consultas": true,
   "remitos": true,
@@ -41,7 +40,6 @@ const ventas = document.querySelector('.ventas');
 const clientes = document.querySelector('.clientes');
 const caja = document.querySelector('.caja');
 const productos = document.querySelector('.productos');
-const movimiento = document.querySelector('.movimiento');
 const consulta = document.querySelector('.consulta');
 const recibo = document.querySelector('.recibo');
 const remitos = document.querySelector('.remitos');
@@ -102,9 +100,6 @@ window.addEventListener('load',async e=>{
     };
     if(modulos.caja){
         caja.classList.remove('hidden');
-    };
-    if(modulos.movimientos){
-        movimiento.classList.remove('hidden');
     };
     if(modulos.consultas){
         consulta.classList.remove('hidden');
@@ -240,10 +235,6 @@ caja.addEventListener('click',async e=>{
             caja.click();
 
         };
-});
-
-movimiento.addEventListener('click',e=>{
-    location.href = "./movimiento/movimiento.html";
 });
 
 consulta.addEventListener('click',e=>{

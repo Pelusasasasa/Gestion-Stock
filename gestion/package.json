@@ -47,6 +47,7 @@
   "dependencies": {
     "@afipsdk/afip.js": "^0.7.3",
     "axios": "^0.26.1",
+    "bootstrap-icons": "^1.13.1",
     "cuit-validator": "^1.0.0",
     "dotenv": "^16.0.1",
     "electron-reload": "^2.0.0-alpha.1",
