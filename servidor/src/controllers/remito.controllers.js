@@ -24,7 +24,7 @@ remitoCTRL.postOne = async(req, res) => {
         await remito.save();
         res.send(remito);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         if (error.code === 11000){
             res.status(400).send({error: 'El numero ya es utilizado'});
         }

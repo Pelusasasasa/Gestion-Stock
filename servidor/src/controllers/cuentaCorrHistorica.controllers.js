@@ -42,7 +42,7 @@ historicaCTRL.eliminarHistorica = async (req, res) => {
             historica
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             msg: ' No se pudo eliminar la historica hable con el administrador',
             ok: false,

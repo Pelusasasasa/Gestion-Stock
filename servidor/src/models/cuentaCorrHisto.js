@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const Historica = new mongoose.Schema({
-    _id:{
-        type: Number,
-        required:true
-    },
     idCliente:{
         type:String,
         required:true
@@ -49,4 +45,4 @@ const Historica = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("Historica",Historica);
+module.exports = mongoose.model("Historica", Historica);

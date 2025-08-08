@@ -3,7 +3,7 @@ const sweet = require('sweetalert2');
 require("dotenv").config();
 
 const { ipcRenderer } = require('electron');
-const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
+const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
 
@@ -64,7 +64,6 @@ let descuento = 0;
 let dolar = 0;
 let dolarInstalador = 0;
 
-let descuentoStock = [];
 let listaProductos = [];
 let cuentas = [];
 
@@ -194,19 +193,6 @@ const crearProducto = () => {
     codBarra.focus();
 };
 
-//Descontamos el stock de los productos si la venta es contado, tarjeta o cuenta corriente
-const descontarStock = async ({ cantidad, producto }) => {
-    delete producto.idTabla;
-    if (producto.unidad !== "Horas") {
-        if (facturaAnterior) {
-            producto.stock += cantidad;
-        } else {
-            producto.stock -= cantidad;
-        }
-        descuentoStock.push(producto)
-    }
-};
-
 const eliminarCuentas = async () => {
     for (let elem of cuentas) {
         const { data: compensada } = await axios.delete(`${URL}compensada/traerCompensada/id/${elem}`);
@@ -250,6 +236,7 @@ const hacerHistoricaRecibo = async (numero, haber, tipo) => {
 const listarCliente = async (id) => {
     codigo.value = id;
     const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
+
     if (cliente !== "") {
         nombre.value = cliente.nombre;
         saldo.value = cliente.saldo;
@@ -259,7 +246,8 @@ const listarCliente = async (id) => {
         direccion.value = cliente.direccion;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none');
-        lista.value = cliente.tipoCuenta;
+        lista.value = cliente.tipoCuenta ?? 'NORMAL';
+
         codBarra.focus();
     } else {
         codigo.value = "";
@@ -389,20 +377,6 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     };
 
 
-};
-
-//creamos la cuenta historica cuando la venta se hace en cuenta corriente
-const ponerEnCuentaHistorica = async (venta, saldo) => {
-    const cuenta = {};
-    cuenta.cliente = venta.cliente;
-    cuenta.idCliente = venta.idCliente;
-    cuenta.nro_venta = venta.numero;
-    cuenta.tipo_comp = venta.tipo_comp;
-    cuenta.debe = venta.precio;
-    cuenta.condicion = venta.condicion;
-    cuenta.saldo = facturaAnterior ? saldo - venta.precio : venta.precio + saldo;
-    cuenta.observaciones = observaciones.value;
-    (await axios.post(`${URL}historica`, cuenta)).data;
 };
 
 const sacarIva = (lista, condicion) => {
@@ -594,8 +568,9 @@ facturar.addEventListener('click', async e => {
 
     if (verificado) {
         alerta.classList.remove('none');
-        const numeros = (await axios.get(`${URL}numero`)).data;
         const venta = {};
+        const movimientos = [];
+        let ventaTraida = {};
 
         venta.idCliente = codigo.value;
         venta.cliente = nombre.value;
@@ -606,6 +581,13 @@ facturar.addEventListener('click', async e => {
         venta.tipo_venta = await verTipoVenta();
         venta.listaProductos = listaProductos;
         venta.observaciones = observaciones.value.toUpperCase();
+        venta.direccion = direccion.value;
+        venta.localidad = localidad.value;
+        venta.condicion = lista.value;
+        venta.checkboxDolar = checkboxDolar.checked;
+        venta.dolar = lista.value === 'NORMAL' ? dolar : dolarInstalador;
+        venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+        venta.vendedor = vendedor ? vendedor : "";
 
         //Ponemos propiedades para la factura electronica
         venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura, cuit.value, condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
@@ -622,15 +604,6 @@ facturar.addEventListener('click', async e => {
         venta.iva105 = iva105;
         venta.gravado105 = gravado105;
         venta.cantIva = cantIva;
-
-        venta.direccion = direccion.value;
-        venta.localidad = localidad.value;
-        venta.condicion = lista.value;
-        venta.checkboxDolar = checkboxDolar.checked;
-        venta.dolar = lista.value === 'NORMAL' ? dolar : dolarInstalador;
-        venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
-        venta.vendedor = vendedor ? vendedor : "";
-
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
 
 
@@ -643,12 +616,6 @@ facturar.addEventListener('click', async e => {
                 alerta.children[1].innerHTML = "Generando Venta";
             };
 
-            // venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta, parseFloat(saldo.value));
-
-            if (venta.tipo_venta === "CC" && parseFloat(inputRecibo.value) !== 0) {
-                await hacerRecibo(numeros.Recibo);
-            }
-
             const cliente = {};
             cliente.nombre = nombre.value;
             cliente.localidad = localidad.value;
@@ -658,16 +625,19 @@ facturar.addEventListener('click', async e => {
             cliente._id = codigo.value;
 
             if (venta.tipo_venta === "PP") {
-                await axios.post(`${URL}Presupuesto`, venta);
+                const { data} = await axios.post(`${URL}Presupuesto`, venta);
+                ventaTraida = data.venta;
+                movimientos.push(...data.movimientos);
             } else if (venta.tipo_venta === "RT") {
                 if (!venta.vendedor) {
                     venta.vendedor = 'GONZALO';
                 };
                 await axios.post(`${URL}remitos`, venta);
             } else {
-                await axios.post(`${URL}ventas`, venta);
+                const { data } = await axios.post(`${URL}ventas`, venta);
+                ventaTraida = data.venta;
+                movimientos.push(...data.movimientos);
             };
-            console.log(venta);
 
             //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
             if (remitosTraidos.length > 0) {
@@ -677,7 +647,7 @@ facturar.addEventListener('click', async e => {
             };
 
             if (impresion.checked) {
-                ipcRenderer.send('imprimir', [situacion, venta, cliente, movimientos, checkboxDolar.checked]);
+                ipcRenderer.send('imprimir', [situacion, ventaTraida, cliente, movimientos, checkboxDolar.checked]);
             };
 
             if (facturaVarios) {

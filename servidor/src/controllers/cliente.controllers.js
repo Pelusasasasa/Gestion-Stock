@@ -46,7 +46,7 @@ clienteCTRL.cargarCliente = async (req, res) => {
             cliente
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo cargar el cliente, Hable con el administrador'
@@ -71,7 +71,7 @@ clienteCTRL.modificarCliente = async (req, res) => {
         });
         
     } catch (error) {      
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo modificar el cliente, Hable con el administrador'

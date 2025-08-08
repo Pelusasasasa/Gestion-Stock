@@ -7,6 +7,7 @@ const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { descontarStock } = require('../helpers/descontarStock');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
 const { crearCompensada } = require('../helpers/crearCompensada');
+const { crearHistorica } = require('../helpers/crearHistorica');
 
 ventaCTRL.getForId = async(req,res)=>{
     const {id} = req.params;
@@ -38,9 +39,14 @@ ventaCTRL.cargarVenta = async(req,res)=>{
             }); 
 
             const compensada = await crearCompensada(venta);
-            console.log(compensada);
             if(!compensada) return res.status(400).json({
                 msg: "Error al crear la compensada",
+                ok: false
+            });
+
+            const historica = await crearHistorica(venta);
+            if(!historica) return res.status(400).json({
+                msg: "Error al crear la historica",
                 ok: false
             });
         };
@@ -53,7 +59,7 @@ ventaCTRL.cargarVenta = async(req,res)=>{
             });
         };
 
-        const movimientos = await crearMovimientosStock(venta);
+        const movimientos = await crearMovimientosStock(req.body.listaProductos, venta);
         if(!movimientos) return res.status(400).json({
             ok: false,
             msg: "Error al crear los movimientos"
@@ -63,12 +69,24 @@ ventaCTRL.cargarVenta = async(req,res)=>{
         await venta.save();
         if (req.body.F) {
             funcion.crearPDF(req.body);//creamos un pdf con la venta
-        }
+        };
+
+
+        const nuevaVenta = await Venta.findOne({_id:venta._id})
+            .populate('vendedor', 'nombre');
 
         console.log(`Venta con el numero: ${venta.numero} Cargada`);
-        res.send("Venta Guardada");
+        res.status(201).json({
+            ok: true,
+            venta: nuevaVenta,
+            movimientos,
+        })
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: "Error al cargar la venta, hable con el administrador"
+        });
     }
 };
 

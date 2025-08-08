@@ -1,8 +1,8 @@
 const movProducto = require("../models/movProducto");
 
-exports.crearMovimientosStock = async(venta) => {
-    let bandera = true;
-    for(const {cantidad, producto, series} of venta.listaProductos){
+exports.crearMovimientosStock = async(listaProductos, venta) => {
+    const movimientos = [];
+    for(const {cantidad, producto, series} of listaProductos){
         try {
             const movimiento = {};
             movimiento.fecha = venta.fecha;
@@ -10,6 +10,7 @@ exports.crearMovimientosStock = async(venta) => {
             movimiento.cliente = venta.idCliente;
             movimiento.marca = producto.marca;
             movimiento.codProd = producto._id;
+            movimiento.producto = producto.descripcion;
             movimiento.rubro = producto.rubro;
             movimiento.cantidad = cantidad;
             movimiento.iva = producto.impuesto;
@@ -20,12 +21,13 @@ exports.crearMovimientosStock = async(venta) => {
 
             const nuevoMovimiento = new movProducto(movimiento);
             await nuevoMovimiento.save();
+            movimientos.push(movimiento);
 
         } catch (error) {
-            console.log(error);
-            bandera = false;
+            console.error(error);
+            movimientos = undefined;
         }
     };
-    return bandera
+    return movimientos
 
 };

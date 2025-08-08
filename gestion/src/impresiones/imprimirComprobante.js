@@ -33,6 +33,7 @@ window.addEventListener('load',e=>{
         let movimientos = JSON.parse(args)[3];
         let auxDolar = JSON.parse(args)[4];
 
+
         await ponerDatosVenta(datosVenta, auxDolar);
         await ponerDatosClientes(datosClientes);
         await ponerDatosArticulos(movimientos, auxDolar);
@@ -42,15 +43,16 @@ window.addEventListener('load',e=>{
 });
 
 const ponerDatosVenta = (datos, auxDolar)=>{
+    console.log(datos)
     const fecha = new Date(datos.fecha);
     const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
     const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
 
-    dolar.innerText = datos.dolar.toFixed(2);
+    dolar.innerText = datos?.dolar?.toFixed(2);
     numero.innerText = datos.numero.toString().padStart(8,'0');
     date.innerText = fechaParseada;
     tipoPago.innerText = datos.tipoVenta ?? datos.tipo_venta;
-    vendedor.innerText = datos.vendedor;
+    vendedor.innerText = datos?.vendedor?.nombre ?? '';
     condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
 
     if(datos.tipo_venta !== 'RT' && datos.tipoVenta !== 'RT'){
@@ -77,7 +79,6 @@ const ponerDatosArticulos = (datos, auxDolar)=>{
         }
 
         const tr = document.createElement('tr');
-        console.log(movimiento);
 
         const tdCantidad = document.createElement('td');
         const tdCodigo = document.createElement('td');

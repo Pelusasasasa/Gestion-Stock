@@ -21,7 +21,7 @@ eventoCTRL.deleteOne = async (req, res) => {
             deleteEvento
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: ' No se pudo eliminar el evento, hable con el administrador'
@@ -47,7 +47,7 @@ eventoCTRL.deleteForRelatedIdModel = async (req, res) => {
             deleteEvento
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo eliminar el evento, hable con el administrador',
@@ -77,7 +77,7 @@ eventoCTRL.getForMonth = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puo obtener los datos, hable con el administrador'
@@ -102,7 +102,7 @@ eventoCTRL.getForRelatedIdModel = async (req, res) => {
             evento
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo obtener los eventos por id y modelo, hable con el administrador',
@@ -137,7 +137,7 @@ eventoCTRL.patchOne = async (req, res) => {
             updateEvento
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo modificar el evento, hablar con el administrador'
@@ -167,7 +167,7 @@ eventoCTRL.postOne = async (req, res) => {
             evento
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puedo cargar el evento, hable con el administrador'

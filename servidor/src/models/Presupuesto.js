@@ -33,6 +33,15 @@ const Presupuesto = new Schema({
         type:Number,
         required:true,
     },
+    dolar: {
+        type: Number,
+        default: 0,
+    },
+    vendedor: {
+        type: Schema.Types.ObjectId,
+        ref: 'Vendedor',
+        required: true
+    },
     caja:{
         type:String,
         default:""

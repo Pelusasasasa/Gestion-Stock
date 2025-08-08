@@ -19,7 +19,7 @@ exports.crearCompensada = async(venta) => {
         await nuevaCompensada.save();
         return true;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return false;
     }
 }

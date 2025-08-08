@@ -18,7 +18,7 @@ exports.sumarSaldoCliente = async(id, precio) => {
         };
         
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return {
             ok: false
         }

@@ -13,7 +13,7 @@ tipoTarjetaCTRL.postOne = async (req, res) => {
             tipo
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -31,7 +31,7 @@ tipoTarjetaCTRL.getAll = async (req, res) => {
             tipos
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -61,7 +61,7 @@ tipoTarjetaCTRL.patchOne = async (req, res) => {
             updateTipo
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador',
@@ -81,7 +81,7 @@ tipoTarjetaCTRL.deleteOne = async (req, res) => {
             deleteTipo
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: true,
             msg: 'Hable con el administrador'

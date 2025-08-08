@@ -106,7 +106,7 @@ productoCTRL.updateProducto = async(req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puedo modificar el producto',
@@ -126,7 +126,7 @@ productoCTRL.cargarProducto = async (req, res) => {
         mensaje = `Producto ${producto.descripcion} cargado`;
         estado = true;
     } catch (error) {
-        console.log(error)
+        console.error(error)
     };
 
     console.log(mensaje);
@@ -264,7 +264,7 @@ productoCTRL.getProductosPorMarca = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
             ok: false,
             msg: 'Hablar con el administrador'
@@ -296,7 +296,7 @@ productoCTRL.modificarVarios = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'

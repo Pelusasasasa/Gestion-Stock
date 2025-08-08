@@ -171,7 +171,7 @@ document.addEventListener('keyup',async e=>{
 ventas.addEventListener('click',async e=>{
         const vendedor = await verificarUsuarios();
         if (vendedor) {
-            location.href = `./venta/index.html?vendedor=${vendedor.nombre}`;
+            location.href = `./venta/index.html?vendedor=${vendedor._id}`;
             ipcRenderer.send('sacar-cierre');
         }else if(vendedor === ""){
             await sweet.fire({

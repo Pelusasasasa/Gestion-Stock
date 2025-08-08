@@ -18,7 +18,7 @@ movCajaCTRL.deleteOne = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: true,
             msg: 'No se pueod eliminar el movimiento',
@@ -54,7 +54,7 @@ movCajaCTRL.getForDates = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puede obtener los movimientos, hable con el administrador',
@@ -84,7 +84,7 @@ movCajaCTRL.patchOne = async (req, res) => {
             updateMovCaja
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puedo modificar el movimiento de caja, hable con el administador',
@@ -117,7 +117,7 @@ movCajaCTRL.postOne = async (req, res) => {
             mov
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo cargar el mov, Hable con el administrador',

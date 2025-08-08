@@ -41,7 +41,7 @@ exports.actualizarNumero = async(tipo_venta) => {
             numero: numero[tipo]
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return {
             ok: false
         }

@@ -21,7 +21,7 @@ categoryEventCTRL.deleteOne = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'no se puedo eliminar la categoria, hable con el adminstrador'
@@ -41,7 +41,7 @@ categoryEventCTRL.getAll = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al traer las categorias de eventos, hable con el administrador'
@@ -68,7 +68,7 @@ categoryEventCTRL.getOneForName = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puede obtener la categoria, hable con el administrador',
@@ -103,7 +103,7 @@ categoryEventCTRL.patchOne = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al actualizar una categoria de evento, hable con el administrador'
@@ -133,7 +133,7 @@ categoryEventCTRL.postOne = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al cargar Categoria de evento, hable con el administrador',

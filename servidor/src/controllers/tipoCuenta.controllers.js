@@ -30,7 +30,7 @@ tipoCuentaCTRL.getAll = async (req, res) => {
             tipoCuentas
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo obtener los tipos de cuenta, hable con el administrador'
@@ -50,7 +50,7 @@ tipoCuentaCTRL.getForText = async(req, res) => {
             tipo
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puede obtener los tipos de cuentas, hable con el administrador',
@@ -70,7 +70,7 @@ tipoCuentaCTRL.getForType = async (req, res) => {
             tipoCuentas
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se puede obtener los tipos de cuentas, hable con el administrador',
@@ -104,7 +104,7 @@ tipoCuentaCTRL.patchOne = async (req, res) => {
             updateTipoCuenta
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo modificar el tipo de cuenta, hable con el administrador'
@@ -135,7 +135,7 @@ tipoCuentaCTRL.postOne = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo cargar el tipo de cuenta, hable con el administrador'

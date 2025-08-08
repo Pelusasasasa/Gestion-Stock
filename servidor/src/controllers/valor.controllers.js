@@ -16,7 +16,7 @@ valorCTRL.deleteOne = async(req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -34,7 +34,7 @@ valorCTRL.getAll = async(req, res) => {
             valores
         });
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -57,7 +57,7 @@ valorCTRL.patchOne = async(req, res) => {
             updateValor
         })
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -79,7 +79,7 @@ valorCTRL.postOne = async(req, res) => {
             valor
         })
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'

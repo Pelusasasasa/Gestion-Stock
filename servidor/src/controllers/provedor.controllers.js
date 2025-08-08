@@ -92,7 +92,7 @@ provedorCTRL.postProvedor = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -112,7 +112,7 @@ provedorCTRL.patchProvedor = async (req, res) => {
             updateProvedor
         })
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.send({
             msg: error.message,
             ok: false

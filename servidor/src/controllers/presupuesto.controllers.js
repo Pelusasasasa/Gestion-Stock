@@ -1,18 +1,49 @@
 const presupuestoCTRL = {};
 
 const funcion = require('../assets/js/pdf');
+const { actualizarNumero } = require('../helpers/actualizarNumero');
+const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
 const Presupuesto = require('../models/Presupuesto');
 
 presupuestoCTRL.post = async(req,res)=>{
-    const now = new Date();
-    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+  try {
     const presupuesto = new Presupuesto(req.body);
+
+    const numeroActualizado = await actualizarNumero(presupuesto.tipo_venta);
+    if(numeroActualizado.ok){
+        presupuesto.numero = numeroActualizado.numero;
+    };
+
+    const movimientos = await crearMovimientosStock(req.body.listaProductos, presupuesto);
+    if(!movimientos){
+        return res.status(400).json({
+            ok: false,
+            msg: "Error al crear los movimientos"
+        });
+    };
+    
     await presupuesto.save();
+
     if (req.body.F) {
-        funcion.crearPDF(req.body);//creamos un pdf con la venta
-    }
-    console.log(`Presupuesto ${req.body.numero} cargado a las ${req.body.fecha}`);
-    res.send();
+        funcion.crearPDF(req.body);//creamos un pdf con la presupuesto
+    };
+
+    const nuevoPresupuesto = await Presupuesto.findById(presupuesto._id).populate('vendedor', 'nombre');
+    console.log(`Presupuesto ${presupuesto.numero} cargado a las ${req.body.fecha}`);
+    
+    res.status(201).json({
+        ok: true,
+        venta: nuevoPresupuesto,
+        movimientos
+    });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+        ok: false,
+        msg: "Error en el servidor al cargar el presupuesto, hable con el administrador"
+    });
+  }
 };
 
 presupuestoCTRL.get = async(req,res)=>{

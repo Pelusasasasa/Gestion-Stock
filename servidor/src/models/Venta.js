@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const {Schema, Types, model} = require('mongoose');
 
-const Venta = new mongoose.Schema({
+const Venta = new Schema({
     fecha:{
         type:Date,
         default: Date.now
@@ -18,10 +18,6 @@ const Venta = new mongoose.Schema({
         type:Number,
         required:true
     },
-    listaProductos:{
-        type:[],
-        required:true
-    },
     precio:{
         type:Number,
         required:true
@@ -37,6 +33,15 @@ const Venta = new mongoose.Schema({
     tipo_comp:{
         type:String,
         default:""
+    },
+    dolar: {
+        type: Number,
+        default: 0
+    },
+    vendedor: {
+        type: Types.ObjectId,
+        ref: 'Vendedor',
+        required: true
     },
     caja:{
         type:String,
@@ -95,4 +100,4 @@ const Venta = new mongoose.Schema({
 
 });
 
-module.exports = mongoose.model('Venta',Venta);
+module.exports = model('Venta',Venta);

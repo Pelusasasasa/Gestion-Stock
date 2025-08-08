@@ -14,7 +14,7 @@ movimientoCTRL.deleteForIdAndTipo = async (req, res) => {
             movs
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo eliminar los movimientos de productos',
@@ -38,7 +38,7 @@ movimientoCTRL.modificarVarios = async (req, res) => {
             movs
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: true,
             msg: 'No se pudo modificar los movimientos',
