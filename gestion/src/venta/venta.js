@@ -632,7 +632,9 @@ facturar.addEventListener('click', async e => {
                 if (!venta.vendedor) {
                     venta.vendedor = 'GONZALO';
                 };
-                await axios.post(`${URL}remitos`, venta);
+                const { data } = await axios.post(`${URL}remitos`, venta);
+                ventaTraida = data.venta;
+                movimientos.push(...data.movimientos);
             } else {
                 const { data } = await axios.post(`${URL}ventas`, venta);
                 ventaTraida = data.venta;

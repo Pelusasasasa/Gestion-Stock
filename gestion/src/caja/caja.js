@@ -12,7 +12,7 @@ const axios  = require("axios");
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
-const { cerrarVentana, redondear, agregarMovimientoVendedores } = require("../helpers");
+const { cerrarVentana, redondear, agregarMovimientoVendedores, parsearFecha } = require("../helpers");
 const sweet = require('sweetalert2');
 
 const {vendedores} = require('../configuracion.json');
@@ -393,9 +393,7 @@ const listarVentas = async (ventas)=>{
 
     let totalVenta = 0;
     for await(let venta of lista){
-        const fecha = new Date(venta.fecha);
-        const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
-        const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
+        const fecha = parsearFecha(venta.fecha)
 
         const tr = document.createElement('tr');
         tr.id = venta._id;
@@ -416,12 +414,12 @@ const listarVentas = async (ventas)=>{
         tdAcciones.classList.add('acciones')
 
         tdNumero.innerHTML = venta.numero;
-        tdFecha.innerHTML = fechaParseada;
+        tdFecha.innerHTML = fecha;
         tdCliente.innerHTML = venta.cliente;
         tdCodProducto.innerHTML = venta.tipo_comp;
         tdProducto.innerHTML = venta.tipo_comp === 'Recibo' ? venta.valorRecibido : '';
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
-        tdVendedor.innerHTML = venta.vendedor ? venta.vendedor : "";
+        tdVendedor.innerHTML = venta.vendedor ? venta.vendedor.nombre : "";
         tdCaja.innerHTML = venta.caja ? venta.caja : "Caja 1";
         tdAcciones.innerHTML = `
             <div class=tool>

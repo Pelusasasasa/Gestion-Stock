@@ -48,7 +48,7 @@ const ponerDatosVenta = (datos, auxDolar)=>{
     const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
     const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
 
-    dolar.innerText = datos?.dolar?.toFixed(2);
+    dolar.innerText = datos?.dolar?.toFixed(2) ?? '0.00';
     numero.innerText = datos.numero.toString().padStart(8,'0');
     date.innerText = fechaParseada;
     tipoPago.innerText = datos.tipoVenta ?? datos.tipo_venta;

@@ -67,7 +67,8 @@ presupuestoCTRL.getForDay = async(req,res)=>{
             {fecha:{$gte:inicioDia}},
             {fecha:{$lte:finDia}}
         ]
-    });
+    })
+    .populate('vendedor', 'nombre');
     res.send(presupuestos);
 };
 

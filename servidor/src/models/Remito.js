@@ -1,7 +1,6 @@
-const {Schema, model} = require('mongoose');
+const {Schema, model, Types} = require('mongoose');
 
 const Remito = new Schema({
-
 
     fecha:{
         type: Date,
@@ -17,7 +16,7 @@ const Remito = new Schema({
         required: true,
         set: value => value.trim()
     },
-    tipoVenta:{
+    tipo_venta:{
         type: String,
         default: 'RT',
         set: value => value.toUpperCase().trim()
@@ -43,9 +42,9 @@ const Remito = new Schema({
         set: value => value.toUpperCase().trim()
     },
     vendedor: {
-        type: String,
-        required: true,
-        set: value => value.toUpperCase().trim()
+        type: Types.ObjectId,
+        ref: 'Vendedor',
+        required: true
     },
     pasado: {
         type: Boolean,

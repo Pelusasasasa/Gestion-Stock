@@ -1,6 +1,9 @@
 const remitoCTRL = {}
 
 
+const { actualizarNumero } = require('../helpers/actualizarNumero');
+const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
+const { descontarStock } = require('../helpers/descontarStock');
 const Remito = require('../models/Remito');
 
 remitoCTRL.getAll = async(req, res) => {
@@ -18,16 +21,42 @@ remitoCTRL.getforid = async(req, res) => {
 };
 
 remitoCTRL.postOne = async(req, res) => {
-    const remito = new Remito(req.body);
     try {
-        console.log(remito)
+        const remito = new Remito(req.body);
+
+        const numeroActualizado = await actualizarNumero(remito.tipo_venta);
+        if(numeroActualizado.ok){
+            remito.numero = numeroActualizado.numero;
+        };
+
+        const stockDescontado = await descontarStock(req.body.listaProductos);
+        if(!stockDescontado) return res.status(400).json({
+            ok: false,
+            msg: "Error al descontar el stock"
+        });
+
+        const movimientos = await crearMovimientosStock(req.body.listaProductos, remito);
+        if(!movimientos) return res.status(400).json({
+            ok: false,
+            msg: "Error al crear los movimientos"
+        });
+
         await remito.save();
-        res.send(remito);
+
+        const nuevoRemito = await Remito.findOne({_id:remito._id})
+            .populate('vendedor', 'nombre');
+        
+        res.status(201).json({
+            ok: true,
+            venta: nuevoRemito,
+            movimientos,
+        })
     } catch (error) {
         console.error(error);
-        if (error.code === 11000){
-            res.status(400).send({error: 'El numero ya es utilizado'});
-        }
+        res.status(500).json({
+            ok: false,
+            msg: "Error al cargar el remito, hable con el administrador"
+        });
     }
 };
 

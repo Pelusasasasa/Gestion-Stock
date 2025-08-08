@@ -22,10 +22,11 @@ window.addEventListener('load',async e=>{
 const listarMarcas = (lista)=>{
     listar.innerHTML = "";
     lista.forEach(element => {
+        if(element === '') return;
         listar.innerHTML += `
-        <div>
-            <label for="${element}">${element}</label>
-            <input type="checkbox" name=marca id="${element}" />
+        <div class="flex border border-gray-400 items-center  rounded-sm gap-2 py-1 px-2">
+            <input type="checkbox" name=marca id="${element}" class="bg-transparent"/>
+            <label for="${element}" class="font-bold">${element}</label>
         </div>
         ` 
     });
@@ -33,9 +34,10 @@ const listarMarcas = (lista)=>{
 
 descargar.addEventListener('click',async e=>{
     ipcRenderer.invoke('saveDialog').then( async args=>{
-       const path = args;
+    const path = args;
     const marcas = document.querySelectorAll('input[name=marca]')
     let marcasCheckeadas = [];
+
     for(let marca of marcas){
         if (marca.checked) {
             marcasCheckeadas.push(marca.id)
@@ -64,4 +66,11 @@ descargar.addEventListener('click',async e=>{
     XLSX.writeFile(wb,ruta);
 
     });
+});
+
+
+document.addEventListener('keydown',e=>{
+    if(e.key === 'Escape'){
+        window.close();
+    }
 });

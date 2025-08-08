@@ -561,4 +561,10 @@ funciones.cargarMovCaja = async(descripcion, puntoVenta, numero, tipo, importe, 
     }
 };
 
+funciones.parsearFecha = (date) => {
+    const fecha = new Date(date);
+    const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
+    const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
+    return fechaParseada
+}
 module.exports = funciones;

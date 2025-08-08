@@ -52,7 +52,7 @@ ventaCTRL.cargarVenta = async(req,res)=>{
         };
 
         if(venta.tipo_venta !== 'PP'){
-            const stockDescontado = await descontarStock(venta.listaProductos);
+            const stockDescontado = await descontarStock(req.body.listaProductos);
             if(!stockDescontado) return res.status(400).json({
                 ok: false,
                 msg: "Error al descontar el stock"
@@ -65,12 +65,10 @@ ventaCTRL.cargarVenta = async(req,res)=>{
             msg: "Error al crear los movimientos"
         });
 
-        
         await venta.save();
         if (req.body.F) {
             funcion.crearPDF(req.body);//creamos un pdf con la venta
         };
-
 
         const nuevaVenta = await Venta.findOne({_id:venta._id})
             .populate('vendedor', 'nombre');
@@ -99,8 +97,7 @@ ventaCTRL.VentasDia = async(req,res)=>{
             {fecha:{$gte:inicioDia}},
             {fecha:{$lte:finDia}}
         ]
-    
-    });
+    }).populate('vendedor', 'nombre');
     res.send(ventas);
 };
 

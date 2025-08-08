@@ -258,12 +258,6 @@ const hacerMenu = () => {
       label: "Productos",
       submenu: [
         {
-          label: "Agregar Producto",
-          click() {
-            abrirVentana("productos/agregarProducto.html", 650, 900)
-          }
-        },
-        {
           label: "Aumento Por Marcas",
           click() {
             abrirVentana('productos/marcas.html', 300, 500, true);
@@ -282,12 +276,6 @@ const hacerMenu = () => {
           },
         },
         {
-          label: "Cambio de Producto",
-          click() {
-            abrirVentana("productos/cambio.html", 750, 900)
-          }
-        },
-        {
           label: "Listado de Nro Series",
           click() {
             ventanaPrincipal.loadFile('src/serie/listado.html');
@@ -296,7 +284,7 @@ const hacerMenu = () => {
         {
           label: "Lista de Precios",
           click() {
-            abrirVentana('productos/listaPrecios.html', 1000, 1000)
+            abrirVentana('productos/listaPrecios.html', 800, 1000)
           }
         },
         {

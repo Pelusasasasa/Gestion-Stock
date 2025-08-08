@@ -1,7 +1,7 @@
 const axios = require('axios');
 const Swal = require('sweetalert2')
 const { ipcRenderer } = require('electron');
-const { getParameterByName } = require('../helpers');
+const { getParameterByName, parsearFecha } = require('../helpers');
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -186,6 +186,7 @@ const listarRemitos = (lista) => {
     tbody.innerHTML = '';
 
     for (let elem of lista){
+        const fecha = parsearFecha(elem.fecha)
         const tr = document.createElement('tr');
 
         tr.classList.add('cursor-pointer');
@@ -229,8 +230,8 @@ const listarRemitos = (lista) => {
         tdObseraciones.classList.add('border');
         tdPasar.classList.add('border');
         tdReimprimir.classList.add('border');
-
-        tdFecha.innerText = elem.fecha.slice(0,10).split('-', 3).reverse().join('/  ');
+        
+        tdFecha.innerText = fecha;
         tdCodCliente.innerText = elem.idCliente;
         tdCliente.innerText = elem.cliente;
         tdNumero.innerText = elem.numero.toString().padStart(8, '0');
