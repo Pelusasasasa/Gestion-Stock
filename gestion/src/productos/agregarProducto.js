@@ -1,3 +1,6 @@
+const dolarInstalador = document.querySelector('#dolarInstalador');
+
+
 //Identificador
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
@@ -12,6 +15,7 @@ const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
+const costoIvaInstalador = document.querySelector('#costoIvaInstalador');
 //Total
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
@@ -70,6 +74,7 @@ window.addEventListener('load', async e => {
         costoDolar.setAttribute('disabled', "");
     }
     dolar.value = ((await axios.get(`${URL}numero`)).data.Dolar).toFixed(2);
+    dolarInstalador.value = ((await axios.get(`${URL}numero`)).data.dolarInstalador).toFixed(2)
 
     traerRubros();
     traerProvedores();
@@ -172,24 +177,20 @@ costoDolar.addEventListener('keypress', e => {
 });
 
 impuesto.addEventListener('keypress', e => {
-    apretarEnter(e, costoIva);
-})
-
-costoIva.addEventListener('keypress', e => {
     apretarEnter(e, ganancia);
-})
+});
 
 ganancia.addEventListener('keypress', e => {
     apretarEnter(e, total);
-})
+});
 
 total.addEventListener('keypress', e => {
     apretarEnter(e, guardar);
-})
+});
 
 salir.addEventListener('click', e => {
     window.close();
-})
+});
 
 document.addEventListener('keydown', e => {
     cerrarVentana(e)
@@ -243,9 +244,11 @@ impuesto.addEventListener('blur', e => {
     impuesto.value = impuesto.value === "" ? 0 : impuesto.value;
     if (parseFloat(costoDolar.value) !== 0) {
         costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoDolar.value) / 100) + parseFloat(costoDolar.value)) * parseFloat(dolar.value), 2)
+        costoIvaInstalador.value = ((parseFloat(costoDolar.value) + (parseFloat(costoDolar.value) * parseFloat(impuesto.value) / 100)) * parseFloat(dolarInstalador.value)).toFixed(2);
     } else {
         costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costo.value) / 100) + parseFloat(costo.value)).toFixed(2);
-    }
+        costoIvaInstalador.value = (parseFloat(costo.value) + (parseFloat(costo.value) * parseFloat(impuesto.value / 100))).toFixed(2);
+    };
 });
 
 total.addEventListener('focus', e => {

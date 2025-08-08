@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const CuentaCompensada = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true
-    },
     idCliente: {
         type: String,
         required: true

@@ -17,6 +17,7 @@ const total = document.getElementById('total');
 
 const cliente = document.getElementById('cliente');
 const idCliente = document.getElementById('idCliente');
+const dolar = document.getElementById('dolar');
 const cuit = document.getElementById('cuit');
 const direccion = document.getElementById('direccion');
 const localidad = document.getElementById('localidad');
@@ -24,7 +25,6 @@ const cond_iva = document.getElementById('cond_iva');
 
 const tbody = document.querySelector('tbody');
 
-let dolar;
 
 window.addEventListener('load',e=>{
     ipcRenderer.on('imprimir',async(e,args)=>{
@@ -33,34 +33,31 @@ window.addEventListener('load',e=>{
         let movimientos = JSON.parse(args)[3];
         let auxDolar = JSON.parse(args)[4];
 
-        
-        if ((auxDolar)) {
-            dolar = (await axios.get(`${URL}numero/Dolar`)).data;
-        };
-        
-        await ponerDatosVenta(datosVenta);
+        await ponerDatosVenta(datosVenta, auxDolar);
         await ponerDatosClientes(datosClientes);
-        await ponerDatosArticulos(movimientos);
+        await ponerDatosArticulos(movimientos, auxDolar);
 
         ipcRenderer.send('imprimir-ventana',JSON.parse(args)[0]);
     });
 });
 
-const ponerDatosVenta = (datos)=>{
-    const now = new Date(datos.fecha);
-    const aux = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    const fecha = aux.slice(0,10).split('-',3);
-    const hora = aux.slice(11,19).split(':',3);
+const ponerDatosVenta = (datos, auxDolar)=>{
+    const fecha = new Date(datos.fecha);
+    const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
+    const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
+
+    dolar.innerText = datos.dolar.toFixed(2);
     numero.innerText = datos.numero.toString().padStart(8,'0');
-    date.innerText = `${fecha[2]}/${fecha[1]}/${fecha[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
+    date.innerText = fechaParseada;
     tipoPago.innerText = datos.tipoVenta ?? datos.tipo_venta;
     vendedor.innerText = datos.vendedor;
     condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
+
     if(datos.tipo_venta !== 'RT' && datos.tipoVenta !== 'RT'){
-        subTotal.innerText = dolar ? ((datos.precio + datos.descuento) / dolar).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
+        subTotal.innerText = auxDolar ? ((datos.precio + datos.descuento) / parseFloat(dolar.innerText)).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
         descuento.innerText = datos?.descuento?.toFixed(2);
-        total.innerText = dolar ? (datos.precio / dolar).toFixed(2) : datos.precio.toFixed(2);
-    }
+        total.innerText = auxDolar ? (datos.precio / parseFloat(dolar.innerText)).toFixed(2) : datos.precio.toFixed(2);
+    };
 };
 
 const ponerDatosClientes = (datos)=>{
@@ -72,11 +69,11 @@ const ponerDatosClientes = (datos)=>{
     cond_iva.innerHTML = datos.condicionIva.toUpperCase();
 };
 
-const ponerDatosArticulos = (datos)=>{
+const ponerDatosArticulos = (datos, auxDolar)=>{
     datos.forEach(movimiento => {
-
-        if (dolar) {
-            movimiento.precio = movimiento.precio / dolar;
+        
+        if (auxDolar) {
+            movimiento.precio = movimiento.precio / parseFloat(dolar.innerText);
         }
 
         const tr = document.createElement('tr');

@@ -2,13 +2,12 @@ const axios = require('axios');
 const sweet = require('sweetalert2');
 require("dotenv").config();
 
-const { ipcRenderer, clipboard } = require('electron');
+const { ipcRenderer } = require('electron');
 const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verificarDatos, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
 
 const URL = process.env.GESTIONURL;
-
 
 let vendedor = getParameterByName('vendedor');
 let esRemito = getParameterByName('remito');
@@ -53,22 +52,25 @@ const alerta = document.querySelector('.alerta');
 //body
 const body = document.querySelector('body');
 
-
 let tipoFactura = getParameterByName("tipoFactura");
 let facturaAnterior;
 
-let movimientos = [];
-let descuentoStock = [];
+let situacion = "blanco";
+
 let totalGlobal = 0;
 let idProducto = 0;
-let situacion = "blanco";
 let porcentajeH = 0;
 let descuento = 0;
 let dolar = 0;
+let dolarInstalador = 0;
+
+let descuentoStock = [];
 let listaProductos = [];
-let seleccionado;
-let facturaVarios = false;
 let cuentas = [];
+
+let seleccionado;
+
+let facturaVarios = false;
 
 const arreglarSaldo = async (id) => {
     let saldoADescontar = 0;
@@ -100,30 +102,6 @@ const calcularTotal = async () => {
 const cambiarSituacion = (situacion) => {
     situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
     situacion === "negro" ? remitoDiv.classList.remove('none') : remitoDiv.classList.add('none');
-};
-
-//Cargamos el movimiento de producto a la BD
-const cargarMovimiento = async ({ cantidad, producto, series }, numero, cliente, tipo_venta, tipo_comp, caja, vendedor = "") => {
-    const movimiento = {};
-    movimiento.tipo_venta = tipo_venta;
-    movimiento.codProd = producto._id;
-    movimiento.producto = producto.descripcion;
-    movimiento.cliente = cliente
-    movimiento.cantidad = cantidad;
-    movimiento.marca = producto.marca;
-
-    movimiento.precio = lista.value === "1" ? producto.precio : parseFloat(sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolar));
-
-    movimiento.rubro = producto.rubro;
-    movimiento.nro_venta = numero;
-    movimiento.impuesto = producto.impuesto;
-    movimiento.tipo_comp = tipo_comp;
-    movimiento.caja = caja;
-    movimiento.iva = producto.impuesto;
-    movimiento.series = series;
-    movimiento.vendedor = vendedor;
-    movimiento.unidad = producto.unidad;
-    movimientos.push(movimiento);
 };
 
 const cargarRemito = async () => {
@@ -281,7 +259,7 @@ const listarCliente = async (id) => {
         direccion.value = cliente.direccion;
         condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
         cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none');
-        lista.value = cliente.tipoCuenta === 'NORMAL' ? 1 : 2;
+        lista.value = cliente.tipoCuenta;
         codBarra.focus();
     } else {
         codigo.value = "";
@@ -342,7 +320,7 @@ const listarProducto = async (producto, cant = 1, series = []) => {
 
             codBarra.value = producto._id;
             
-            precioU.value = lista.value === "1" ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolar);
+            precioU.value = lista.value === "NORMAL" ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador);
             
             idProducto++;
             producto.idTabla = `${idProducto}`;
@@ -384,34 +362,19 @@ const listarProducto = async (producto, cant = 1, series = []) => {
             const tr = document.getElementById(producto.idTabla);
             tr.children[1].innerHTML = redondear(parseFloat(tr.children[1].innerHTML) + parseFloat(cantidad.value), 2);
             let precio = tr.children[6];
-
             const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
+            
             if(parseFloat(cantidadNueva) === 0) tbody.removeChild(tr);
-            //si lista es 1 entonces redondeamos para el precio comun simplemente
-            if (lista.value === "1") {
-                if (checkboxDolar.checked) {
-                    precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio / dolar, 2)
-                } else {
-                    precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio, 2);
-                }
+            
+            //Si la lista de de cliente normal se redonde el precio y sino el costo mas iva por el dolar intalador
+            if (lista.value === "NORMAL") {
+                precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio, 2);
                 calcularTotal();
             } else {
-                //Si la lista es 2 entonces redondeamos con el costo simplemente
-                console.log("Cantidad Nueva es: " + cantidadNueva);
-                if (checkboxDolar.checked) {
-                    if (producto.costo !== 0) {
-                        precio.innerHTML = redondear(cantidadNueva * (producto.costo / dolar), 2);
-                        calcularTotal();
-                    } else {
-                        precio.innerHTML = redondear(cantidadNueva * producto.costoDolar, 2);
-                        calcularTotal();
-                    }
-                } else {
-                    precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolar)), 2);
-                    calcularTotal();
-                }
+                precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador)), 2);
+                calcularTotal();
+            };
 
-            }
             totalGlobal = parseFloat(total.value);
         };
 
@@ -428,28 +391,6 @@ const listarProducto = async (producto, cant = 1, series = []) => {
 
 };
 
-//creamos la cuenta compensada cuando la venta se hace en cuenta corriente
-const ponerEnCuentaCompensada = async (venta) => {
-    const cuenta = {};
-    cuenta.cliente = venta.cliente;
-    cuenta.idCliente = venta.idCliente;
-    cuenta.nro_venta = venta.numero;
-    cuenta.importe = venta.precio;
-    cuenta.pagado = inputRecibo.value;
-    cuenta.condicion = venta.condicion;
-    cuenta.tipo_comp = venta.tipo_comp;
-    cuenta.saldo = venta.precio - parseFloat(inputRecibo.value);
-    cuenta.observaciones = observaciones.value;
-
-    //Si es una Factura Agregamos para que se pueda guarar el numero de factura
-    if (venta.F) {
-        cuenta.nro_factura = `${venta.afip.puntoVenta.padStart(4, '0')}-${(venta.afip.numero).toString().padStart(8, '0')}`;
-    };
-
-
-    await axios.post(`${URL}compensada`, cuenta);
-};
-
 //creamos la cuenta historica cuando la venta se hace en cuenta corriente
 const ponerEnCuentaHistorica = async (venta, saldo) => {
     const cuenta = {};
@@ -464,22 +405,6 @@ const ponerEnCuentaHistorica = async (venta, saldo) => {
     (await axios.post(`${URL}historica`, cuenta)).data;
 };
 
-const sumarSaldo = async (id, nuevoSaldo, venta) => {
-    const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
-    cliente.listaVentas.push(venta);
-    if (facturaAnterior) {
-        cliente.saldo = (cliente.saldo - nuevoSaldo);
-    } else {
-        cliente.saldo = (cliente.saldo + nuevoSaldo - parseFloat(inputRecibo.value)).toFixed(2);
-    }
-
-    try {
-        await axios.put(`${URL}clientes/id/${id}`, cliente);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 const sacarIva = (lista, condicion) => {
     let totalIva0 = 0;
     let totalIva21 = 0;
@@ -487,7 +412,7 @@ const sacarIva = (lista, condicion) => {
     let gravado0 = 0;
     let totalIva105 = 0;
     let gravado105 = 0;
-    if (condicion === '1') {
+    if (condicion === 'NORMAL') {
         lista.forEach(({ producto, cantidad }) => {
             if (producto.impuesto === 21) {
                 gravado21 += cantidad * producto.precio / 1.21;
@@ -530,12 +455,12 @@ const sacarIva = (lista, condicion) => {
     return [parseFloat(totalIva21.toFixed(2)), parseFloat(totalIva0.toFixed(2)), parseFloat(gravado21.toFixed(2)), parseFloat(gravado0.toFixed(2)), parseFloat(totalIva105.toFixed(2)), parseFloat(gravado105.toFixed(2)), cantIva]
 };
 
-const togglePrecios = async (e) => {
+const togglePrecios = async (e) => { 
     for await (let { cantidad, producto } of listaProductos) {
 
         const tr = document.getElementById(`${producto.idTabla}`);
 
-        if (lista.value === "1") {
+        if (lista.value === "NORMAL") {
             tr.children[5].innerText = producto.precio.toFixed(2);
             tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText), 2);
         } else {
@@ -543,8 +468,8 @@ const togglePrecios = async (e) => {
                 tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100), 2);
                 tr.children[6].innerText = redondear(parseFloat(tr.children[5].innerText) * parseFloat(tr.children[1].innerText), 2);
             } else {
-                tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar, 2);
-                tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar * parseFloat(tr.children[1].innerText), 2);
+                tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador, 2);
+                tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * parseFloat(tr.children[1].innerText), 2);
             }
         };
     };
@@ -700,34 +625,14 @@ facturar.addEventListener('click', async e => {
 
         venta.direccion = direccion.value;
         venta.localidad = localidad.value;
-        venta.condicion = lista.value === "1" ? "Normal" : "Instalador"
-
+        venta.condicion = lista.value;
         venta.checkboxDolar = checkboxDolar.checked;
-        venta.dolar = dolar;
+        venta.dolar = lista.value === 'NORMAL' ? dolar : dolarInstalador;
         venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
         venta.vendedor = vendedor ? vendedor : "";
 
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
 
-        if (venta.tipo_venta === "CC") {
-            venta.numero = numeros["Cuenta Corriente"] + 1;
-        } else if (venta.tipo_venta === "RT") {
-            venta.numero = numeros["Remito"] + 1;
-        } else if (venta.tipo_venta === "PP") {
-            venta.numero = numeros["Presupuesto"] + 1;
-        } else if (venta.tipo_venta === "CD") {
-            venta.numero = numeros["Contado"] + 1;
-        };
-
-        if (venta.tipo_venta === "CC") {
-            await axios.put(`${URL}numero/Cuenta Corriente`, { "Cuenta Corriente": venta.numero });
-        } else if (venta.tipo_venta === "PP") {
-            await axios.put(`${URL}numero/Presupuesto`, { "Presupuesto": venta.numero });
-        } else if (venta.tipo_venta === "RT") {
-            await axios.put(`${URL}numero/Remito`, { "Remito": venta.numero });
-        } else {
-            await axios.put(`${URL}numero/Contado`, { Contado: venta.numero });
-        }
 
         try {
             if (situacion === "blanco") {
@@ -736,30 +641,9 @@ facturar.addEventListener('click', async e => {
                 venta.F = true;
             } else {
                 alerta.children[1].innerHTML = "Generando Venta";
-            }
-
-            /*Si no es facturar varios lo que hacemos es seguir el curso nomar de una venta, 
-            sino borramos la cuenta compensada y los moviminetos le cambiamos el numero*/
-
-            for (let producto of listaProductos) {
-                await cargarMovimiento(producto, venta.numero, venta.cliente, venta.tipo_venta, venta.tipo_comp, venta.caja, venta.vendedor);
-                if (!(producto.producto.productoCreado)) {
-                    !esRemito && await descontarStock(producto);
-                }
-                //producto.producto.precio = producto.producto.precio - redondear((parseFloat(descuentoPor.value) * producto.producto.precio / 100,2));
             };
 
-            (venta.tipo_venta !== "PP" && !facturaVarios) && await axios.put(`${URL}productos/descontarStock`, descuentoStock);
-
-            await axios.post(`${URL}movimiento`, movimientos);
-
-
-            //sumamos al cliente el saldo y agregamos la venta a la lista de venta
-            venta.tipo_venta === "CC" && await sumarSaldo(venta.idCliente, venta.precio, venta.numero);
-
-            //Ponemos en la cuenta conpensada si es CC
-            venta.tipo_venta === "CC" && await ponerEnCuentaCompensada(venta);
-            venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta, parseFloat(saldo.value));
+            // venta.tipo_venta === "CC" && await ponerEnCuentaHistorica(venta, parseFloat(saldo.value));
 
             if (venta.tipo_venta === "CC" && parseFloat(inputRecibo.value) !== 0) {
                 await hacerRecibo(numeros.Recibo);
@@ -783,7 +667,7 @@ facturar.addEventListener('click', async e => {
             } else {
                 await axios.post(`${URL}ventas`, venta);
             };
-
+            console.log(venta);
 
             //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
             if (remitosTraidos.length > 0) {
@@ -992,6 +876,7 @@ lista.addEventListener('change', togglePrecios);
 window.addEventListener('load', async e => {
 
     dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+    dolarInstalador = (await axios.get(`${URL}numero/dolarInstalador`)).data;
 
     if (tipoFactura === "notaCredito") {
 

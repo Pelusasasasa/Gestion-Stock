@@ -11,11 +11,16 @@
 <body class="agregarProducto">
         <section id="titulo">
             <h1>Agregar Producto</h1>
-            <main>
-                <label for="dolar">Dolar</label>
-                <input type="text" disabled class="text-rigth" name="dolar" id="dolar">
+            <main class="mr-2">
+                <label for="dolarInstalador">Dolar Instalador</label>
+                <input type="number" disabled class="text-rigth" name="dolarInstalador" id="dolarInstalador">
+            </main>
+            <main class="mr-2">
+                <label for="dolar">Dolar Normal</label>
+                <input type="number" disabled class="text-rigth" name="dolar" id="dolar">
             </main>
         </section>
+
         <fieldset>
             <legend>Identificador</legend>
             <section class="identificador">
@@ -85,7 +90,12 @@
                 </div>
                 <div class="input">
                     <label for="costoIva">Costo + Iva</label>
-                    <input type="number" value="0.00" name="costoIva" id="costoIva"> 
+                    <input type="number" disabled value="0.00" name="costoIva" id="costoIva"> 
+                </div>
+
+                <div class="input">
+                    <label for="costoIvaInstalador">Costo + Iva (Instalador)</label>
+                    <input type="number" disabled value="0.00" name="costoIvaInstalador" id="costoIvaInstalador"> 
                 </div>
             </section>
         </fieldset>

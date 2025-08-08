@@ -389,11 +389,14 @@ const listarVentas = async (ventas)=>{
         lista = ventas.filter(venta=>venta.tipo_venta === "T");
     }else{
         lista = ventas;
-    }
+    };
+
     let totalVenta = 0;
     for await(let venta of lista){
-        const fecha = venta.fecha.slice(0,10).split('-',3).reverse().join('/');
-        const hora = venta.fecha.slice(11,19).split(':',3).join(':');
+        const fecha = new Date(venta.fecha);
+        const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
+        const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
+
         const tr = document.createElement('tr');
         tr.id = venta._id;
         tr.classList.add('bold')
@@ -413,7 +416,7 @@ const listarVentas = async (ventas)=>{
         tdAcciones.classList.add('acciones')
 
         tdNumero.innerHTML = venta.numero;
-        tdFecha.innerHTML = fecha + " - " + hora;
+        tdFecha.innerHTML = fechaParseada;
         tdCliente.innerHTML = venta.cliente;
         tdCodProducto.innerHTML = venta.tipo_comp;
         tdProducto.innerHTML = venta.tipo_comp === 'Recibo' ? venta.valorRecibido : '';
@@ -422,12 +425,10 @@ const listarVentas = async (ventas)=>{
         tdCaja.innerHTML = venta.caja ? venta.caja : "Caja 1";
         tdAcciones.innerHTML = `
             <div class=tool>
-                    <span class=material-icons>edit</span>
-                    <p class=tooltip>Modificar</p>
+                    <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
                 </div>
             <div class=tool>
-                <span class=material-icons>delete</span>
-                <p class=tooltip>Eliminar</p>
+                <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
             </div>
         `
 

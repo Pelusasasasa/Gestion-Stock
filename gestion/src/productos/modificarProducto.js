@@ -11,6 +11,7 @@ const archivo = require('../configuracion.json')
 
 //Identificador
 const dolar = document.getElementById('dolar');
+const dolarInstalador = document.getElementById('dolarInstalador');
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
 //Informacion
@@ -24,6 +25,7 @@ const costo = document.querySelector('#costo');
 const costoDolar = document.querySelector('#costoDolar');
 const impuesto = document.querySelector('#impuesto');
 const costoIva = document.querySelector('#costoIva');
+const costoIvaInstalador = document.querySelector('#costoIvaInstalador');
 //Total
 const ganancia = document.querySelector('#ganancia');
 const total = document.querySelector('#total');
@@ -70,7 +72,9 @@ ipcRenderer.on('informacion', async (e, args) => {
     if (!archivo.dolar) {
         costoDolar.setAttribute('disabled', "");
     }
-    dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2)
+    dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2);
+    dolarInstalador.value = (await axios.get(`${URL}numero/dolarInstalador`)).data.toFixed(2);
+    
     const { informacion } = args;
     vendedor = args.vendedor;
     traerRubros();
@@ -83,21 +87,26 @@ ipcRenderer.on('informacion', async (e, args) => {
 //llenamos los inputs con la informacion que tenemos
 const llenarInputs = async (codigoProducto) => {
     codigo.value = codigoProducto;
+
     const id = codigo.value.replace(/\//g, '%2F');
     const producto = (await axios.get(`${URL}productos/${id}`)).data;
-    unidad.value = producto.unidad;
+
     descripcion.value = producto.descripcion;
+    unidad.value = producto.unidad;
     marca.value = producto.marca;
+    select.value = producto.rubro;
     provedor.value = producto.provedor;
     stock.value = producto.stock;
-    select.value = producto.rubro;
     costo.value = producto.costo.toFixed(2);
     costoDolar.value = producto.costoDolar.toFixed(2);
     impuesto.value = producto.impuesto.toFixed(2);
+
     if (producto.costoDolar !== 0) {
         costoIva.value = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(dolar.value), 2);
+        costoIvaInstalador.value = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(dolarInstalador.value), 2);
     } else {
         costoIva.value = (producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2);
+        costoIvaInstalador.value = (producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2);
     }
     ganancia.value = producto.ganancia.toFixed(2);
     total.value = producto.precio.toFixed(2);
@@ -184,10 +193,14 @@ costoDolar.addEventListener('keypress', e => {
 });
 
 impuesto.addEventListener('keypress', e => {
-    apretarEnter(e, costoIva);
+    apretarEnter(e, ganancia);
 });
 
 costoIva.addEventListener('keypress', e => {
+    apretarEnter(e, costoIvaInstalador);
+});
+
+costoIvaInstalador.addEventListener('keypress', e => {
     apretarEnter(e, ganancia);
 });
 
@@ -238,8 +251,10 @@ total.addEventListener('focus', e => {
 impuesto.addEventListener('blur', e => {
     if (parseFloat(costoDolar.value) !== 0) {
         costoIva.value = redondear((parseFloat(costoDolar.value) + (parseFloat(costoDolar.value) * parseFloat(impuesto.value) / 100)) * parseFloat(dolar.value), 2);
+        costoIvaInstalador.value = redondear((parseFloat(costoDolar.value) + (parseFloat(costoDolar.value) * parseFloat(impuesto.value) / 100)) * parseFloat(dolarInstalador.value), 2);
     } else {
         costoIva.value = (parseFloat(costo.value) + (parseFloat(costo.value) * parseFloat(impuesto.value) / 100)).toFixed(2);
+        costoIvaInstalador.value = (parseFloat(costo.value) + (parseFloat(costo.value) * (parseFloat(impuesto.value) / 100))).toFixed(2)
     }
 });
 

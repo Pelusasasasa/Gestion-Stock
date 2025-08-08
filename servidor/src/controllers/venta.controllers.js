@@ -2,6 +2,11 @@ const ventaCTRL = {};
 
 const Venta = require('../models/Venta');
 const funcion = require('../assets/js/pdf');
+const { sumarSaldoCliente } = require('../helpers/sumarSaldoCliente');
+const { actualizarNumero } = require('../helpers/actualizarNumero');
+const { descontarStock } = require('../helpers/descontarStock');
+const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
+const { crearCompensada } = require('../helpers/crearCompensada');
 
 ventaCTRL.getForId = async(req,res)=>{
     const {id} = req.params;
@@ -17,16 +22,54 @@ ventaCTRL.putForId = async(req,res)=>{
 };
 
 ventaCTRL.cargarVenta = async(req,res)=>{
-    const now = new Date();
-    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    const venta = new Venta(req.body);
-    await venta.save();
-    if (req.body.F) {
-        funcion.crearPDF(req.body);//creamos un pdf con la venta
-    }
+    try {
+        const venta = new Venta(req.body);
 
-    console.log(`Venta con el numero: ${venta.numero} Cargada`);
-    res.send("Venta Guardada");
+        const numeroActualizado = await actualizarNumero(venta.tipo_venta);
+        if(numeroActualizado.ok){
+            venta.numero = numeroActualizado.numero
+        };
+
+        if(venta.tipo_venta === 'CC'){
+            const saldoModficado =  await sumarSaldoCliente(venta.idCliente, venta.precio);
+            if(!saldoModficado.ok) return res.status(400).json({
+                msg: "Error al modificar el saldo del cliente",
+                ok: false
+            }); 
+
+            const compensada = await crearCompensada(venta);
+            console.log(compensada);
+            if(!compensada) return res.status(400).json({
+                msg: "Error al crear la compensada",
+                ok: false
+            });
+        };
+
+        if(venta.tipo_venta !== 'PP'){
+            const stockDescontado = await descontarStock(venta.listaProductos);
+            if(!stockDescontado) return res.status(400).json({
+                ok: false,
+                msg: "Error al descontar el stock"
+            });
+        };
+
+        const movimientos = await crearMovimientosStock(venta);
+        if(!movimientos) return res.status(400).json({
+            ok: false,
+            msg: "Error al crear los movimientos"
+        });
+
+        
+        await venta.save();
+        if (req.body.F) {
+            funcion.crearPDF(req.body);//creamos un pdf con la venta
+        }
+
+        console.log(`Venta con el numero: ${venta.numero} Cargada`);
+        res.send("Venta Guardada");
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 ventaCTRL.VentasDia = async(req,res)=>{
