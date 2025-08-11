@@ -109,11 +109,15 @@ window.addEventListener('load',async e=>{
     fecha.value = `${a}-${m}-${d}`;
     selectMes.value = m;
     inputAnio.value = a;
+
     ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
     recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
     ventas = [...ventas,...recibos];
     gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
     cuentasCorrientes = ((await axios.get(`${URL}ventas/dia/${fecha.value}`)).data).filter(venta => venta.tipo_venta === "CC");
+
+    console.log(ventas);
+
     listarVentas(ventas);
 });
 
@@ -131,8 +135,12 @@ const verQueTraer = async()=>{
         }
     }else if(botonSeleccionado.classList.contains("mes")){
         if (filtro === "Ingresos") {
-            ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
+            const  { data } = (await axios.get(`${URL}ventas/mes/${selectMes.value}`));
             recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
+
+            if(!data.ok) return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
+
+            ventas = data.ventas
             return([...ventas,...recibos])
         }else{
             return ((await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data);
@@ -181,8 +189,13 @@ botonMes.addEventListener('click',async e=>{
 
     //vemos que tipo de filtro es y ahi vemos si traemos los ingresos o gastos
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-        ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
+        const { data } = (await axios.get(`${URL}ventas/mes/${selectMes.value}`));
         recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
+
+        if(!data.ok) return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
+        
+        ventas = data.ventas;
+
         cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
         if (filtro === "Ingresos") {
             listarVentas([...ventas,...recibos]);
@@ -273,9 +286,15 @@ fecha.addEventListener('keypress',async e=>{
 
 selectMes.addEventListener('click',async e=>{
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-        ventas = (await axios.get(`${URL}ventas/mes/${selectMes.value}`)).data;
+        const { data } = (await axios.get(`${URL}ventas/mes/${selectMes.value}`));
         recibos = (await axios.get(`${URL}recibo/mes/${selectMes.value}`)).data;
         cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+
+
+        if(!data.ok) return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
+
+        ventas = data.ventas
+        
 
         if (filtro === "Ingresos") {
             listarVentas([...ventas,...recibos]);
@@ -408,7 +427,6 @@ const listarVentas = async (ventas)=>{
         const tdPrecio =  document.createElement('td');
         const tdPrecioTotal = document.createElement('td');
         const tdVendedor = document.createElement('td');
-        const tdCaja = document.createElement('td');
         const tdAcciones = document.createElement('td');
 
         tdAcciones.classList.add('acciones')
@@ -420,7 +438,6 @@ const listarVentas = async (ventas)=>{
         tdProducto.innerHTML = venta.tipo_comp === 'Recibo' ? venta.valorRecibido : '';
         tdPrecioTotal.innerHTML = venta.tipo_comp === "Nota Credito C" ? redondear(venta.precio * -1,2) : venta.precio.toFixed(2);
         tdVendedor.innerHTML = venta.vendedor ? venta.vendedor.nombre : "";
-        tdCaja.innerHTML = venta.caja ? venta.caja : "Caja 1";
         tdAcciones.innerHTML = `
             <div class=tool>
                     <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
@@ -439,7 +456,6 @@ const listarVentas = async (ventas)=>{
         tr.appendChild(tdPrecio);
         tr.appendChild(tdPrecioTotal);
         tr.appendChild(tdVendedor);
-        tr.appendChild(tdCaja);
         tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
@@ -480,13 +496,12 @@ const listarGastos = (gastos)=>{
 };
 
 const listarMovimientoComprobante = async(movimientos,codigo)=>{
-        for await(let {cantidad,precio,fecha,cliente,codProd,producto,nro_venta,descripcion} of  movimientos){
+        for await(let {cantidad, precio, fecha, cliente, codProd, producto, nro_venta, series} of  movimientos){
             const trProducto = document.createElement('tr');
             trProducto.classList.add('none');
             trProducto.classList.add(`venta${codigo}`);
 
-            const date = fecha.slice(0,10).split('-',3);
-            const hora = fecha.slice(11,19).split(':',3);
+            const date = parsearFecha(fecha);
 
             const tdNumeroProducto = document.createElement('td');
             const tdFechaProducto = document.createElement('td');
@@ -496,15 +511,23 @@ const listarMovimientoComprobante = async(movimientos,codigo)=>{
             const tdCantidad = document.createElement('td');
             const tdPrecioProducto = document.createElement('td');
             const tdTotalProducto = document.createElement('td');
+            const tdSerie = document.createElement('td');
 
             tdNumeroProducto.innerHTML = nro_venta;
-            tdFechaProducto.innerHTML = `${date[2]}/${date[1]}/${date[0]} - ${hora[0]}:${hora[1]}:${hora[2]}`;
+            tdFechaProducto.innerHTML = date;
             tdClienteProducto.innerHTML = cliente;
             tdIdProducto.innerHTML = codProd === undefined ? " " : codProd;
             tdDescripcion.innerHTML = producto;
             tdCantidad.innerHTML = cantidad.toFixed(2);
             tdPrecioProducto.innerHTML = precio.toFixed(2);
             tdTotalProducto.innerHTML = (cantidad*precio).toFixed(2);
+            tdSerie.innerHTML = `
+                <div>
+                    <textarea name="" id="" class=w-full m-0>
+                        ${series}
+                    </textarea>
+                </div>
+            `;
 
             trProducto.appendChild(tdNumeroProducto);
             trProducto.appendChild(tdFechaProducto);
@@ -514,6 +537,7 @@ const listarMovimientoComprobante = async(movimientos,codigo)=>{
             trProducto.appendChild(tdCantidad);
             trProducto.appendChild(tdPrecioProducto);
             trProducto.appendChild(tdTotalProducto);
+            trProducto.appendChild(tdSerie);
 
             tbody.appendChild(trProducto);
     };

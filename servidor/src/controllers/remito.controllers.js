@@ -3,6 +3,7 @@ const remitoCTRL = {}
 
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
+const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const { descontarStock } = require('../helpers/descontarStock');
 const Remito = require('../models/Remito');
 
@@ -42,6 +43,8 @@ remitoCTRL.postOne = async(req, res) => {
         });
 
         await remito.save();
+
+        await crearMovimientoVendedores(`Se hizo un remito al cliente ${remito.cliente}`, remito.vendedor);
 
         const nuevoRemito = await Remito.findOne({_id:remito._id})
             .populate('vendedor', 'nombre');

@@ -12,6 +12,10 @@ const movProducto = new mongoose.Schema({
         type:String,
         default:""
     },
+    nombreCliente: {
+        type: String,
+        default: ''
+    },
     marca:{
         type:String,
         default:""

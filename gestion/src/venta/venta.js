@@ -657,9 +657,6 @@ facturar.addEventListener('click', async e => {
                 await eliminarCuentas();
             };
 
-            //Agregar movimiento de los vendedores
-            await agregarMovimientoVendedores(`Hizo una venta al cliente ${cliente.nombre}`, vendedor);
-
             facturaVarios && window.close();
             esRemito ? location.href = '../menu.html' : location.reload();
         } catch (error) {

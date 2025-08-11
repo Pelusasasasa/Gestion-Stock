@@ -8,6 +8,7 @@ const { descontarStock } = require('../helpers/descontarStock');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
 const { crearCompensada } = require('../helpers/crearCompensada');
 const { crearHistorica } = require('../helpers/crearHistorica');
+const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 
 ventaCTRL.getForId = async(req,res)=>{
     const {id} = req.params;
@@ -70,6 +71,8 @@ ventaCTRL.cargarVenta = async(req,res)=>{
             funcion.crearPDF(req.body);//creamos un pdf con la venta
         };
 
+        await crearMovimientoVendedores(`Se hizo una venta al cliente ${venta.cliente}`, venta.vendedor);
+
         const nuevaVenta = await Venta.findOne({_id:venta._id})
             .populate('vendedor', 'nombre');
 
@@ -90,31 +93,56 @@ ventaCTRL.cargarVenta = async(req,res)=>{
 
 ventaCTRL.VentasDia = async(req,res)=>{
     const {fecha} = req.params;
-    const inicioDia = new Date(fecha + "T00:00:00.000Z");
-    const finDia = new Date(fecha + "T23:59:59.999Z");
-    const ventas = await Venta.find({
-        $and:[
-            {fecha:{$gte:inicioDia}},
-            {fecha:{$lte:finDia}}
-        ]
-    }).populate('vendedor', 'nombre');
-    res.send(ventas);
+
+    try {
+        const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
+        const inicioDia = new Date(fechaBase);
+        const finDia = new Date(fechaBase);
+        finDia.setHours(23, 59, 59, 999);
+
+        const ventas = await Venta.find({
+            $and:[
+                {fecha:{$gte:inicioDia}},
+                {fecha:{$lte:finDia}}
+            ]
+        }).populate('vendedor', 'nombre');
+        res.send(ventas);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudieron obtener las ventas, hable con el administrador'
+        })
+    }
 };
 
 ventaCTRL.ventasMes = async(req,res)=>{
-    const {fecha} = req.params;
-    let mes = parseFloat(fecha);
-    mes = mes>12 ? 1 : mes;
-    let hoy = new Date();
-    let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
-    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
-    const ventas = await Venta.find({
-    $and:[
-        {fecha:{$gte:new Date(fechaConMes)}},
-        {fecha:{$lte:new Date(fechaConMesSig)}}
-    ]
-});
-    res.send(ventas);
+    try {
+        const {fecha} = req.params;
+        let mes = parseFloat(fecha);
+        mes = mes>12 ? 1 : mes;
+        let hoy = new Date();
+        let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
+        let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes===12 ? 1 : mes + 1}-1`);
+
+        const ventas = await Venta.find({
+            $and:[
+                {fecha:{$gte:new Date(fechaConMes)}},
+                {fecha:{$lte:new Date(fechaConMesSig)}}
+            ]         
+        }).populate('vendedor', 'nombre');
+
+        res.status(200).json({
+            ok: true,
+            ventas
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudieron obtener las ventas, hable con el administrador'
+        })
+    }
 };
 
 ventaCTRL.ventaAnio = async(req,res)=>{

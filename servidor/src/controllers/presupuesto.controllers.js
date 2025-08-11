@@ -3,6 +3,7 @@ const presupuestoCTRL = {};
 const funcion = require('../assets/js/pdf');
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
+const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const Presupuesto = require('../models/Presupuesto');
 
 presupuestoCTRL.post = async(req,res)=>{
@@ -28,7 +29,11 @@ presupuestoCTRL.post = async(req,res)=>{
         funcion.crearPDF(req.body);//creamos un pdf con la presupuesto
     };
 
+    await crearMovimientoVendedores(`Se hizo un presupuesto al cliente ${presupuesto.cliente}`, presupuesto.vendedor);
+
     const nuevoPresupuesto = await Presupuesto.findById(presupuesto._id).populate('vendedor', 'nombre');
+    
+
     console.log(`Presupuesto ${presupuesto.numero} cargado a las ${req.body.fecha}`);
     
     res.status(201).json({

@@ -108,8 +108,11 @@ const eliminarNro = async () => {
 };
 
 const filtrar = async () => {
-    const series = (await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`)).data;
-    listarSeries(series);
+    const { data } = (await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`));
+
+    if(!data.ok) return await sweet.fire('Error al obtener los numeros de series' ,'No se pudo obtener los numeros de series', 'error');
+    
+    listarSeries(data.movs);
 };
 
 const listarSeries = (series) => {
@@ -120,6 +123,7 @@ const listarSeries = (series) => {
         tr.id = serie._id;
 
         const tdFecha = document.createElement('td');
+        const tdCliente = document.createElement('td');
         const tdCodigo = document.createElement('td');
         const tdProducto = document.createElement('td');
         const tdNroSerie = document.createElement('td');
@@ -128,6 +132,7 @@ const listarSeries = (series) => {
         const tdVendedor = document.createElement('td');
 
         tdFecha.classList.add('border');
+        tdCliente.classList.add('border');
         tdCodigo.classList.add('border');
         tdProducto.classList.add('border');
         tdNroSerie.classList.add('border');
@@ -137,6 +142,7 @@ const listarSeries = (series) => {
 
         tdFecha.classList.add('border-black');
         tdCodigo.classList.add('border-black');
+        tdCliente.classList.add('border-black');
         tdProducto.classList.add('border-black');
         tdNroSerie.classList.add('border-black');
         tdProvedor.classList.add('border-black');
@@ -144,6 +150,7 @@ const listarSeries = (series) => {
         tdVendedor.classList.add('border-black');
 
         tdFecha.innerText = serie.fecha.slice(0, 10).split('-', 3).reverse().join('/');
+        tdCliente.innerText = `${serie?.idCliente ?? ''} - ${serie.cliente ?? ''}`;
         tdCodigo.innerText = serie.codigo;
         tdProducto.innerText = serie.producto;
         tdNroSerie.innerText = serie.nro_serie;
@@ -152,6 +159,7 @@ const listarSeries = (series) => {
         tdVendedor.innerText = serie.vendedor;
 
         tr.appendChild(tdFecha);
+        tr.appendChild(tdCliente);
         tr.appendChild(tdCodigo);
         tr.appendChild(tdProducto);
         tr.appendChild(tdNroSerie);
@@ -164,10 +172,7 @@ const listarSeries = (series) => {
 };
 
 const inicio = async () => {
-
-    const series = (await axios.get(`${URL}nroSerie`)).data;
-    listarSeries(series);
-
+    filtrar();
 };
 
 buscador.addEventListener('keyup', filtrar);

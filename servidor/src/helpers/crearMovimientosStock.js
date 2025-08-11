@@ -8,6 +8,7 @@ exports.crearMovimientosStock = async(listaProductos, venta) => {
             movimiento.fecha = venta.fecha;
             movimiento.tipo_venta = venta.tipo_venta;
             movimiento.cliente = venta.idCliente;
+            movimiento.nombreCliente = venta.cliente;
             movimiento.marca = producto.marca;
             movimiento.codProd = producto._id;
             movimiento.producto = producto.descripcion;
