@@ -36,7 +36,7 @@ app.use('/gestion/numero', require('./routes/numero'));
 
 app.use('/gestion/presupuesto', require('./routes/presupuesto'));
 
-app.use('/gestion/productos', require('./routes/producto'));
+app.use('/gestion/productos', require('./routes/producto.route'));
 
 app.use('/gestion/recibo', require('./routes/recibo'));
 

@@ -3,16 +3,45 @@ const productoCTRL = {};
 const Producto = require('../models/producto');
 const Numero = require('../models/Numero');
 const { default: mongoose } = require('mongoose');
+const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
+const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
 
 
 productoCTRL.descontarStock = async (req, res) => {
-    const array = req.body;
-    for await (let producto of array) {
-        delete producto.precio;
-        await Producto.findOneAndUpdate({ _id: producto._id }, producto);
-        console.log(`Producto ${producto.descripcion} modificado el stock a: ${producto.stock}`)
-    };
-    res.send("Stock Modificado")
+    const { id } = req.params;
+    const { stock, tipo, descripcion, vendedor, series } = req.body
+    try {
+        const producto = await Producto.findByIdAndUpdate(id, { stock }, {new: true});
+
+        const movimientoVendedor = await crearMovimientoVendedores(tipo === 'resta' ? `Resto el stock a ${stock} del producto ${descripcion}}` : `Sumo el stock a ${stock} del producto ${descripcion}`, vendedor);
+        
+        if(!movimientoVendedor) return res.status(404).json({
+            ok: false,
+            msg: 'Error al crear el movimiento del vendedor'
+        });
+
+
+        const movimientoSeries = await crearNumeroSeries(series);
+        console.log(movimientoSeries)
+
+        if(!movimientoSeries) return res.status(404).json({
+            ok: false,
+            msg: 'Error al crear el numero de serie'
+        });
+
+        res.status(200).json({
+            ok: true,
+            producto
+        });
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            ok: false,
+            msg: 'Error al descontrar stock, hable con el administrador'
+        });
+    }
 };
 
 productoCTRL.getsProductos = async (req, res) => {

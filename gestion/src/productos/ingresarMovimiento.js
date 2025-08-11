@@ -3,8 +3,6 @@ const axios = require("axios");
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 
-const { agregarMovimientoVendedores } = require('../helpers');
-
 const URL = process.env.GESTIONURL;
 
 const codigo = document.querySelector('#codigo');
@@ -88,46 +86,55 @@ const listarProvedores = (lista) => {
 };
 
 const guardarMovimiento = async () => {
-
     if (cantidad.value === "") {
         await sweet.fire({
             title: 'Falta poner una cantidad'
         });
         return;
-    }
-
-    const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
-    producto.stock = nuevoStock.value;
-
-    (await axios.put(`${URL}productos/descontarStock`, [producto]));
-
-    await agregarMovimientoVendedores(inputAux.id === 'resta' ? `Resto el stock de ${stock.value} a ${nuevoStock.value} del producto ${descripcion.value}` : `Sumo el stock de ${stock.value} a ${nuevoStock.value}  del producto ${descripcion.value}`, vendedor);
-
-    ipcRenderer.send('informacion-a-ventana', {
-        _id: codigo.value,
-        descripcion: descripcion.value,
-        stock: nuevoStock.value,
-    });
+    };
 
     //Hacemos para que se guarden numeros de series si es que los hay
     const trs = document.querySelectorAll('#tbody tr');
+
+    const series = [];
+
     for (let tr of trs) {
 
         const serie = {
-            provedor: tr.children[2].innerText,
-            factura: tr.children[1].innerText,
             nro_serie: tr.children[0].innerText,
+            provedor: tr.children[1].innerText,
+            factura: tr.children[2].innerText,
             codigo: codigo.value,
             producto: descripcion.value,
             marca: producto.marca,
             vendedor: vendedor
         };
 
-        await axios.post(`${URL}nroSerie`, serie);
+        series.push(serie);
+    };
 
+    try {
+        const  { data } = await axios.put(`${URL}productos/descontarStock/${codigo.value}`, {
+            stock: nuevoStock.value,
+            descripcion: descripcion.value,
+            vendedor: vendedor,
+            tipo: inputAux.id,
+            series
+        });
+
+        if(!data.ok) return await sweet('Error al descontrar stock', error.msg, 'error');
+
+        ipcRenderer.send('informacion-a-ventana', {
+            _id: codigo.value,
+            descripcion: descripcion.value,
+            stock: nuevoStock.value,
+        });
+
+        window.close();
+    } catch (error) {
+        console.log(error);
+        await sweet('Error al descontar stock', error.response.data.msg, 'error');
     }
-
-    window.close();
 
 };
 
@@ -135,7 +142,7 @@ const verPermiso = (permiso) => {
     if (permiso === 0) {
         document.getElementById('series').classList.remove('none')
     }
-}
+};
 
 agregarSerie.addEventListener('click', agregarSerieTabla);
 

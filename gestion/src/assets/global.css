@@ -365,8 +365,20 @@ table tbody {
   height: calc(100vh - 80px);
 }
 
+.h-calc-100vh-10px{
+  height: calc(100vh - 80px);
+}
+
 .h-80vh {
   height: 80vh;
+}
+
+.h-75vh {
+  height: 75vh;
+}
+
+.h-70vh {
+  height: 70vh;
 }
 
 .h-60vh {

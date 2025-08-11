@@ -22,7 +22,6 @@ let seleccionado = '';
 let subSeleccionado = '';
 
 const vendedor = getParameterByName('vendedor');
-
 const apretarTecla = async(e) => {
 
     if (e.keyCode === 27){
@@ -263,7 +262,6 @@ const pasarCuenta = async() => {
     const trSeleccinados = document.querySelectorAll('tr input[type="checkbox"]:checked');
     const filasSeleccionadas = Array.from(trSeleccinados).map(checkbox => checkbox.closest('tr'));
     const idFilas = filasSeleccionadas.map(elem => elem.id);
-    
     location.href = `../venta/index.html?remito=true&remitos=${JSON.stringify(idFilas)}&vendedor=${vendedor}`;
 };
 

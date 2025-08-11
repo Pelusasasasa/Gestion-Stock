@@ -8,9 +8,12 @@ exports.buscarMovimientosPorNROSeries = async(lista) => {
             const numero = elem.toObject();
 
             const mov = await movProducto.findOne({
-                series: {
-                    $in: [elem.nro_serie]
-                }
+                $and: [
+                    {series: {
+                        $in: [elem.nro_serie]
+                    }},
+                    {producto: elem.producto}
+                ]
             });
             
             numero.idCliente = mov?.cliente;

@@ -352,7 +352,11 @@ const listarProducto = async (producto, cant = 1, series = []) => {
             let precio = tr.children[6];
             const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
             
-            if(parseFloat(cantidadNueva) === 0) tbody.removeChild(tr);
+            if(parseFloat(cantidadNueva) === 0){
+                tbody.removeChild(tr);
+                listaProductos = listaProductos.filter(elem => elem.producto.idTabla !== producto.idTabla);
+            };
+
             
             //Si la lista de de cliente normal se redonde el precio y sino el costo mas iva por el dolar intalador
             if (lista.value === "NORMAL") {

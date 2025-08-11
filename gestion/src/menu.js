@@ -262,7 +262,7 @@ recibo.addEventListener('click',async e=>{
 remitos.addEventListener('click', async e => {
     const vendedor = await verificarUsuarios();
     if(vendedor){
-        location.href = `./remitos/remitos.html?vendedor=${vendedor.nombre}`;
+        location.href = `./remitos/remitos.html?vendedor=${vendedor._id}`;
     }else{
         await sweet.fire({
             title:"Contraseña incorrecta"
