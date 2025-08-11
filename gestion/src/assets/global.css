@@ -190,8 +190,21 @@ table tbody {
   padding: 1rem;
 }
 
+.py-1{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .p-2 {
   padding: 2rem;
+}
+
+.pt-2 {
+  padding-top: 2rem;
+}
+
+.pb-2{
+  padding-bottom: 2rem;
 }
 
 .px-2{
@@ -199,10 +212,6 @@ table tbody {
   padding-right: 2rem;
 }
 
-.py-1{
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
 
 .py-2{
   padding-top: 2rem;

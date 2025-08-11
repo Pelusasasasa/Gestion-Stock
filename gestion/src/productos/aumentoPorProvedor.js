@@ -9,8 +9,12 @@ const aceptar = document.getElementById('aceptar');
 const salir = document.getElementById('salir');
 
 window.addEventListener('load',async e=>{
-    const provedores = (await axios.get(`${URL}productos/provedores`)).data;
-    listarProvedores(provedores);
+    const { data } = (await axios.get(`${URL}provedores`));
+    if(data.ok){
+        listarProvedores(data.provedores);
+    }else{
+        await sweet.fire('Error al traer los provedores', data.msg, 'error');
+    }
 });
 
 aceptar.addEventListener('click',async e=>{
@@ -43,8 +47,8 @@ porcentaje.addEventListener('keypress',e=>{
 const listarProvedores = async(lista)=>{
     for await (let elem of lista){
         const option = document.createElement('option');
-        option.value = elem.provedor;
-        option.text = elem.provedor;
+        option.value = elem.nombre;
+        option.text = elem.nombre;
 
         select.appendChild(option)
     }

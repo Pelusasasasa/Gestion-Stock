@@ -1,4 +1,4 @@
-const { dialog, app, BrowserWindow, Menu, ipcRenderer } = require('electron');
+const { dialog, app, BrowserWindow, Menu, ipcRenderer, screen } = require('electron');
 const { ipcMain } = require('electron/main');
 const { mostrarMenu } = require('./menuSecundario/menuSecundario');
 const { condIva } = require('./configuracion.json');
@@ -6,6 +6,8 @@ const path = require('path');
 const modulos = require('./config.json');
 
 require('dotenv').config();
+
+
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
 if (process.env.NODE_ENV === 'desarrollo') {
   require('electron-reload')(__dirname, {
@@ -15,7 +17,7 @@ if (process.env.NODE_ENV === 'desarrollo') {
 
 if (require('electron-squirrel-startup')) {
   app.quit();
-};
+}
 
 global.ventanaPrincipal = null;
 global.nuevaVentana = null;
@@ -34,6 +36,19 @@ const createWindow = () => {
   ventanaPrincipal.loadFile(path.join(__dirname, 'menu.html'));
 
   hacerMenu();
+};
+
+const calcularPorCiento = (porCiento) => {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
+  const windowWidth = Math.floor(width * porCiento);
+  const windowHeight = Math.floor(height * porCiento);
+
+  return {
+    width: windowWidth,
+    height: windowHeight
+  }
 };
 
 app.on('ready', createWindow);
@@ -260,19 +275,22 @@ const hacerMenu = () => {
         {
           label: "Aumento Por Marcas",
           click() {
-            abrirVentana('productos/marcas.html', 300, 500, true);
+            const {width, height} = calcularPorCiento(0.3);
+            abrirVentana('productos/marcas.html', height, width, true);
           }
         },
         {
           label: "Aumento Por Provedores",
           click() {
-            abrirVentana('productos/aumentoPorProvedor.html', 300, 500, true);
+            const {width, height} = calcularPorCiento(0.4);
+            abrirVentana('productos/aumentoPorProvedor.html', height, width, true);
           }
         },
         {
           label: "Cambio de precio por lista",
           click() {
-            abrirVentana('productos/cambioPrecioLista.html', 500, 500, false, true, true);
+            const {width, height} = calcularPorCiento(0.9);
+            abrirVentana('productos/cambioPrecioLista.html', height, width, false, true);
           },
         },
         {
@@ -284,13 +302,15 @@ const hacerMenu = () => {
         {
           label: "Lista de Precios",
           click() {
-            abrirVentana('productos/listaPrecios.html', 800, 1000)
+            const {width, height} = calcularPorCiento(0.9);
+            abrirVentana('productos/listaPrecios.html', height, width)
           }
         },
         {
           label: "Modificar Codigo",
           click() {
-            abrirVentana("productos/modificarCodigo.html", 500, 500)
+            const {width, height} = calcularPorCiento(0.6);
+            abrirVentana("productos/modificarCodigo.html", height, width)
           }
         }
 
