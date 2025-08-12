@@ -217,32 +217,6 @@ const eliminarCuentas = async () => {
     };
 };
 
-//Esta funcion genera un recibo cuando ponemos un valor distinto de 0 en el input de recibo
-const hacerRecibo = async (numero) => {
-    const recibo = {};
-    recibo.fecha = new Date();
-    recibo.cliente = nombre.value;
-    recibo.idCliente = codigo.value;
-    recibo.numero = numero + 1;
-    recibo.precio = inputRecibo.value;
-    recibo.tipo_comp = "Recibo";
-    recibo.tipo_venta = "CD";
-    await hacerHistoricaRecibo(recibo.numero, recibo.precio, recibo.tipo_comp);
-    await axios.post(`${URL}recibo`, recibo);
-    await axios.put(`${URL}numero/Recibo`, { Recibo: recibo.numero });
-};
-
-//Esta funcion genera una cuenta historica cuando ponemos un valor distinto de 0 en el input de recibo
-const hacerHistoricaRecibo = async (numero, haber, tipo) => {
-    const cuenta = {};
-    cuenta.cliente = nombre.value;
-    cuenta.idCliente = codigo.value;
-    cuenta.nro_venta = numero + 1;
-    cuenta.tipo = tipo;
-    cuenta.haber = haber;
-    cuenta.saldo = parseFloat(total.value) - parseFloat(haber) + parseFloat(saldo.value);
-    (await axios.post(`${URL}historica`, cuenta)).data;
-};
 
 //Lo que hacemos es listar el cliente traido
 const listarCliente = async (id) => {

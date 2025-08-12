@@ -425,7 +425,6 @@ const crearCuentaCompensada = async (cuenta) => {
     }
 };
 
-
 entregado.addEventListener('focus', e => {
     entregado.select();
 });

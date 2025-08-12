@@ -114,15 +114,15 @@ const imprimirRemito = async(e) => {
         const id = e.target.parentNode.parentNode.parentNode.id
         const {data} = await axios.get(`${URL}remitos/forId/${id}`)
         try {
-            const { data} = await axios.get(`${URL}clientes/id/${data.idCliente}`);
-            if(data.ok){
-                cliente = data.cliente;
+            const { data: clienteTraido } = await axios.get(`${URL}clientes/id/${data.idCliente}`);
+            if(clienteTraido.ok){
+                cliente = clienteTraido.cliente;
             }else{
-                return await Swal.fire('Error al obtener el cliente', data.msg, 'error');
+                return await Swal.fire('Error al obtener el cliente', clienteTraido.msg, 'error');
             }
         } catch (error) {
             console.log(error);
-            return await Swal.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+            return await Swal.fire('Error al obtener el cliente', error?.response?.clienteTraido?.msg, 'error');
         }
         const { data: movs } = await axios.get(`${URL}movimiento/${data.numero}/RT`);
         ipcRenderer.send('imprimir', ['negro', data, cliente, movs, false]);

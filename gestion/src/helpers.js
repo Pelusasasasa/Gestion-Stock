@@ -75,8 +75,9 @@ funciones.redondear = (numero,decimales)=>{
 funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(venta)
     const fecha = new Date(Date.now()-((new Date()).getTimezoneOffset()*60000)).toISOString().split('T')[0];
-    const serverStatus = await afip.ElectronicBilling.getServerStatus();
-    console.log(serverStatus) // mostramos el estado del servidor
+    const {AppServer, AuthServer, DbServer} = await afip.ElectronicBilling.getServerStatus();
+    console.log('Estado del servidor')
+    console.log({AppServer, AuthServer, DbServer}) // mostramos el estado del servidor
 
     let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher(puntoVenta,venta.cod_comp);
     console.log(ultimaElectronica);
