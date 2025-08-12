@@ -40,7 +40,18 @@ ipcRenderer.on('recibir', async (e, args) => {
     if (tipo === "cliente") {
         listaCompensada = (await axios.get(`${URL}compensada/traerCompensadas/${informacion}`)).data;
         listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${informacion}`)).data;
-        const cliente = (await axios.get(`${URL}clientes/id/${informacion}`)).data;
+        try {
+            const { data } = (await axios.get(`${URL}clientes/id/${informacion}`));
+            if(!data.ok){
+                return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+            }else{
+                cliente = data.cliente;
+            };
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+        }
+
         saldo.value = cliente.saldo;
         clienteInput.value = cliente.nombre.slice(0, 45);
         buscar.value = cliente._id;
@@ -360,6 +371,7 @@ const listarMovientosRecibos = async (movimientos) => {
 //cuando tocamos actualizar una venta, actualizamos con los precios de hoy en dia
 actualizar.addEventListener('click', async e => {
     if (trSeleccionado) {
+        let cliente = '';
         //traemos las compensa que seleccionamos
         const cuentaCompensada = (await axios.get(`${URL}compensada/traerCompensada/id/${trSeleccionado.id}`)).data;
         //Traemos la historica que seleccionamos
@@ -369,7 +381,17 @@ actualizar.addEventListener('click', async e => {
         //Traemos la venta de lo seleccionado
         const venta = (await axios.get(`${URL}ventas/numeroYtipo/${trSeleccionado.id}/CC`)).data;
         //Traemos el cliente
-        const cliente = (await axios.get(`${URL}clientes/id/${cuentaCompensada.idCliente}`)).data;
+        try {
+            const { data } = (await axios.get(`${URL}clientes/id/${cuentaCompensada.idCliente}`));
+            if(data.ok){
+                cliente = data.body;
+            }else{
+                return await sweet.fire('Error al obtener el cliente', data.msg, 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+        }
 
         let total = 0;
         for await (let movimiento of movimientos) {
@@ -437,7 +459,15 @@ borrar.addEventListener('click', borrarCuentaCompHist);
 buscar.addEventListener('keypress', async e => {
     if (e.key === "Enter") {
         if (buscar.value !== "") {
-            clienteTraido = (await axios.get(`${URL}clientes/id/${buscar.value}`)).data;
+            try {
+                const { data } = (await axios.get(`${URL}clientes/id/${buscar.value}`));
+                if(!data.ok) return await sweet.fire('Error al obtener el cliente', data.msg, 'error');
+                clienteTraido = data.cliente;
+            } catch (error) {
+                console.log(error);
+                return await sweet.fire('Error al obtener el cliente',`${error?.response?.data?.msg}`, 'error');
+            }
+
             saldo.value = (clienteTraido.saldo).toFixed(2);
             clienteInput.value = clienteTraido.nombre;
             if (clienteTraido === "") {

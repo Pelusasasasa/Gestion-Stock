@@ -110,9 +110,20 @@ const handleCheckbox = async(e) => {
 const imprimirRemito = async(e) => {
     
     if(e.target.nodeName === 'BUTTON'){
+        let cliente = '';
         const id = e.target.parentNode.parentNode.parentNode.id
         const {data} = await axios.get(`${URL}remitos/forId/${id}`)
-        const { data: cliente} = await axios.get(`${URL}clientes/id/${data.idCliente}`);
+        try {
+            const { data} = await axios.get(`${URL}clientes/id/${data.idCliente}`);
+            if(data.ok){
+                cliente = data.cliente;
+            }else{
+                return await Swal.fire('Error al obtener el cliente', data.msg, 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            return await Swal.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+        }
         const { data: movs } = await axios.get(`${URL}movimiento/${data.numero}/RT`);
         ipcRenderer.send('imprimir', ['negro', data, cliente, movs, false]);
     }

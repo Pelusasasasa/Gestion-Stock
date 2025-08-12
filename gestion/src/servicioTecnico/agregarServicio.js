@@ -97,8 +97,18 @@ ipcRenderer.on('informacion',async (e,args)=>{
 ipcRenderer.on('recibir', async(e,args) => {
     const {tipo,informacion} = JSON.parse(args);
     if (tipo === 'cliente') {
-        const elem = (await axios.get(`${URL}clientes/id/${informacion}`)).data;
-        listarCliente(elem);
+        try {
+            if(data.ok){
+                const { data } = await axios.get(`${URL}clientes/id/${informacion}`);
+                listarCliente(elem);
+            }else{
+                return await sweet.fire('Error al obtener el cliente', data.msg, 'error')
+            }
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+        }
+        
     };
 
     if (tipo === 'producto') {
@@ -247,8 +257,20 @@ const listarEnDetalles = (parametro) => {
 
 idCliente.addEventListener('keypress',async e=>{
     if (e.keyCode === 13 && idCliente.value !== "") {
-        const cliente = (await axios.get(`${URL}clientes/id/${idCliente.value}`)).data;
-        console.log(cliente)
+        let cliente = {};
+        try {
+            const { data } = (await axios.get(`${URL}clientes/id/${idCliente.value}`));
+
+            if(data.ok){
+                cliente = data.cliente;
+            }else{
+                return await sweet.fire('Error al obtener el cliente', data.msg, 'error');
+            };
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+        }
+
         if (cliente) {
             listarCliente(cliente);
             codProd.focus();

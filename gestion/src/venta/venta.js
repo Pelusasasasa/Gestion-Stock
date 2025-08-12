@@ -81,7 +81,17 @@ const arreglarSaldo = async (id) => {
         saldoADescontar += compensada.importe;
     };
 
-    const { data: cliente } = await axios.get(`${URL}clientes/id/${id}`);
+    try {
+        const { data } = await axios.get(`${URL}clientes/id/${id}`);
+        if(data.ok){
+            cliente = data.cliente
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
     cliente.saldo = (cliente.saldo - saldoADescontar).toFixed(2);
 
     await axios.put(`${URL}clientes/id/${id}`, cliente);
@@ -237,7 +247,18 @@ const hacerHistoricaRecibo = async (numero, haber, tipo) => {
 //Lo que hacemos es listar el cliente traido
 const listarCliente = async (id) => {
     codigo.value = id;
-    const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
+    let cliente = {};
+    try {
+        const { data } = (await axios.get(`${URL}clientes/id/${id}`));
+        if(data.ok){
+            cliente = data.cliente
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        };
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error')
+    }
 
     if (cliente !== "") {
         nombre.value = cliente.nombre;

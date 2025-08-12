@@ -43,7 +43,19 @@ window.addEventListener('DOMContentLoaded',async e=>{
 codigo.addEventListener('keyup',async e=>{
     console.log(e.keyCode)
     if (e.keyCode === 13 && codigo.value !== "") {
-        cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
+        cliente = {};
+
+        try {
+            const { data} = await axios.get(`${URL}clientes/id/${codigo.value}`);
+            if(data.ok){
+                cliente = data.cliente;
+            }else{
+                await sweet.fire('Error al obtener cliente', data.msg, 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            await sweet.fire('Error al obtener cliente', error.response?.data?.msg, 'error');
+        }
         if (cliente) {
             listarCliente(cliente);
             saldoNuevo.focus();

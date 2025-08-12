@@ -63,7 +63,20 @@ ipcRenderer.on('recibir-ventana-secundaria', (e, args) => {
 
 //Le descontamos un saldo al cliente
 const descontarSaldoCliente = async (idCliente, precio) => {
-    const cliente = (await axios.get(`${URL}clientes/id/${idCliente}`)).data;
+    let cliente = {};
+
+    try {
+        const { data } = await axios.get(`${URL}clientes/id/${idCliente}`);
+        if(data.ok){
+            cliente = data.cliente
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
+
     cliente.saldo = (cliente.saldo - precio).toFixed(2);
     await axios.put(`${URL}clientes/id/${idCliente}`, cliente);
 };
@@ -85,7 +98,20 @@ const modificarCuentaCompensadas = async () => {
 
 //Pnemos los valores del cliente traido
 const ponerInputs = async (id) => {
-    const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
+    let cliente = {};
+
+    try {
+        const { data} = await axios.get(`${URL}clientes/id/${id}`);
+        if(data.ok){
+            cliente = data.cliente
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
+
     if (cliente !== "") {
         codigo.value = cliente._id;
         nombre.value = cliente.nombre;
@@ -286,7 +312,19 @@ imprimir.addEventListener('click', async e => {
 
     let lista = await ponerMovimientosRecibo(recibo.numero);
     const res = (await axios.post(`${URL}recibo`, recibo)).data;
-    const cliente = (await axios.get(`${URL}clientes/id/${codigo.value}`)).data;
+
+    let cliente = {};
+    try {
+        const { data } = await axios.get(`${URL}clientes/id/${codigo.value}`);
+        if(data.ok){
+            cliente = data.cliente;
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error')
+        }
+    } catch (error) {
+        console.log(error);
+        await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
 
     if (cheque.checked) {
         await ipcRenderer.send('abrir-ventana', {
@@ -343,7 +381,21 @@ const ponerEnCuentaHistorica = async (recibo) => {
     cuenta.haber = recibo.precio;
     cuenta.tipo_comp = "Recibo";
     cuenta.condicion = recibo.valorRecibido;
-    const cliente = (await axios.get(`${URL}clientes/id/${recibo.idCliente}`)).data;
+
+    let cliente = {};
+    try {
+        const { data } = await axios.get(`${URL}clientes/id/${recibo.idCliente}`);
+        if(data.ok){
+            cliente = data.cliente;
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error')
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
+
+
     cuenta.saldo = (cliente.saldo - recibo.precio).toFixed(2);
     await axios.post(`${URL}historica`, cuenta);
 };

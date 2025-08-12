@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 //routes
-app.use('/gestion/clientes', require('./routes/cliente'));
+app.use('/gestion/clientes', require('./routes/cliente.route'));
 
 app.use('/gestion/compensada', require('./routes/compensada'));
 

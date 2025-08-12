@@ -30,7 +30,19 @@ const salir = document.querySelector('.salir');
 
 const ponerInputs = async(id)=>{
     codigo.value = id;
-    const cliente = (await axios.get(`${URL}clientes/id/${id}`)).data;
+    let cliente = {};
+    try {
+        const { data } = await axios.get(`${URL}clientes/id/${id}`);
+        if(data.ok){
+            cliente = data.cliente;
+        }else{
+            await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
+
     nombre.value = cliente.nombre;
     cuit.value = cliente.cuit ? cliente.cuit : "";
     localidad.value = cliente.localidad;

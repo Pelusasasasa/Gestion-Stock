@@ -39,11 +39,18 @@ window.addEventListener('load',e=>{
 const filtrar = async()=>{
     tbody.innerHTML = "";
     let clientes;
-    if (nombre.value !== "") {
-        clientes = (await axios.get(`${URL}clientes/buscar/${nombre.value}`)).data; 
-    }else{
-        clientes = (await axios.get(`${URL}clientes/buscar/NADA`)).data; 
-    }
+
+    try {
+        const { data } = await axios.get(`${URL}clientes/buscar/${nombre.value === '' ? 'NADA' : nombre.value}`);
+        if(data.ok){
+            clientes = data.clientes;
+        }else{
+            return await sweet.fire(`Error al obtener los clientes`, data.msg, 'error');
+        };
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire(`Error al obtener los clientes`, error?.response?.data?.msg, 'error');
+    };
     listarClientes(clientes);
 }
 

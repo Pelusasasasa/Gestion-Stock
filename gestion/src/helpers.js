@@ -301,6 +301,7 @@ funciones.ponerNumero = async()=>{
         let movimientos;
         let venta;
         let recibo;
+
         if (isConfirmed) {
             if (tipo.value === "PP") {
                 venta = (await axios.get(`${URL}presupuesto/forNumber/${numero.value}`)).data;
@@ -309,13 +310,22 @@ funciones.ponerNumero = async()=>{
             }else{
                 venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/${tipo.value}`)).data;
                 if (!venta) {
-                   venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/T`)).data; 
+                    venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/T`)).data; 
                 }
             }
             
-            cliente = recibo 
-                ? (await axios.get(`${URL}clientes/id/${recibo.idCliente}`)).data 
-                : (await axios.get(`${URL}clientes/id/${venta.idCliente}`)).data;
+            try {
+                const { data } = await axios.get(`${URL}clientes/id/${recibo ? recibo.idCliente : venta.idCliente}`);
+                if(data.ok){
+                    cliente = data.cliente
+                }else{
+                    await sweet.fire('Error al obtener el cliente', data?.msg, 'error')
+                }
+                
+            } catch (error) {
+                console.log(error);
+                await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+            };
 
             movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;
 
