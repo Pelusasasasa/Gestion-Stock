@@ -43,7 +43,6 @@ window.addEventListener('load',e=>{
 });
 
 const ponerDatosVenta = (datos, auxDolar)=>{
-    console.log(datos)
     const fecha = new Date(datos.fecha);
     const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
     const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`

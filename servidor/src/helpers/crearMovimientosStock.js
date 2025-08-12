@@ -1,8 +1,23 @@
 const movProducto = require("../models/movProducto");
 
 exports.crearMovimientosStock = async(listaProductos, venta) => {
+
+    console.log(venta.condicion);
+
     const movimientos = [];
     for(const {cantidad, producto, series} of listaProductos){
+
+        let precioFinal = 0;
+
+        if(venta.condicion === 'INSTALADOR'){
+            precio = producto.costoDolar !== 0 
+                ? (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * venta.dolar 
+                : producto.costo + (producto.costo * producto.impuesto / 100)
+        }else{
+            precio = producto.precio;
+        };
+
+        
         try {
             const movimiento = {};
             movimiento.fecha = venta.fecha;
@@ -15,7 +30,7 @@ exports.crearMovimientosStock = async(listaProductos, venta) => {
             movimiento.rubro = producto.rubro;
             movimiento.cantidad = cantidad;
             movimiento.iva = producto.impuesto;
-            movimiento.precio = producto.precio;
+            movimiento.precio = precio;
             movimiento.series = series;
             movimiento.nro_venta = venta.numero;
             movimiento.tipo_comp = venta.tipo_comp;

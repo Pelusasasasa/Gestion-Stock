@@ -136,7 +136,9 @@ const cargarRemito = async () => {
         
         await listarProducto(producto, elem.cantidad)
         const pro = listaProductos.find(({ producto }) => producto._id === elem.codProd);
-        pro.series = elem.series;
+        if(pro){
+            pro.series = elem?.series;
+        }
     };
 
     observaciones.value = textoObservaciones;
@@ -433,9 +435,8 @@ const sacarIva = (lista, condicion) => {
     return [parseFloat(totalIva21.toFixed(2)), parseFloat(totalIva0.toFixed(2)), parseFloat(gravado21.toFixed(2)), parseFloat(gravado0.toFixed(2)), parseFloat(totalIva105.toFixed(2)), parseFloat(gravado105.toFixed(2)), cantIva]
 };
 
-const togglePrecios = async (e) => { 
+const togglePrecios = async (e) => {
     for await (let { cantidad, producto } of listaProductos) {
-
         const tr = document.getElementById(`${producto.idTabla}`);
 
         if (lista.value === "NORMAL") {
@@ -508,6 +509,10 @@ const vefiricarVenta = async () => {
 
     return bandera;
 };
+
+checkboxDolar.addEventListener('click', () => {
+    togglePrecios();
+});
 
 document.addEventListener('keydown', e => {
     if (e.key === "Escape") {

@@ -65,7 +65,6 @@ const ingresarMovimiento = async(e) => {
             title: "Contraseña Incorrecta"
         })
     }
-
 };
 
 const listar = (productos)=>{
@@ -98,7 +97,7 @@ const listar = (productos)=>{
                 <p class=tooltip>Modificar</p>
             </div>
             <div id=delete class="tool ${permiso !== 0 && "none"}">
-                <span id=delete class=material-icons>delete</span>
+                <span id=delete class=material-icons-outlined>delete</span>
                 <p class=tooltip>Eliminar</p>
             </div>
         `
