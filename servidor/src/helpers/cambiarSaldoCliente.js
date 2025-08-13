@@ -1,6 +1,6 @@
 const Cliente = require("../models/Cliente");
 
-exports.sumarSaldoCliente = async(id, precio) => {
+exports.cambiarSaldoCliente = async(id, precio, recibo = false) => {
 
     try {
         const cliente = await Cliente.findById(id);
@@ -9,7 +9,11 @@ exports.sumarSaldoCliente = async(id, precio) => {
             ok: false
         };
 
-        cliente.saldo += precio;
+        if(recibo){
+            cliente.saldo -= precio;
+        }else{
+            cliente.saldo += precio;
+        }
 
         await cliente.save();
 

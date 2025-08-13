@@ -19,7 +19,7 @@ exports.actualizarNumero = async(tipo_venta) => {
             case 'PP':
                 tipo = 'Presupuesto';
                 break;
-            case 'RECIBO':
+            case 'RB':
                 tipo = 'Recibo';
                 break;
             default:

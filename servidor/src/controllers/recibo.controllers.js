@@ -1,14 +1,38 @@
 const reciboCTRL = {};
 
+const { actualizarNumero } = require('../helpers/actualizarNumero');
+const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
+const { crearHistorica } = require('../helpers/crearHistorica');
 const Recibo = require('../models/Recibo');
 
 
 reciboCTRL.cargarRecibo = async(req,res)=>{
-    const now = new Date();
-    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
     const nuevoRecibo = new Recibo(req.body);
-    await nuevoRecibo.save();
-    console.log(`Recibo ${req.body.numero} cargado`)
+    
+    const numeroActualizado = await actualizarNumero(nuevoRecibo.tipo_venta)
+    if(numeroActualizado.ok){
+        nuevoRecibo.numero = numeroActualizado.numero;
+    };
+    const saldoModificado = await cambiarSaldoCliente(nuevoRecibo.idCliente, nuevoRecibo.precio, true);
+    if(!saldoModificado.ok){
+        return res.status(400).json({
+            ok: false,
+            msg: "Error al modificar el saldo del cliente"
+        });
+    }
+
+    const historica = await crearHistorica(nuevoRecibo);
+    if(!historica){
+        return res.status(400).json({
+            ok: false,
+            msg: "Error al crear la historica"
+        });
+    }
+
+
+    console.log(nuevoRecibo)
+    // await nuevoRecibo.save();
+    // console.log(`Recibo ${req.body.numero} cargado`)
     res.send( nuevoRecibo );
 }
 
@@ -56,13 +80,13 @@ reciboCTRL.recibosAnio = async(req,res)=>{
         ]
     });
     res.send(recibos);
-}
+};
 
 reciboCTRL.getForNumber = async(req,res)=>{
     const {number} = req.params;
     console.log(number)
     const recibo = await Recibo.findOne({numero:number});
     res.send(recibo)
-}
+};
 
 module.exports = reciboCTRL;

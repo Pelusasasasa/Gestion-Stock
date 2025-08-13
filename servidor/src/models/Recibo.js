@@ -1,16 +1,17 @@
-const mongoose = require('mongoose');
+const {Schema, model, Types} = require('mongoose');
 
-const Recibo = new mongoose.Schema({
+const Recibo = new Schema({
     fecha:{
         type:Date,
         default: Date.now
     },
     cliente:{
-        type:String,
+        type: String,
         required:true
     },
     idCliente:{
-        type:String,
+        type: Schema.Types.Number,
+        ref: 'Cliente',
         required:true
     },
     numero:{
@@ -27,11 +28,11 @@ const Recibo = new mongoose.Schema({
     },
     tipo_comp:{
         type:String,
-        default:""
+        default: "Recibo"
     },
     tipo_venta:{
         type:String,
-        default:"CD"
+        default:"RB"
     },
     valorRecibido:{
         type:String,
@@ -40,4 +41,4 @@ const Recibo = new mongoose.Schema({
 
 });
 
-module.exports = mongoose.model("Recibo",Recibo);
+module.exports = model("Recibo",Recibo);

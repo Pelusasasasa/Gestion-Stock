@@ -61,39 +61,17 @@ ipcRenderer.on('recibir-ventana-secundaria', (e, args) => {
     location.href = "../menu.html";
 })
 
-//Le descontamos un saldo al cliente
-const descontarSaldoCliente = async (idCliente, precio) => {
-    let cliente = {};
-
-    try {
-        const { data } = await axios.get(`${URL}clientes/id/${idCliente}`);
-        if(data.ok){
-            cliente = data.cliente
-        }else{
-            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
-        }
-    } catch (error) {
-        console.log(error);
-        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
-    }
-
-    cliente.saldo = (cliente.saldo - precio).toFixed(2);
-    await axios.put(`${URL}clientes/id/${idCliente}`, cliente);
-};
 
 //Todas las compensadas que se modificaron las modificamos
 const modificarCuentaCompensadas = async () => {
-    const trs = document.querySelectorAll('tbody tr');
+document.querySelectorAll('tbody tr');
+    let numeros = [];
     for await (let tr of trs) {
         const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : "";
-        const compensada = numero !== "" ? (await axios.get(`${URL}compensada/traerCompensada/id/${numero}`)).data : "";
-        console.log(compensada)
-        if (compensada !== "") {
-            compensada.pagado = parseFloat((compensada.pagado + parseFloat(tr.children[5].children[0].value)).toFixed(2));
-            compensada.saldo = parseFloat(tr.children[6].innerHTML).toFixed(2);
-            await axios.put(`${URL}compensada/traerCompensada/id/${compensada.nro_venta}`, compensada);
-        }
-    }
+        numeros.push(numero);
+    };
+
+    return numeros;
 };
 
 //Pnemos los valores del cliente traido
@@ -266,15 +244,14 @@ entregado.addEventListener('change', async e => {
 imprimir.addEventListener('click', async e => {
     //ponemos los valores en el recibo
     const recibo = {};
-    recibo.fecha = new Date();
     recibo.cliente = nombre.value;
     recibo.idCliente = codigo.value;
-    recibo.numero = (await axios.get(`${URL}numero`)).data["Recibo"] + 1; //ponemos el numero traido mas 1|
-    recibo.tipo_comp = "Recibo";
+    recibo.tipo_comp = 'Recibo';
+    recibo.tipo_venta = 'RB'
     recibo.descuento = 0;
     recibo.valorRecibido = nroCheque ? `CHEQUE ${nroCheque.toUpperCase()}` : "EFECTIVO";
     recibo.precio = parseFloat(total.value);
-    recibo.vendedor = vendedor ? vendedor : "";
+    recibo.vendedor = vendedor ? vendedor : '';
     recibo.caja = archivo.caja;
 
     try {
@@ -286,13 +263,8 @@ imprimir.addEventListener('click', async e => {
             recibo.tipo_venta = "T";
             // await cargarFactura(recibo)
         }
-        cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
-        await modificarCuentaCompensadas();
-        await ponerEnCuentaHistorica(recibo);
-        await descontarSaldoCliente(recibo.idCliente, recibo.precio);
-
-        await axios.put(`${URL}numero/Recibo`, { Recibo: recibo.numero });
-
+        // cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
+        recibo.compensadas = await modificarCuentaCompensadas();
 
 
     } catch (error) {
@@ -303,50 +275,50 @@ imprimir.addEventListener('click', async e => {
     };
 
 
-    try {
-        const { data } = await axios.get(`${URL}tipoCuenta/forText/Recibo`);
-        await cargarMovCaja(recibo.cliente, '000R', recibo.numero, data.tipo._id, recibo.precio, "639dbc31dfdb8a1d243d19c2");
-    } catch (error) {
-        console.log(error)
-    }
+    // try {
+    //     const { data } = await axios.get(`${URL}tipoCuenta/forText/Recibo`);
+    //     await cargarMovCaja(recibo.cliente, '000R', recibo.numero, data.tipo._id, recibo.precio, "639dbc31dfdb8a1d243d19c2");
+    // } catch (error) {
+    //     console.log(error)
+    // }
 
-    let lista = await ponerMovimientosRecibo(recibo.numero);
+    // let lista = await ponerMovimientosRecibo(recibo.numero);
     const res = (await axios.post(`${URL}recibo`, recibo)).data;
 
-    let cliente = {};
-    try {
-        const { data } = await axios.get(`${URL}clientes/id/${codigo.value}`);
-        if(data.ok){
-            cliente = data.cliente;
-        }else{
-            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error')
-        }
-    } catch (error) {
-        console.log(error);
-        await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
-    }
+    // let cliente = {};
+    // try {
+    //     const { data } = await axios.get(`${URL}clientes/id/${codigo.value}`);
+    //     if(data.ok){
+    //         cliente = data.cliente;
+    //     }else{
+    //         return await sweet.fire('Error al obtener el cliente', data?.msg, 'error')
+    //     }
+    // } catch (error) {
+    //     console.log(error);
+    //     await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    // }
 
-    if (cheque.checked) {
-        await ipcRenderer.send('abrir-ventana', {
-            path: './cheque/agregarCheque.html',
-            altura: 800,
-            ancho: 600,
-            reinicio: false,
-            informacion: JSON.stringify([res, cliente, lista, false])
-        });
-    } else if (tarjeta.checked) {
-        await ipcRenderer.send('abrir-ventana', {
-            path: './tarjeta/agregarTarjeta.html',
-            altura: 800,
-            ancho: 600,
-            reinicio: false,
-            informacion: JSON.stringify([res, cliente, lista, false])
-        });
-    } else {
-        ipcRenderer.send('imprimir-recibo', [res, cliente, lista, false]);
+    // if (cheque.checked) {
+    //     await ipcRenderer.send('abrir-ventana', {
+    //         path: './cheque/agregarCheque.html',
+    //         altura: 800,
+    //         ancho: 600,
+    //         reinicio: false,
+    //         informacion: JSON.stringify([res, cliente, lista, false])
+    //     });
+    // } else if (tarjeta.checked) {
+    //     await ipcRenderer.send('abrir-ventana', {
+    //         path: './tarjeta/agregarTarjeta.html',
+    //         altura: 800,
+    //         ancho: 600,
+    //         reinicio: false,
+    //         informacion: JSON.stringify([res, cliente, lista, false])
+    //     });
+    // } else {
+    //     ipcRenderer.send('imprimir-recibo', [res, cliente, lista, false]);
 
-        location.href = "../menu.html";
-    }
+    //     location.href = "../menu.html";
+    // };
 });
 
 const ponerMovimientosRecibo = async (numero, tipo) => {
@@ -370,34 +342,6 @@ const ponerMovimientosRecibo = async (numero, tipo) => {
         }
     };
     return lista;
-};
-
-//Ponemos en historica el recibo
-const ponerEnCuentaHistorica = async (recibo) => {
-    const cuenta = {};
-    cuenta.idCliente = recibo.idCliente;
-    cuenta.cliente = recibo.cliente;
-    cuenta.nro_venta = recibo.numero;
-    cuenta.haber = recibo.precio;
-    cuenta.tipo_comp = "Recibo";
-    cuenta.condicion = recibo.valorRecibido;
-
-    let cliente = {};
-    try {
-        const { data } = await axios.get(`${URL}clientes/id/${recibo.idCliente}`);
-        if(data.ok){
-            cliente = data.cliente;
-        }else{
-            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error')
-        }
-    } catch (error) {
-        console.log(error);
-        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
-    }
-
-
-    cuenta.saldo = (cliente.saldo - recibo.precio).toFixed(2);
-    await axios.post(`${URL}historica`, cuenta);
 };
 
 const crearCompensadaAFavor = async (saldo) => {

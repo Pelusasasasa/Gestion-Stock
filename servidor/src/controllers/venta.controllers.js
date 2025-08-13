@@ -2,7 +2,7 @@ const ventaCTRL = {};
 
 const Venta = require('../models/Venta');
 const funcion = require('../assets/js/pdf');
-const { sumarSaldoCliente } = require('../helpers/sumarSaldoCliente');
+const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { descontarStock } = require('../helpers/descontarStock');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
@@ -33,7 +33,7 @@ ventaCTRL.cargarVenta = async(req,res)=>{
         };
 
         if(venta.tipo_venta === 'CC'){
-            const saldoModficado =  await sumarSaldoCliente(venta.idCliente, venta.precio);
+            const saldoModficado =  await cambiarSaldoCliente(venta.idCliente, venta.precio, false);
             if(!saldoModficado.ok) return res.status(400).json({
                 msg: "Error al modificar el saldo del cliente",
                 ok: false
