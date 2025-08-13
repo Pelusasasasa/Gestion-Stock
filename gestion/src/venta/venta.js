@@ -432,20 +432,23 @@ const sacarIva = (lista, condicion) => {
 
 const togglePrecios = async (e) => {
     for await (let { cantidad, producto } of listaProductos) {
-        const tr = document.getElementById(`${producto.idTabla}`);
+        console.log(producto);
+        if(producto?._id){
+            const tr = document.getElementById(`${producto.idTabla}`);
 
-        if (lista.value === "NORMAL") {
-            tr.children[5].innerText = producto.precio.toFixed(2);
-            tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText), 2);
-        } else {
-            if (producto.costo !== 0) {
-                tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100), 2);
-                tr.children[6].innerText = redondear(parseFloat(tr.children[5].innerText) * parseFloat(tr.children[1].innerText), 2);
+            if (lista.value === "NORMAL") {
+                tr.children[5].innerText = producto.precio.toFixed(2);
+                tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText), 2);
             } else {
-                tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador, 2);
-                tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * parseFloat(tr.children[1].innerText), 2);
-            }
-        };
+                if (producto.costo !== 0) {
+                    tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100), 2);
+                    tr.children[6].innerText = redondear(parseFloat(tr.children[5].innerText) * parseFloat(tr.children[1].innerText), 2);
+                } else {
+                    tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador, 2);
+                    tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * parseFloat(tr.children[1].innerText), 2);
+                }
+            };
+        }
     };
     calcularTotal();
 };
@@ -640,9 +643,14 @@ facturar.addEventListener('click', async e => {
                 ventaTraida = data.venta;
                 movimientos.push(...data.movimientos);
             } else {
-                const { data } = await axios.post(`${URL}ventas`, venta);
-                ventaTraida = data.venta;
-                movimientos.push(...data.movimientos);
+                try {
+                    const { data } = await axios.post(`${URL}ventas`, venta);
+                    ventaTraida = data.venta;
+                    movimientos.push(...data.movimientos);
+                } catch (error) {
+                    console.log(error);
+                    return await sweet.fire('No se pudo generar la venta', error?.response?.data?.msg, 'error');
+                }
             };
 
             //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado

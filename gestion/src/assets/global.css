@@ -318,6 +318,10 @@ table tbody {
   font-weight: 900;
 }
 
+.text-xs {
+  font-size: 1.2rem;
+}
+
 .text-xl {
   font-size: 2rem;
 }

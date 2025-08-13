@@ -500,6 +500,7 @@ const listarMovimientoComprobante = async(movimientos,codigo)=>{
             const trProducto = document.createElement('tr');
             trProducto.classList.add('none');
             trProducto.classList.add(`venta${codigo}`);
+            trProducto.classList.add(`text-xs`);
 
             const date = parsearFecha(fecha);
 
@@ -523,9 +524,12 @@ const listarMovimientoComprobante = async(movimientos,codigo)=>{
             tdTotalProducto.innerHTML = (cantidad*precio).toFixed(2);
             tdSerie.innerHTML = `
                 <div>
-                    <textarea name="" id="" class=w-full m-0>
+                    ${series.length > 0 ? 
+                        `<textarea name="" id="" class=w-full m-0>
                         ${series}
-                    </textarea>
+                        </textarea>`
+                        : ''
+                    }
                 </div>
             `;
 
