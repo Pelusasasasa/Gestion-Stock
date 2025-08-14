@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const path = require('path');
+const backUpMongoLocal = require('../backUpMongoLocal');
 
 
 //settings
@@ -64,5 +65,12 @@ app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
 app.use('/gestion/tipoCuenta', require('./routes/tipoCuenta.routes'));
 app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
 app.use('/gestion/valores', require('./routes/valor.route'));
+
+setInterval(() => {
+    clg('Backup de la base de datos en proceso...');
+    backUpMongoLocal();
+}, 1000 * 60 * 60)
+
+backUpMongoLocal();
 
 module.exports = app;
