@@ -120,10 +120,25 @@ const cargarRemito = async () => {
     let aux = 0;
 
     for (let elem of remitosTraidos) {
-        const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
+       let remito = {};
+
+       try {
+         const { data } = (await axios.get(`${URL}remitos/forId/${elem}`));
+         if(data.ok){
+            remito = data.remito;
+         }else{
+            return await sweet.fire('No se pudo obtener los remito', data.msg, 'error');
+         }
+       } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se pudo obtener los remitos', error?.response?.data?.msg, 'error');
+       };
+
         const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
+       console.log(mov);
         textoObservaciones += remito.observaciones + ' ';
         movimientosRemitos.push(...mov);
+
         idCliente = remito.idCliente;
     };
 
@@ -692,6 +707,17 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
     facturaVarios = true;
 
     const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
+    try {
+        const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
+        if (data.ok){
+            vendedor = data.venta.vendedor._id;
+        }else{
+            return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
+    }
     listarCliente(data.idCliente)
 
     for (let elem of cuentas) {

@@ -11,9 +11,27 @@ const { crearHistorica } = require('../helpers/crearHistorica');
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 
 ventaCTRL.getForId = async(req,res)=>{
-    const {id} = req.params;
-    const venta = await Venta.find({numero:id});
-    res.send(venta[0]);
+    const {id, tipoVenta} = req.params;
+    
+    try {
+        const venta = await Venta.findOne({
+        $and:[
+            {tipoVenta:tipoVenta},
+            {numero:id}
+            ]})
+            .populate('vendedor', 'nombre');
+            
+        res.status(200).json({
+            ok: true,
+            venta
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo obtener la venta, hable con el administrador',
+        })
+    }
 };
 
 ventaCTRL.putForId = async(req,res)=>{

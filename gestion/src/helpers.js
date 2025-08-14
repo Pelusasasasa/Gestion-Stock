@@ -70,6 +70,18 @@ funciones.selecciona_value = (idInput)=>{
 funciones.redondear = (numero,decimales)=>{
     const signo = numero >= 0 ? 1 : -1;
     return(parseFloat(Math.round((numero * Math.pow(10,decimales)) + (signo * 0.0001)) / Math.pow(10,decimales)).toFixed(decimales));
+};
+
+funciones.tablaCondicionIVAReceptorId = (condicion) => {
+    if(condicion === "Consumidor Final"){
+        return 5
+    }else if(condicion === "Monotributo"){
+        return 6
+    }else if(condicion === "Exento"){
+        return 4
+    }else{
+        return 1
+    }
 }
 
 funciones.cargarFactura = async (venta,notaCredito)=>{
@@ -100,6 +112,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'ImpOpEx': 0,
         'ImpIVA': archivo.condIva === "Inscripto" ? parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)) : 0,
         'ImpTrib': 0,
+        // 'CondicionIVAReceptorId': funciones.tablaCondicionIVAReceptorId(venta.condicionIva),
         'MonId': 'PES',
         'PtoVta': puntoVenta,
         'MonCotiz' 	: 1,

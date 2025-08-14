@@ -41,6 +41,7 @@ clienteCTRL.id = async (req, res) => {
 
 clienteCTRL.getClienteId = async (req, res) => {
     const { id } = req.params;
+    console.log(id);
 
     if(isNaN(id)) return res.status(400).json({
         ok: false,

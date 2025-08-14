@@ -14,10 +14,8 @@ let arreglo = [];
 
 
 window.addEventListener('load', async() => {
-
     arreglo = (await axios.get(`${URL}cuenta`)).data;
     ponerPrimerCuenta(arreglo);
-
 });
 
 prev.addEventListener('click', () => {
@@ -100,7 +98,7 @@ const ponerPrimerCuenta = (lista) => {
 const sigCuenta = () => {
     const aux = cuentas.value.split('-', 2)[0].trim();
     const i = arreglo.findIndex( elem => elem.cuenta === aux);
-    cuentas.value = arreglo[i + 1] ? arreglo[i + 1].cuenta + ' - ' + arreglo[i + 1].idCuenta : aux;
+    cuentas.value = arreglo[i + 1] ? arreglo[i + 1].cuenta + ' - ' + arreglo[i + 1].idCuenta : cuentas.value;
     cuentas.id = arreglo[i + 1] ? arreglo[i + 1].idCuenta : cuentas.id;
 };
 
@@ -110,3 +108,10 @@ const antCuenta = () => {
     cuentas.value = arreglo[i - 1] ? arreglo[i - 1].cuenta + ' - ' + arreglo[i - 1].idCuenta : cuentas.value;
     cuentas.id = arreglo[i - 1] ? arreglo[i - 1].idCuenta : cuentas.id;
 };
+
+
+document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+        window.close();
+    }
+})

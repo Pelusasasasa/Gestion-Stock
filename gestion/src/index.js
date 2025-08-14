@@ -248,7 +248,8 @@ const hacerMenu = () => {
         {
           label: "Cuentas",
           click() {
-            abrirVentana("cuentas/cuentas.html", 500, 550)
+            const {width, height} = calcularPorCiento(0.4);
+            abrirVentana("cuentas/cuentas.html", height, width)
           }
         },
         {

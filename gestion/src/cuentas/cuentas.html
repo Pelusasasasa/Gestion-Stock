@@ -7,19 +7,29 @@
     <link rel="stylesheet" href="./cuentas.css">
     <title>Cuentas</title>
 </head>
-<body>
-    <section class="seccionCuentas">
+<body class="h-calc-100vh-10px">
+    <section class="seccionCuentas h-full">
         <main class="cuentas">
             <div>
                 <label for="cuentas">Cuentas</label>
                 <input type="text" disabled name="cuentas" id="cuentas">
             </div>
-            <button id="agregar"> + </button>
-            <button id="borrar"> - </button>
+            <button id="agregar">
+                <i class="bi bi-plus-circle" style="color: #000"></i>
+            </button>
+            <button id="borrar">
+                <i class="bi bi-dash-circle" style="color: #000"></i>
+            </button>
         </main>
         <main>
-            <button id="prev">Anterior</button>
-            <button id="next">Siguiente</button>
+            <button id="prev">
+                <i class="bi bi-arrow-left" style="color: #000"></i>
+                Anterior
+            </button>
+            <button id="next">
+                Siguiente
+                <i class="bi bi-arrow-right" style="color: #000"></i>
+            </button>
         </main>
     </section>
 </body>
