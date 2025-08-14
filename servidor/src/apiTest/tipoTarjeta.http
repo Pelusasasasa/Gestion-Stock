@@ -1,0 +1,28 @@
+###Postear un tipo Tarjeta
+
+POST http://localhost:4000/gestion/tipoTarjeta
+Content-Type: application/json
+
+{
+    "nombre": "Visa"
+}
+
+###Get All tipo Tarjeta
+
+GET http://localhost:4000/gestion/tipoTarjeta
+
+
+###Patch un tipo Tarjeta
+
+PATCH http://localhost:4000/gestion/tipoTarjeta/forId/67eb5c5a7593a44509336e47
+Content-Type: application/json
+
+{
+    "nombre": "VISA DEBITO"
+}
+
+###Delete un tipo Tarjeta
+
+DELETE http://localhost:4000/gestion/tipoTarjeta/forId/67eb5c5a7593a44509336e47
+
+

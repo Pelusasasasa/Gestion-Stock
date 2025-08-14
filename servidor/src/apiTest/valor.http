@@ -1,0 +1,27 @@
+#Post One Valor
+POST http://localhost:4000/gestion/valores
+Content-Type: application/json
+
+{
+    "nombre": "Valor 1",
+    "importe": 1000,
+    "icono": "icono",
+    "vendedor": "Agustin",
+    "pc": "PC"
+}
+
+
+###Get All
+GET http://localhost:4000/gestion/valores
+
+###Patch One
+PATCH http://localhost:4000/gestion/valores/forId/67f01d6627c5e73907ab6f0e
+Content-Type: application/json
+
+{
+    "importe": 5000
+}
+
+
+###Delete One
+DELETE http://localhost:4000/gestion/valores/forId/67f01d6627c5e73907ab6f0e

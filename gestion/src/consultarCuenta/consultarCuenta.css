@@ -1,0 +1,88 @@
+.consultaCuenta .buscador{
+    display: flex;
+    justify-content: space-around;
+}
+.buscador .inputs{
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 2rem
+}
+
+@media (max-width: 1100px){
+    #buscar,#saldo{
+        width: 10rem;
+    }
+}
+
+.buscador .inputs main {
+    display: flex;
+    flex-direction: column;
+}
+.listaVentas{
+    margin-top: 2rem;
+    height: 40vh;
+    background-color: white;
+    overflow: scroll;
+}
+
+.listaVentas table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.listaVentas table thead th{
+    border: .1rem solid black;
+    text-align: center;
+}
+
+.listaVentas table tbody td{
+    border: .1rem solid black;
+}
+
+.listaProductos,.listaMovRecibo{
+    margin-top: 2rem;
+    height: 40vh;
+    background-color: white;
+    overflow: scroll;
+}
+
+.listaProductos table,.listaMovRecibo table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.listaProductos table thead th,.listaMovRecibo table thead th{
+    border: .1rem solid black;
+    text-align: center;
+}
+
+table tbody tr:hover{
+    cursor: pointer;
+    background-color: lightgray;
+}
+
+table tbody td{
+    text-align: center;
+    border: .1rem solid black;
+}
+
+.abajo{
+    margin-top: 1rem;
+}
+
+.abajo button{
+    margin-right: 2rem;
+}
+
+.botones button{
+    margin: 0 2rem;
+}
+
+
+.td-con-scroll{
+    max-width: 200px;
+    max-height: 100px;
+    overflow: auto;
+    word-wrap: break-word;
+    white-space: normal;
+}

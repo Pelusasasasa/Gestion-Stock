@@ -1,0 +1,86 @@
+const servicioCTRL = {};
+
+const Servicio = require('../models/ServicioTecnico');
+
+servicioCTRL.getAll = async(req,res)=>{
+    const servicios = await Servicio.find()
+        .populate('vendedor', ['nombre', 'permiso'])
+        .populate('idCliente', ['nombre', 'telefono', 'direccion'])
+        .populate('codProd', ['producto', 'marca', 'descripcion']);
+    res.send(servicios)
+};
+
+servicioCTRL.getForId = async(req, res) => {
+    const servicio = await Servicio.findById(req.params.id)
+    .populate('vendedor', ['nombre', 'permiso'])
+    .populate('idCliente', ['nombre', 'telefono', 'direccion'])
+    .populate('codProd', ['producto', 'marca', 'descripcion']);
+    res.send(servicio);
+};
+
+servicioCTRL.getForText = async(req, res) => {
+    const {text} = req.params;
+    if (text !== 'vacio') {
+        const re = new RegExp(`^${text}`);
+    
+        const servicios = await Servicio.find({
+            $or: [
+                {producto:{$regex:re, $options: 'i'}},
+                {marca:{$regex:re, $options: 'i'}},
+                {modelo:{$regex:re, $options: 'i'}},
+                {cliente:{$regex:re, $options: 'i'}},
+            ]
+        })
+        .populate('vendedor', ['nombre', 'permiso'])
+        .populate('idCliente', ['nombre', 'telefono', 'direccion'])
+        .populate('codProd', ['producto', 'marca', 'descripcion']);
+
+        res.send(servicios);
+    }else{
+        const servicios = await Servicio.find();
+        res.send(servicios);
+    }
+
+};
+
+servicioCTRL.post = async(req, res)=>{
+    const now = new Date();
+    req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+    console.log("a")
+    const servicio = new Servicio(req.body);
+    try {
+        await servicio.save();
+
+        res.send(servicio);
+    } catch (error) {
+        console.error(error)
+        res.status(500).send({
+            ok: false,
+            msg: 'Hable Con el Administrador'
+        });
+    }
+};
+
+servicioCTRL.putForId = async(req, res) => {
+
+    const {id} = req.params;
+
+    const now = new Date();
+    if(req.body.fechaEgreso){
+       req.body.fechaEgreso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString(); 
+    }
+    
+    const servicio = await Servicio.findByIdAndUpdate({_id:id},req.body);
+    res.send(servicio);
+
+};
+
+servicioCTRL.deleteForId = async(req, res) => {
+    const {id} = req.params;
+
+    const servicio = await Servicio.findOneAndDelete({_id: id});
+
+    res.send( servicio );
+};
+
+module.exports = servicioCTRL;

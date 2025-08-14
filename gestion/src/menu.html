@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    
+    <link rel="stylesheet" href="./assets/global.css">
+    <link rel="stylesheet" href="./menu.css">
+</head>
+<body class="grid row-2-2fr-1fr h-auto">
+    <section class="menu flex-1">
+        <div class="card ventas hidden">
+            <i class="bi bi-cart" style="color: #ca8a04"></i>
+            <h3>Ventas</h3>
+        </div>
+    
+        <div class="card clientes hidden">
+            <i class="bi bi-person" style="color: #ca8a04"></i>
+            <h3>Clientes</h3>
+        </div>
+    
+        <div class="card productos hidden">
+            <i class="bi bi-box" style="color: #ca8a04"></i>
+            <h3>Productos</h3>
+        </div>
+    
+        <div class="card caja hidden">
+            <i class="bi bi-coin" style="color: #ca8a04"></i>
+            <h3>Caja</h3>
+        </div>
+    
+        <div class="card consulta hidden">
+            <i class="bi bi-file-earmark-bar-graph" style="color: #ca8a04"></i>
+            <h3>Consultar Cuenta</h3>
+        </div>
+    
+        <div class="card recibo hidden">
+            <i class="bi bi-file-earmark-text" style="color: #ca8a04"></i>
+            <h3>Recibo</h3>
+        </div>
+
+        <div class="card remitos hidden">
+            <i class="bi bi-file-excel" style="color: #ca8a04"></i>
+            <h3>Remitos</h3>
+        </div>
+
+        <div class="card servicioTecnico hidden">
+            <i class="bi bi-tools" style="color: #ca8a04"></i>
+            <h3>Servicio Tecnico</h3>
+        </div>
+        
+    </section>
+    <section class="final mt-auto">
+        <main class="informacion">
+            <p id="atajoVentas" class="hidden">F1: Ventas</p>
+            <p id="atajoAgregarCliente" class="hidden">F2: Agregar Cliente</p>
+            <p id="atajoAgregarProducto" class="hidden">F3: Agregar Producto</p>
+            <p id="atajoCambioProducto" class="hidden">F4: Cambio de Producto</p>
+            <p id="atajoGasto" class="hidden">F5: Ingresar Gastos Generales</p>
+            <p id="atajoNotaCredito" class="hidden">F6: Nota Credito</p>
+        </main>
+    </section>
+</body>
+<script src="menu.js"></script>
+</html>

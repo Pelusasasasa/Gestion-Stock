@@ -1,0 +1,204 @@
+require('dotenv').config();
+const axios = require("axios");
+const { ipcRenderer } = require('electron');
+const sweet = require('sweetalert2');
+
+const URL = process.env.GESTIONURL;
+
+const codigo = document.querySelector('#codigo');
+const descripcion = document.querySelector('#descripcion');
+
+const inputs = document.querySelectorAll('input[name="operacion"]');
+
+const stock = document.querySelector('#stock');
+const cantidad = document.querySelector('#cantidad');
+const nuevoStock = document.querySelector('#nuevoStock');
+
+const serie = document.querySelector('#serie');
+const factura = document.querySelector('#factura');
+const provedor = document.querySelector('#provedor');
+const agregarSerie = document.querySelector('#agregarSerie');
+const tbody = document.querySelector('#tbody');
+
+const aceptar = document.getElementById('aceptar');
+const salir = document.getElementById('salir');
+
+let inputAux;
+let producto;
+let acceso;
+let vendedor = '';
+
+const agregarSerieTabla = async () => {
+
+    if (serie.value === "") {
+        await sweet.fire({
+            title: 'Falta poner un numero de serie'
+        });
+        return;
+    };
+
+    if (provedor.value === "") {
+        await sweet.fire({
+            title: 'Falta poner un provedor'
+        });
+        return;
+    };
+
+    const tr = document.createElement('tr');
+
+    const tdSerie = document.createElement('td');
+    const tdFactura = document.createElement('td');
+    const tdProvedor = document.createElement('td');
+
+    tdSerie.innerText = serie.value;
+    tdFactura.innerText = factura.value;
+    tdProvedor.innerText = provedor.value.toUpperCase();
+
+    tr.appendChild(tdSerie);
+    tr.appendChild(tdProvedor);
+    tr.appendChild(tdFactura);
+
+    tbody.appendChild(tr);
+
+    serie.value = "";
+    serie.focus();
+};
+
+const listarProducto = ({ _id, descripcion: desc, stock: sto, provedor: pro }) => {
+    codigo.value = _id;
+    descripcion.value = desc;
+    stock.value = sto.toFixed(2);
+
+    if (pro) {
+        provedor.value = pro;
+    }
+};
+
+const listarProvedores = (lista) => {
+    for (let elem of lista) {
+        const option = document.createElement('option');
+
+        option.value = elem.nombre;
+        option.text = elem.nombre.slice(0,15);
+
+        provedor.appendChild(option);
+    };
+};
+
+const guardarMovimiento = async () => {
+    if (cantidad.value === "") {
+        await sweet.fire({
+            title: 'Falta poner una cantidad'
+        });
+        return;
+    };
+
+    //Hacemos para que se guarden numeros de series si es que los hay
+    const trs = document.querySelectorAll('#tbody tr');
+
+    const series = [];
+
+    for (let tr of trs) {
+
+        const serie = {
+            nro_serie: tr.children[0].innerText,
+            provedor: tr.children[1].innerText,
+            factura: tr.children[2].innerText,
+            codigo: codigo.value,
+            producto: descripcion.value,
+            marca: producto.marca,
+            vendedor: vendedor
+        };
+
+        series.push(serie);
+    };
+
+    try {
+        const  { data } = await axios.put(`${URL}productos/descontarStock/${codigo.value}`, {
+            stock: nuevoStock.value,
+            descripcion: descripcion.value,
+            vendedor: vendedor,
+            tipo: inputAux.id,
+            series
+        });
+
+        if(!data.ok) return await sweet('Error al descontrar stock', error.msg, 'error');
+
+        ipcRenderer.send('informacion-a-ventana', {
+            _id: codigo.value,
+            descripcion: descripcion.value,
+            stock: nuevoStock.value,
+        });
+
+        window.close();
+    } catch (error) {
+        console.log(error);
+        await sweet('Error al descontar stock', error.response.data.msg, 'error');
+    }
+
+};
+
+const verPermiso = (permiso) => {
+    if (permiso === 0) {
+        document.getElementById('series').classList.remove('none')
+    }
+};
+
+agregarSerie.addEventListener('click', agregarSerieTabla);
+
+aceptar.addEventListener('click', guardarMovimiento);
+
+cantidad.addEventListener('keypress', e => {
+    if (e.keyCode === 13) {
+        cantidad.value = parseFloat(cantidad.value).toFixed(2);
+
+        inputs.forEach(input => {
+            if (input.checked) {
+                inputAux = input;
+            }
+        });
+
+        if (inputAux.id === "resta") {
+            nuevoStock.value = (parseFloat(stock.value) - parseFloat(cantidad.value)).toFixed(2);
+        } else {
+            nuevoStock.value = (parseFloat(stock.value) + parseFloat(cantidad.value)).toFixed(2);
+        };
+
+        aceptar.focus();
+    };
+});
+
+document.addEventListener('keydown', e => {
+    if (e.keyCode === 27) {
+        window.close();
+    }
+});
+
+serie.addEventListener('keypress', (e) => {
+    if (e.keyCode === 13) {
+        if (provedor.value === "") {
+            provedor.focus();
+        } else {
+            agregarSerieTabla();
+        }
+    };
+});
+
+salir.addEventListener('click', e => {
+    window.close();
+});
+
+ipcRenderer.on('informacion', async (e, { informacion, vendedor: vend }) => {
+    const { data } = (await axios.get(`${URL}provedores`));
+    provedores = data.provedores;
+
+    listarProvedores(provedores);
+
+    vendedor = vend.nombre;
+    acceso = vend.permiso;
+
+    producto = (await axios.get(`${URL}productos/${informacion}`)).data;
+    listarProducto(producto);
+    verPermiso(acceso);
+
+});

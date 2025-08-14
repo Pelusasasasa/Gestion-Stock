@@ -1,0 +1,40 @@
+.table,.movimientos{
+    overflow: scroll;
+    background-color: white;
+}
+
+.table{
+    height: 80vh;
+}
+
+.movimientos{
+    height: 40vh;
+    background-color: lightgray;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,td{
+    text-align: center;
+    border: .1rem solid black;
+    cursor: pointer;
+}
+
+header{
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+h1{
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+input{
+    width: 50rem;
+    margin-bottom: 2rem;
+}

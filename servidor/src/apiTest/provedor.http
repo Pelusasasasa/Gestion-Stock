@@ -1,0 +1,13 @@
+###Post Provedor
+
+POST http://localhost:4000/gestion/provedores/
+Content-Type: application/json
+
+{
+    "nombre": "Agustin",
+    "iva": "Consumidor Final",
+    "cuit": "20416305847",
+    "domicilio": "Repetto 3345",
+    "localidad": "Chajari"
+
+}

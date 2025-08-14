@@ -1,0 +1,1044 @@
+const axios = require('axios');
+const sweet = require('sweetalert2');
+require("dotenv").config();
+
+const { ipcRenderer } = require('electron');
+const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
+const archivo = require('../configuracion.json');
+const { default: Swal } = require('sweetalert2');
+
+const URL = process.env.GESTIONURL;
+
+let vendedor = getParameterByName('vendedor');
+let esRemito = getParameterByName('remito');
+let remitosTraidosJSON = getParameterByName('remitos');
+let remitosTraidos = remitosTraidosJSON ? JSON.parse(remitosTraidosJSON) : '';
+
+//Parte Cliente
+const codigo = document.querySelector('#codigo');
+const nombre = document.querySelector('#nombre');
+const telefono = document.querySelector('#telefono');
+const localidad = document.querySelector('#localidad');
+const direccion = document.querySelector('#direccion');
+const cuit = document.querySelector('#cuit');
+const condicionIva = document.querySelector('#condicion');
+const lista = document.getElementById('lista');
+const observaciones = document.getElementById('observaciones');
+
+//Parte Producto
+const cantidad = document.querySelector('#cantidad');
+const codBarra = document.querySelector('#cod-barra')
+const precioU = document.querySelector('#precio-U');
+const iva = document.querySelector('#iva');
+const tbody = document.querySelector('.tbody');
+
+//parte totales
+const total = document.querySelector('#total');
+const inputRecibo = document.querySelector('#recibo');
+const porcentaje = document.querySelector('#porcentaje');
+const radio = document.querySelectorAll('input[name="condicion"]');
+const remitoDiv = document.querySelector('.remito');
+const cuentaCorrientediv = document.querySelector('.cuentaCorriente');
+
+//botones
+const facturar = document.querySelector('.facturar');
+const volver = document.querySelector('.volver');
+const impresion = document.querySelector("#impresion");
+const checkboxDolar = document.querySelector("#dolar");
+
+//alerta
+const alerta = document.querySelector('.alerta');
+
+//body
+const body = document.querySelector('body');
+
+let tipoFactura = getParameterByName("tipoFactura");
+let facturaAnterior;
+
+let situacion = "blanco";
+
+let totalGlobal = 0;
+let idProducto = 0;
+let porcentajeH = 0;
+let descuento = 0;
+let dolar = 0;
+let dolarInstalador = 0;
+
+let listaProductos = [];
+let cuentas = [];
+
+let seleccionado;
+
+let facturaVarios = false;
+
+const arreglarSaldo = async (id) => {
+    let saldoADescontar = 0;
+
+    for (let elem of cuentas) {
+
+        const { data: compensada } = await axios.get(`${URL}compensada/traerCompensada/id/${elem}`);
+
+        saldoADescontar += compensada.importe;
+    };
+
+    try {
+        const { data } = await axios.get(`${URL}clientes/id/${id}`);
+        if(data.ok){
+            cliente = data.cliente
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+    }
+    cliente.saldo = (cliente.saldo - saldoADescontar).toFixed(2);
+
+    await axios.put(`${URL}clientes/id/${id}`, cliente);
+};
+
+const calcularTotal = async () => {
+    const trs = document.querySelectorAll('tbody tr');
+    let aux = 0;
+    for await (let tr of trs) {
+        aux += parseFloat(tr.children[6].innerText);
+    };
+
+    total.value = redondear(aux, 2);
+};
+
+//Lo usamos para mostrar o ocultar cuestiones que tiene que ver con las ventas
+const cambiarSituacion = (situacion) => {
+    situacion === "negro" ? document.querySelector('#tarjeta').parentNode.classList.add('none') : document.querySelector('#tarjeta').parentNode.classList.remove('none');
+    situacion === "negro" ? remitoDiv.classList.remove('none') : remitoDiv.classList.add('none');
+};
+
+const cargarRemito = async () => {
+    let movimientosRemitos = [];
+    let idCliente = '';
+    let textoObservaciones = '';
+    let aux = 0;
+
+    for (let elem of remitosTraidos) {
+       let remito = {};
+
+       try {
+         const { data } = (await axios.get(`${URL}remitos/forId/${elem}`));
+         if(data.ok){
+            remito = data.remito;
+         }else{
+            return await sweet.fire('No se pudo obtener los remito', data.msg, 'error');
+         }
+       } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se pudo obtener los remitos', error?.response?.data?.msg, 'error');
+       };
+
+        const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
+       console.log(mov);
+        textoObservaciones += remito.observaciones + ' ';
+        movimientosRemitos.push(...mov);
+
+        idCliente = remito.idCliente;
+    };
+
+    for await (let elem of movimientosRemitos) {
+        let producto;
+        const res = elem.codProd.toUpperCase().replace(/\//g, '%2F');
+        
+        if(res) {
+            producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+        }else{
+            producto = {};
+            producto._id = elem.codProd;
+            producto.descripcion = elem.producto;
+            producto.precio = elem.precio;
+            producto.marca = elem.marca;
+            producto.impuesto = elem.iva;
+        }
+        producto.idTabla = aux;
+        aux++;
+        
+        await listarProducto(producto, elem.cantidad)
+        const pro = listaProductos.find(({ producto }) => producto._id === elem.codProd);
+        if(pro){
+            pro.series = elem?.series;
+        }
+    };
+
+    observaciones.value = textoObservaciones;
+    listarCliente(idCliente);
+
+};
+
+const crearProducto = () => {
+    idProducto++;
+    const producto = {
+        descripcion: descripcion.value.toUpperCase(),
+        precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value) / 100), 2)),
+        rubro: "Cualquiera",
+        idTabla: `${idProducto}`,
+        impuesto: iva.value,
+        impuesto: parseFloat(iva.value),
+        productoCreado: true
+    };
+    listaProductos.push({ cantidad: parseFloat(cantidad.value), producto });
+    tbody.innerHTML += `
+        <tr id=${idProducto}>
+            <td></td>
+            <td>${cantidad.value}</td>
+            <td>${descripcion.value.toUpperCase()}</td>
+            <td></td>
+            <td>${producto.impuesto.toFixed(2)}</td>
+            <td>${parseFloat(producto.precio).toFixed(2)}</td>
+            <td>${redondear((producto.precio * parseFloat(cantidad.value)), 2)}</td>
+            <td class=acciones>
+                <div class=tool>
+                        <span class=material-icons>post_add</span>
+                        <p class=tooltip>Agregar Nº serie</p>
+                </div>
+                <div class=tool>
+                    <span class=material-icons>delete</span>
+                    <p class=tooltip>Eliminar</p>
+                </div>
+            </td>
+        </tr>
+    `;
+    tbody.scrollIntoView({
+        block: "end"
+    });
+
+    total.value = redondear((parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value)), 2);
+    totalGlobal = parseFloat(total.value);
+    cantidad.value = "1.00";
+    codBarra.value = "";
+    precioU.value = "";
+    iva.value = "21.00";
+    // rubro.value = "";
+    descripcion.value = "";
+    console.log(descripcion.value)
+    codBarra.focus();
+};
+
+const eliminarCuentas = async () => {
+    for (let elem of cuentas) {
+        const { data: compensada } = await axios.delete(`${URL}compensada/traerCompensada/id/${elem}`);
+        const { data: historica } = await axios.delete(`${URL}historica/porNumero/${elem}`);
+        const { data: movs } = await axios.delete(`${URL}movimiento/${elem}/CC`);
+
+        console.log(compensada);
+        console.log(historica);
+        console.log(movs);
+    };
+};
+
+
+//Lo que hacemos es listar el cliente traido
+const listarCliente = async (id) => {
+    codigo.value = id;
+    let cliente = {};
+    try {
+        const { data } = (await axios.get(`${URL}clientes/id/${id}`));
+        if(data.ok){
+            cliente = data.cliente
+        }else{
+            return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
+        };
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error')
+    }
+
+    if (cliente !== "") {
+        nombre.value = cliente.nombre;
+        saldo.value = cliente.saldo;
+        cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
+        telefono.value = cliente.telefono;
+        localidad.value = cliente.localidad;
+        direccion.value = cliente.direccion;
+        condicionIva.value = cliente.condicionIva ? cliente.condicionIva : "Consumidor Final";
+        cliente.condicionFacturacion === 1 ? cuentaCorrientediv.classList.remove('none') : cuentaCorrientediv.classList.add('none');
+        lista.value = cliente.tipoCuenta ?? 'NORMAL';
+
+        codBarra.focus();
+    } else {
+        codigo.value = "";
+        codigo.focus();
+    }
+};
+
+//Lo que hacemos es listar el producto traido
+const listarProducto = async (producto, cant = 1, series = []) => {
+    if(!producto) return await Swal.fire('Producto no encontrado', `No se encontro producto con el codigo ${codBarra.value}`, 'error');
+
+    cantidad.value = cant;
+    
+
+    if (!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad') {
+        descripcion.value = producto.descripcion;
+
+        await sweet.fire({
+            title: "No se puede poner una cantidad con decimal a un producto que se venda por unidad",
+            returnFocus: false
+        });
+        cantidad.value = "1.00";
+        descripcion.value = "";
+        codBarra.value = "";
+        codBarra.focus();
+        return;
+    };
+
+    producto = producto === "" ? (await axios.get(`${URL}productos/buscar/porNombre/${producto}`)).data : producto;//buscamos el producto por descripcion
+    //ponemos el precio del producto con un descuento si es que hay
+    producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value) / 100, 2));
+
+
+    //Buscamos si el produto ya esta cargado
+    if (producto !== "") {
+        const productoYaUsado = listaProductos.find(({ producto: product }) => {
+            if(product._id === '' && (product.idTabla === producto.idTabla)){
+                return product
+            }else if (product._id !== '' && (product._id === producto._id)) {
+                return product
+            };
+            
+        });
+
+        //Esto sucede si el producto No esta cargado
+        if (producto !== "" && !productoYaUsado) {
+            if (producto.stock === 0 && archivo.stockNegativo) {
+                await sweet.fire({
+                    title: "Producto con Stock en 0"
+                });
+            };
+            if (producto.stock - (parseFloat(cantidad.value)) < 0 && archivo.stockNegativo) {
+                await sweet.fire({
+                    title: "Producto con Stock menor a 0",
+                });
+            }
+            listaProductos.push({ cantidad: parseFloat(cantidad.value), producto, series });
+
+            codBarra.value = producto._id;
+            
+            precioU.value = lista.value === "NORMAL" ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador);
+            
+            idProducto++;
+            producto.idTabla = `${idProducto}`;
+
+            tbody.innerHTML += `
+                <tr id=${producto.idTabla}>
+                    <td>${codBarra.value}</td>
+                    <td>${cantidad.value}</td>
+                    <td>${producto.descripcion.toUpperCase()}</td>
+                    <td>${producto.marca}</td>
+                    <td>${producto.impuesto.toFixed(2)}</td>
+                    <td>${parseFloat(precioU.value).toFixed(2)}</td>
+                    <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value), 2)}</td>
+                    <td class=acciones>
+                        <div class=tool>
+                            <span class=material-icons>post_add</span>
+                            <p class=tooltip>Series</p>
+                        </div>
+                        <div class=tool>
+                            <span class=material-icons>delete</span>
+                            <p class=tooltip>Eliminar</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            tbody.scrollIntoView({//hacemos un scroll al final del producto cargado ultimo
+                block: "end"
+            });
+
+            await calcularTotal();
+            totalGlobal = parseFloat(total.value);
+
+        } else if (producto !== "" && productoYaUsado) {
+            //Esto sucede si el producto ya esta cargado
+            productoYaUsado.cantidad += parseFloat(cantidad.value);
+            producto.idTabla = productoYaUsado.producto.idTabla;
+
+            const tr = document.getElementById(producto.idTabla);
+            tr.children[1].innerHTML = redondear(parseFloat(tr.children[1].innerHTML) + parseFloat(cantidad.value), 2);
+            let precio = tr.children[6];
+            const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
+            
+            if(parseFloat(cantidadNueva) === 0){
+                tbody.removeChild(tr);
+                listaProductos = listaProductos.filter(elem => elem.producto.idTabla !== producto.idTabla);
+            };
+
+            
+            //Si la lista de de cliente normal se redonde el precio y sino el costo mas iva por el dolar intalador
+            if (lista.value === "NORMAL") {
+                precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio, 2);
+                calcularTotal();
+            } else {
+                precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador)), 2);
+                calcularTotal();
+            };
+
+            totalGlobal = parseFloat(total.value);
+        };
+
+        cantidad.value = "1.00";
+        codBarra.value = "";
+        descripcion.value = "";
+        precioU.value = "";
+        codBarra.focus();
+
+    } else {
+        descripcion.focus();
+    };
+
+
+};
+
+const sacarIva = (lista, condicion) => {
+    let totalIva0 = 0;
+    let totalIva21 = 0;
+    let gravado21 = 0;
+    let gravado0 = 0;
+    let totalIva105 = 0;
+    let gravado105 = 0;
+    if (condicion === 'NORMAL') {
+        lista.forEach(({ producto, cantidad }) => {
+            if (producto.impuesto === 21) {
+                gravado21 += cantidad * producto.precio / 1.21;
+                totalIva21 += cantidad * producto.precio / 1.21 * 21 / 100;
+            } else if (producto.impuesto === 10.5) {
+                gravado105 += cantidad * producto.precio / 1.105
+                totalIva105 += cantidad * producto.precio / 1.105 * 10.5 / 100;
+            } else {
+                gravado0 += cantidad * producto.precio / 1;
+                totalIva0 += (cantidad * producto.precio) - (producto.precio / 1);
+            }
+        });
+    } else {
+        lista.forEach(({ producto, cantidad }) => {
+            let auxCosto = producto.costoDolar === 0 ? producto.costo * producto.impuesto / 100 : producto.costoDolar * dolar;
+            let auxCostoIva = auxCosto + (auxCosto * producto.impuesto / 100);
+            if (producto.impuesto === 21) {
+                gravado21 += cantidad * auxCostoIva / 1.21;
+                totalIva21 += cantidad * auxCostoIva / 1.21 * 21 / 100;
+            } else if (producto.impuesto === 10.5) {
+                gravado105 += cantidad * auxCostoIva / 1.105
+                totalIva105 += cantidad * auxCostoIva / 1.105 * 10.5 / 100;
+            } else {
+                gravado0 += cantidad * auxCostoIva / 1;
+                totalIva0 += (cantidad * auxCostoIva) - (auxCostoIva / 1);
+            }
+        });
+    }
+
+    let cantIva = 0
+    if (gravado0 !== 0) {
+        cantIva++;
+    }
+    if (gravado21 !== 0) {
+        cantIva++;
+    }
+    if (gravado105 !== 0) {
+        cantIva++;
+    }
+    return [parseFloat(totalIva21.toFixed(2)), parseFloat(totalIva0.toFixed(2)), parseFloat(gravado21.toFixed(2)), parseFloat(gravado0.toFixed(2)), parseFloat(totalIva105.toFixed(2)), parseFloat(gravado105.toFixed(2)), cantIva]
+};
+
+const togglePrecios = async (e) => {
+    for await (let { cantidad, producto } of listaProductos) {
+        console.log(producto);
+        if(producto?._id){
+            const tr = document.getElementById(`${producto.idTabla}`);
+
+            if (lista.value === "NORMAL") {
+                tr.children[5].innerText = producto.precio.toFixed(2);
+                tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText), 2);
+            } else {
+                if (producto.costo !== 0) {
+                    tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto / 100), 2);
+                    tr.children[6].innerText = redondear(parseFloat(tr.children[5].innerText) * parseFloat(tr.children[1].innerText), 2);
+                } else {
+                    tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador, 2);
+                    tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * parseFloat(tr.children[1].innerText), 2);
+                }
+            };
+        }
+    };
+    calcularTotal();
+};
+
+//Ver Codigo Documento
+const verCodigoDocumento = async (cuit) => {
+    if (cuit !== "00000000" && cuit !== "") {
+        if (cuit.length === 8) {
+            return 96
+        } else {
+            return 80
+        }
+    }
+
+    return 99
+};
+
+//Vemos que input tipo radio esta seleccionado
+const verTipoVenta = () => {
+    let retornar;
+    radio.forEach(input => {
+        if (input.checked) {
+            retornar = input.value;
+        }
+    });
+    return retornar;
+};
+
+//Vefiricamos si la venta tiene los datos base para hacerla
+const vefiricarVenta = async () => {
+    let bandera = true;
+
+    if (codigo.value === "") {
+        await sweet.fire({
+            title: "Poner un codigo de cliente"
+        });
+        bandera = false;
+    } else if (!verSiHayInternet() && situacion === "blanco") {
+        await sweet.fire({
+            title: "No se puede hacer la factura porque no hay internet"
+        });
+        bandera = false;
+    } else if (cuit.value.length === 8 && condicionIva.value === "Responsable Inscripto" && archivo.condIva === "Inscripto") {
+        if (tipoFactura) {
+            await sweet.fire({
+                title: "No se puede hacer Nota Credito B a un Inscripto"
+            });
+            bandera = false;
+        } else {
+            await sweet.fire({
+                title: "No se puede hacer Factura B a un Inscripto"
+            });
+            bandera = false;
+        }
+    }
+
+    return bandera;
+};
+
+checkboxDolar.addEventListener('click', () => {
+    togglePrecios();
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === "Escape") {
+        sweet.fire({
+            title: "Cancelar Venta?",
+            "showCancelButton": true,
+            "confirmButtonText": "Aceptar",
+            "cancelButtonText": "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.href = "../menu.html";
+            }
+        });
+    };
+
+    if (e.keyCode === 18) {
+        document.addEventListener('keydown', event => {
+            if (event.keyCode === 120) {
+                body.classList.toggle('negro');
+                situacion = situacion === "negro" ? "blanco" : "negro";
+                cambiarSituacion(situacion);
+            }
+        }, { once: true })
+    } else if (e.keyCode === 113) {
+        const opciones = {
+            path: "clientes/agregarCliente.html",
+            ancho: 900,
+            altura: 600
+        };
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.keyCode === 114) {
+        const opciones = {
+            path: "productos/agregarProducto.html",
+            ancho: 900,
+            altura: 650
+        };
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.keyCode === 115) {
+        const opciones = {
+            path: "productos/cambio.html",
+            ancho: 1000,
+            altura: 550,
+        }
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.keyCode === 116) {
+        const opciones = {
+            path: "gastos/gastos.html",
+            ancho: 500,
+            altura: 400
+        }
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.keyCode === 117) {
+        impresion.checked = !impresion.checked;
+    } else if (e.keyCode === 118) {
+        checkboxDolar.checked = !checkboxDolar.checked;
+        togglePrecios();
+    };
+});
+
+facturar.addEventListener('click', async e => {
+    let verificado = await vefiricarVenta();
+
+    if (verificado) {
+        alerta.classList.remove('none');
+        const venta = {};
+        const movimientos = [];
+        let ventaTraida = {};
+
+        venta.idCliente = codigo.value;
+        venta.cliente = nombre.value;
+        venta.fecha = new Date();
+
+        venta.precio = parseFloat(total.value);
+        venta.descuento = descuento;
+        venta.tipo_venta = await verTipoVenta();
+        venta.listaProductos = listaProductos;
+        venta.observaciones = observaciones.value.toUpperCase();
+        venta.direccion = direccion.value;
+        venta.localidad = localidad.value;
+        venta.condicion = lista.value;
+        venta.checkboxDolar = checkboxDolar.checked;
+        venta.dolar = lista.value === 'NORMAL' ? dolar : dolarInstalador;
+        venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
+        venta.vendedor = vendedor ? vendedor : "";
+
+        //Ponemos propiedades para la factura electronica
+        venta.cod_comp = situacion === "blanco" ? await verCodigoComprobante(tipoFactura, cuit.value, condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value) : 0;
+        venta.tipo_comp = situacion === "blanco" ? await verTipoComprobante(venta.cod_comp) : await verTipoComprobanteNegro(venta.tipo_venta);
+        venta.num_doc = cuit.value !== "" ? cuit.value : "00000000";
+        venta.cod_doc = await verCodigoDocumento(cuit.value);
+        venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value;
+
+        const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, lista.value); //sacamos el iva de los productos
+        venta.iva21 = iva21;
+        venta.iva0 = iva0;
+        venta.gravado0 = gravado0;
+        venta.gravado21 = gravado21;
+        venta.iva105 = iva105;
+        venta.gravado105 = gravado105;
+        venta.cantIva = cantIva;
+        venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
+
+
+        try {
+            if (situacion === "blanco") {
+                alerta.classList.remove('none');
+                venta.afip = await cargarFactura(venta, facturaAnterior ? true : false);
+                venta.F = true;
+            } else {
+                alerta.children[1].innerHTML = "Generando Venta";
+            };
+
+            const cliente = {};
+            cliente.nombre = nombre.value;
+            cliente.localidad = localidad.value;
+            cliente.cuit = cuit.value;
+            cliente.condicionIva = condicionIva.value;
+            cliente.direccion = direccion.value;
+            cliente._id = codigo.value;
+
+            if (venta.tipo_venta === "PP") {
+                const { data} = await axios.post(`${URL}Presupuesto`, venta);
+                ventaTraida = data.venta;
+                movimientos.push(...data.movimientos);
+            } else if (venta.tipo_venta === "RT") {
+                if (!venta.vendedor) {
+                    venta.vendedor = 'GONZALO';
+                };
+                const { data } = await axios.post(`${URL}remitos`, venta);
+                ventaTraida = data.venta;
+                movimientos.push(...data.movimientos);
+            } else {
+                try {
+                    const { data } = await axios.post(`${URL}ventas`, venta);
+                    ventaTraida = data.venta;
+                    movimientos.push(...data.movimientos);
+                } catch (error) {
+                    console.log(error);
+                    return await sweet.fire('No se pudo generar la venta', error?.response?.data?.msg, 'error');
+                }
+            };
+
+            //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
+            if (remitosTraidos.length > 0) {
+                for (let elem of remitosTraidos) {
+                    (await axios.put(`${URL}remitos/pasado/${elem}`));
+                };
+            };
+
+            if (impresion.checked) {
+                ipcRenderer.send('imprimir', [situacion, ventaTraida, cliente, movimientos, checkboxDolar.checked]);
+            };
+
+            if (facturaVarios) {
+                await arreglarSaldo(codigo.value);
+                await eliminarCuentas();
+            };
+
+            facturaVarios && window.close();
+            esRemito ? location.href = '../menu.html' : location.reload();
+        } catch (error) {
+
+            await sweet.fire({
+                title: "No se pudo generar la venta"
+            });
+            console.log(error)
+        } finally {
+            alerta.classList.add('none');
+        }
+    }
+});
+
+ipcRenderer.on('informacion', (e, args) => {
+    dolar = args;
+});
+
+ipcRenderer.on('facturarVarios', async (e, args) => {
+    cuentas = JSON.parse(args);
+    facturaVarios = true;
+
+    const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
+    try {
+        const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
+        if (data.ok){
+            vendedor = data.venta.vendedor._id;
+        }else{
+            return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
+    }
+    listarCliente(data.idCliente)
+
+    for (let elem of cuentas) {
+        const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
+        for await (let mov of movs) {
+            const res = mov.codProd.toUpperCase().replace(/\//g, '%2F');
+            let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            listarProducto(producto, mov.cantidad, mov.series);
+        };
+    };
+});
+
+ipcRenderer.on('recibir', async(e, args) => {
+    const { tipo, informacion, cantidad } = JSON.parse(args);
+
+    tipo === "cliente" && listarCliente(informacion);
+    tipo === "Ningun cliente" && nombre.focus();
+
+    if(tipo === "producto"){
+        const res = informacion.toUpperCase().replace(/\//g, '%2F');
+        let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+        listarProducto(producto, cantidad);
+    }
+});
+
+//ponemos un numero para la venta y luego mandamos a imprimirla
+ipcRenderer.on('poner-numero', async (e, args) => {
+    ponerNumero();
+});
+
+//Hacemos para que se seleccione un tr
+tbody.addEventListener('click', async e => {
+    seleccionado && seleccionado.classList.remove('seleccionado');
+    if (e.target.nodeName === "TD") {
+        seleccionado = e.target.parentNode;
+    } else if (e.target.nodeName === "DIV") {
+        seleccionado = e.target.parentNode.parentNode;
+    } else if (e.target.nodeName === "SPAN") {
+        seleccionado = e.target.parentNode.parentNode.parentNode;
+    }
+    seleccionado.classList.add('seleccionado');
+    if (e.target.innerHTML === "post_add") {
+        //Traemops el producto seleccionado para ver si tiene nuemores de series ya cargados y asi mostrarlos
+        const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
+        let valor = "";
+
+        if (producto.series) {
+            producto.series.forEach(serie => {
+                if (valor) {
+                    valor = valor + "\n" + serie
+                } else {
+                    valor = serie;
+                }
+            });
+        };//Ponemos el con saltos de lineas para que se muestre correctamente
+
+        await sweet.fire({
+            title: "Nro Series",
+            confirmButtonText: "Aceptar",
+            showCancelButton: true,
+            input: "textarea",
+            inputValue: valor //Si tiene un valor lo ponemos por defecto
+        }).then(({ isConfirmed, value }) => {
+            if (isConfirmed) {
+                const objeto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
+                objeto.series = value.split('\n')
+            }
+        })
+    }
+    if (e.target.innerHTML === "delete") {
+        sweet.fire({
+            title: "Borrar?",
+            confirmButtonText: "Aceptar",
+            showCancelButton: true
+        }).then(({ isConfirmed }) => {
+            tbody.removeChild(seleccionado);
+            const productoABorrar = listaProductos.findIndex(({ producto, cantidad }) => seleccionado.id === producto.idTabla);
+            listaProductos.splice(productoABorrar, 1);
+            togglePrecios();
+        });
+    }
+});
+
+tbody.addEventListener('dblclick', async se => {
+    sweet.fire({
+        title: "Cambio",
+        html: `
+            <section class=cambio>
+                <main>
+                    <label htmlFor="cantidadCambio">Cantidad</label>
+                    <input class=text-rigth type="text" name="cantidadCambio" value=${seleccionado.children[1].innerHTML} id="cantidadCambio"/>
+                </main>
+                <main>
+                    <label htmlFor="precioCambio">Precio</label>
+                    <input class=text-rigth type="text" name="precioCambio" value=${seleccionado.children[5].innerHTML} id="precioCambio"/>
+                </main>
+                <main>
+                    <label htmlFor="ivaCambio">Iva</label>
+                    <input class=text-rigth type="text" name="ivaCambio" value=${seleccionado.children[4].innerHTML} id="ivaCambio"/>
+                </main>
+            </section>
+        `,
+        confirmButtonText: "Aceptar",
+        showCancelButton: true
+    }).then(async ({ isConfirmed }) => {
+        if (isConfirmed) {
+            const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
+            //Borramos el total anterior
+            totalGlobal = parseFloat(redondear(totalGlobal - (producto.producto.precio * producto.cantidad), 2));
+
+            producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
+            producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
+            producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
+
+            seleccionado.children[1].innerHTML = producto.cantidad.toFixed(2);
+            seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
+            seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
+            seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad, 2);
+
+            totalGlobal = parseFloat(redondear(totalGlobal + (producto.producto.precio * producto.cantidad), 2));
+            total.value = totalGlobal.toFixed(2);
+        }
+    })
+});
+
+//Buscamos un cliente, si sabemos el codigo directamente apretamos enter
+codigo.addEventListener('keypress', async e => {
+    if (e.key === "Enter") {
+        if (codigo.value === "") {
+            const opciones = {
+                path: './clientes/clientes.html',
+                botones: false,
+            }
+            ipcRenderer.send('abrir-ventana', opciones)
+        } else {
+            listarCliente(codigo.value)
+        }
+    }
+});
+
+codBarra.addEventListener('keypress', async e => {
+    if (e.key === "Enter" && codBarra.value !== "" && codBarra.value !== "999-999") {
+        cantidad.focus();
+    } else if (e.key === "Enter" && codBarra.value === "") {
+        //Esto abre una ventana donde lista todos los productos
+        const opciones = {
+            path: "./productos/productos.html",
+            botones: false
+        }
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (codBarra.value === "999-999") {
+        cantidad.focus();
+    }
+
+    if (e.keyCode === 37) {
+        cantidad.focus();
+    }
+});
+
+lista.addEventListener('change', togglePrecios);
+
+//Por defecto ponemos el A Consumidor Final y tambien el select
+window.addEventListener('load', async e => {
+
+    dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+    dolarInstalador = (await axios.get(`${URL}numero/dolarInstalador`)).data;
+
+    if (tipoFactura === "notaCredito") {
+
+        await sweet.fire({
+            title: "Numero de Factura Anterior",
+            input: "text",
+            confirmButtonText: "Aceptar",
+            showCancelButton: true
+        }).then(({ isConfirmed, value }) => {
+            if (isConfirmed) {
+                facturaAnterior = value.padStart(8, '0');
+            } else {
+                location.href = '../menu.html';
+            }
+        });
+    } else if (esRemito) {
+        cargarRemito();
+    };
+
+    cambiarSituacion(situacion);//
+});
+
+descripcion.addEventListener('keypress', e => {
+    if (e.keyCode === 13) {
+        precioU.focus();
+    }
+});
+
+precioU.addEventListener('keypress', async e => {
+    if ((e.key === "Enter")) {
+        if (precioU.value !== "") {
+            crearProducto();
+        } else {
+            await sweet.fire({
+                title: "Poner un precio al Producto",
+            });
+        }
+    }
+});
+
+iva.addEventListener('keypress', e => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        precioU.focus();
+    }
+});
+
+porcentaje.addEventListener('change', async e => {
+    porcentaje.value = porcentaje.value === "" ? "0.00" : porcentaje.value;
+    descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100, 2);
+    for await (let { cantidad, producto } of listaProductos) {
+        totalGlobal -= parseFloat(redondear(producto.precio * cantidad, 2))
+        producto.precio = parseFloat(redondear(producto.precio / (porcentajeH / 100 + 1), 2));
+        producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value) / 100, 2));
+        const tr = document.getElementById(producto.idTabla)
+        tr.children[4].innerHTML = producto.precio.toFixed(2);
+        tr.children[5].innerHTML = redondear(producto.precio * cantidad, 2);
+        totalGlobal = parseFloat(redondear(totalGlobal + producto.precio * cantidad, 2));
+        total.value = totalGlobal.toFixed(2);
+    }
+    porcentajeH = parseFloat(porcentaje.value);
+});
+
+volver.addEventListener('click', () => {
+    location.href = "../menu.html";
+});
+
+nombre.addEventListener('keypress', e => {
+    apretarEnter(e, cuit);
+});
+
+cuit.addEventListener('keypress', e => {
+    apretarEnter(e, lista);
+});
+
+lista.addEventListener('keypress', e => {
+    e.preventDefault();
+    apretarEnter(e, telefono);
+});
+
+telefono.addEventListener('keypress', e => {
+    apretarEnter(e, localidad);
+});
+
+localidad.addEventListener('keypress', e => {
+    apretarEnter(e, direccion);
+});
+
+direccion.addEventListener('keypress', e => {
+    apretarEnter(e, condicionIva);
+});
+
+condicionIva.addEventListener('keypress', e => {
+    e.preventDefault();
+    apretarEnter(e, observaciones);
+});
+
+observaciones.addEventListener('keypress', e => {
+    apretarEnter(e, codBarra);
+});
+
+cantidad.addEventListener('keypress', async e => {
+    if (e.keyCode === 13) {
+        if (eval(e.target.value)) {
+            const res = codBarra.value.toUpperCase().replace(/\//g, '%2F');
+            let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            listarProducto(producto, cantidad.value);
+        } else {
+            cantidad.value = "";
+        };
+    }
+});
+
+cantidad.addEventListener('keydown', e => {
+    if (e.keyCode === 39) {
+        codBarra.focus();
+    }
+});
+
+codigo.addEventListener('focus', e => {
+    codigo.select();
+});
+
+nombre.addEventListener('focus', e => {
+    nombre.select()
+});
+
+cuit.addEventListener('focus', e => {
+    cuit.select()
+});
+
+localidad.addEventListener('focus', e => {
+    localidad.select();
+});
+
+telefono.addEventListener('focus', e => {
+    telefono.select();
+});
+
+direccion.addEventListener('focus', e => {
+    direccion.select();
+});
+
+total.addEventListener('focus', e => {
+    total.select();
+});
+
+cantidad.addEventListener('focus', e => {
+    cantidad.select();
+});
+
+porcentaje.addEventListener('focus', e => {
+    porcentaje.select();
+});
+
+inputRecibo.addEventListener('focus', e => {
+    inputRecibo.select();
+});

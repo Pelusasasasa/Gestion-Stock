@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aumento por provedor</title>
+    <link rel="stylesheet" href="../assets/global.css">
+    <link rel="stylesheet" href="./productos.css">
+</head>
+<body class="provedores h-screen flex flex-col m-0 justify-between">
+    <section class="inputs pt-2">
+        <main class="flex flex-col">
+            <label for="provedores">Provedores</label>
+            <select name="provedores" autofocus id="provedores"></select>
+        </main>
+
+        <main class="flex flex-col ">
+            <label for="porcentaje">Porcentaje %</label>
+            <input type="number" name="porcentaje" id="porcentaje">
+        </main>
+    </section>
+    <section class="botones mt-auto pb-2">
+        <button id="aceptar">Aceptar</button>
+        <button id="salir">Salir</button>
+    </section>
+    <script src="./aumentoPorProvedor.js"></script>
+</body>
+</html>

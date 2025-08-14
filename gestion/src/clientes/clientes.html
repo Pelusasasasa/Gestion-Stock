@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="../assets/global.css">
+    <link rel="stylesheet" href="clientes.css">
+    <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
+</head>
+<body class="seccionCliente">
+    <header class="flex justify-between">
+
+        <div class="flex items-center mt-2 gap-2">
+            <p class="material-icons-outlined m-0 azul">person</p>
+            <p class="m-0 text-xl font-bold">Gestion de Clientes</p>
+        </div>
+
+        <div class="flex gap-2 items-center botones">
+            <button class="agregar items-center flex gap-2 p-1 bg-black text-white">
+                <span class="material-icons-outlined">add</span>
+                <span>Agregar Cliente</span>
+            </button>
+
+            <button class="salir items-center flex gap-2 p-1 border border-gray-400">
+                <span class="material-icons-outlined">close</span>
+                <span>Salir</span>
+            </button>
+        </div>
+    </header>
+
+    <section class="buscador">
+
+        <div class="buscador-nombre">
+            <input type="text" name="nombre" autofocus id="nombre" placeholder="Nombre Cliente...">
+        </div>
+
+    </section>
+
+    <section class="tabla">
+        <table>
+            <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Nombre</th>
+                    <th>Direccion</th>
+                    <th>Telefono</th>
+                    <th>Cuit</th>
+                    <th>Condicion Iva</th>
+                    <th>Saldo</th>
+                    <th class="acciones">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </section>
+
+    <script src="./clientes.js"></script>
+</body>
+</html>

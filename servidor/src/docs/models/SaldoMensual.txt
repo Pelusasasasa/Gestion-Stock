@@ -1,0 +1,3 @@
+En el modelo de Saldo Mensual declaramos un modelo como schema y le ponemos el mes que va a contener el año tambien como 2024-04
+Y un saldo que es un numero justamente del saldo inicial de cada mes, este modelo representa el saldo incial para cada mes, luego de cerrar la caja
+que se hara de forma automatica

@@ -1,0 +1,146 @@
+const tipoCuentaCTRL = {};
+
+const TipoCuenta = require('../models/TipoCuenta');
+
+tipoCuentaCTRL.deleteOne = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const tipoCuentaDelete = await TipoCuenta.findByIdAndDelete(id);
+
+        res.status(200).json({
+            ok: true,
+            tipoCuentaDelete
+        });
+    } catch (error) {
+        res.status(500).json({
+            msg: 'No se pudo eliminar el tipo de cuenta, hable con el administrador',
+            ok: false
+        })
+    }
+};
+
+tipoCuentaCTRL.getAll = async (req, res) => {
+
+    try {
+        const tipoCuentas = await TipoCuenta.find();
+
+        res.status(200).json({
+            ok: true,
+            tipoCuentas
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo obtener los tipos de cuenta, hable con el administrador'
+        });
+    }
+
+};
+
+tipoCuentaCTRL.getForText = async(req, res) => {
+    const { text } = req.params;
+
+    try {
+        const tipo = await TipoCuenta.findOne({nombre: text});
+
+        res.status(200).json({
+            ok: true,
+            tipo
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se puede obtener los tipos de cuentas, hable con el administrador',
+            error: error
+        })
+    }
+};
+
+tipoCuentaCTRL.getForType = async (req, res) => {
+    const { tipo } = req.params;
+
+    try {
+        const tipoCuentas = await TipoCuenta.find({ tipo });
+
+        res.status(200).json({
+            ok: true,
+            tipoCuentas
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se puede obtener los tipos de cuentas, hable con el administrador',
+            error: error
+        })
+    }
+};
+
+tipoCuentaCTRL.patchOne = async (req, res) => {
+
+    const { id } = req.params;
+    const { nombre, tipo } = req.body;
+
+    try {
+
+        const tipoUsado = await TipoCuenta.findOne({
+            $and: [
+                { nombre },
+                { tipo }
+            ]
+        });
+
+        if (tipoUsado) return res.status(400).json({
+            ok: false,
+            msg: 'Ya existe un tipo de cuenta con ese nombre'
+        });
+
+        const updateTipoCuenta = await TipoCuenta.findByIdAndUpdate({ _id: id }, { nombre, tipo }, { new: true });
+        res.status(200).json({
+            ok: true,
+            updateTipoCuenta
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo modificar el tipo de cuenta, hable con el administrador'
+        })
+    }
+
+};
+
+tipoCuentaCTRL.postOne = async (req, res) => {
+    try {
+
+        const { nombre, tipo } = req.body;
+
+        const tipoUsado = await TipoCuenta.findOne({ nombre });
+
+        if (tipoUsado) return res.status(400).json({
+            ok: false,
+            msg: 'Ya existe una cuenta con ese nombre'
+        });
+
+
+        const tipoCuenta = new TipoCuenta({ nombre, tipo });
+        await tipoCuenta.save();
+
+        res.status(201).json({
+            ok: true,
+            tipoCuenta
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo cargar el tipo de cuenta, hable con el administrador'
+        });
+    }
+};
+
+module.exports = tipoCuentaCTRL;
