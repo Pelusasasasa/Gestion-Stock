@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
 
+const volver = document.getElementById('volver');
 const buscador = document.getElementById('buscador');
 const remitoC = document.getElementById('remitoC');
 const listRem = document.getElementById('listRem');
@@ -83,8 +84,7 @@ const clickTbody = async(e) => {
         subSeleccionado.classList.add('subSeleccionado');
     };
     let aux = remitos.find( elem => elem._id === seleccionado.id);
-    
-    movs = (await axios.get(`${URL}movimiento/${aux.numero}/${aux.tipoVenta}`)).data;
+    movs = (await axios.get(`${URL}movimiento/${aux.numero}/${aux.tipo_venta}`)).data;
     listarMovs( movs );
 };
 
@@ -283,3 +283,7 @@ remitoC.addEventListener('change', cambioTipoRemito);
 pasarCTA.addEventListener('click', pasarCuenta);
 tbody.addEventListener('click', clickTbody);
 window.addEventListener('load', cargarPagina);
+
+volver.addEventListener('click', () => {
+    location.href = '../menu.html';
+});

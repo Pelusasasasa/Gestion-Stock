@@ -707,6 +707,17 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
     facturaVarios = true;
 
     const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
+    try {
+        const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
+        if (data.ok){
+            vendedor = data.venta.vendedor._id;
+        }else{
+            return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
+    }
     listarCliente(data.idCliente)
 
     for (let elem of cuentas) {
