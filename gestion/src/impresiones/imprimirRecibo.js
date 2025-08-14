@@ -46,6 +46,7 @@ function listarCliente(cliente){
 };
 
 function listarcomprobantes(lista) {
+    console.log(lista)
     lista.map(elem =>{
         tbody.innerHTML += `
             <tr>

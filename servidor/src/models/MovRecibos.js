@@ -3,7 +3,8 @@ const {Schema,model} = require('mongoose');
 const MovRecibo = new Schema({
     fecha:{
         type:Date,
-        required:true
+        required:true,
+        default: Date.now,
     },
     idCliente:{
         type:String,

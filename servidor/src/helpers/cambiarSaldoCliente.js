@@ -18,7 +18,8 @@ exports.cambiarSaldoCliente = async(id, precio, recibo = false) => {
         await cliente.save();
 
         return {
-            ok: true
+            ok: true,
+            cliente
         };
         
     } catch (error) {

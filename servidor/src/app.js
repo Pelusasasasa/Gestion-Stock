@@ -26,7 +26,7 @@ app.use('/gestion/marca', require('./routes/marca.route'));
 
 app.use('/gestion/movimiento', require('./routes/movProducto.route'));
 
-app.use('/gestion/movRecibo', require('./routes/movRecibo'));
+app.use('/gestion/movRecibo', require('./routes/movRecibo.route'));
 
 app.use('/gestion/movVendedores', require('./routes/movVendedores'));
 

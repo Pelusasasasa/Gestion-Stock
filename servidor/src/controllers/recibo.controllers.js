@@ -1,39 +1,70 @@
 const reciboCTRL = {};
 
+const { actualizarCompensadas } = require('../helpers/actualizarCompensadas');
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
+const { cargarMovsRecibos } = require('../helpers/cargarMovsRecibos');
 const { crearHistorica } = require('../helpers/crearHistorica');
 const Recibo = require('../models/Recibo');
 
 
 reciboCTRL.cargarRecibo = async(req,res)=>{
-    const nuevoRecibo = new Recibo(req.body);
+    try {
+        
+        const nuevoRecibo = new Recibo(req.body);
+        
+        const numeroActualizado = await actualizarNumero(nuevoRecibo.tipo_venta)
+        if(numeroActualizado.ok){
+            nuevoRecibo.numero = numeroActualizado.numero;
+        }else{
+            return res.status(400).json({
+                ok: false,
+                msg: "Error al actualizar el numero del recibo"
+            });
+        };
+        
+        const saldoModificado = await cambiarSaldoCliente(nuevoRecibo.idCliente, nuevoRecibo.precio, true);
+        if(!saldoModificado.ok){
+            return res.status(400).json({
+                ok: false,
+                msg: "Error al modificar el saldo del cliente"
+            });
+        };
     
-    const numeroActualizado = await actualizarNumero(nuevoRecibo.tipo_venta)
-    if(numeroActualizado.ok){
-        nuevoRecibo.numero = numeroActualizado.numero;
-    };
-    const saldoModificado = await cambiarSaldoCliente(nuevoRecibo.idCliente, nuevoRecibo.precio, true);
-    if(!saldoModificado.ok){
-        return res.status(400).json({
+        const historica = await crearHistorica(nuevoRecibo);
+        if(!historica){
+            return res.status(400).json({
+                ok: false,
+                msg: "Error al crear la historica"
+            });
+        };
+        
+        const compensadasModificadas = await actualizarCompensadas(req.body.compensadas);
+    
+        if(!compensadasModificadas.ok) return res.status(400).json({
             ok: false,
-            msg: "Error al modificar el saldo del cliente"
+            msg: 'Error al modificar las compensadas'
         });
-    }
-
-    const historica = await crearHistorica(nuevoRecibo);
-    if(!historica){
-        return res.status(400).json({
+        
+        const movsRecibos = await cargarMovsRecibos(compensadasModificadas.compensadas, numeroActualizado.numero);
+        if(!movsRecibos.ok) return res.status(400).json({
             ok: false,
-            msg: "Error al crear la historica"
+            msg: 'Error al cargar los movimientos de los recibos'
         });
+        await nuevoRecibo.save();
+        res.status(201).json({
+            ok: true,
+            recibo: nuevoRecibo,
+            movsRecibos: movsRecibos.movs,
+            cliente: saldoModificado.cliente
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo realizar el recibo, hable con el administrador'
+        })
     }
-
-
-    console.log(nuevoRecibo)
-    // await nuevoRecibo.save();
-    // console.log(`Recibo ${req.body.numero} cargado`)
-    res.send( nuevoRecibo );
 }
 
 reciboCTRL.recibosDia = async(req,res)=>{
