@@ -13,19 +13,24 @@
 
 <body class="consultaCuenta">
     <section class="buscador">
-        <section class="inputs">
-            <main class="">
+        <section class="colums-4-1fr-4fr-1fr-1fr grid gap-2">
+            <main id="divBuscador" class="flex flex-col">
                 <label for="buscar">Buscar cliente</label>
                 <input type="text" id="buscar" autofocus name="buscar">
             </main>
-            <main>
+            <main class="flex flex-col">
                 <label for="cliente">Cliente</label>
                 <input type="text" name="cliente" disabled id="cliente">
             </main>
 
-            <main class="saldo">
+            <main class="saldo flex flex-col">
                 <label for="saldo">Saldo</label>
                 <input type="text" disabled id="saldo" name="saldo">
+            </main>
+
+            <main id="divDolarTomado" class="dolarTomado flex flex-col">
+                <label for="dolarTomado">Dolar Tomado</label>
+                <input type="number" disabled    id="dolarTomado" name="dolarTomado">
             </main>
         </section>
 

@@ -96,7 +96,20 @@ const ponerInputs = async (id) => {
         saldo.value = (cliente.saldo).toFixed(2);
         localidad.value = cliente.localidad;
         direccion.value = cliente.direccion;
-        const compensadas = (await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`)).data;
+        let compensadas = [];
+
+        try {
+            const { data } = await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`);
+        
+            if(data.ok){
+                compensadas = data.compensadas;
+            }else{
+                await sweet.fire('No se pudo obtener las compensadas', data.msg, 'error');
+            };
+        } catch (error) {
+            console.log(error);
+            await sweet.fire('No se pudo traer las compensadas', error?.response?.data?.msg, 'error');
+        };
         tbody.innerHTML = "";
 
         let i = 1;

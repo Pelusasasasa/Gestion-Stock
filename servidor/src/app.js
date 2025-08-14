@@ -44,7 +44,7 @@ app.use('/gestion/remitos', require('./routes/remito.route'));
 
 app.use('/gestion/rubro', require('./routes/rubro'));
 
-app.use('/gestion/ventas', require('./routes/venta'));
+app.use('/gestion/ventas', require('./routes/venta.router'));
 
 app.use('/gestion/pedidos', require('./routes/pedido'));
 

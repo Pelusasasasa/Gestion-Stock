@@ -1,5 +1,6 @@
 const compensadaCTRL = {};
 
+const { agregarIngormacionCompensadas } = require('../helpers/agregarIngormacionCompensadas');
 const CuentaCompensada = require('../models/cuentaCorrComp');
 
 compensadaCTRL.crearCompensda = async(req,res)=>{
@@ -18,9 +19,28 @@ compensadaCTRL.crearCompensda = async(req,res)=>{
 }
 
 compensadaCTRL.traerPorCliente = async(req,res)=>{
-    const {id} = req.params;
-    const compensadas = await CuentaCompensada.find({$and:[{idCliente:id},{saldo:{$not:{$eq:0}}}]});
-    res.send(compensadas);
+    const { id } = req.params;
+
+    try {
+        const compensadas = await CuentaCompensada.find({
+            $and: [
+                {idCliente: id},
+                {saldo:{ $not: {$eq:0} }}
+            ]});
+
+        const compensadasConInformacion = await agregarIngormacionCompensadas(compensadas);
+
+        res.status(200).json({
+            ok: true,
+            compensadas: compensadasConInformacion
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error al traer las cuentas Compensadas'
+        })
+    }
 };
 
 compensadaCTRL.traerCompensada = async(req,res)=>{

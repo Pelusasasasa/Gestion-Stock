@@ -9,9 +9,13 @@
 }
 
 @media (max-width: 1100px){
-    #buscar,#saldo{
+    #buscar, #saldo{
         width: 10rem;
     }
+}
+
+#divBuscador, #divDolarTomado{
+    width: 10rem;
 }
 
 .buscador .inputs main {
@@ -85,4 +89,10 @@ table tbody td{
     overflow: auto;
     word-wrap: break-word;
     white-space: normal;
+}
+
+@media (width < 600px){
+    .buscador {
+        background-color: red;
+    }
 }

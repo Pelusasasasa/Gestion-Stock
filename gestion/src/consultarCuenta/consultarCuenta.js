@@ -15,6 +15,7 @@ const tbodyProducto = document.querySelector(".listaProductos tbody");
 const tbodyMovRecibo = document.querySelector(".listaMovRecibo tbody");
 const clienteInput = document.querySelector('#cliente');
 const saldo = document.querySelector('#saldo');
+const dolarTomado = document.querySelector('#dolarTomado');
 
 const actualizar = document.querySelector('.actualizar');
 const compensada = document.querySelector('.compensada');
@@ -38,7 +39,19 @@ let tipoLista = "compensada";
 ipcRenderer.on('recibir', async (e, args) => {
     const { tipo, informacion } = JSON.parse(args);
     if (tipo === "cliente") {
-        listaCompensada = (await axios.get(`${URL}compensada/traerCompensadas/${informacion}`)).data;
+        try {
+            const { data } = await axios.get(`${URL}compensada/traerCompensadas/${informacion}`);
+            
+            if(data.ok){
+                listaCompensada = data.compensadas;
+            }else{
+                await sweet.fire('No se pudo obtener las compensadas', data.msg, 'error');
+            };
+        } catch (error) {
+            console.log(error);
+            await sweet.fire('No se pudo traer las compensadas', error?.response?.data?.msg, 'error');
+        };
+
         listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${informacion}`)).data;
         try {
             const { data } = (await axios.get(`${URL}clientes/id/${informacion}`));
@@ -128,6 +141,50 @@ const borrarCuentaCompHist = async (e) => {
     }
 };
 
+const buscarCliente = async(e) => {
+    if (e.key === "Enter") {
+        if (buscar.value !== "") {
+            try {
+                const { data } = (await axios.get(`${URL}clientes/id/${buscar.value}`));
+                if(!data.ok) return await sweet.fire('Error al obtener el cliente', data.msg, 'error');
+                clienteTraido = data.cliente;
+            } catch (error) {
+                console.log(error);
+                return await sweet.fire('Error al obtener el cliente',`${error?.response?.data?.msg}`, 'error');
+            }
+
+            saldo.value = (clienteTraido.saldo).toFixed(2);
+            clienteInput.value = clienteTraido.nombre;
+
+            try {
+                const { data } = await axios.get(`${URL}compensada/traerCompensadas/${clienteTraido._id}`);
+                if(data.ok){
+                    listaCompensada = data.compensadas;
+                }else{
+                    await sweet.fire('No se pudo obtener las compensadas', data.msg, 'error');
+                };
+            } catch (error) {
+                console.log(error);
+                await sweet.fire('No se pudo traer las compensadas', error?.response?.data?.msg, 'error');
+            };
+
+            listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${clienteTraido._id}`)).data;
+            
+            if (tipoLista === "compensada") {
+                listarVentas(listaCompensada);
+            } else {
+                listarVentas(listaHistorica);
+            }
+        } else {
+            const options = {
+                path: './clientes/clientes.html',
+                botones: false,
+            }
+            ipcRenderer.send('abrir-ventana', options)
+        }
+    }
+}
+
 const clickCompensada = async (e) => {
     actualizar.removeAttribute('disabled');
     tipoLista = "compensada";
@@ -145,6 +202,8 @@ const clickCuenta = async (e) => {
         trSeleccionado = e.target.parentNode;
         trSeleccionado.classList.add('seleccionado');
 
+        dolarTomado.value = listaCompensada.find(elem => elem.nro_venta == id).dolar || 0;
+        
         if (trSeleccionado.children[3].innerText !== "Recibo") {
             movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
             tbodyProducto.innerHTML = "";
@@ -219,7 +278,6 @@ const listarVentas = async (lista) => {
         const tdSaldo = document.createElement('td');
         const tdCondicion = document.createElement('td');
 
-        console.log(tdCondicion)
         tdCondicion.classList.add('td-con-scroll');
 
         const date = new Date(venta.fecha);
@@ -456,42 +514,7 @@ actualizar.addEventListener('click', async e => {
 
 borrar.addEventListener('click', borrarCuentaCompHist);
 
-buscar.addEventListener('keypress', async e => {
-    if (e.key === "Enter") {
-        if (buscar.value !== "") {
-            try {
-                const { data } = (await axios.get(`${URL}clientes/id/${buscar.value}`));
-                if(!data.ok) return await sweet.fire('Error al obtener el cliente', data.msg, 'error');
-                clienteTraido = data.cliente;
-            } catch (error) {
-                console.log(error);
-                return await sweet.fire('Error al obtener el cliente',`${error?.response?.data?.msg}`, 'error');
-            }
-
-            saldo.value = (clienteTraido.saldo).toFixed(2);
-            clienteInput.value = clienteTraido.nombre;
-            if (clienteTraido === "") {
-                sweet.fire({ title: "Cliente no encontrado" });
-                buscar.value = "";
-                buscar.focus();
-            } else {
-                listaCompensada = (await axios.get(`${URL}compensada/traerCompensadas/${clienteTraido._id}`)).data;
-                listaHistorica = (await axios.get(`${URL}historica/traerPorCliente/${clienteTraido._id}`)).data;
-                if (tipoLista === "compensada") {
-                    listarVentas(listaCompensada);
-                } else {
-                    listarVentas(listaHistorica);
-                }
-            }
-        } else {
-            const options = {
-                path: './clientes/clientes.html',
-                botones: false,
-            }
-            ipcRenderer.send('abrir-ventana', options)
-        }
-    }
-});
+buscar.addEventListener('keypress', buscarCliente);
 
 compensada.addEventListener('click', clickCompensada);
 
