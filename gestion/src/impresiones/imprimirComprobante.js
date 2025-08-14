@@ -36,7 +36,7 @@ window.addEventListener('load',e=>{
 
         await ponerDatosVenta(datosVenta, auxDolar);
         await ponerDatosClientes(datosClientes);
-        await ponerDatosArticulos(movimientos, auxDolar);
+        await ponerDatosArticulos(movimientos, auxDolar, datosVenta);
 
         ipcRenderer.send('imprimir-ventana',JSON.parse(args)[0]);
     });
@@ -47,7 +47,12 @@ const ponerDatosVenta = (datos, auxDolar)=>{
     const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
     const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
     
-    dolar.innerText = datos?.dolar?.toFixed(2) ?? '0.00';
+    if(datos.condicion === 'INSTALADOR'){
+        dolar.innerText = datos?.dolar?.toFixed(2);
+    }else{
+        dolar.parentElement.style.display = 'none';
+    };
+
     numero.innerText = datos.numero.toString().padStart(8,'0');
     date.innerText = fechaParseada;
     tipoPago.innerText = datos.tipoVenta ?? datos.tipo_venta;
@@ -55,9 +60,9 @@ const ponerDatosVenta = (datos, auxDolar)=>{
     condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
 
     if(datos.tipo_venta !== 'RT' && datos.tipoVenta !== 'RT'){
-        subTotal.innerText = auxDolar ? ((datos.precio + datos.descuento) / parseFloat(dolar.innerText)).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
+        subTotal.innerText = auxDolar ? ((datos.precio + datos.descuento) / parseFloat(datos.dolar)).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
         descuento.innerText = datos?.descuento?.toFixed(2);
-        total.innerText = auxDolar ? (datos.precio / parseFloat(dolar.innerText)).toFixed(2) : datos.precio.toFixed(2);
+        total.innerText = auxDolar ? (datos.precio / parseFloat(datos.dolar)).toFixed(2) : datos.precio.toFixed(2);
     };
 };
 
@@ -70,11 +75,11 @@ const ponerDatosClientes = (datos)=>{
     cond_iva.innerHTML = datos.condicionIva.toUpperCase();
 };
 
-const ponerDatosArticulos = (datos, auxDolar)=>{
+const ponerDatosArticulos = (datos, auxDolar, venta)=>{
     datos.forEach(movimiento => {
         
         if (auxDolar) {
-            movimiento.precio = movimiento.precio / parseFloat(dolar.innerText);
+            movimiento.precio = movimiento.precio / parseFloat(venta.dolar);
         }
 
         const tr = document.createElement('tr');
