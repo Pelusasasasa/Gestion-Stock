@@ -222,6 +222,9 @@ const listarVentas = async (lista) => {
         console.log(tdCondicion)
         tdCondicion.classList.add('td-con-scroll');
 
+        console.log(tdCondicion)
+        tdCondicion.classList.add('td-con-scroll');
+
         const date = new Date(venta.fecha);
         let day = date.getDate();
         let month = date.getMonth() + 1;

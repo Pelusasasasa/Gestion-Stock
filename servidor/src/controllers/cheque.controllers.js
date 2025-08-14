@@ -24,6 +24,10 @@ chequeCTRL.postOne = async (req, res) => {
 
     const result = await validateCheque(req.body);
 
+<<<<<<< HEAD
+=======
+    console.log(result)
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
 
     if (!result.success) return res.status(400).json({
         msg: 'Error en el formato de los datos',
@@ -33,6 +37,7 @@ chequeCTRL.postOne = async (req, res) => {
 
 
     try {
+        console.log(result.data)
         const cheque = new Cheque(result.data);
         await cheque.save();
 

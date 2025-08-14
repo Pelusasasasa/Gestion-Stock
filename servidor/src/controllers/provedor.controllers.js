@@ -92,7 +92,11 @@ provedorCTRL.postProvedor = async (req, res) => {
         })
 
     } catch (error) {
+<<<<<<< HEAD
         console.error(error);
+=======
+        console.log(error);
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -112,7 +116,11 @@ provedorCTRL.patchProvedor = async (req, res) => {
             updateProvedor
         })
     } catch (error) {
+<<<<<<< HEAD
         console.error(error)
+=======
+        console.log(error)
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
         res.send({
             msg: error.message,
             ok: false

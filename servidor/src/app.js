@@ -12,7 +12,11 @@ app.use(cors());
 app.use(express.json());
 
 //routes
+<<<<<<< HEAD
 app.use('/gestion/clientes', require('./routes/cliente.route'));
+=======
+app.use('/gestion/clientes', require('./routes/cliente'));
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
 
 app.use('/gestion/compensada', require('./routes/compensada'));
 
@@ -20,6 +24,7 @@ app.use('/gestion/cuenta', require('./routes/cuenta'));
 
 app.use('/gestion/gastos', require('./routes/gasto'));
 
+<<<<<<< HEAD
 app.use('/gestion/historica', require('./routes/historica.route'));
 
 app.use('/gestion/marca', require('./routes/marca.route'));
@@ -27,6 +32,15 @@ app.use('/gestion/marca', require('./routes/marca.route'));
 app.use('/gestion/movimiento', require('./routes/movProducto.route'));
 
 app.use('/gestion/movRecibo', require('./routes/movRecibo.route'));
+=======
+app.use('/gestion/historica', require('./routes/historica'));
+
+app.use('/gestion/marca', require('./routes/marca.route'));
+
+app.use('/gestion/movimiento', require('./routes/movProducto'));
+
+app.use('/gestion/movRecibo', require('./routes/movRecibo'));
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
 
 app.use('/gestion/movVendedores', require('./routes/movVendedores'));
 
@@ -36,7 +50,11 @@ app.use('/gestion/numero', require('./routes/numero'));
 
 app.use('/gestion/presupuesto', require('./routes/presupuesto'));
 
+<<<<<<< HEAD
 app.use('/gestion/productos', require('./routes/producto.route'));
+=======
+app.use('/gestion/productos', require('./routes/producto'));
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
 
 app.use('/gestion/recibo', require('./routes/recibo'));
 
@@ -53,6 +71,7 @@ app.use('/gestion/servicios', require('./routes/servicioTecnico.route'));
 app.use('/gestion/vendedores', require('./routes/vendedor'));
 
 //Caja
+<<<<<<< HEAD
 app.use('/gestion/categoriaEvento', require('./routes/categoryEvento.routes'));
 app.use('/gestion/cheques', require('./routes/cheque.routes'));
 app.use('/gestion/evento', require('./routes/evento.routes'));
@@ -65,4 +84,13 @@ app.use('/gestion/tipoCuenta', require('./routes/tipoCuenta.routes'));
 app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
 app.use('/gestion/valores', require('./routes/valor.route'));
 
+=======
+app.use('/gestion/cheques', require('./routes/cheque.routes'));
+app.use('/gestion/provedores', require('./routes/provedor.routes'));
+app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
+app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
+app.use('/gestion/valores', require('./routes/valor.route'));
+
+
+>>>>>>> 6aadc1f11a9e0019334b8cbb53fa4cd3ef10910e
 module.exports = app;
