@@ -120,10 +120,25 @@ const cargarRemito = async () => {
     let aux = 0;
 
     for (let elem of remitosTraidos) {
-        const remito = (await axios.get(`${URL}remitos/forId/${elem}`)).data;
+       let remito = {};
+
+       try {
+         const { data } = (await axios.get(`${URL}remitos/forId/${elem}`));
+         if(data.ok){
+            remito = data.remito;
+         }else{
+            return await sweet.fire('No se pudo obtener los remito', data.msg, 'error');
+         }
+       } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se pudo obtener los remitos', error?.response?.data?.msg, 'error');
+       };
+
         const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
+       console.log(mov);
         textoObservaciones += remito.observaciones + ' ';
         movimientosRemitos.push(...mov);
+
         idCliente = remito.idCliente;
     };
 

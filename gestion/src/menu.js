@@ -8,7 +8,6 @@ require("dotenv").config();
 
 const URL = process.env.GESTIONURL;
 
-const archivo = require('./configuracion.json');
 const filePath = path.join(__dirname, 'config.json');
 let modulos = '';
 
@@ -22,7 +21,7 @@ const moduloCreate = {
   "remitos": true,
   "gastos": true,
   "servicioTecnico": true
-}
+};
 
 try {
     modulos = require('./config.json');
@@ -31,10 +30,9 @@ try {
     location.reload();
 }
 
-
 ipcRenderer.send('poner-cierre');
 
-const {abrirVentana, ponerNumero, cargarVendedor, verificarUsuarios} = require('./helpers');
+const {ponerNumero, cargarVendedor, verificarUsuarios} = require('./helpers');
 
 const ventas = document.querySelector('.ventas');
 const clientes = document.querySelector('.clientes');
@@ -43,20 +41,16 @@ const productos = document.querySelector('.productos');
 const consulta = document.querySelector('.consulta');
 const recibo = document.querySelector('.recibo');
 const remitos = document.querySelector('.remitos');
-const notaCredito = document.querySelector('.notaCredito');
 const servicioTecnico = document.querySelector('.servicioTecnico');
 
 const atajoVentas = document.getElementById('atajoVentas');
 const atajoAgregarCliente = document.getElementById('atajoAgregarCliente');
 const atajoAgregarProducto = document.getElementById('atajoAgregarProducto');
-const atajoModificarProducto = document.getElementById('atajoModificarProducto');
 const atajoNotaCredito = document.getElementById('atajoNotaCredito');
 
 let verVendedores;
 
 window.addEventListener('load',async e=>{
-
-    await cargarPrimerCliente();
 
     const vendedores = (await axios.get(`${URL}vendedores`)).data;
     if (!vendedores.find(vendedor => vendedor.permiso === 0)) {
@@ -167,7 +161,6 @@ document.addEventListener('keyup',async e=>{
     }
 });
 
-
 ventas.addEventListener('click',async e=>{
         const vendedor = await verificarUsuarios();
         if (vendedor) {
@@ -233,7 +226,6 @@ caja.addEventListener('click',async e=>{
                 title:"Contraseña incorrecta"
             });
             caja.click();
-
         };
 });
 
@@ -263,7 +255,7 @@ remitos.addEventListener('click', async e => {
     const vendedor = await verificarUsuarios();
     if(vendedor){
         location.href = `./remitos/remitos.html?vendedor=${vendedor._id}`;
-    }else{
+    }else if(vendedor === ''){
         await sweet.fire({
             title:"Contraseña incorrecta"
         })
@@ -277,11 +269,6 @@ servicioTecnico.addEventListener('click', async e => {
     location.href = `./servicioTecnico/servicio.html?vendedor=${user.codigo}&permiso=${user.permiso}`;
 });
 
-// notaCredito.addEventListener('click',e=>{
-//     location.href = "./venta/index.html?tipoFactura=notaCredito";
-//     ipcRenderer.send('sacar-cierre');
-// });
-
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero',async (e,args)=>{
     ponerNumero();
@@ -290,29 +277,6 @@ ipcRenderer.on('poner-numero',async (e,args)=>{
 ipcRenderer.on('libroIva',async (e,args)=>{
     location.href = "./libroIva/libroIva.html";
 });
-
-const cargarPrimerCliente = async()=>{
-    const id = (await axios.get(`${URL}clientes`)).data;
-    if (id === 1) {
-        const cliente = {};
-        cliente._id = 1;
-        cliente.nombre = "Consumidor Final";
-        cliente.telefono = "";
-        cliente.direccion = "CHAJARI";
-        cliente.localidad = "CHAJARI";
-        cliente.cuit = "00000000";
-        cliente.condicionFacturacion = 2;
-
-        try {
-            await axios.post(`${URL}clientes`,cliente);
-        } catch (error) {
-            console.log(error);
-            await sweet.fire({
-                title:"No se pudo cargar el primer cliene, cargarlo normal"
-            })
-        }
-    }
-};
 
 
 ipcRenderer.on('verificarUsuario', async(e,args) => {

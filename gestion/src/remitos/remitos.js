@@ -103,8 +103,6 @@ const handleCheckbox = async(e) => {
             elem.disabled = !elem.disabled;
         }
     }
-
-
 };
 
 const imprimirRemito = async(e) => {
@@ -112,9 +110,12 @@ const imprimirRemito = async(e) => {
     if(e.target.nodeName === 'BUTTON'){
         let cliente = '';
         const id = e.target.parentNode.parentNode.parentNode.id
-        const {data} = await axios.get(`${URL}remitos/forId/${id}`)
+        const { data } = await axios.get(`${URL}remitos/forId/${id}`);
+
+        if(!data.ok) return await Swal.fire('No se pudo obtener el remito', data.msg, 'error');
+
         try {
-            const { data: clienteTraido } = await axios.get(`${URL}clientes/id/${data.idCliente}`);
+            const { data: clienteTraido } = await axios.get(`${URL}clientes/id/${data.remito.idCliente}`);
             if(clienteTraido.ok){
                 cliente = clienteTraido.cliente;
             }else{
@@ -124,10 +125,10 @@ const imprimirRemito = async(e) => {
             console.log(error);
             return await Swal.fire('Error al obtener el cliente', error?.response?.clienteTraido?.msg, 'error');
         }
-        const { data: movs } = await axios.get(`${URL}movimiento/${data.numero}/RT`);
-        ipcRenderer.send('imprimir', ['negro', data, cliente, movs, false]);
+        const { data: movs } = await axios.get(`${URL}movimiento/${data.remito.numero}/RT`);
+        ipcRenderer.send('imprimir', ['negro', data.remito, cliente, movs, false]);
     }
-}
+};
 
 const listarMovs = (lista) => {
     tbodyMov.innerHTML = '';
@@ -243,7 +244,7 @@ const listarRemitos = (lista) => {
         
         tdFecha.innerText = fecha;
         tdCodCliente.innerText = elem.idCliente;
-        tdCliente.innerText = elem.cliente;
+        tdCliente.innerText = `${elem.cliente.length > 50 ? `${elem.cliente.slice(0,50)}...` : elem.cliente}` ;
         tdNumero.innerText = elem.numero.toString().padStart(8, '0');
         tdObseraciones.innerText = elem.observaciones;
         tdReimprimir.innerHTML = 

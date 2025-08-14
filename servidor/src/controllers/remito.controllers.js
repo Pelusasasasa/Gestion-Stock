@@ -16,9 +16,21 @@ remitoCTRL.getAll = async(req, res) => {
 remitoCTRL.getforid = async(req, res) => {
     const { id } = req.params;
 
-    const remito = await Remito.findOne({_id: id});
+    try {
+        const remito = await Remito.findById(id)
+            .populate('vendedor', 'nombre');
 
-    res.send(remito);
+        res.status(200).json({
+            remito,
+            ok: true
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo obtener el remito, hable con el administrador'
+        })
+    };
 };
 
 remitoCTRL.postOne = async(req, res) => {
