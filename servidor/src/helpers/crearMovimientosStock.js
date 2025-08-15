@@ -2,8 +2,6 @@ const movProducto = require("../models/movProducto");
 
 exports.crearMovimientosStock = async(listaProductos, venta) => {
 
-    console.log(venta.condicion);
-
     const movimientos = [];
     for(const {cantidad, producto, series} of listaProductos){
 

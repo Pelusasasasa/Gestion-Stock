@@ -25,7 +25,7 @@ exports.buscarMovimientosPorNROSeries = async(lista) => {
 
         return movs;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudieron obtener las ventas, hable con el administrador'

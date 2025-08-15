@@ -21,7 +21,7 @@ exports.cargarMovsRecibos = async(lista, numeroRecibo) => {
 
             movs.push(nuevoMovRecibo);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             bandera = false;
         }
     };

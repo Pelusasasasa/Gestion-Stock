@@ -26,7 +26,6 @@ const direccion = document.querySelector('#direccion');
 const fecha = document.querySelector('#fecha');
 const observaciones = document.getElementById('observaciones');
 
-
 const tbody = document.querySelector('tbody');
 const total = document.querySelector('#total');
 const imprimir = document.querySelector('.imprimir');
@@ -178,7 +177,17 @@ const ponerVenta = async (cuenta) => {
     tr.appendChild(tdSaldo);
 
     tbody.appendChild(tr);
-}
+};
+
+const verValorRecibo = () => {
+    if(cheque.checked){
+        return `CHEQUE`
+    }else if(tarjeta.checked){
+        return `TARJETA`
+    }else{
+        return 'EFECTIVO';
+    }
+};
 
 //Cuando hago un click que seleccione el input
 let inputSeleccionado = tbody;
@@ -266,65 +275,45 @@ imprimir.addEventListener('click', async e => {
     recibo.precio = parseFloat(total.value);
     recibo.vendedor = vendedor ? vendedor : '';
     recibo.caja = archivo.caja;
-
-    try {
-        //Vemos si es tarjeta para hacerla factura
-        if (tarjeta.checked) {
-            recibo.cod_comp = 11;
-            recibo.num_doc = "00000000";
-            recibo.cod_doc = 99;
-            recibo.tipo_venta = "T";
-            // await cargarFactura(recibo)
-        }
-        // cuentaAFavor && await crearCuentaCompensada(cuentaAFavor)
-        recibo.compensadas = await modificarCuentaCompensadas();
-    } catch (error) {
-        console.log(error)
-        await sweet.fire({
-            title: "No se pudo generar la venta"
-        })
-    };
-
-
+    recibo.compensadas = await modificarCuentaCompensadas();
+    recibo.valorRecibido = verValorRecibo();
+    
     // try {
     //     const { data } = await axios.get(`${URL}tipoCuenta/forText/Recibo`);
     //     await cargarMovCaja(recibo.cliente, '000R', recibo.numero, data.tipo._id, recibo.precio, "639dbc31dfdb8a1d243d19c2");
     // } catch (error) {
     //     console.log(error)
     // }
+
     try {
         const { data } = (await axios.post(`${URL}recibo`, recibo));
         if(data.ok){
-            console.log(data)
-            ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, true]);
+            if (cheque.checked) {
+                await ipcRenderer.send('abrir-ventana', {
+                    path: './cheque/agregarCheque.html',
+                    altura: 800,
+                    ancho: 600,
+                    reinicio: false,
+                    informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false])
+                });
+            }else if (tarjeta.checked) {
+                await ipcRenderer.send('abrir-ventana', {
+                    path: './tarjeta/agregarTarjeta.html',
+                    altura: 800,
+                    ancho: 600,
+                    reinicio: false,
+                    informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false])
+                });
+            } else {
+                ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
+                location.href = "../menu.html";
+            };
         }else{
             await sweet.fire('Error al generar el recibo', data?.msg, 'error');
-        }
+        };
     } catch (error) {
         console.log(error)
     }
-
-    // if (cheque.checked) {
-    //     await ipcRenderer.send('abrir-ventana', {
-    //         path: './cheque/agregarCheque.html',
-    //         altura: 800,
-    //         ancho: 600,
-    //         reinicio: false,
-    //         informacion: JSON.stringify([res, cliente, lista, false])
-    //     });
-    // } else if (tarjeta.checked) {
-    //     await ipcRenderer.send('abrir-ventana', {
-    //         path: './tarjeta/agregarTarjeta.html',
-    //         altura: 800,
-    //         ancho: 600,
-    //         reinicio: false,
-    //         informacion: JSON.stringify([res, cliente, lista, false])
-    //     });
-    // } else {
-    //     ipcRenderer.send('imprimir-recibo', [res, cliente, lista, false]);
-
-    //     location.href = "../menu.html";
-    // };
 });
 
 const crearCompensadaAFavor = async (saldo) => {

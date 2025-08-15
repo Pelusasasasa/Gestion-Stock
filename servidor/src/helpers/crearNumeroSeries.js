@@ -8,7 +8,7 @@ exports.crearNumeroSeries = async(lista) => {
             await serie.save();
         };
     } catch (error) {
-        console.log(error);
+        console.error(error);
         bandera = false;
     };
 

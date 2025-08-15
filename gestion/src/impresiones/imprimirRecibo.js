@@ -1,9 +1,7 @@
 const { ipcRenderer } = require("electron");
 
-
-
 const numeroRecibo = document.getElementById('numeroRecibo');
-const fecha = document.getElementById('fecha');
+const date = document.getElementById('fecha');
 const nombre = document.getElementById('nombre');
 const codigo = document.getElementById('codigo');
 const cuit = document.getElementById('cuit');
@@ -28,8 +26,12 @@ async function listar(e,args){
 }
 
 function listarDatosRecibo(recibo) {
+    const fecha = new Date(recibo.fecha);
+    const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
+    const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`;
+
+    date.innerText = fechaParseada;
     numeroRecibo.innerText = "R" + recibo.numero;
-    fecha.innerText = recibo.fecha.slice(0,10).split('-',3).reverse().join('/') + " - " + recibo.fecha.slice(11,19);
     valores.innerText = recibo.valorRecibido;
     total.innerText = recibo.precio.toFixed(2);
 };

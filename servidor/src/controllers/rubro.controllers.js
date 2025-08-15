@@ -31,7 +31,6 @@ rubroCTRL.putRubro = async(req,res)=>{
 
 rubroCTRL.deleteForId = async(req,res)=>{
     const {id} = req.params;
-    console.log(id)
     await Rubros.findOneAndDelete({_id:id});
     res.send();
 }

@@ -5,7 +5,6 @@ exports.crearHistorica = async(venta) => {
 
     try {
         const cliente = await Cliente.findById(venta.idCliente)
-
         const historica = {};
         historica.fecha = venta.fecha;
         historica.cliente = venta.cliente;
@@ -15,7 +14,8 @@ exports.crearHistorica = async(venta) => {
         historica.debe = venta.precio;
         historica.haber = 0;
         historica.saldo = cliente.saldo;
-        historica.condicion = venta.condicion; //Puede ser NORMAL o  INSTALADOR
+        //Puede ser EFECTIVO o TARJETA O CHEQUE si es Recibo y si es venta NORMAL O INSTALADOR
+        historica.condicion = venta.tipo_venta === 'RB' ? venta.valorRecibido : venta.condicion; 
         historica.observaciones = venta.observaciones;
 
         const nuevaHistorica = new Historica(historica);

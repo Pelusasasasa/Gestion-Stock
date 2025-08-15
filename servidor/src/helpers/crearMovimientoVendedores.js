@@ -12,7 +12,7 @@ exports.crearMovimientoVendedores = async(descripcion, vendedor) => {
         nuevoMovimiento.save();
         return true;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return false;
     }
 

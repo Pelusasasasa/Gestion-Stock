@@ -21,7 +21,7 @@ clienteCTRL.getsClientes = async (req, res) => {
             clientes
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo obtener los clientes, Hable con el administrador'
@@ -41,7 +41,6 @@ clienteCTRL.id = async (req, res) => {
 
 clienteCTRL.getClienteId = async (req, res) => {
     const { id } = req.params;
-    console.log(id);
 
     if(isNaN(id)) return res.status(400).json({
         ok: false,
@@ -61,7 +60,7 @@ clienteCTRL.getClienteId = async (req, res) => {
             cliente
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo obtener el cliente, Hable con el administrador'

@@ -46,7 +46,6 @@ servicioCTRL.getForText = async(req, res) => {
 servicioCTRL.post = async(req, res)=>{
     const now = new Date();
     req.body.fecha = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    console.log("a")
     const servicio = new Servicio(req.body);
     try {
         await servicio.save();

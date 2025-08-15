@@ -35,7 +35,7 @@ compensadaCTRL.traerPorCliente = async(req,res)=>{
             compensadas: compensadasConInformacion
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al traer las cuentas Compensadas'
@@ -59,7 +59,6 @@ compensadaCTRL.modificarCompensada = async(req,res)=>{
 
 compensadaCTRL.eliminarCuenta = async(req,res)=>{
     const {id} = req.params;
-    console.log(id)
     const compensada = await CuentaCompensada.findOneAndDelete({nro_venta:id});
     res.send(compensada);
 };

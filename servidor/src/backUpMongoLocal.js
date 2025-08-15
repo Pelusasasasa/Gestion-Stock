@@ -4,7 +4,7 @@ const fs = require('fs');
 
 //Configuracion
 const DB_NAME = 'gestion';
-const BACKUP_DIR = path.join(__dirname, 'backups');
+const BACKUP_DIR = path.join(__dirname, '../backups');
 
 if(!fs.existsSync(BACKUP_DIR)){
     fs.mkdirSync(BACKUP_DIR)
@@ -30,7 +30,7 @@ const backUpMongoLocal = () => {
             console.log(`Backup completado: ${backUpDir}`);
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
     
 };

@@ -21,7 +21,6 @@ cuentaCTRL.postCuenta = async (req, res) => {
 
 cuentaCTRL.deleteCuenta = async (req, res) => {
     const {id} = req.params;
-    console.log(id)
     const cuenta = await Cuenta.findOneAndDelete({idCuenta: id})
     res.send(cuenta);
 };

@@ -126,7 +126,7 @@ ventaCTRL.VentasDia = async(req,res)=>{
         }).populate('vendedor', 'nombre');
         res.send(ventas);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudieron obtener las ventas, hable con el administrador'
@@ -155,7 +155,7 @@ ventaCTRL.ventasMes = async(req,res)=>{
             ventas
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudieron obtener las ventas, hable con el administrador'

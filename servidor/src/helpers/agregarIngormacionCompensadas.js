@@ -10,8 +10,7 @@ exports.agregarIngormacionCompensadas = async(lista) => {
                 {tipo_venta: 'CC'}
             ]
         });
-        
-        compensada.dolar = venta.dolar;
+        compensada.dolar = venta?.dolar ?? '0';
         compensadas.push(compensada);
     };
 

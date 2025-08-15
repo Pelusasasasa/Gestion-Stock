@@ -30,7 +30,6 @@ reciboCTRL.cargarRecibo = async(req,res)=>{
                 msg: "Error al modificar el saldo del cliente"
             });
         };
-    
         const historica = await crearHistorica(nuevoRecibo);
         if(!historica){
             return res.status(400).json({
@@ -39,7 +38,7 @@ reciboCTRL.cargarRecibo = async(req,res)=>{
             });
         };
         
-        const compensadasModificadas = await actualizarCompensadas(req.body.compensadas);
+        const compensadasModificadas = await actualizarCompensadas(req.body.compensadas, nuevoRecibo);
     
         if(!compensadasModificadas.ok) return res.status(400).json({
             ok: false,
@@ -59,7 +58,7 @@ reciboCTRL.cargarRecibo = async(req,res)=>{
             cliente: saldoModificado.cliente
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo realizar el recibo, hable con el administrador'
@@ -88,14 +87,12 @@ reciboCTRL.recibosMes = async(req,res)=>{
 
     let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`)
     let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
-    console.log(fechaConMesSig)
     const recibos = await Recibo.find({
         $and:[
             {fecha:{$gte:fechaConMes}},
             {fecha:{$lte:fechaConMesSig}}
         ]
     });
-    console.log(recibos)
     res.send(recibos);
 };
 
@@ -115,7 +112,6 @@ reciboCTRL.recibosAnio = async(req,res)=>{
 
 reciboCTRL.getForNumber = async(req,res)=>{
     const {number} = req.params;
-    console.log(number)
     const recibo = await Recibo.findOne({numero:number});
     res.send(recibo)
 };

@@ -19,7 +19,6 @@ const Historica = new mongoose.Schema({
     },
     condicion:{
         type:String,
-        default:"NORMAL",
         set: value => value.toUpperCase()
     },
     debe:{

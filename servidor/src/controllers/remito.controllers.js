@@ -25,7 +25,7 @@ remitoCTRL.getforid = async(req, res) => {
             ok: true
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo obtener el remito, hable con el administrador'
