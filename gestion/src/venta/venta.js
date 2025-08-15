@@ -3,7 +3,7 @@ const sweet = require('sweetalert2');
 require("dotenv").config();
 
 const { ipcRenderer } = require('electron');
-const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName } = require('../helpers');
+const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName, sacarIva } = require('../helpers');
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
 
@@ -232,7 +232,6 @@ const eliminarCuentas = async () => {
     };
 };
 
-
 //Lo que hacemos es listar el cliente traido
 const listarCliente = async (id) => {
     codigo.value = id;
@@ -393,56 +392,6 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     };
 
 
-};
-
-const sacarIva = (lista, condicion) => {
-    let totalIva0 = 0;
-    let totalIva21 = 0;
-    let gravado21 = 0;
-    let gravado0 = 0;
-    let totalIva105 = 0;
-    let gravado105 = 0;
-    if (condicion === 'NORMAL') {
-        lista.forEach(({ producto, cantidad }) => {
-            if (producto.impuesto === 21) {
-                gravado21 += cantidad * producto.precio / 1.21;
-                totalIva21 += cantidad * producto.precio / 1.21 * 21 / 100;
-            } else if (producto.impuesto === 10.5) {
-                gravado105 += cantidad * producto.precio / 1.105
-                totalIva105 += cantidad * producto.precio / 1.105 * 10.5 / 100;
-            } else {
-                gravado0 += cantidad * producto.precio / 1;
-                totalIva0 += (cantidad * producto.precio) - (producto.precio / 1);
-            }
-        });
-    } else {
-        lista.forEach(({ producto, cantidad }) => {
-            let auxCosto = producto.costoDolar === 0 ? producto.costo * producto.impuesto / 100 : producto.costoDolar * dolar;
-            let auxCostoIva = auxCosto + (auxCosto * producto.impuesto / 100);
-            if (producto.impuesto === 21) {
-                gravado21 += cantidad * auxCostoIva / 1.21;
-                totalIva21 += cantidad * auxCostoIva / 1.21 * 21 / 100;
-            } else if (producto.impuesto === 10.5) {
-                gravado105 += cantidad * auxCostoIva / 1.105
-                totalIva105 += cantidad * auxCostoIva / 1.105 * 10.5 / 100;
-            } else {
-                gravado0 += cantidad * auxCostoIva / 1;
-                totalIva0 += (cantidad * auxCostoIva) - (auxCostoIva / 1);
-            }
-        });
-    }
-
-    let cantIva = 0
-    if (gravado0 !== 0) {
-        cantIva++;
-    }
-    if (gravado21 !== 0) {
-        cantIva++;
-    }
-    if (gravado105 !== 0) {
-        cantIva++;
-    }
-    return [parseFloat(totalIva21.toFixed(2)), parseFloat(totalIva0.toFixed(2)), parseFloat(gravado21.toFixed(2)), parseFloat(gravado0.toFixed(2)), parseFloat(totalIva105.toFixed(2)), parseFloat(gravado105.toFixed(2)), cantIva]
 };
 
 const togglePrecios = async (e) => {
@@ -618,7 +567,7 @@ facturar.addEventListener('click', async e => {
         venta.cod_doc = await verCodigoDocumento(cuit.value);
         venta.condicionIva = condicionIva.value === "Responsable Inscripto" ? "Inscripto" : condicionIva.value;
 
-        const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, lista.value); //sacamos el iva de los productos
+        const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, venta.condicion); //sacamos el iva de los productos
         venta.iva21 = iva21;
         venta.iva0 = iva0;
         venta.gravado0 = gravado0;

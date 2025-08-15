@@ -85,7 +85,6 @@ funciones.tablaCondicionIVAReceptorId = (condicion) => {
 }
 
 funciones.cargarFactura = async (venta,notaCredito)=>{
-    console.log(venta)
     const fecha = new Date(Date.now()-((new Date()).getTimezoneOffset()*60000)).toISOString().split('T')[0];
     const {AppServer, AuthServer, DbServer} = await afip.ElectronicBilling.getServerStatus();
     console.log('Estado del servidor')
@@ -97,6 +96,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
     console.log(parseFloat(venta.facturaAnterior));
     let aux = venta.condicionIva === "Inscripto" ? 1 : 6
     let ventaAnterior = venta.facturaAnterior && await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior),puntoVenta,aux);
+
     let data = {
         'cantReg':1,
         'CbteTipo':venta.cod_comp,
@@ -118,6 +118,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'MonCotiz' 	: 1,
         'Iva':[],
     };
+
     notaCredito && (data.CbtesAsoc = [
         {
             "Tipo":ventaAnterior.CbteTipo,
@@ -508,7 +509,61 @@ funciones.sacarCosto = (costo,costoDolar,impuesto=0,dolar)=>{
         const retorno = redondear(costo +(costo * impuesto / 100),2);
         return retorno
     }
-}
+};
+
+funciones.sacarIva = (lista, condicion) => {
+    let totalIva0 = 0;
+    let totalIva21 = 0;
+    let gravado21 = 0;
+    let gravado0 = 0;
+    let totalIva105 = 0;
+    let gravado105 = 0;
+
+    if (condicion === 'NORMAL') {
+        lista.forEach(({ producto, cantidad }) => {
+            if (producto.impuesto === 21) {
+                gravado21 += cantidad * producto.precio / 1.21;
+                totalIva21 += cantidad * producto.precio / 1.21 * 21 / 100;
+            } else if (producto.impuesto === 10.5) {
+                gravado105 += cantidad * producto.precio / 1.105
+                totalIva105 += cantidad * producto.precio / 1.105 * 10.5 / 100;
+            } else {
+                gravado0 += cantidad * producto.precio / 1;
+                totalIva0 += (cantidad * producto.precio) - (producto.precio / 1);
+            }
+        });
+
+    } else {
+        
+        lista.forEach(({ producto, cantidad }) => {
+            let auxCosto = producto.costoDolar === 0 ? producto.costo * producto.impuesto / 100 : producto.costoDolar * dolarInstalador;
+            let auxCostoIva = auxCosto + (auxCosto * producto.impuesto / 100);
+
+            if (producto.impuesto === 21) {
+                gravado21 += cantidad * auxCostoIva / 1.21;
+                totalIva21 += cantidad * auxCostoIva / 1.21 * 21 / 100;
+            } else if (producto.impuesto === 10.5) {
+                gravado105 += cantidad * auxCostoIva / 1.105
+                totalIva105 += cantidad * auxCostoIva / 1.105 * 10.5 / 100;
+            } else {
+                gravado0 += cantidad * auxCostoIva / 1;
+                totalIva0 += (cantidad * auxCostoIva) - (auxCostoIva / 1);
+            }
+        });
+    }
+
+    let cantIva = 0
+    if (gravado0 !== 0) {
+        cantIva++;
+    }
+    if (gravado21 !== 0) {
+        cantIva++;
+    }
+    if (gravado105 !== 0) {
+        cantIva++;
+    }
+    return [parseFloat(totalIva21.toFixed(2)), parseFloat(totalIva0.toFixed(2)), parseFloat(gravado21.toFixed(2)), parseFloat(gravado0.toFixed(2)), parseFloat(totalIva105.toFixed(2)), parseFloat(gravado105.toFixed(2)), cantIva]
+};
 
 funciones.verificarDatos = async ()=>{
     if (codigo.value === "") {
