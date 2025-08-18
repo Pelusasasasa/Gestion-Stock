@@ -112,12 +112,11 @@ window.addEventListener('load',async e=>{
 
     ventas = (await axios.get(`${URL}ventas/dia/${fecha.value}`)).data;
     recibos = (await axios.get(`${URL}recibo/dia/${fecha.value}`)).data;
-    ventas = [...ventas,...recibos];
     gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
-    cuentasCorrientes = ((await axios.get(`${URL}ventas/dia/${fecha.value}`)).data).filter(venta => venta.tipo_venta === "CC");
 
-    console.log(ventas);
+    cuentasCorrientes = ventas.filter(venta => venta.tipo_venta === "CC");
 
+    ventas = [...ventas,...recibos];
     listarVentas(ventas);
 });
 
