@@ -68,12 +68,15 @@ reciboCTRL.cargarRecibo = async(req,res)=>{
 
 reciboCTRL.recibosDia = async(req,res)=>{
     const {fecha} = req.params;
-    const iniciodia = new Date(fecha + "T00:00:00.000Z");
-    const findia = new Date(fecha + "T23:59:59.999Z");
+    const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
+    const inicioDia = new Date(fechaBase);
+    const finDia = new Date(fechaBase);
+    finDia.setHours(23, 59, 59, 999);
+    
     const recibos = await Recibo.find({
         $and:[
-            {fecha:{$gte:iniciodia}},
-            {fecha:{$lte:findia}}
+            {fecha:{$gte:inicioDia}},
+            {fecha:{$lte:finDia}}
         ]
     })
     res.send(recibos);

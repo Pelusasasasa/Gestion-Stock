@@ -91,6 +91,7 @@ borrar.addEventListener('click', async() => {
 });
 
 const ponerPrimerCuenta = (lista) => {
+    if(lista.length === 0) return;
     cuentas.value = lista[0].cuenta + ' - ' + lista[0].idCuenta;
     cuentas.id = lista[0].idCuenta;
 };

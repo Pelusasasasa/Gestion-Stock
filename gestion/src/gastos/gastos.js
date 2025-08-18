@@ -97,7 +97,9 @@ aceptar.addEventListener('click',async e=>{
         return;
     };
 
-    gasto.fecha = fecha.value;
+    const ahora = new Date();
+    const hora = ahora.toTimeString().slice(0, 8)
+    gasto.fecha = fecha.value + 'T'  + hora;
     gasto.descripcion = descripcion.value.toUpperCase();
     gasto.importe = importe.value;
     gasto.cuenta = (await axios.get(`${URL}cuenta/idCuenta/${cuenta.value}`)).data.cuenta;

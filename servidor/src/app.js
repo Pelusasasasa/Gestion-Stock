@@ -17,6 +17,8 @@ app.use('/gestion/clientes', require('./routes/cliente.route'));
 
 app.use('/gestion/compensada', require('./routes/compensada'));
 
+app.use('/gestion/caja', require('./routes/caja.routes'));
+
 app.use('/gestion/cuenta', require('./routes/cuenta'));
 
 app.use('/gestion/gastos', require('./routes/gasto'));
