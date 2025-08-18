@@ -28,7 +28,7 @@ exports.crearMovimientosStock = async(listaProductos, venta) => {
             movimiento.rubro = producto.rubro;
             movimiento.cantidad = cantidad;
             movimiento.iva = producto.impuesto;
-            movimiento.precio = precio;
+            movimiento.precio = producto.precio;
             movimiento.series = series;
             movimiento.nro_venta = venta.numero;
             movimiento.tipo_comp = venta.tipo_comp;
