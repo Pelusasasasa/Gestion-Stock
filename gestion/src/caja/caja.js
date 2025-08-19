@@ -1,25 +1,14 @@
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-    results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+const {  redondear, parsearFecha, getParameterByName } = require("../helpers");
+const sweet = require('sweetalert2');
+const axios  = require("axios");
+require("dotenv").config();
+
+const {vendedores} = require('../configuracion.json');
 
 let vendedor = getParameterByName('vendedor');
 let permiso = getParameterByName('permiso');
 
-const axios  = require("axios");
-require("dotenv").config();
 const URL = process.env.GESTIONURL;
-
-const { cerrarVentana, redondear, parsearFecha } = require("../helpers");
-const sweet = require('sweetalert2');
-
-const {vendedores} = require('../configuracion.json');
-
-let seleccionado;
-let subSeleccionado;
-
 const tarjeta = document.querySelector('.tarjeta');
 const contado = document.querySelector('.contado');
 
@@ -42,24 +31,20 @@ const tbodyGastos = document.querySelector('.tbodyGastos');
 const volver = document.querySelector('.volver');
 const total = document.querySelector('#total');
 
-const pestaña = document.querySelector('.pestaña')
+const pestaña = document.querySelector('.pestaña');
 
-let ventas = [];
-let recibos = [];
-let gastos = [];
-let presupuestos = [];
-let cuentasCorrientes = [];
-let tipoVenta = "CD";
-let filtro = "Ingresos";
-const fechaHoy = new Date();
-let d = fechaHoy.getDate();
-let m = fechaHoy.getMonth() + 1;
-let a = fechaHoy.getFullYear(); 
 
-m = m<10 ? `0${m}`: m;
-d = d<10 ? `0${d}`: d;
+let seleccionado, ventas = [], recibos = [], gastos = [], presupuestos = [], cuentasCorrientes = [], filtro = "Ingresos",
+
+//La idea es que cada vez que necesimetos re contstruir las ventas llamemos a este funcion
+tipoFecha = 'dia',
+tipoVenta = "CD",
+date = '';
 
 pestaña.addEventListener('click',async e=>{
+    const gastos = document.querySelector('.gastos');
+    const listado = document.querySelector('.listado');
+
     if (e.target.parentNode.nodeName === "MAIN") {
         if (vendedores && permiso !== "0" && e.target.innerHTML === "Gastos") {
             await sweet.fire({
@@ -71,125 +56,53 @@ pestaña.addEventListener('click',async e=>{
             filtro = e.target.innerHTML;
         }
         if (filtro === "Gastos") {
-            document.querySelector('.gastos').classList.remove('none');
-            document.querySelector('.listado').classList.add('none');
-            //Esconder botones
+            gastos.classList.remove('none');
+            listado.classList.add('none');
             tarjeta.classList.add('none');
             contado.classList.add('none');
-            let retornar = await verQueTraer();
-            listarGastos(retornar);
+
+            buscar();
         }else if(filtro === "Ingresos"){
-            document.querySelector('.listado').classList.remove('none');
-            document.querySelector('.gastos').classList.add('none');
-            //Mostrar botones
+            listado.classList.remove('none');
+            gastos.classList.add('none');
             tarjeta.classList.remove('none');
             contado.classList.remove('none');
-            let retornar = await verQueTraer();
-            tipoVenta = "CD";
 
-            listarVentas(retornar);
+            tipoVenta = "CD";
+            buscar();
         }else if(filtro === "Presupuestos"){
             contado.classList.remove('none');
             tarjeta.classList.add('none');
-            let retornar = await verQueTraer();
+
             tipoVenta = "PP";
-            listarVentas(retornar)
+            buscar();
         }else{
-            document.querySelector('.listado').classList.remove('none');
-            document.querySelector('.gastos').classList.add('none');
-            //Esconder botones
+            listado.classList.remove('none');
+            gastos.classList.add('none');            
             tarjeta.classList.add('none');
             contado.classList.add('none');
             tipoVenta = "CC";
-            listarVentas(cuentasCorrientes);
+
+            buscar();
         }
     }
 });
 
 window.addEventListener('load',async e=>{
-    fecha.value = `${a}-${m}-${d}`;
-    selectMes.value = m;
-    inputAnio.value = a;
+    
+    fecha.value = parsearFecha(new Date).slice(0, 10).split('/', 3).reverse().join('-');
+    selectMes.value = parsearFecha(new Date).slice(0, 10).split('/', 3)[1];
+    inputAnio.value = parsearFecha(new Date).slice(0, 10).split('/', 3)[2];
 
-    const { data } = await axios.get(`${URL}caja/dia/${fecha.value}`);
-
-    ventas = data.ventas;
-    recibos = data.recibos;
-    gastos = data.gastos;
-    cuentasCorrientes = ventas.filter(venta => venta.tipo_venta === "CC");
-
-    ventas = [...ventas,...recibos];
-    listarVentas(ventas);
+    buscar();
 });
-
-const verQueTraer = async()=>{
-    if (botonSeleccionado.classList.contains("botonDia")) {
-        if (filtro === "Ingresos") {
-            try {
-                const { data } = await axios.get(`${URL}caja/dia/${fecha.value}`);
-                if( data.ok ){
-                    ventas = data.ventas;
-                    recibos = data.recibos;
-                }else{
-                    return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del dia', 'error');
-                }
-            } catch (error) {
-                return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-            };
-
-            return([...ventas,...recibos]);
-
-        }else if(filtro === "Presupuestos"){
-            presupuestos = (await axios.get(`${URL}presupuesto/forDay/${fecha.value}`)).data;
-            return presupuestos
-        }else{
-            return ((await axios.get(`${URL}gastos/dia/${fecha.value}`)).data);
-        }
-    }else if(botonSeleccionado.classList.contains("botonMes")){
-        if (filtro === "Ingresos") {
-
-            try {
-                const { data } = await axios.get(`${URL}caja/mes/${selectMes.value}`);
-                if( data.ok ) {
-                    ventas = data.ventas;
-                    recibos = data.recibos;
-                }else{
-                    return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
-                }
-            } catch (error) {
-                console.log(error)
-                return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-            };
-
-            return([...ventas,...recibos])
-        };
-    }else{
-        if (filtro === "Ingresos") {
-            try {
-                const { data } = (await axios.get(`${URL}caja/anio/${inputAnio.value}`));
-                if(data.ok){
-                    ventas = data.ventas;
-                    recibos = data.recibos;
-                    return([...ventas,...recibos])
-                }else{
-                    await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del año', 'error');
-                };
-            } catch (error) {
-                console.log(error);
-                await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-            }
-            
-        }else{
-            return ((await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data)
-        }
-    }
-};
 
 //Cuando se hace click en el boton tarjeta, lo que hacemos es mostrar las ventas con tarjetas
 tarjeta.addEventListener('click',e=>{
     if(!tarjeta.classList.contains('buttonSeleccionado')){
         contado.classList.remove('buttonSeleccionado');
         tarjeta.classList.add('buttonSeleccionado');
+
         tipoVenta = "T";
         listarVentas(ventas)
     };
@@ -215,74 +128,26 @@ botonMes.addEventListener('click',async e=>{
     dia.classList.add('none');
     anio.classList.add('none');
 
+    tipoFecha = 'mes';
 
-    //vemos que tipo de filtro es y ahi vemos si traemos los ingresos o gastos
-    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-        try {
-            const { data } = await axios.get(`${URL}caja/mes/${selectMes.value}`);
+    buscar();
 
-            if(data.ok){
-                ventas = data.ventas;
-                recibos = data.recibos;
-                cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-            }else{
-                return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
-            }
-        } catch (error) {
-            console.log(error);
-            return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-        };
-
-        if (filtro === "Ingresos") {
-            listarVentas([...ventas,...recibos]);
-        }else{
-            listarVentas(cuentasCorrientes);
-        }
-    }else if(filtro === "Presupuestos"){
-        presupuestos = (await axios.get(`${URL}presupuesto/forMonth/${selectMes.value}`)).data;
-        listarVentas(presupuestos);
-    }else{
-        gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
-        listarGastos(gastos);
-    }
 });
 
 //muestra las ventas del dia cuando tocamos en el boton
 botonDia.addEventListener('click',async e=>{
     botonSeleccionado.classList.remove('seleccionado');
     botonSeleccionado = botonDia;
+
     dia.classList.remove('none');
     mes.classList.add('none');
     anio.classList.add('none');
-    botonSeleccionado.classList.add('seleccionado');
-    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
 
-        try {
-            const { data } = await axios.get(`${URL}/caja/dia/${fecha.value}`);
-            if(data.ok){
-                ventas = data.ventas;
-                recibos = data.recibos;
-                cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-            }else{
-                return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del dia', 'error');
-            }
-        } catch (error) {
-            console.log(error);
-            return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-        };
-        
-        if (filtro === "Ingresos") {
-            listarVentas([...ventas,...recibos]);
-        }else{
-            listarVentas(cuentasCorrientes);
-        }
-    }else if(filtro === "Presupuestos"){
-        presupuestos = (await axios.get(`${URL}presupuesto/forDay/${fecha.value}`)).data;
-        listarVentas(presupuestos);
-    }else{
-        gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
-        listarGastos(gastos);
-    }
+    botonSeleccionado.classList.add('seleccionado');
+
+    tipoFecha = 'dia';
+
+    buscar();
 });
 
 //muestra las ventas del año cuando tocamos en el boton
@@ -294,130 +159,27 @@ botonAnio.addEventListener('click',async e=>{
     mes.classList.add('none');
     botonSeleccionado.classList.add('seleccionado');
 
-    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-        try {
-            const { data } = await axios.get(`${URL}caja/anio/${inputAnio.value}`);
-            if(data.ok){
-                ventas = data.ventas;
-                recibos = data.recibos;
-                cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-            }else{
-                return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del año', 'error');
-            }
-        } catch (error) {
-            console.log(error);
-            return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-        };
+    tipoFecha = 'anio'
 
-        if (filtro === "Ingresos") {
-            listarVentas([...ventas,...recibos]);
-        }else{
-            listarVentas(cuentasCorrientes);
-        };
-
-    }else if(filtro === "Presupuestos"){
-        presupuestos = (await axios.get(`${URL}presupuesto/forYear/${inputAnio.value}`)).data;
-        listarVentas(presupuestos);
-    }else{
-        gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
-        listarGastos(gastos);
-    }
+    buscar()
 });
 
 fecha.addEventListener('keypress',async e=>{
     if ((e.key === "Enter")) {
-        if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-            try {
-                const { data } = await axios.get(`${URL}caja/dia/${fecha.value}`);
-
-                if(data.ok){
-                    ventas = data.ventas;
-                    recibos = data.recibos;
-                    cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-                }else{
-                    return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del dia', 'error');
-                }
-            } catch (error) {
-                console.log(error);
-                return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-            };
-
-            if (filtro === "Ingresos") {
-                listarVentas([...ventas,...recibos]);
-            }else{
-                listarVentas(cuentasCorrientes);
-            }
-        }else if(filtro === "Presupuestos"){
-            presupuestos = (await axios.get(`${URL}presupuesto/forDay/${fecha.value}`)).data;
-            listarVentas(presupuestos);
-        }else{
-            gastos = (await axios.get(`${URL}gastos/dia/${fecha.value}`)).data;
-            listarGastos(gastos);
-        }
-    }
+        tipoFecha = 'dia';
+        buscar();
+    };
 });
 
 selectMes.addEventListener('click',async e=>{
-    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-
-        try {
-            const { data } = await axios.get(`${URL}caja/mes/${selectMes.value}`);
-            if(data.ok){
-                ventas = data.ventas;
-                recibos = data.recibos;
-                cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-            }else{
-                return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
-            }
-        } catch (error) {
-            console.log(error);
-            return await sweet.fire('Error al obtener informacion de la caja', error?.response?.data?.msg, 'error');
-        };
-        
-
-        if (filtro === "Ingresos") {
-            listarVentas([...ventas,...recibos]);
-        }else{
-            listarVentas(cuentasCorrientes)
-        }
-    }else if(filtro === "Presupuestos"){
-        presupuestos = (await axios.get(`${URL}presupuesto/forMonth/${selectMes.value}`)).data;
-        listarVentas(presupuestos);
-    }else{
-        gastos = (await axios.get(`${URL}gastos/mes/${selectMes.value}`)).data;
-        listarGastos(gastos);
-    }
+    tipoFecha = 'mes';
+    buscar();
 });
 
 inputAnio.addEventListener('keypress',async e=>{
     if (e.key === "Enter") {
-        if (filtro === "Ingresos") {
-            try {
-                const { data } = await axios.get(`${URL}caja/anio/${inputAnio.value}`);
-                if(data.ok){
-                    ventas = data.ventas;
-                    recibos = data.recibos;
-                    cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
-                }else{
-                    return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del año', 'error');
-                }
-            } catch (error) {
-                console.log(error);
-                await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
-            };
-            
-            if (condition) {
-                listarVentas([...ventas,...recibos]);
-            }else{
-                listarVentas(cuentasCorrientes);
-            };
-        }else if(filtro === "Presupuestos"){
-            presupuestos = (await axios.get(`${URL}presupuesto/forYear/${inputAnio.value}`)).data;
-            listarVentas(presupuestos);
-        }else{
-            gastos = (await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data;
-            listarGastos(gastos)
-        }
+        tipoFecha = 'anio';
+        buscar();
     }
 });
 
@@ -479,12 +241,52 @@ tbodyGastos.addEventListener('click',e=>{
     seleccionado.classList.add('seleccionado')
 });
 
-const listarVentas = async (ventas)=>{
-    console.log("a");
+const buscar = async() => {
+    
+    if(tipoFecha === 'dia'){
+        date = fecha.value;
+    }else if(tipoFecha === 'mes'){
+        date = selectMes.value;
+    }else if(tipoFecha === 'anio'){
+        date = inputAnio.value;
+    };
+    
+    //vemos que tipo de filtro es y ahi vemos si traemos los ingresos o gastos
+    if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
+        try {
+            const { data } = await axios.get(`${URL}caja/${tipoFecha}/${date}`);
+
+            if(data.ok){
+                ventas = data.ventas.filter(venta=>venta.tipo_venta === "CD");
+                recibos = data.recibos;
+                cuentasCorrientes = data.ventas.filter(venta=>venta.tipo_venta === "CC");
+            }else{
+                return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
+        };
+
+        if (filtro === "Ingresos") {
+            listarVentas([...ventas,...recibos]);
+        }else{
+            listarVentas(cuentasCorrientes);
+        }
+    }else if(filtro === "Presupuestos"){
+        presupuestos = (await axios.get(`${URL}presupuesto/${tipoFecha}/${date}`)).data;
+        listarVentas(presupuestos);
+    }else{
+        gastos = (await axios.get(`${URL}gastos/${tipoFecha}/${date}`)).data;
+        listarGastos(gastos);
+    }
+};
+
+const listarVentas = async (comprobantes)=>{
     tbody.innerHTML = ``;
     let lista = [];
     //organizamos las ventas por fecha
-    ventas.sort((a,b)=>{
+    comprobantes.sort((a,b)=>{
         if (a.fecha>b.fecha) {
             return 1;
         }else if(b.fecha>a.fecha){
@@ -492,15 +294,12 @@ const listarVentas = async (ventas)=>{
         }
         return 0;
     });
+
     //filtramos las ventas si son contadas o tarjeta
-    if (tipoVenta === "CD") {
-        lista = ventas.filter(venta=>(venta.tipo_venta === "CD"));
-    }else if(tipoVenta === "CC"){
-        lista = ventas;
-    }else if(tipoVenta === "T"){
-        lista = ventas.filter(venta=>venta.tipo_venta === "T");
+    if(tipoVenta === "T"){
+        lista = comprobantes.filter(venta=>venta.tipo_venta === "T");
     }else{
-        lista = ventas;
+        lista = comprobantes;
     };
 
     let totalVenta = 0;
