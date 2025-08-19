@@ -37,7 +37,7 @@ app.use('/gestion/nroSerie', require('./routes/nroSerie'));
 
 app.use('/gestion/numero', require('./routes/numero'));
 
-app.use('/gestion/presupuesto', require('./routes/presupuesto'));
+app.use('/gestion/presupuesto', require('./routes/presupuesto.route'));
 
 app.use('/gestion/productos', require('./routes/producto.route'));
 
@@ -69,7 +69,7 @@ app.use('/gestion/tipoTarjeta', require('./routes/tipoTarjeta.routes'));
 app.use('/gestion/valores', require('./routes/valor.route'));
 
 setInterval(() => {
-    clg('Backup de la base de datos en proceso...');
+    console.log('Backup de la base de datos en proceso...');
     backUpMongoLocal();
 }, 1000 * 60 * 60)
 

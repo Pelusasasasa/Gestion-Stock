@@ -37,6 +37,11 @@ const Recibo = new Schema({
     valorRecibido:{
         type:String,
         required:true
+    },
+    vendedor: {
+        type: Types.ObjectId,
+        ref: 'Vendedor',
+        required: true
     }
 
 });

@@ -93,7 +93,7 @@ presupuestoCTRL.getForMonth = async(req,res)=>{
             {fecha:{$gte:inicioMes}},
             {fecha:{$lt:finMes}}
         ]
-    });
+    }).populate('vendedor', 'nombre');
     res.send(presupuestos);
 };
 
@@ -107,7 +107,7 @@ presupuestoCTRL.getForYear = async(req,res)=>{
             {fecha:{$gte:inicioAño}},
             {fecha:{$lte:finAño}}
         ]
-    });
+    }).populate('vendedor', 'nombre');
     res.send(presupuestos);
 };
 

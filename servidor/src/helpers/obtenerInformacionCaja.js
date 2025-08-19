@@ -22,7 +22,7 @@ exports.traerInformacionCajaDelDia = async(req, res) => {
                 {fecha: {$gte: inicioDia}},
                 {fecha: {$lte: finDia}}
             ]
-        });
+        }).populate('vendedor', 'nombre');;
 
         const gastos = await Gasto.find({
             $and: [
@@ -60,7 +60,7 @@ exports.traerInformacionCajaDelMes = async(req, res) => {
             $expr: { $eq: [{ $month: "$fecha" }, mes] }
         }).populate('vendedor', 'nombre');
 
-        const recibos = await Venta.find({
+        const recibos = await Recibo.find({
             $expr: { $eq: [{ $month: "$fecha" }, mes] }
         }).populate('vendedor', 'nombre');
 
@@ -88,7 +88,7 @@ exports.traerInformacionCajaDelAnio = async(req, res) => {
 
         const recibos = await Recibo.find({
             $expr: { $eq: [{ $year: "$fecha" }, year] }
-        })//.populate('vendedor', 'nombre');
+        }).populate('vendedor', 'nombre');
 
 
         res.status(200).json({
