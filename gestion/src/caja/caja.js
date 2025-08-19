@@ -12,7 +12,7 @@ const axios  = require("axios");
 require("dotenv").config();
 const URL = process.env.GESTIONURL;
 
-const { cerrarVentana, redondear, agregarMovimientoVendedores, parsearFecha } = require("../helpers");
+const { cerrarVentana, redondear, parsearFecha } = require("../helpers");
 const sweet = require('sweetalert2');
 
 const {vendedores} = require('../configuracion.json');
@@ -165,9 +165,20 @@ const verQueTraer = async()=>{
         };
     }else{
         if (filtro === "Ingresos") {
-            ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-            recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
-            return([...ventas,...recibos])
+            try {
+                const { data } = (await axios.get(`${URL}caja/anio/${inputAnio.value}`));
+                if(data.ok){
+                    ventas = data.ventas;
+                    recibos = data.recibos;
+                    return([...ventas,...recibos])
+                }else{
+                    await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del año', 'error');
+                };
+            } catch (error) {
+                console.log(error);
+                await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
+            }
+            
         }else{
             return ((await axios.get(`${URL}gastos/anio/${inputAnio.value}`)).data)
         }
@@ -282,15 +293,28 @@ botonAnio.addEventListener('click',async e=>{
     dia.classList.add('none');
     mes.classList.add('none');
     botonSeleccionado.classList.add('seleccionado');
+
     if (filtro === "Ingresos" || filtro === "Cuenta Corriente") {
-        ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-        recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
-        cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+        try {
+            const { data } = await axios.get(`${URL}caja/anio/${inputAnio.value}`);
+            if(data.ok){
+                ventas = data.ventas;
+                recibos = data.recibos;
+                cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+            }else{
+                return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del año', 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
+        };
+
         if (filtro === "Ingresos") {
             listarVentas([...ventas,...recibos]);
         }else{
             listarVentas(cuentasCorrientes);
-        }
+        };
+
     }else if(filtro === "Presupuestos"){
         presupuestos = (await axios.get(`${URL}presupuesto/forYear/${inputAnio.value}`)).data;
         listarVentas(presupuestos);
@@ -368,9 +392,20 @@ selectMes.addEventListener('click',async e=>{
 inputAnio.addEventListener('keypress',async e=>{
     if (e.key === "Enter") {
         if (filtro === "Ingresos") {
-            ventas = (await axios.get(`${URL}ventas/anio/${inputAnio.value}`)).data;
-            recibos = (await axios.get(`${URL}recibo/anio/${inputAnio.value}`)).data;
-            cuentasCorrientes = ventas.filter(venta => venta.tipo_venta === "CC");
+            try {
+                const { data } = await axios.get(`${URL}caja/anio/${inputAnio.value}`);
+                if(data.ok){
+                    ventas = data.ventas;
+                    recibos = data.recibos;
+                    cuentasCorrientes = ventas.filter(venta=>venta.tipo_venta === "CC");
+                }else{
+                    return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del año', 'error');
+                }
+            } catch (error) {
+                console.log(error);
+                await sweet.fire('Error al obtener las ventas', error.response?.data?.msg, 'error');
+            };
+            
             if (condition) {
                 listarVentas([...ventas,...recibos]);
             }else{
@@ -409,8 +444,10 @@ tbody.addEventListener('click',async e=>{
         }).then(async({isConfirmed})=>{
             if (isConfirmed) {
                 try {
-                    await axios.delete(`${URL}ventas/id/${seleccionado.id}/${seleccionado.children[3].innerHTML}`);
-                    vendedor && await agregarMovimientoVendedores(`Elimino la venta ${seleccionado.children[0].innerHTML} con el precio ${seleccionado.children[7].innerHTML}`,vendedor);
+                    await axios.delete(`${URL}ventas/id/${seleccionado.id}/${seleccionado.children[3].innerHTML}`, {
+                        params: {vendedor: vendedor}
+                    });
+
                     tbody.removeChild(seleccionado);
                     total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[7].innerHTML),2);
                 } catch (error) {
@@ -443,6 +480,7 @@ tbodyGastos.addEventListener('click',e=>{
 });
 
 const listarVentas = async (ventas)=>{
+    console.log("a");
     tbody.innerHTML = ``;
     let lista = [];
     //organizamos las ventas por fecha

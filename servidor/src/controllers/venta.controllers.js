@@ -178,11 +178,35 @@ ventaCTRL.ventaAnio = async(req,res)=>{
 }
 
 ventaCTRL.deleteForId = async(req,res)=>{
-    const {id} = req.params;
-    await Venta.findOneAndRemove({_id:id});
-    console.log(`Venta ${id} Eliminada`)
-    res.send(`Venta ${id} Eliminada`);
-}
+    const { id } = req.params;
+    try {
+        const venta = await Venta.findByIdAndDelete(id);
+
+        if(!venta) return res.status(404).json({
+            ok: false,
+            msg: 'Venta no encontrada'
+        });
+
+        const movCreado = await crearMovimientoVendedores(`Elimino la venta con numero ${venta.numero}`, req.query.vendedor);
+        if(!movCreado) return res.status(500).json({
+            ok: false,
+            msg: 'No se pudo crear el movimiento de vendedor, Hable con el administrador'
+        });
+
+        res.status(200).json({
+            ok: true,
+            msg: `Venta ${venta.numero} eliminada`
+        })
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo eliminar la venta, hable con el administrador'
+        })
+    };
+};
 
 ventaCTRL.getForNumberAndType = async(req,res)=>{
     const {numero,tipo} = req.params;

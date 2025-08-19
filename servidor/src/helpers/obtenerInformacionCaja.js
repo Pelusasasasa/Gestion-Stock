@@ -70,10 +70,38 @@ exports.traerInformacionCajaDelMes = async(req, res) => {
             recibos: recibos
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al obtener la información de la caja del mes'
         })
     }
+};
+
+
+exports.traerInformacionCajaDelAnio = async(req, res) => {
+    const { year } = req.params;
+    try {
+        const ventas = await Venta.find({
+            $expr: { $eq: [{ $year: "$fecha" }, year] }
+        }).populate('vendedor', 'nombre');
+
+        const recibos = await Recibo.find({
+            $expr: { $eq: [{ $year: "$fecha" }, year] }
+        })//.populate('vendedor', 'nombre');
+
+
+        res.status(200).json({
+            ok: true,
+            ventas: ventas,
+            recibos: recibos
+        });
+    } catch (error) {
+        console.error("Error al traer la información de la caja del año:", error);
+        res.status(500).json({
+            ok: false,
+            msg: "Error al obtener la información de la caja del año"
+        });
+    }
+
 };

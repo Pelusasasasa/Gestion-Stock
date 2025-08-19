@@ -1,7 +1,6 @@
 const MovVendedores = require("../models/MovVendedores");
 
 exports.crearMovimientoVendedores = async(descripcion, vendedor) => {
-
     try {
         const movimiento = {};
 
@@ -10,6 +9,7 @@ exports.crearMovimientoVendedores = async(descripcion, vendedor) => {
 
         const nuevoMovimiento = await new MovVendedores(movimiento);
         nuevoMovimiento.save();
+        
         return true;
     } catch (error) {
         console.error(error);

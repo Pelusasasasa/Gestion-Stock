@@ -1,5 +1,5 @@
 
-const {cerrarVentana,apretarEnter, verificarUsuarios, agregarMovimientoVendedores} = require('../helpers');
+const { verificarUsuarios } = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -72,9 +72,10 @@ codigo.addEventListener('keyup',async e=>{
 modificar.addEventListener('click',async e=>{
     try {
         cliente.saldo = saldoNuevo.value;
-        const { data} = await axios.put(`${URL}clientes/id/${cliente._id}`,cliente);
+        cliente.vendedor = vendedor;
+        const { data} = await axios.put(`${URL}clientes/id/${cliente._id}`, cliente);
+
         if(data.ok){
-            vendedor && await agregarMovimientoVendedores(`Modifico el saldo del cliente ${cliente.nombre} de ${saldoViejo.value} a ${saldoNuevo.value}`,vendedor);
             ipcRenderer.send('arreglarSaldo', JSON.stringify(cliente));
             window.close();
         }else{

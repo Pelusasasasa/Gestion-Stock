@@ -1,4 +1,4 @@
-const {cerrarVentana,apretarEnter, agregarMovimientoVendedores} = require('../helpers');
+const {cerrarVentana,apretarEnter} = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
@@ -47,12 +47,13 @@ agregar.addEventListener('click',async e=>{
     cliente.condicionFacturacion = condicionFacturacion.value;
     cliente.tipoCuenta = tipoCuenta.value;
     cliente.observaciones = observaciones.value.trim().toUpperCase();
+    cliente.vendedor = vendedor;
+    console.log(vendedor);
 
     try {
-        const {data} = (await axios.post(`${URL}clientes`,cliente));
+        const {data} = (await axios.post(`${URL}clientes`, cliente));
 
         if(data.ok){
-            vendedor && await agregarMovimientoVendedores(`Agrego el  liente ${cliente.nombre} con direccion ${cliente.direccion}`,vendedor);
             await sweet.fire(`Cliente ${data.cliente.nombre} Agregado`, 'Cliente agregado correctamente', 'success');
             await ipcRenderer.send('informacion-a-ventana-principal',cliente);
             window.close();

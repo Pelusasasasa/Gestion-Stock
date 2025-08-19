@@ -16,7 +16,7 @@ const axios = require('axios');
 require('dotenv').config()
 const URL = process.env.GESTIONURL;
 
-const {recorrerFlechas, copiar, agregarMovimientoVendedores} = require('../helpers');
+const {recorrerFlechas, copiar } = require('../helpers');
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
@@ -158,11 +158,14 @@ tbody.addEventListener('click',async e=>{
             }).then(async({isConfirmed})=>{
                 if (isConfirmed) {
                     try {
-                        const mensaje = (await axios.delete(`${URL}clientes/id/${seleccionado.id}`)).data;
-                        vendedor && agregarMovimientoVendedores(`Elimino el cliente ${seleccionado.children[1].innerHTML} con direccion en ${seleccionado.children[2].innerHTML}`,vendedor);
-                        await sweet.fire({
-                            title:mensaje
+                        
+                        const { data } = await axios.delete(`${URL}clientes/id/${seleccionado.id}`, {
+                            params: { vendedor }
                         });
+                        console.log(data);
+
+                        await sweet.fire('Cliente Eliminado', data.msg, 'success');
+                        
                         tbody.removeChild(seleccionado);
                     } catch (error) {
                         console.log(error)
@@ -252,11 +255,11 @@ function listarclienteNuevo(e,cliente){
     tdSaldo.innerText = "0.00";
     tdAcciones.innerHTML = `
     <div class=tool>
-        <span class=material-icons>edit</span>
+        <span class=material-icons-outlined id=edit>edit</span>
         <p class=tooltip>Modificar</p>
     </div>
     <div class="tool ${permiso !== 0 && "none"}">
-        <span class=material-icons>delete</span>
+        <span  class=material-icons-outlined id=delete>delete</span>
         <p class=tooltip>Eliminar</p>
     </div>
 `

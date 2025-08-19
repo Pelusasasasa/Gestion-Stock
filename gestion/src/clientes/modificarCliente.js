@@ -1,6 +1,6 @@
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
-const {cerrarVentana,apretarEnter,selecciona_value, agregarMovimientoVendedores} = require('../helpers');
+const { cerrarVentana,apretarEnter } = require('../helpers');
 
 const axios = require('axios');
 require("dotenv").config();
@@ -70,12 +70,11 @@ modificar.addEventListener('click',async e=>{
     cliente.condicionIva = condicionIva.value;
     cliente.tipoCuenta = tipoCuenta.value;
     cliente.observaciones = observaciones.value.toUpperCase();
-    
+    cliente.vendedor = vendedor;
         try {
             const {data} = (await axios.put(`${URL}clientes/id/${cliente._id}`,cliente));
     
             if (data.ok) {
-                vendedor && await agregarMovimientoVendedores(`Modifico el cliente ${cliente.nombre} con direccion en ${cliente.direccion}`,vendedor);
                 await sweet.fire('Cliente modificado', `Se modifico el cliente ${data.cliente.nombre} correctamente`, 'success');
                 ipcRenderer.send('enviar-ventana-principal',cliente);
                 window.close();

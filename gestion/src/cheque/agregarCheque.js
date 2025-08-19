@@ -33,7 +33,7 @@ ipcRenderer.on('informacion', (e, args) => {
 
 const guardar = async () => {
     if (! await validarDatos()) return;
-    console.log("a");
+    
     const cheque = {};
     cheque.f_recibido = fecha.value;
     cheque.numero = numero.value;

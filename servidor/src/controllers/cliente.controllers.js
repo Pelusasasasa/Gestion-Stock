@@ -1,4 +1,5 @@
 const clienteCTRL = {};
+const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const Clientes = require('../models/Cliente');
 
 clienteCTRL.getsClientes = async (req, res) => {
@@ -80,6 +81,11 @@ clienteCTRL.cargarCliente = async (req, res) => {
             msg: 'No se pudo cargar el cliente'
         });
 
+        const movCreado = await crearMovimientoVendedores(`Alta de Cliente ${cliente.nombre}`, req.body.vendedor);
+        if(!movCreado) return res.status(500).json({
+            ok: false,
+            msg: 'No se pudo crear el movimiento de vendedor, Hable con el administrador'
+        });
 
         res.status(201).json({
             ok: true,
@@ -104,6 +110,12 @@ clienteCTRL.modificarCliente = async (req, res) => {
             msg: 'No se existe el cliente'
         });
 
+        const movCreado = await crearMovimientoVendedores(`Modificacion del Cliente ${cliente.nombre}`, req.body.vendedor);
+        if(!movCreado) return res.status(500).json({
+            ok: false,
+            msg: 'No se pudo crear el movimiento de vendedor, Hable con el administrador'
+        });
+
         console.log(`Cliente ${cliente.nombre} Modificado`);
         res.status(200).json({
             ok: true,
@@ -121,9 +133,33 @@ clienteCTRL.modificarCliente = async (req, res) => {
 
 clienteCTRL.eliminarCliente = async (req, res) => {
     const { id } = req.params;
-    const cliente = await Clientes.findOneAndDelete({ _id: id });
-    console.log(`Cliente ${cliente.nombre} Eliminado`)
-    res.send(`Cliente ${cliente.nombre} Eliminado`);
+    try {
+        const cliente = await Clientes.findOneAndDelete({ _id: id });
+
+        if(!cliente) return res.status(404).json({
+            ok: false,
+            msg: 'No existe el cliente'
+        });
+
+        const movCreado = await crearMovimientoVendedores(`Eliminacion de Cliente ${cliente.nombre}`, req.query.vendedor);
+        if(!movCreado) return res.status(500).json({
+            ok: false,
+            msg: 'No se pudo crear el movimiento de vendedor, Hable con el administrador'
+        });
+
+        res.status(200).json({
+            ok: true,
+            msg: `Cliente ${cliente.nombre} Eliminado`
+        });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo eliminar el cliente, Hable con el administrador'
+        });
+    }
+
 };
 
 clienteCTRL.traerClienteConSaldo = async (req, res) => {

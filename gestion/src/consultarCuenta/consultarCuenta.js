@@ -202,7 +202,7 @@ const clickCuenta = async (e) => {
         trSeleccionado = e.target.parentNode;
         trSeleccionado.classList.add('seleccionado');
 
-        dolarTomado.value = listaCompensada.find(elem => elem.nro_venta == id).dolar || 0;
+        dolarTomado.value = listaCompensada.find(elem => elem.nro_venta == id)?.dolar || 0;
         
         if (trSeleccionado.children[3].innerText !== "Recibo") {
             movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
