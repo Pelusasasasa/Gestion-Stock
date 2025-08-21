@@ -73,6 +73,4 @@ setInterval(() => {
     backUpMongoLocal();
 }, 1000 * 60 * 60)
 
-backUpMongoLocal();
-
 module.exports = app;

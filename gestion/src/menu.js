@@ -234,21 +234,17 @@ consulta.addEventListener('click',e=>{
 });
 
 recibo.addEventListener('click',async e=>{
-    if (verVendedores) {
-        const vendedor = await verificarUsuarios();
+    const vendedor = await verificarUsuarios();
+    
         if (vendedor) {
-            location.href = `./recibo/recibo.html?vendedor=${vendedor.nombre}`;
+            location.href = `./recibo/recibo.html?vendedor=${vendedor._id}`;
             ipcRenderer.send('sacar-cierre');
         }else if(vendedor === ""){
             await sweet.fire({
                 title:"Contraseña incorrecta"
             })
             clientes.click()
-        }
-    }else{
-        location.href = "./recibo/recibo.html";
-        ipcRenderer.send('sacar-cierre');
-    }
+        };
 });
 
 remitos.addEventListener('click', async e => {

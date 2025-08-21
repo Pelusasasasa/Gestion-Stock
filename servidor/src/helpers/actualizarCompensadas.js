@@ -7,7 +7,7 @@ exports.actualizarCompensadas = async(lista, recibo) => {
     for(let elem of lista){
         
         try {
-            const compensada = await cuentaCorrComp .findOne({nro_venta: elem.numero});
+            const compensada = await cuentaCorrComp.findOne({nro_venta: elem.numero});
             compensada.pagado = compensada.pagado + elem.pagado;
             compensada.saldo = compensada.saldo - elem.pagado;
             total -= elem.pagado;
