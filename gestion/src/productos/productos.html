@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./productos.css">
     <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
 </head>
-<body class="productos">
+<body class="productos m-0 p-0">
         <div class="buscador">
             <fieldset>
                 <legend>Buscador</legend>
@@ -48,6 +48,29 @@
                 <tbody></tbody>
             </table>
         </div>
+
+
+        <div id="historicaMovDiv" class="bg-opacity-80 left-0 top-0 h-screen absolute w-full none ">
+            <div class="w-full top-15 absolute bg-white h-50 border overflow-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cod. Cliente</th>
+                            <th>Cliente</th>
+                            <th>Tipo Comp.</th>
+                            <th>Cantidad</th>
+                            <th>Egreso</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historicaMovTable">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <section class="botones">
             <button class="agregar">Agregar Producto</button>
             <button class="ingresarMov">Ingresar Movimiento</button>

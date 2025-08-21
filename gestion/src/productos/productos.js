@@ -1,21 +1,15 @@
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-    results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+require("dotenv").config();
+
+const sweet = require('sweetalert2');
+const axios = require('axios');
+const { ipcRenderer } = require("electron");
+const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores, verificarUsuarios, getParameterByName } = require("../helpers");
+
+const URL = process.env.GESTIONURL;
 
 let vendedor = getParameterByName("vendedor")
 let permiso = getParameterByName("permiso");
 permiso = permiso === "" ? 0 : parseInt(permiso);
-
-const { ipcRenderer } = require("electron");
-const sweet = require('sweetalert2');
-
-const axios = require('axios');
-const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores, verificarUsuarios } = require("../helpers");
-require("dotenv").config();
-const URL = process.env.GESTIONURL;
 
 let seleccionado;
 let subSeleccionado;
@@ -24,11 +18,12 @@ let ventanaSecundaria = false;
 const seleccion = document.querySelector('#seleccion');
 const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
+const historicaMovDiv = document.getElementById('historicaMovDiv');
+const historicaMovTable = document.getElementById('historicaMovTable');
 const agregar = document.querySelector('.agregar');
 const ingresarMov = document.querySelector('.ingresarMov');
 const salir = document.querySelector('.salir');
 const buscador = document.querySelector('#buscarProducto');
-
 
 const filtrar = async()=>{
     tbody.innerHTML = '';
@@ -93,12 +88,13 @@ const listar = (productos)=>{
         tdRubro.innerText = rubro;
         tdAcciones.innerHTML = `
             <div id=edit class=tool>
-                <span id=edit class=material-icons>edit</span>
-                <p class=tooltip>Modificar</p>
+                <span id=edit class=material-icons-outlined title='Historial Mov'>visibility</span>
+            </div>
+            <div id=edit class=tool>
+                <span id=edit title='Modificar' class=material-icons-outlined>edit</span>
             </div>
             <div id=delete class="tool ${permiso !== 0 && "none"}">
-                <span id=delete class=material-icons-outlined>delete</span>
-                <p class=tooltip>Eliminar</p>
+                <span id=delete title='Eliminar' class=material-icons-outlined>delete</span>
             </div>
         `
 
@@ -113,6 +109,40 @@ const listar = (productos)=>{
         tbody.appendChild(tr);
     }
 };
+
+const listarMovimientos = (lista) => {
+    for(let elem of lista){
+        const tr = document.createElement('tr');
+        tr.id = elem._id;
+        console.log(elem);
+        // const tdFecha = document.createElement('td');
+        const tdFecha = document.createElement('td');
+        const tdCodCliente = document.createElement('td');
+        const tdCliente = document.createElement('td');
+        const tdTipo = document.createElement('td');
+        const tdCantidad = document.createElement('td');
+        const tdPrecio = document.createElement('td');
+        const tdTotal = document.createElement('td');
+        
+        tdFecha.innerText = elem.fecha;
+        tdCodCliente.innerText = elem.cliente;
+        tdCliente.innerText = elem.nombreCliente;
+        tdTipo.innerText = elem.tipo_comp;
+        tdCantidad.innerText = elem.cantidad.toFixed(2);
+        tdPrecio.innerText = elem.precio.toFixed(2);
+        tdTotal.innerText = (elem.precio * elem.cantidad).toFixed(2);
+
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdCodCliente);
+        tr.appendChild(tdCliente);
+        tr.appendChild(tdTipo);
+        tr.appendChild(tdCantidad);
+        tr.appendChild(tdPrecio);
+        tr.appendChild(tdTotal);
+
+        historicaMovTable.appendChild(tr);
+    }
+}
 
 window.addEventListener('load',async e=>{
     filtrar();
@@ -150,7 +180,7 @@ buscador.addEventListener('change',e=>{
 });
 
 //cuando ahcemos un click en un tr lo ponemos como que esta seleccionado
-tbody.addEventListener('click',e=>{
+tbody.addEventListener('click',async e=>{
     seleccionado && seleccionado.classList.toggle('seleccionado');
     subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
 
@@ -198,6 +228,20 @@ tbody.addEventListener('click',e=>{
             vendedor:vendedor
         }
         ipcRenderer.send('abrir-ventana',opciones);
+    }else if(e.target.innerHTML === 'visibility'){
+        historicaMovDiv.classList.remove('none');
+        try {
+            const {data} = await axios.get(`${URL}movimiento/porProducto/${seleccionado.id}`);
+            if(data.ok){
+                listarMovimientos(data.movimientos);
+            }
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('Erro al obtener los movimientos', error?.response?.data?.msg, 'error');
+        }
+        
+
+        console.log(seleccionado);
     }
 
 })

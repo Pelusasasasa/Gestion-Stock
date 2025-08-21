@@ -72,6 +72,26 @@ movimientoCTRL.porId = async (req, res) => {
     res.send(movimientos)
 };
 
+movimientoCTRL.traerPorProducto = async(req, res) => {
+    const { codigo } = req.params;
+    try {
+        const movimientos = await movProducto.find({codProd: codigo}).sort('fecha');
+
+        console.log(movimientos[0]);
+
+        res.status(200).json({
+            ok: true,
+            movimientos
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo obtener los movimientos de Productos, hable con el administrador'
+        })
+    }
+};
+
 movimientoCTRL.porRubro = async (req, res) => {
     const { rubro, desde, hasta } = req.params;
     const productos = await movProducto.find({

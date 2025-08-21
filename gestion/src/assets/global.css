@@ -1,4 +1,4 @@
- @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
@@ -186,6 +186,10 @@ table tbody {
 
 /* Padding */
 
+.p-0 {
+  padding: 0;
+}
+
 .p-1 {
   padding: 1rem;
 }
@@ -346,6 +350,10 @@ table tbody {
   width: 100%;
 }
 
+.w-calc-100vw-10px{
+  width: calc(100vw - 45px);
+}
+
 .w-80 {
   width: 80rem;
 }
@@ -432,7 +440,43 @@ table tbody {
 
 /* heigth */
 
+/* Position */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.top-0{
+  top: 0rem;
+}
+
+.top-15{
+  top: 15rem;
+}
+
+
+.left-0{
+  left: 0;
+}
+
+
+/* opacity */
+.opacity-1{
+  opacity: 1;
+}
+
+.opacity-80{
+  opacity: 0.8;
+}
+
 /* background */
+
+.bg-opacity-80{
+  background-color: rgba(0, 0, 0, 0.8);
+}
 
 .backgroud-white {
   background-color: white;
@@ -448,6 +492,10 @@ table tbody {
 
 .bg-black {
   background-color: black;
+}
+
+.bg-gray-500{
+  background-color: gray;
 }
 
 .bg-orange-700{
