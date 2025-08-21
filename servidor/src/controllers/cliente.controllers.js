@@ -153,7 +153,7 @@ clienteCTRL.eliminarCliente = async (req, res) => {
         });
         
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo eliminar el cliente, Hable con el administrador'

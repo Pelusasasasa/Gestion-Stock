@@ -142,6 +142,11 @@ table tbody {
   margin: 2rem;
 }
 
+.mx-2{
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
 .mt-auto {
   margin-top: auto;
 }
@@ -158,8 +163,16 @@ table tbody {
   margin-top: 2rem;
 }
 
+.mt-5 {
+  margin-top: 5rem;
+}
+
 .mr-2 {
   margin-right: 2rem;
+}
+
+.mr-5 {
+  margin-right: 5rem;
 }
 
 .ml-2 {
@@ -247,6 +260,10 @@ table tbody {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-end {
+  justify-content: end;
 }
 
 .items-center {
@@ -350,7 +367,7 @@ table tbody {
   width: 100%;
 }
 
-.w-calc-100vw-10px{
+.w-calc-100vw-45px{
   width: calc(100vw - 45px);
 }
 
@@ -426,6 +443,10 @@ table tbody {
   height: 20rem;
 }
 
+.h-10 {
+  height: 10rem;
+}
+
 .h-24 {
   height: 24rem;
 }
@@ -436,6 +457,14 @@ table tbody {
 
 .h-50 {
   height: 50rem;
+}
+
+.h-60 {
+  height: 60rem;
+}
+
+.h-70 {
+  height: 70rem;
 }
 
 /* heigth */
@@ -451,6 +480,10 @@ table tbody {
 
 .top-0{
   top: 0rem;
+}
+
+.top-10{
+  top: 10rem;
 }
 
 .top-15{
@@ -546,6 +579,10 @@ table tbody {
 
 #edit{
   color: rgb(85, 85, 85)
+}
+
+#visibility{
+  color: rgb(63, 139, 63)
 }
 
 .azul{

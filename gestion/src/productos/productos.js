@@ -3,7 +3,7 @@ require("dotenv").config();
 const sweet = require('sweetalert2');
 const axios = require('axios');
 const { ipcRenderer } = require("electron");
-const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores, verificarUsuarios, getParameterByName } = require("../helpers");
+const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores, verificarUsuarios, getParameterByName, parsearFecha } = require("../helpers");
 
 const URL = process.env.GESTIONURL;
 
@@ -19,6 +19,7 @@ const seleccion = document.querySelector('#seleccion');
 const body = document.querySelector('body');
 const tbody = document.querySelector('tbody');
 const historicaMovDiv = document.getElementById('historicaMovDiv');
+const cerrarMovLista = document.getElementById('cerrarMovLista');
 const historicaMovTable = document.getElementById('historicaMovTable');
 const agregar = document.querySelector('.agregar');
 const ingresarMov = document.querySelector('.ingresarMov');
@@ -88,7 +89,7 @@ const listar = (productos)=>{
         tdRubro.innerText = rubro;
         tdAcciones.innerHTML = `
             <div id=edit class=tool>
-                <span id=edit class=material-icons-outlined title='Historial Mov'>visibility</span>
+                <span id=visibility class=material-icons-outlined title='Historial Mov'>visibility</span>
             </div>
             <div id=edit class=tool>
                 <span id=edit title='Modificar' class=material-icons-outlined>edit</span>
@@ -111,11 +112,12 @@ const listar = (productos)=>{
 };
 
 const listarMovimientos = (lista) => {
+    historicaMovTable.innerHTML = "";
+
     for(let elem of lista){
         const tr = document.createElement('tr');
         tr.id = elem._id;
-        console.log(elem);
-        // const tdFecha = document.createElement('td');
+
         const tdFecha = document.createElement('td');
         const tdCodCliente = document.createElement('td');
         const tdCliente = document.createElement('td');
@@ -124,7 +126,7 @@ const listarMovimientos = (lista) => {
         const tdPrecio = document.createElement('td');
         const tdTotal = document.createElement('td');
         
-        tdFecha.innerText = elem.fecha;
+        tdFecha.innerText = parsearFecha(elem.fecha);
         tdCodCliente.innerText = elem.cliente;
         tdCliente.innerText = elem.nombreCliente;
         tdTipo.innerText = elem.tipo_comp;
@@ -238,13 +240,9 @@ tbody.addEventListener('click',async e=>{
         } catch (error) {
             console.log(error);
             return await sweet.fire('Erro al obtener los movimientos', error?.response?.data?.msg, 'error');
-        }
-        
-
-        console.log(seleccionado);
-    }
-
-})
+        };
+    };
+});
 
 agregar.addEventListener('click',e=>{
     const opciones = {
@@ -286,6 +284,10 @@ document.addEventListener("keydown",e=>{
         location.href = "../menu.html";
     }
     recorrerFlechas(e.keyCode);
+});
+
+cerrarMovLista.addEventListener('click', () => {
+    historicaMovDiv.classList.add('none');
 });
 
 salir.addEventListener('click',e=>{

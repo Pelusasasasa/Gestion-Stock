@@ -75,16 +75,14 @@ movimientoCTRL.porId = async (req, res) => {
 movimientoCTRL.traerPorProducto = async(req, res) => {
     const { codigo } = req.params;
     try {
-        const movimientos = await movProducto.find({codProd: codigo}).sort('fecha');
-
-        console.log(movimientos[0]);
+        const movimientos = await movProducto.find({codProd: codigo}).sort({fecha: -1});
 
         res.status(200).json({
             ok: true,
             movimientos
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se pudo obtener los movimientos de Productos, hable con el administrador'
@@ -113,7 +111,6 @@ movimientoCTRL.post = async (req, res) => {
     const movimientoAGuardar = new movProducto(movimiento);
     await movimientoAGuardar.save();
 
-    console.log(movimientoAGuardar)
 
     res.send(`Movimiento con el id ${movimientoAGuardar._id} de tipo ${movimientoAGuardar.tipo_comp} a la hora ${(new Date()).toLocaleString()}`);
 
