@@ -1,6 +1,5 @@
 const remitoCTRL = {}
 
-
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
@@ -78,13 +77,30 @@ remitoCTRL.postOne = async(req, res) => {
 remitoCTRL.putPasado = async(req, res) => {
     const { id } = req.params;
 
-    const remito = await Remito.findOneAndUpdate({_id: id,},{
+    try {
+        const remito = await Remito.findOneAndUpdate({_id: id,},{
         $set: {
             pasado: true
-        }
-    });
+            }
+        });
 
-    res.send(remito);
+
+        if(!remito) return res.status(400).json({
+            ok: false,
+            msg: "No se pudo actualizar el remito"
+        });
+
+        res.status(200).json({
+            ok: true,
+            remito
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: "Error al actualizar el remito, hable con el administrador"
+        });
+    };
 };
 
 module.exports = remitoCTRL;

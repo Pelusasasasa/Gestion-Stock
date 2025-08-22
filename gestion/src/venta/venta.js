@@ -620,7 +620,15 @@ facturar.addEventListener('click', async e => {
             //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
             if (remitosTraidos.length > 0) {
                 for (let elem of remitosTraidos) {
-                    (await axios.put(`${URL}remitos/pasado/${elem}`));
+                    try {
+                        const { data } = await axios.put(`${URL}remitos/pasado/${elem}`);
+                        if(!data.ok){
+                            return await sweet.fire('No se pudo quitar los remitos pero se paso la venta', data?.msg, 'error');
+                        };
+                    } catch (error) {
+                        console.log(error);
+                        return await sweet.fire('No se pudo quitar los remitos pero se paso la venta', data?.response?.data?.msg, 'error');
+                    };
                 };
             };
 
