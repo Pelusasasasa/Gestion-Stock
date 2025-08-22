@@ -39,15 +39,12 @@ const apretarTecla = async(e) => {
 
 const cargarPagina = async() => {
     remitos =(await axios.get(`${URL}remitos`)).data;
-    listarRemitos(remitos.filter(elem => !elem.pasado));
+    listarRemitos(remitos.filter(elem => elem.pasado === remitoC.checked));
 };
 
 const cambioTipoRemito = async(e) => {
-    if (e.target.checked){
-        listarRemitos(remitos.filter(elem => elem.pasado));
-    }else{
-        listarRemitos(remitos.filter(elem => !elem.pasado));
-    }
+    const filtro = remitos.filter(elem => elem.cliente.startsWith(buscador.value.toUpperCase()));
+    listarRemitos(filtro.filter(elem => elem.pasado === remitoC.checked));
 };
 
 const clickTbody = async(e) => {
@@ -89,8 +86,8 @@ const clickTbody = async(e) => {
 };
 
 const filtrarRemitos = async(e) => {
-    const filtro = remitos.filter(elem => elem.cliente.startsWith(buscador.value.toUpperCase()))
-    listarRemitos(filtro);
+    const filtro = remitos.filter(elem => elem.cliente.startsWith(buscador.value.toUpperCase()));
+    listarRemitos(filtro.filter(elem => elem.pasado === remitoC.checked));
 };
 
 const handleCheckbox = async(e) => {
