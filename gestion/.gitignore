@@ -97,3 +97,4 @@ src/config.json
 *.xlsx
 
 Gestion-win32-x64
+*.jpg
