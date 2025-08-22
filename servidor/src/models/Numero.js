@@ -16,7 +16,7 @@ const Numero = new mongoose.Schema({
     },
     "Servicio": {
         type:Number,
-        default:0
+        default: 0
     }
 });
 

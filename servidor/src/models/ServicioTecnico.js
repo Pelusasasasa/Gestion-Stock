@@ -11,58 +11,27 @@ const Servicio = new Schema({
         required:true,
         unique:true
     },
-    idCliente:{
-        type: Schema.Types.Number,
-        ref: 'Cliente',
-        required:true
+    datosClientes: {
+        type: Object,
+        required: true
     },
-    cliente:{
-        type:String,
-        required:[true, 'El nombre del Cliente es Obligatorio'],
-        set: (value) => value.toUpperCase().trim(),
-    },
-    codProd:{
-        type: Schema.Types.String,
-        ref: 'Producto',
-        required:true
-    },
-    producto:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-    },
-    modelo: {
+    estado: {
         type: String,
-        default: ''
+        default: 'Pendiente'
     },
-    serie: {
-        type: 'String',
+    activo: {
+        type: Boolean,
+        default: true
     },
-    problemas:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-        default:""
-    },
-    detalles:{
-        type:String,
-        set: (value) => value.toUpperCase().trim(),
-        default:""
-    },
-    total:{
-        type:Number,
-        default:0
-    },
-    fechaEgreso:{
-        type:Date,
-    },
-    vendedor:{
+    vendedor: {
         type: Schema.Types.ObjectId,
         ref: 'Vendedor',
         required: true
     },
-    estado:{
-        type: Number,
-        default: 0
+    sugerencias: {
+        type: String,
+        default: ''
     }
 });
 
-module.exports = model('Servicio',Servicio)
+module.exports = model('Servicio', Servicio)

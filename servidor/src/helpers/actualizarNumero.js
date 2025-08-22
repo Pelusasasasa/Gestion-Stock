@@ -22,6 +22,9 @@ exports.actualizarNumero = async(tipo_venta) => {
             case 'RB':
                 tipo = 'Recibo';
                 break;
+            case 'SR':
+                tipo = 'Servicio';
+                break;
             default:
                 tipo = 'Contados';
                 break;
