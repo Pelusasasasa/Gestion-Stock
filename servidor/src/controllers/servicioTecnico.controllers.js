@@ -135,9 +135,6 @@ servicioCTRL.traerActivos = async(req,res)=>{
         })
     }
 
-
-
-    res.send(servicios)
 };
 
 servicioCTRL.modificarEstado = async(req, res) => {

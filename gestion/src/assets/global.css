@@ -519,6 +519,10 @@ table tbody {
   background-color: transparent;
 }
 
+.bg-green-600 {
+  background-color: #16a34a;
+}
+
 .bg-white {
   background-color: white;
 }

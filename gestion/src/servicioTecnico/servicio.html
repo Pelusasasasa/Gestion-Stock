@@ -10,12 +10,21 @@
     <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
 </head>
 <body class="listaServicio">
-    <h1>Lista De Servicios</h1>
+    
+    <header class="flex justify-between">
+        <h1>Servicio Tecnico</h1>
 
-    <section class="buscador">
-        <label for="buscador">Buscador</label>
-        <input type="text" name="buscador" id="buscador">
-    </section>
+        <div class="flex gap-2 items-center">
+            <button class="flex items-center gap-2">
+                <i class="bi bi-printer" style="font-weight: bold;"></i>
+                <p class="m-0 text-bold">Imprimir</p>
+            </button>
+            <button class="text-white bg-green-600 flex items-center gap-2">
+                <i class="bi bi-plus-lg"></i>
+                <p class="m-0">Nuevo Servicio</p>
+            </button>
+        </div>
+    </header>
 
     <section class="table">
         <table>
@@ -35,32 +44,6 @@
             </thead>
             <tbody></tbody>
         </table>
-    </section>
-    <section class="botones">
-        <div class="colores">
-            <div>
-                <div class="square bg-red"></div>
-                <p>Sin Revisar</p>
-            </div>
-
-            <div>
-                <div class="square bg-yellow"></div>
-                <p>En Proceso</p>
-            </div>
-
-            <div>
-                <div class="square bg-gray"></div>
-                <p>Finalizado</p>
-            </div>
-
-            <div>
-                <div class="square bg-green"></div>
-                <p>Egresado</p>
-            </div>
-        </div>
-        <button id="agregar">Agregar</button>
-        <button id="modificar">Modificar</button>
-        <button id="salir">Salir</button>
     </section>
     <script src="./servicio.js"></script>
 </body>
