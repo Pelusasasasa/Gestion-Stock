@@ -34,8 +34,7 @@ servicioCTRL.crearServicio = async(req, res)=>{
             msg: 'No se pudo modificar el numero'
         });
 
-        console.log(numero)
-        req.body.numero = numero.Servicio;
+        req.body.numero = numero.numero;
 
         const servicio = new Servicio(req.body);
     
@@ -49,9 +48,11 @@ servicioCTRL.crearServicio = async(req, res)=>{
 
         await servicio.save();
 
+        const nuevoServicio = await Servicio.findById(servicio._id).populate('vendedor', ['nombre']);
+
         res.status(201).json({
             ok: true,
-            servicio,
+            servicio: nuevoServicio,
             equiposCargados
         });
 
@@ -65,14 +66,12 @@ servicioCTRL.crearServicio = async(req, res)=>{
 };
 
 servicioCTRL.traerPorId = async(req, res) => {
-
+    const { id } = req.params;
     try {
-        const servicio = await Servicio.findById(req.params.id)
+        const servicio = await Servicio.findById(id)
             .populate('vendedor', ['nombre', 'permiso']);
-        
         const equipos = await EquipoServicio.find({numero: servicio.numero});
-
-        res.status({
+        res.status(200).json({
             ok: true,
             servicio,
             equipos

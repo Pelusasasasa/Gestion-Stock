@@ -126,6 +126,15 @@ ipcMain.on('imprimir-recibo', (e, args) => {
   })
 })
 
+ipcMain.on('imprimir-servicio', (e, args) => {
+  const servicio = args;
+  abrirVentana("impresiones/imprimirServicio.html", 800, 500, false, true);
+
+  nuevaVentana.webContents.on('did-finish-load', function(){
+    nuevaVentana.webContents.send('imprimir-servicio', JSON.stringify(servicio));
+  })
+});
+
 ipcMain.on('imprimir-ventana', (e, args) => {
   const option = {};
   option.silent = false;

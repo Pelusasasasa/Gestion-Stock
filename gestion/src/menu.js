@@ -260,9 +260,18 @@ remitos.addEventListener('click', async e => {
 });
 
 servicioTecnico.addEventListener('click', async e => {
-    const user = await verificarUsuarios();
+    const vendedor = await verificarUsuarios();
 
-    location.href = `./servicioTecnico/servicio.html?vendedor=${user.codigo}&permiso=${user.permiso}`;
+    if(vendedor){
+        location.href = `./servicioTecnico/servicio.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
+    }else if(vendedor === ''){
+        await sweet.fire({
+            title: 'Contraseña Incorrecta'
+        });
+        servicioTecnico.click();
+    };
+
+    
 });
 
 //ponemos un numero para la venta y luego mandamos a imprimirla

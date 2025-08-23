@@ -1,7 +1,10 @@
 const EquipoServicio = require("../models/EquipoServicio");
 
-exports.cargarEquipos = async(equipos, numero) => {
+exports.cargarEquipos = async(equipos = [], numero) => {
     const nuevosEquipos = [];
+
+    if(equipos.length === 0) return true;
+
     try {
         for(let equipo of equipos){
             equipo.numero = numero;

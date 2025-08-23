@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/global.css">
+    <title>Impresion Servicio Tecnico</title>
+</head>
+<body>
+    <header class="grid columns-2-2fr-1fr bg-white">
+        <div id="logo" class="border">
+
+        </div>
+
+        <div id="infoServicio">
+            <p class="border text-center m-0">ORDEN DE TRABAJO</p>
+            <p class="border m-0">Fecha:  <span id="fecha"></span></p>
+            <p class="border font-bold m-0">Orden: <span id="numero"></span></p>
+        </div>
+    </header>
+
+    <section id="cliente" class="bg-white">
+        <div class="grid columns-2 justify-around ">
+            <p class="m-0 border">Cliente:</p>
+            <p class="m-0 border">Direccion: </p>
+        </div>
+
+        <div class="grid columns-2 justify-around">
+            <p class="m-0 border">Telefono: </p>
+            <p class="m-0 border">Detalle: </p>
+        </div>
+    </section>
+
+    <section class="h-auto bg-white">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr>
+                    <th class="border">Equipo</th>
+                    <th class="border">Modelo</th>
+                    <th class="border">Numero Serie</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <tr>
+                    <td class="border h-2"></td>
+                    <td class="border"></td>
+                    <td class="border"></td>
+                </tr>
+                <tr>
+                    <td class="border h-2"></td>
+                    <td class="border"></td>
+                    <td class="border"></td>
+                </tr>
+                <tr>
+                    <td class="border h-2"></td>
+                    <td class="border"></td>
+                    <td class="border"></td>
+                </tr>
+                <tr>
+                    <td class="border h-2"></td>
+                    <td class="border"></td>
+                    <td class="border"></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="bg-white w-full">
+        <label for="sugerencia" class="border flex w-full">Observaciones/Sugerencias</label>
+        <textarea class="w-full border" rows="10" name="sugerencia" id="sugerencia"></textarea>
+    </section>
+
+    <section class="bg-white flex justify-around border">
+        <div>
+            <p class="m-0 pt-5">FIRMA CONFORME CLIENTE</p>
+        </div>
+        <div>
+            <p class="m-0 pt-5">FIRMA TECNICO RESPONSABLE</p>
+        </div>
+    </section>
+
+    <script src="./imprimirServicio.js"></script>
+</body>
+</html>

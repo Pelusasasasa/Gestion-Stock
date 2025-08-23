@@ -1,19 +1,90 @@
 require('dotenv').config();
 const axios = require('axios');
 const { default: Swal } = require('sweetalert2');
-const { parsearFecha } = require('../helpers');
+const { parsearFecha, getParameterByName } = require('../helpers');
+const { ipcRenderer } = require('electron');
 
-
-
+const vendedor = getParameterByName('vendedor');
 
 const URL = process.env.GESTIONURL;
 
+const imprimir = document.getElementById('imprimir');
+const agregar = document.getElementById('agregar');
 
 const cantidad = document.getElementById('cantidad');
 const tbody = document.getElementById('tbody');
 
+
+let servicios = [];
+
+const agregarServicioALista = (servicio) => {
+
+    const fragment = document.createDocumentFragment();
+    const tr = document.createElement('tr');
+
+    tr.id = servicio._id;
+
+    const tdNumero = document.createElement('td');
+    const tdFecha = document.createElement('td');
+    const tdNombre = document.createElement('td');
+    const tdDireccion = document.createElement('td');
+    const tdTelefono = document.createElement('td');
+    const tdEstado = document.createElement('td');
+    const tdVendedor = document.createElement('td');
+    const tdAcciones = document.createElement('td');
+
+    tdAcciones.classList.add('flex');
+    tdAcciones.classList.add('gap-2');
+    tdAcciones.classList.add('justify-center');
+        
+    tdNumero.innerText = servicio.numero;
+    tdFecha.innerText = parsearFecha(servicio.fecha);
+    tdNombre.innerText = servicio.datosClientes?.nombre ?? '';
+    tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
+    tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
+    tdEstado.innerText = servicio.estado;
+    tdVendedor.innerText = servicio.vendedor.nombre;
+    tdAcciones.innerHTML = `
+            <div class=tool>
+                    <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
+                </div>
+            <div class=tool>
+                <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
+            </div>
+        `
+
+    tr.appendChild(tdNumero);
+    tr.appendChild(tdFecha);
+    tr.appendChild(tdNombre);
+    tr.appendChild(tdDireccion);
+    tr.appendChild(tdTelefono);
+    tr.appendChild(tdEstado);
+    tr.appendChild(tdVendedor);
+    tr.appendChild(tdAcciones);
+
+    fragment.appendChild(tr);
+
+    tbody.appendChild(fragment);
+
+};
+
 const cargarPagina = async () => {
     traerServicios();
+};
+
+const reImprimirservicio = async(e) => {
+    const id = e.target.parentNode.parentNode.parentNode.id;
+    try {
+        const { data } = await axios.get(`${URL}servicios/${id}`);
+        if(data.ok){
+            ipcRenderer.send('imprimir-servicio', data.servicio);
+        }else{
+            return Swal.fire('Error al cargar el servicio', data.msg, 'error');
+        };
+    } catch (error) {
+        console.log(error);
+        return Swal.fire(`Error al obtener el servicio`, error?.response?.data?.msg, 'error');
+    }
 };
 
 const eliminarServicio = async(e) => {
@@ -31,7 +102,34 @@ const eliminarServicio = async(e) => {
         console.log(error);
         return await Swal.fire('Error al eliminar servicio', error?.response?.data?.msg, 'error');
     } 
-}
+};
+
+const imprimirNuevoServicio = async(e) => {
+    try {
+        const servicio = {}
+        servicio.vendedor = vendedor;
+        servicio.datosClientes = {};
+
+        const {isConfirmed} = await Swal.fire({
+            confirmButtonText: 'Aceptar',
+            showCancelButton: true,
+            title: 'Quiere Agrega un servicio en blanco'
+        });
+
+        if(!isConfirmed) return;
+
+        const { data } = await axios.post(`${URL}servicios`, servicio);
+        if(data.ok){
+            agregarServicioALista(data.servicio);
+            ipcRenderer.send('imprimir-servicio', data.servicio);
+        }else{
+            return await Swal.fire('Error al cargar el servicio', data.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await Swal.fire('errro al cargar el servicio', error?.response?.data?.msg, 'error');
+    }
+};
 
 const traerServicios = async() => {
 
@@ -73,15 +171,18 @@ const listarServicios = async(lista) => {
 
         tdNumero.innerText = servicio.numero;
         tdFecha.innerText = parsearFecha(servicio.fecha);
-        tdCliente.innerText = servicio.datosClientes.nombre.toUpperCase();
-        tdDireccion.innerText = servicio.datosClientes.direccion;
-        tdTelefono.innerText = servicio.datosClientes.telefono;
+        tdCliente.innerText = servicio.datosClientes?.nombre.toUpperCase() ?? '';
+        tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
+        tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
         tdEstado.innerText = servicio.estado;
-        tdVendedor.innerText = servicio.vendedor;
+        tdVendedor.innerText = servicio.vendedor.nombre;
         tdAcciones.innerHTML = `
             <div class=tool>
-                    <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
-                </div>
+                <span class=material-icons-outlined title='Re-Imprimir' id='printer'>print</span>
+            </div>
+            <div class=tool>
+                <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
+            </div>
             <div class=tool>
                 <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
             </div>
@@ -95,12 +196,26 @@ const listarServicios = async(lista) => {
         tr.appendChild(tdEstado);
         tr.appendChild(tdVendedor);
         tr.appendChild(tdAcciones);
-
+        
+        
         tbody.appendChild(tr);
-
-
-        document.getElementById('delete').addEventListener('click', eliminarServicio);
     };
 };
+
+document.addEventListener('keyup', (e) => {
+    if(e.key === 'Escape'){
+        location.href = '../menu.html';
+    };
+});
+
+imprimir.addEventListener('click', imprimirNuevoServicio);
+
+tbody.addEventListener('click', e => {
+    if(e.target.id === 'printer'){
+        reImprimirservicio(e);
+    }else if(e.target.id === 'delete'){
+        eliminarServicio(e)
+    };
+});
 
 window.addEventListener('load', cargarPagina);

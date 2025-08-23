@@ -6,126 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Servicio</title>
     <link rel="stylesheet" href="../assets/global.css">
-    <link rel="stylesheet" href="./servicio.css">
     <link href="../../node_modules/material-icons/iconfont/material-icons.css" rel="stylesheet">
 </head>
-<body>
-    <section class="cliente">
-        <fieldset>
-            <legend>Cliente</legend>
-            <main>
-                <label for="idCliente">Codigo *</label>
-                <input type="text" autofocus name="idCliente" id="idCliente">
-            </main>
-            <main>
-                <label for="cliente">Cliente *</label>
-                <input type="text" name="cliente" id="cliente">
-            </main>
-            <main>
-                <label for="direccion">Direccion</label>
-                <input type="text" name="direccion" id="direccion">
-            </main>
-            <main>
-                <label for="telefono">Telefono</label>
-                <input type="text" name="telefono" id="telefono">
-            </main>
+<body class="m-0 p-0">
+    
+    <header class="flex justify-between bg-white px-2 pt-2 w-full  ">
+        <div>
+            <h1 class="m-0">Nuevo Servicio Tecnico</h1>
+            <p class="m-0">Ingreso de nuevo servicio tecnico</p>
+        </div>
 
-        </fieldset>
-    </section>
+        <div>
+            <div class="flex gap-2">
+                <button class="flex items-center gap-2">
+                    <i class="bi bi-x-lg"></i>
+                    <p class="m-0">Cancelar</p>
+                </button>
 
-    <section class="productos">
-        <fieldset>
-            <legend>Producto</legend>
-            <section class="producto">
-                <main>
-                    <label for="codProd">Cod. Prod *</label>
-                    <input type="text" name="codProd" id="codProd">
-                </main>
-                <main>
-                    <label for="producto">Producto *</label>
-                    <input type="text" name="producto" id="producto">
-                </main>
-                <main>
-                    <label for="modelo">Modelo</label>
-                    <input type="text" name="modelo" id="modelo">
-                </main>
-                <main>
-                    <label for="marca">Marca</label>
-                    <input type="text" name="marca" id="marca">
-                </main>
-
-            </section>
-            <main class="problemas">
-                <label for="problemas">Problemas</label>
-                <textarea type="text" name="problemas" id="problemas" cols="10" rows="5"></textarea>
-            </main>
-
-            <main class="agregarProduct">
-                <label for="agregarProduct">Agregar</label>
-                <svg id="agregarProduct" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                    stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-            </main>
-
-        </fieldset>
-    </section>
-
-    <section >
-        <fieldset class="egreso"">
-            <legend>Detalles</legend>
-
-            <main class="detalles">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Cod Prod</th>
-                            <th>Producto</th>
-                            <th>Marca</th>
-                            <th>Modelo</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </main>
-
-            <main class="soluciones none">
-                <textarea name="soluciones" id="soluciones" cols="10" rows="5"></textarea>
-            </main>
-
-
-            
-            <div>
-                <main>
-                    <label for="numero">Numero</label>
-                    <input type="number" name="numero" id="numero" disabled>
-                </main>
-
-                <main class="vendedor">
-                    <label for="vendedor">Vendedor</label>
-                    <input type="text" name="vendedor" id="vendedor" disabled>
-                </main>
-                
-                <main class="estado">
-                    <label for="estado">Estado</label>
-                    <select name="estado" id="estado">
-                        <option value="0">Sin Revisar</option>
-                        <option value="1">En Proceso</option>
-                        <option value="2">Finalizado</option>
-                        <option value="3">Egresado</option>
-                    </select>
-                </main>
+                <button class="flex items-center gap-2 bg-green-600 text-white">
+                    <i class="bi bi-floppy"></i>
+                    <p class="m-0">Guardar Servicio</p>
+                </button>
             </div>
-        </fieldset>
-    </section>
+        </div>
+    </header>
 
-    <section class="botones">
-        <button id="agregar">Agregar</button>
-        <button id="modificar" class="none">Modificar</button>
-        <button id="salir">Salir</button>
-    </section>
+    <section class="flex justify-center bg-gray-50">
+        <form action="" class="w-full">
+            <div>
+                <h3>Datos del servicio</h3>
+                <div class="flex flex-col">
+                    <label for="numero">Numero</label>
+                    <input type="text" name="numero" id="numero" disabled class="border rounded-sm">
+                </div>
 
+
+            </div>
+        </form>
+    </section>
     <script src="./agregarServicio.js"></script>
 </body>
 </html>
