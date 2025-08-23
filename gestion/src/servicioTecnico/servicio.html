@@ -26,23 +26,31 @@
         </div>
     </header>
 
+    <section class="mb-2 flex gap-2 items-center">
+        <div class="w-50">
+            <input class="border w-full rounded-sm px-2 py-1" type="text" name="buscador" placeholder="Buscar por cliente, equipo" id="buscador" >
+        </div>
+
+        <div>
+            <p> <span id="cantidad"></span> Servicios encontrados</p>
+        </div>
+    </section>
+
     <section class="table">
         <table>
             <thead>
                 <tr>
                     <th>N°</th>
-                    <th>Fecha Ingreso</th>
+                    <th>Fecha</th>
                     <th>Cliente</th>
-                    <th>Telefono</th>
                     <th>Direccion</th>
-                    <th>Producto</th>
-                    <th>Marca</th>
-                    <th>Modelo</th>
-                    <th>Fecha Egreso</th>
+                    <th>Telefono</th>
                     <th>Estado</th>
+                    <th>Vendedor</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="tbody"></tbody>
         </table>
     </section>
     <script src="./servicio.js"></script>

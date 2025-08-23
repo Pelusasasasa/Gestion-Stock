@@ -5,7 +5,7 @@ const { modificarEquipos, cargarEquipos } = require('../helpers/cargarEquipos');
 const EquipoServicio = require('../models/EquipoServicio');
 const Servicio = require('../models/ServicioTecnico');
 
-servicioCTRL.EliminarPorID = async(req, res) => {
+servicioCTRL.eliminarPorID = async(req, res) => {
     const {id} = req.params;
 
     try {
@@ -86,7 +86,7 @@ servicioCTRL.traerPorId = async(req, res) => {
     };
 };
 
-servicioCTRL.ModificarPorId = async(req, res) => {
+servicioCTRL.modificarPorId = async(req, res) => {
     const {id} = req.params;
     const { equipos } = req.body;
     try {
@@ -121,9 +121,8 @@ servicioCTRL.ModificarPorId = async(req, res) => {
 
 servicioCTRL.traerActivos = async(req,res)=>{
     try {
-        const servicios = await Servicio.find({estado: true})
+        const servicios = await Servicio.find({activo: true})
             .populate('vendedor', ['nombre', 'permiso']);
-
             res.status(200).json({
                 ok: true,
                 servicios

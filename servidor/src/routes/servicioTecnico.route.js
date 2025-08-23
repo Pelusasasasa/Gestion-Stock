@@ -1,16 +1,15 @@
 const {Router} = require('express');
 const router = Router();
 
-const { getForText, traerActivos, EliminarPorID, traerPorId, modificarEstado } = require('../controllers/servicioTecnico.controllers');
-const { cargarEquipos, modificarEquipos } = require('../helpers/cargarEquipos');
+const { getForText, traerActivos, traerPorId, modificarEstado, crearServicio, modificarPorId, eliminarPorID } = require('../controllers/servicioTecnico.controllers');
 
 router.route('/')
     .get(traerActivos)
-    .post(cargarEquipos)
-router.route('/id/:id')
-    .delete(EliminarPorID)
+    .post(crearServicio)
+router.route('/:id')
+    .delete(eliminarPorID)
     .get(traerPorId)
-    .put(modificarEquipos)
+    .put(modificarPorId)
     .patch(modificarEstado)
 router.route('/forText/:text')
     .get(getForText)
