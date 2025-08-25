@@ -145,6 +145,33 @@ servicioCTRL.traerActivos = async(req,res)=>{
 
 };
 
+servicioCTRL.traerPorNumero = async(req, res) => {
+    const { numero } = req.params;
+    
+    try {
+        const servicio = await Servicio.findOne({numero: numero})    ;
+
+        if(!servicio) return res.status(404).json({
+            ok: false,
+            msg: 'No se encontro el servicio'
+        });
+
+        const equipos = await EquipoServicio.find({numero: numero});
+
+        res.status(200).json({
+            ok: true,
+            servicio,
+            equipos
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(200).json({
+            ok: false,
+            msg: 'No se pudo obtener el servicio, hable con el administrador'
+        })
+    }
+}
+
 servicioCTRL.modificarEstado = async(req, res) => {
     const { id } = req.params;
 

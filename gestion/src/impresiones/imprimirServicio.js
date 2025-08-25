@@ -27,11 +27,11 @@ ipcRenderer.on('imprimir-servicio', async(e, args) => {
 
 
 const listarInfoServicio = (servicio) => {
-
+    console.log(servicio)
     fecha.innerText = parsearFecha(servicio.fecha);
     numero.innerText = `ST-${servicio.numero.toString().padStart(4, '0')}`
 
-    nombre.innerText = servicio.datosClientes.nombre;
+    nombre.innerText = servicio.datosClientes?.nombre;
     direccion.innerText = servicio.datosClientes?.direccion;
     telefono.innerText = servicio.datosClientes?.telefono;
 

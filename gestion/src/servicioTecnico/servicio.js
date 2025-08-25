@@ -92,6 +92,16 @@ const reImprimirservicio = async(e) => {
 
 const eliminarServicio = async(e) => {
     const id = e.target.parentNode.parentNode.parentNode.id;
+
+    const { isConfirmed } = await Swal.fire({
+        title: 'Quiere eliminar el servicio?',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar'
+    });
+
+
+    if(!isConfirmed) return;
+
     try {
         
         const { data } = await axios.delete(`${URL}servicios/${id}`);
@@ -124,13 +134,16 @@ const imprimirNuevoServicio = async(e) => {
         const { data } = await axios.post(`${URL}servicios`, servicio);
         if(data.ok){
             agregarServicioALista(data.servicio);
-            ipcRenderer.send('imprimir-servicio', data.servicio);
+            ipcRenderer.send('imprimir-servicio', {
+                servicio: data.servicio,
+                equipos: []
+            });
         }else{
             return await Swal.fire('Error al cargar el servicio', data.msg, 'error');
         }
     } catch (error) {
         console.log(error);
-        return await Swal.fire('errro al cargar el servicio', error?.response?.data?.msg, 'error');
+        return await Swal.fire('error al cargar el servicio', error?.response?.data?.msg, 'error');
     }
 };
 
@@ -180,8 +193,8 @@ const listarServicios = async(lista, equipos) => {
         tdCliente.innerText = servicio.datosClientes?.nombre.toUpperCase() ?? '';
         tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
         tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
-        tdEquipo.innerText = equipo.equipo;
-        tdEstado.innerText = equipo.estado;
+        tdEquipo.innerText = equipo.equipo.slice(0,30);
+        tdEstado.innerHTML = `<p class='m-0 bg-red-50 px-1 text-sm text-red-800 rounded text-semibold rounded-full inline-flex'>${equipo.estado}</p>`;
         tdVendedor.innerText = servicio.vendedor.nombre;
         tdAcciones.innerHTML = `
             <div class=tool>
@@ -228,6 +241,10 @@ imprimir.addEventListener('click', imprimirNuevoServicio);
 tbody.addEventListener('click', e => {
     if(e.target.id === 'printer'){
         reImprimirservicio(e);
+    }else if(e.target.id === 'edit'){
+        const numero = e.target.parentNode.parentNode.parentNode.children[0].innerText;
+        location.href = `./agregarServicio.html?vendedor${vendedor}&numero=${numero}`;
+        console.log(numero)
     }else if(e.target.id === 'delete'){
         eliminarServicio(e)
     };

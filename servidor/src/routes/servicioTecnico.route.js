@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const router = Router();
 
-const { getForText, traerActivos, traerPorId, modificarEstado, crearServicio, modificarPorId, eliminarPorID } = require('../controllers/servicioTecnico.controllers');
+const { getForText, traerActivos, traerPorId, modificarEstado, crearServicio, modificarPorId, eliminarPorID, traerPorNumero } = require('../controllers/servicioTecnico.controllers');
 
 router.route('/')
     .get(traerActivos)
@@ -13,6 +13,8 @@ router.route('/:id')
     .patch(modificarEstado)
 router.route('/forText/:text')
     .get(getForText)
+router.route('/numero/:numero')
+    .get(traerPorNumero)
 
 
 module.exports = router
