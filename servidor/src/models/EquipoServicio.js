@@ -9,7 +9,7 @@ const EquipoServicio = new Schema({
         type: String,
         required: true,
     },
-    modelo: {
+    marca: {
         type: String,
         default: ''
     },

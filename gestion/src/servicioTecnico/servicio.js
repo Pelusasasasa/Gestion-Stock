@@ -14,7 +14,6 @@ const agregar = document.getElementById('agregar');
 const cantidad = document.getElementById('cantidad');
 const tbody = document.getElementById('tbody');
 
-
 let servicios = [];
 let equipos = [];
 
@@ -78,7 +77,10 @@ const reImprimirservicio = async(e) => {
     try {
         const { data } = await axios.get(`${URL}servicios/${id}`);
         if(data.ok){
-            ipcRenderer.send('imprimir-servicio', data.servicio);
+            ipcRenderer.send('imprimir-servicio', {
+                servicio: data.servicio,
+                equipos: data.equipos
+            });
         }else{
             return Swal.fire('Error al cargar el servicio', data.msg, 'error');
         };
@@ -136,10 +138,10 @@ const traerServicios = async() => {
 
     try {
         const { data } = await axios.get(`${URL}servicios`);
-
         if(data.ok){
             servicios = data.servicios;
-            listarServicios(servicios)
+            equipos = data.equipos;
+            listarServicios(servicios, equipos);
         }else{
             await Swal.fire('Error al traer los servicios tecnicos', data.msg, 'error');
         }
@@ -150,10 +152,12 @@ const traerServicios = async() => {
 
 };
 
-const listarServicios = async(lista) => {
+const listarServicios = async(lista, equipos) => {
+    cantidad.innerText = lista.length;
 
-    for(let servicio of lista){
-        
+    for(let equipo of equipos){
+        const servicio = lista.find(elem => elem.numero === equipo.numero);
+
         const tr = document.createElement('tr');
         tr.id = servicio._id;
 
@@ -162,6 +166,7 @@ const listarServicios = async(lista) => {
         const tdCliente = document.createElement('td');
         const tdDireccion = document.createElement('td');
         const tdTelefono = document.createElement('td');
+        const tdEquipo = document.createElement('td');
         const tdEstado = document.createElement('td');
         const tdVendedor = document.createElement('td');
         const tdAcciones = document.createElement('td');
@@ -175,6 +180,8 @@ const listarServicios = async(lista) => {
         tdCliente.innerText = servicio.datosClientes?.nombre.toUpperCase() ?? '';
         tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
         tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
+        tdEquipo.innerText = equipo.equipo;
+        tdEstado.innerText = equipo.estado;
         tdVendedor.innerText = servicio.vendedor.nombre;
         tdAcciones.innerHTML = `
             <div class=tool>
@@ -195,6 +202,7 @@ const listarServicios = async(lista) => {
         tr.appendChild(tdCliente);
         tr.appendChild(tdDireccion);
         tr.appendChild(tdTelefono);
+        tr.appendChild(tdEquipo);
         tr.appendChild(tdEstado);
         tr.appendChild(tdVendedor);
         tr.appendChild(tdAcciones);

@@ -6,8 +6,8 @@ exports.crearMovimientosStock = async(listaProductos, venta) => {
     for(const {cantidad, producto, series} of listaProductos){
 
         let precioFinal = 0;
-
-        if(venta.condicion === 'INSTALADOR'){
+        
+        if(venta.condicion === 'INSTALADOR' && producto._id){
             precio = producto.costoDolar !== 0 
                 ? (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * venta.dolar 
                 : producto.costo + (producto.costo * producto.impuesto / 100)
@@ -28,7 +28,7 @@ exports.crearMovimientosStock = async(listaProductos, venta) => {
             movimiento.rubro = producto.rubro;
             movimiento.cantidad = cantidad;
             movimiento.iva = producto.impuesto;
-            movimiento.precio = producto.precio;
+            movimiento.precio = precio;
             movimiento.series = series;
             movimiento.nro_venta = venta.numero;
             movimiento.tipo_comp = venta.tipo_comp;

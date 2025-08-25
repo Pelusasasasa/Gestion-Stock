@@ -241,6 +241,11 @@ table tbody {
   padding-bottom: 2rem;
 }
 
+.px-1{
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .px-2{
   padding-left: 2rem;
   padding-right: 2rem;
@@ -617,6 +622,10 @@ table tbody {
 
 .overflow-scroll {
   overflow: scroll;
+}
+
+.overflow-auto {
+  overflow: auto;
 }
 
 #delete{

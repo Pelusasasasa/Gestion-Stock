@@ -38,7 +38,7 @@ servicioCTRL.crearServicio = async(req, res)=>{
 
         const servicio = new Servicio(req.body);
     
-        const equiposCargados = await cargarEquipos(equipos);
+        const equiposCargados = await cargarEquipos(equipos, req.body.numero);
         if(!equiposCargados){
             return res.status(500).json({
                 ok: false,
@@ -69,7 +69,8 @@ servicioCTRL.traerPorId = async(req, res) => {
     const { id } = req.params;
     try {
         const servicio = await Servicio.findById(id)
-            .populate('vendedor', ['nombre', 'permiso']);
+        .populate('vendedor', ['nombre', 'permiso']);
+
         const equipos = await EquipoServicio.find({numero: servicio.numero});
         res.status(200).json({
             ok: true,
@@ -120,12 +121,21 @@ servicioCTRL.modificarPorId = async(req, res) => {
 
 servicioCTRL.traerActivos = async(req,res)=>{
     try {
+        let equipos = [];
         const servicios = await Servicio.find({activo: true})
-            .populate('vendedor', ['nombre', 'permiso']);
-            res.status(200).json({
-                ok: true,
-                servicios
-            })
+        .populate('vendedor', ['nombre', 'permiso']);
+
+        for(let servicio of servicios){
+            const equipo = await EquipoServicio.find({numero: servicio.numero});
+            equipos.push(...equipo);
+        };
+        
+        res.status(200).json({
+            ok: true,
+            equipos,
+            servicios
+        });
+
     } catch (error) {
         res.status(500).json({
             ok: false,

@@ -19,6 +19,9 @@ const producto = document.getElementById('producto');
 const sugerencia = document.getElementById('sugerencia');
 const listaClientes = document.getElementById('listaClientes');
 const listaProductos = document.getElementById('listaProductos');
+const productosAgregados = document.getElementById('productosAgregados');
+
+let equipos = [];
 
 const buscarCliente = async(e) => {
     if(e.key === 'Enter'){
@@ -41,7 +44,7 @@ const buscarProducto = async(e) => {
         try {
             const { data } = await axios.get(`${URL}productos/${producto.value}/descripcion`);
             if(data){
-                listarProductos(data)
+                listarProductos(data);
             }else{
                 return await Swal.fire('Error al obtener los productos', data.msg, 'error');
             };
@@ -62,13 +65,16 @@ const cargarPagina = async() => {
 
 const crearServicio = async() => {
 
-    const servicio = {
+    console.log(equipos)
+
+    const servicio = {  
         fecha: fechaConHora(fecha.value),
         datosClientes: {
             nombre: cliente.value,
             direccion: direccion.value,
             telefono: telefono.value
         },
+        equipos: equipos,
         sugerencias: sugerencia.value,     
         vendedor  
     };
@@ -87,6 +93,13 @@ const crearServicio = async() => {
     }
 };
 
+const eliminarEquipo = async(e) => {
+    if(e.target.nodeName === 'SPAN'){
+        productosAgregados.removeChild(e.target.parentNode.parentNode);
+        equipos = equipos.filter(equipo => equipo.equipo === e.target.parentNode.parentNode.children[1].innerText);
+    }
+}
+
 const listarClientes = (lista) => {
     listaClientes.innerHTML = '';
     listaClientes.parentNode.classList.remove('none');
@@ -96,12 +109,11 @@ const listarClientes = (lista) => {
 
         div.addEventListener('click', seleccionarCliente);
 
-        div.classList.add('flex')
-        div.classList.add('flex')
-        div.classList.add('justify-between')
-        div.classList.add('cursor-pointer')
-        div.classList.add('hover-bg-gray')
-        div.classList.add('py-1')
+        div.classList.add('flex');
+        div.classList.add('justify-between');
+        div.classList.add('cursor-pointer');
+        div.classList.add('hover-bg-gray');
+        div.classList.add('py-1');
         
 
         div.innerHTML = `
@@ -115,7 +127,60 @@ const listarClientes = (lista) => {
 };
 
 const listarProductos = (lista) => {
-    console.log(lista);
+    listaProductos.innerHTML = '';
+    listaProductos.parentNode.classList.remove('none');
+
+    for(let producto of lista){
+        const div = document.createElement('div');
+        div.addEventListener('click', seleccionarProducto);
+
+        div.classList.add('flex');
+        div.classList.add('justify-between');
+        div.classList.add('cursor-pointer');
+        div.classList.add('hover-bg-gray');
+        div.classList.add('border-b');
+        div.classList.add('border-gray-400');
+        
+        
+        div.innerHTML = `
+            <p class='m-0 px-1'>${producto._id}</p>
+            <p class='m-0 px-1'>${producto.descripcion}</p>
+            <p class='m-0 px-1'>${producto.marca}</p>
+        `
+
+        listaProductos.appendChild(div);
+    };
+};
+
+const seleccionarProducto = async(e) => {
+    const productoDiv = e.target.nodeName === 'DIV' ? e.target : e.target.parentNode;
+    const { isConfirmed, value } = await Swal.fire({
+        title: 'Numero Serie',
+        confirmButtonText: 'Agregar',
+        showCancelButton: true,
+        input: 'text'
+    });
+
+    if(!isConfirmed) return;
+
+    equipos.push({
+        equipo: productoDiv.children[1].innerText,
+        marca: productoDiv.children[2].innerText,
+        serie: value,
+    });
+
+    productosAgregados.innerHTML += `
+        <div class='flex justify-between w-full'>
+            <p class='m-0'>${productoDiv.children[0].innerText}</p>
+            <p class='m-0'>${productoDiv.children[1].innerText}</p>
+            <p class='m-0'>${productoDiv.children[2].innerText}</p>
+            <p class='m-0'>${value}</p>
+            <p class='m-0 cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
+        </div>
+    `
+
+    listaProductos.parentNode.classList.add('none');
+    producto.value = '';
 };
 
 const seleccionarCliente = (e) => {
@@ -132,7 +197,6 @@ cancelar.addEventListener('click', () => location.href = './servicio.html');
 
 cliente.addEventListener('keypress', buscarCliente);
 producto.addEventListener('keypress', buscarProducto);
-
+productosAgregados.addEventListener('click', eliminarEquipo);
 guardar.addEventListener('click', crearServicio);
-
 window.addEventListener('load', cargarPagina);
