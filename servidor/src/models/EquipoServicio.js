@@ -17,6 +17,10 @@ const EquipoServicio = new Schema({
         type: String,
         default: ''
     },
+    estado: {
+        type: String,
+        default: 'Pendiente'
+    }
 });
 
 module.exports = model('EquipoServicio', EquipoServicio);

@@ -15,10 +15,6 @@ const Servicio = new Schema({
         type: Object,
         required: true
     },
-    estado: {
-        type: String,
-        default: 'Pendiente'
-    },
     activo: {
         type: Boolean,
         default: true

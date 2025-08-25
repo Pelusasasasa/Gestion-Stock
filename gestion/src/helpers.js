@@ -645,5 +645,11 @@ funciones.parsearFecha = (date) => {
     const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
     const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
     return fechaParseada
+};
+
+funciones.fechaConHora = ( fecha ) => {
+    const hoy = new Date();
+    const fechaConHora = new Date(fecha + "T" + hoy.toTimeString().split(" ")[0]);
+    return fechaConHora
 }
 module.exports = funciones;

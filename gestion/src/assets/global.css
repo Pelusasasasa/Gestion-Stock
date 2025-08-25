@@ -75,6 +75,14 @@ input:disabled {
   color: white;
 }
 
+.text-gray-700{
+  color: #71717a;
+}
+
+.text-white{
+  color: white;
+}
+
 .text-rigth {
   text-align: right;
 }
@@ -140,6 +148,11 @@ table tbody {
 
 .m-2 {
   margin: 2rem;
+}
+
+.mx-auto{
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mx-2{
@@ -371,6 +384,10 @@ table tbody {
 
 /* wdith */
 
+.max-w-6xl{
+  max-width: 72rem;
+}
+
 .w-full {
   width: 100%;
 }
@@ -563,8 +580,17 @@ table tbody {
   border-style: solid;
 }
 
+.border-b{
+  border-bottom-width: 0.1rem;
+  border-bottom-style: solid;
+}
+
 .border-black {
   border-color: black;
+}
+
+.border-gray-200{
+  border-color: #e4e4e7
 }
 
 .border-gray-400{
@@ -586,7 +612,7 @@ table tbody {
 }
 
 .rounded-sm{
-  border-radius: 1rem;
+  border-radius: 0.5rem;
 }
 
 .overflow-scroll {

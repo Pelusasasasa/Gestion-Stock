@@ -16,6 +16,7 @@ const tbody = document.getElementById('tbody');
 
 
 let servicios = [];
+let equipos = [];
 
 const agregarServicioALista = (servicio) => {
 
@@ -174,7 +175,6 @@ const listarServicios = async(lista) => {
         tdCliente.innerText = servicio.datosClientes?.nombre.toUpperCase() ?? '';
         tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
         tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
-        tdEstado.innerText = servicio.estado;
         tdVendedor.innerText = servicio.vendedor.nombre;
         tdAcciones.innerHTML = `
             <div class=tool>
@@ -186,7 +186,9 @@ const listarServicios = async(lista) => {
             <div class=tool>
                 <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
             </div>
-        `
+        `;
+
+        servicio
 
         tr.appendChild(tdNumero);
         tr.appendChild(tdFecha);
@@ -201,6 +203,11 @@ const listarServicios = async(lista) => {
         tbody.appendChild(tr);
     };
 };
+
+
+agregar.addEventListener('click', () => {
+    location.href = `./agregarServicio.html?vendedor=${vendedor}`;
+})
 
 document.addEventListener('keyup', (e) => {
     if(e.key === 'Escape'){
