@@ -26,7 +26,7 @@ const agregarHTMLServicio = (servicio = {}, equipo = {}) => {
     if(equipo.estado === 'Finalizado') colorEstado = 'bg-green-50 text-green-800';
     if(equipo.estado === 'Entregado') colorEstado = 'bg-blue-50 text-blue-800';
 
-    const parrafoEstado =  `<p class='m-0 ${colorEstado} px-1 text-sm rounded text-semibold rounded-full inline-flex'>${equipo?.estado ?? ''}</p>`
+    const parrafoEstado =  `<div class='flex justify-center items-center'><p class='m-0 ${colorEstado} justify-center px-1 text-sm rounded text-semibold rounded-full inline-flex'>${equipo?.estado ?? ''}</p></div>`
 
     const tr = document.createElement('tr');
         tr.id = servicio._id;
@@ -79,57 +79,6 @@ const agregarHTMLServicio = (servicio = {}, equipo = {}) => {
         
         
         tbody.appendChild(tr);
-}
-
-const agregarServicioALista = (servicio) => {
-
-    const fragment = document.createDocumentFragment();
-    const tr = document.createElement('tr');
-
-    tr.id = servicio._id;
-
-    const tdNumero = document.createElement('td');
-    const tdFecha = document.createElement('td');
-    const tdNombre = document.createElement('td');
-    const tdDireccion = document.createElement('td');
-    const tdTelefono = document.createElement('td');
-    const tdEstado = document.createElement('td');
-    const tdVendedor = document.createElement('td');
-    const tdAcciones = document.createElement('td');
-
-    tdAcciones.classList.add('flex');
-    tdAcciones.classList.add('gap-2');
-    tdAcciones.classList.add('justify-center');
-        
-    tdNumero.innerText = servicio.numero;
-    tdFecha.innerText = parsearFecha(servicio.fecha);
-    tdNombre.innerText = servicio.datosClientes?.nombre ?? '';
-    tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
-    tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
-    tdEstado.innerText = servicio.estado;
-    tdVendedor.innerText = servicio.vendedor.nombre;
-    tdAcciones.innerHTML = `
-            <div class=tool>
-                    <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
-                </div>
-            <div class=tool>
-                <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
-            </div>
-        `
-
-    tr.appendChild(tdNumero);
-    tr.appendChild(tdFecha);
-    tr.appendChild(tdNombre);
-    tr.appendChild(tdEstado);
-    tr.appendChild(tdVendedor);
-    tr.appendChild(tdAcciones);
-    tr.appendChild(tdDireccion);
-    tr.appendChild(tdTelefono);
-
-    fragment.appendChild(tr);
-
-    tbody.appendChild(fragment);
-
 };
 
 const buscar = (e) => {
@@ -220,7 +169,7 @@ const imprimirNuevoServicio = async(e) => {
 
         const { data } = await axios.post(`${URL}servicios`, servicio);
         if(data.ok){
-            agregarServicioALista(data.servicio);
+            agregarHTMLServicio(data.servicio, {});
             ipcRenderer.send('imprimir-servicio', {
                 servicio: data.servicio,
                 equipos: []
