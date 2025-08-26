@@ -57,11 +57,11 @@ const agregarServicioALista = (servicio) => {
     tr.appendChild(tdNumero);
     tr.appendChild(tdFecha);
     tr.appendChild(tdNombre);
-    tr.appendChild(tdDireccion);
-    tr.appendChild(tdTelefono);
     tr.appendChild(tdEstado);
     tr.appendChild(tdVendedor);
     tr.appendChild(tdAcciones);
+    tr.appendChild(tdDireccion);
+    tr.appendChild(tdTelefono);
 
     fragment.appendChild(tr);
 
@@ -190,6 +190,14 @@ const listarServicios = async(lista, equipos) => {
     for(let equipo of equipos){
         const servicio = lista.find(elem => elem.numero === equipo.numero);
 
+        let colorEstado = 'bg-red-50 text-red-800'
+
+        if(equipo.estado === 'Proceso') colorEstado = 'bg-yellow-50 text-yellow-800';
+        if(equipo.estado === 'Finalizado') colorEstado = 'bg-green-50 text-green-800';
+        if(equipo.estado === 'Entregado') colorEstado = 'bg-blue-50 text-blue-800';
+
+        const parrafoEstado =  `<p class='m-0 ${colorEstado} px-1 text-sm rounded text-semibold rounded-full inline-flex'>${equipo.estado}</p>`
+
         const tr = document.createElement('tr');
         tr.id = servicio._id;
 
@@ -212,8 +220,8 @@ const listarServicios = async(lista, equipos) => {
         tdCliente.innerText = servicio.datosClientes?.nombre.toUpperCase() ?? '';
         tdDireccion.innerText = servicio.datosClientes?.direccion ?? '';
         tdTelefono.innerText = servicio.datosClientes?.telefono ?? '';
-        tdEquipo.innerText = equipo.equipo.slice(0,30);
-        tdEstado.innerHTML = `<p class='m-0 bg-red-50 px-1 text-sm text-red-800 rounded text-semibold rounded-full inline-flex'>${equipo.estado}</p>`;
+        tdEquipo.innerText = equipo.equipo.slice(0,50);
+        tdEstado.innerHTML = parrafoEstado;
         tdVendedor.innerText = servicio.vendedor.nombre;
         tdAcciones.innerHTML = `
             <div class=tool>
@@ -232,12 +240,12 @@ const listarServicios = async(lista, equipos) => {
         tr.appendChild(tdNumero);
         tr.appendChild(tdFecha);
         tr.appendChild(tdCliente);
-        tr.appendChild(tdDireccion);
-        tr.appendChild(tdTelefono);
         tr.appendChild(tdEquipo);
         tr.appendChild(tdEstado);
         tr.appendChild(tdVendedor);
         tr.appendChild(tdAcciones);
+        tr.appendChild(tdDireccion);
+        tr.appendChild(tdTelefono);
         
         
         tbody.appendChild(tr);

@@ -18,7 +18,9 @@ const sugerencia = document.getElementById('sugerencia');
 
 
 ipcRenderer.on('imprimir-servicio', async(e, args) => {
+    console.log(JSON.parse(args))
     const {servicio, equipos} = JSON.parse(args);
+    console.log(equipos)
     await listarInfoServicio(servicio);
     await listarEquipos(equipos);
 
@@ -27,7 +29,6 @@ ipcRenderer.on('imprimir-servicio', async(e, args) => {
 
 
 const listarInfoServicio = (servicio) => {
-    console.log(servicio)
     fecha.innerText = parsearFecha(servicio.fecha);
     numero.innerText = `ST-${servicio.numero.toString().padStart(4, '0')}`
 

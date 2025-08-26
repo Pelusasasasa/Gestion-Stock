@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const Producto = new mongoose.Schema({
     _id:{
         type: String,
-        required:true
+        required:true,
+        trim: true,
+        set: value => value.toUpperCase()
     },
     descripcion:{
         type: String,

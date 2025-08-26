@@ -128,7 +128,7 @@ ipcMain.on('imprimir-recibo', (e, args) => {
 
 ipcMain.on('imprimir-servicio', (e, args) => {
   const servicio = args;
-  abrirVentana("impresiones/imprimirServicio.html", 800, 500, false, true);
+  abrirVentana("impresiones/imprimirServicio.html", 800, 500, false, false);
 
   nuevaVentana.webContents.on('did-finish-load', function(){
     nuevaVentana.webContents.send('imprimir-servicio', JSON.stringify(servicio));

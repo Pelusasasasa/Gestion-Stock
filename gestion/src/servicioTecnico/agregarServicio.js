@@ -1,6 +1,7 @@
 const { default: Swal } = require("sweetalert2");
 const { parsearFecha, getParameterByName, fechaConHora } = require("../helpers");
 const axios = require('axios');
+const { ipcRenderer } = require("electron");
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -88,9 +89,14 @@ const crearServicio = async() => {
 
     try {
         const { data } = await axios.post(`${URL}servicios`, servicio);
+
         if(data.ok){
             await Swal.fire('Servicio creado con exito', '', 'success');
-            location.href = './servicio.html';
+            ipcRenderer.send('imprimir-servicio', {
+                servicio: data.servicio,
+                equipos: data.equiposCargados
+            });
+            location.href = `./servicio.html?vendedor=${vendedor}`;
         }else{
             await Swal.fire('Error al crear el servicio', data.msg, 'error');
         };
@@ -100,10 +106,15 @@ const crearServicio = async() => {
     }
 };
 
-const eliminarEquipo = async(e) => {
+const cambiarEquipo = async(e) => {
     if(e.target.nodeName === 'SPAN'){
         productosAgregados.removeChild(e.target.parentNode.parentNode);
         equipos = equipos.filter(equipo => equipo.equipo !== e.target.parentNode.parentNode.children[0].innerText);
+    };
+
+    if(e.target.nodeName === 'SELECT'){
+        const equipoTraido = equipos.find(equipo => equipo.equipo === e.target.parentNode.children[0].innerText);
+        equipoTraido.estado = e.target.value
     };
 };
 
@@ -147,17 +158,25 @@ const listarServicio = (servicio, lista) => {
 
     for(let equipo of lista){
         equipos.push({
-        equipo:equipo.equipo,
+        _id: equipo._id,
+        equipo: equipo.equipo,
         marca: equipo.marca,
         serie: equipo.serie,
+        estado: equipo.estado
     });
 
     productosAgregados.innerHTML += `
-        <div class='grid columns-4-4fr-1fr-1fr-1fr w-full'>
-            <p class='m-0'>${equipo.equipo}</p>
-            <p class='m-0'>${equipo.marca}</p>
-            <p class='m-0'>${equipo.serie}</p>
-            <p class='m-0 cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
+        <div class='grid columns-5-4fr-1fr-1fr-1fr-1fr w-full'>
+            <p class='m-0 '>${equipo.equipo}</p>
+            <p class='m-0 text-center'>${equipo.marca}</p>
+            <p class='m-0 text-center'>${equipo.serie}</p>
+            <select id='estado' class='m-0 text-xs h-fit-content'>
+                <option ${equipo.estado === 'Pendiente' && 'selected'} value='Pendiente'>Sin Revisar</option>
+                <option ${equipo.estado === 'Proceso' && 'selected'} value='Proceso'>En Proceso</option>
+                <option ${equipo.estado === 'Finalizado' && 'selected'} value='Finalizado'>Finalizado</option>
+                <option ${equipo.estado === 'Entregado' && 'selected'} value='Entregado'>Entregado</option>
+            </select>
+            <p class='m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
         </div>
     `
     }
@@ -202,6 +221,7 @@ const modificarSerivicio = async() => {
         vendedor
     };
     try {
+        console.log(equipos)
         const { data } = await axios.put(`${URL}servicios/${modificar.id}`, {
             servicio,
             equipos
@@ -231,11 +251,17 @@ const seleccionarProducto = async(e) => {
     });
 
     productosAgregados.innerHTML += `
-        <div class='grid columns-4-4fr-1fr-1fr-1fr w-full'>
+        <div class='grid columns-5-4fr-1fr-1fr-1fr-1fr w-full'>
             <p class='m-0'>${productoDiv.children[1].innerText}</p>
-            <p class='m-0'>${productoDiv.children[2].innerText}</p>
-            <p class='m-0'>${value}</p>
-            <p class='m-0 cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
+            <p class='m-0 text-center'>${productoDiv.children[2].innerText}</p>
+            <p class='m-0 text-center'>${value}</p>
+            <select class='m-0 text-xs h-fit-content'>
+                <option selected>Sin Revisar</option>
+                <option>En Proceso</option>
+                <option>Finalizado</option>
+                <option>Entregado</option>
+            </select>
+            <p class='m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
         </div>
     `
 
@@ -277,5 +303,5 @@ cliente.addEventListener('keypress', buscarCliente);
 guardar.addEventListener('click', crearServicio);
 modificar.addEventListener('click', modificarSerivicio)
 producto.addEventListener('keypress', buscarProducto);
-productosAgregados.addEventListener('click', eliminarEquipo);
+productosAgregados.addEventListener('click', cambiarEquipo);
 window.addEventListener('load', cargarPagina);

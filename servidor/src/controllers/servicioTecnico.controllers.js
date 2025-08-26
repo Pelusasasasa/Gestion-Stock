@@ -157,7 +157,6 @@ servicioCTRL.traerPorNumero = async(req, res) => {
         });
 
         const equipos = await EquipoServicio.find({numero: numero});
-
         res.status(200).json({
             ok: true,
             servicio,
