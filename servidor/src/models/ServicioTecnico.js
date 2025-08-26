@@ -26,7 +26,8 @@ const Servicio = new Schema({
     },
     sugerencias: {
         type: String,
-        default: ''
+        default: '',
+        trim: true
     }
 });
 

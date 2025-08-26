@@ -8,6 +8,7 @@ const vendedor = getParameterByName('vendedor');
 
 const URL = process.env.GESTIONURL;
 
+const buscador = document.getElementById('buscador');
 const imprimir = document.getElementById('imprimir');
 const agregar = document.getElementById('agregar');
 
@@ -66,6 +67,22 @@ const agregarServicioALista = (servicio) => {
 
     tbody.appendChild(fragment);
 
+};
+
+const buscar = (e) => {
+    const texto = e.target.value.toUpperCase();
+
+
+    const equiposFiltrados = equipos.filter(elem => elem.equipo.toUpperCase().startsWith(texto));
+    const serviciosFiltrados = servicios.filter(elem => elem.datosClientes.nombre.toUpperCase().startsWith(texto));
+    
+    for(let servicio of serviciosFiltrados){
+        const equipo = equipos.filter(elem => elem.numero === servicio.numero);
+        equiposFiltrados.push(...equipo);
+    }
+    
+    const sinRepetidos = [...new Map(equiposFiltrados.map(item => [item._id, item])).values()];
+    listarServicios(servicios, sinRepetidos)
 };
 
 const cargarPagina = async () => {
@@ -166,6 +183,8 @@ const traerServicios = async() => {
 };
 
 const listarServicios = async(lista, equipos) => {
+    tbody.innerHTML = '';
+
     cantidad.innerText = lista.length;
 
     for(let equipo of equipos){
@@ -225,10 +244,11 @@ const listarServicios = async(lista, equipos) => {
     };
 };
 
-
 agregar.addEventListener('click', () => {
     location.href = `./agregarServicio.html?vendedor=${vendedor}`;
-})
+});
+
+buscador.addEventListener('keyup', buscar);
 
 document.addEventListener('keyup', (e) => {
     if(e.key === 'Escape'){
@@ -243,8 +263,7 @@ tbody.addEventListener('click', e => {
         reImprimirservicio(e);
     }else if(e.target.id === 'edit'){
         const numero = e.target.parentNode.parentNode.parentNode.children[0].innerText;
-        location.href = `./agregarServicio.html?vendedor${vendedor}&numero=${numero}`;
-        console.log(numero)
+        location.href = `./agregarServicio.html?vendedor=${vendedor}&numero=${numero}`;
     }else if(e.target.id === 'delete'){
         eliminarServicio(e)
     };

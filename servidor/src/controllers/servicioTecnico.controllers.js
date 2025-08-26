@@ -88,17 +88,17 @@ servicioCTRL.traerPorId = async(req, res) => {
 
 servicioCTRL.modificarPorId = async(req, res) => {
     const {id} = req.params;
-    const { equipos } = req.body;
+    const { servicio, equipos } = req.body;
     try {
-        const servicio = await Servicio.findByIdAndUpdate(id, req.body);
-        if(!servicio){
+        const servicioTraido = await Servicio.findByIdAndUpdate(id, servicio, {new: true});
+        if(!servicioTraido){
             res.status(404).json({
                 ok: false,
                 msg: 'No existe el servicio tecnico'
             })
         };
 
-        const equiposModificados = await modificarEquipos(equipos);
+        const equiposModificados = await modificarEquipos(equipos, servicioTraido.numero);
 
         if(!equiposModificados) return res.status(404).json({
             ok: false,
@@ -107,7 +107,7 @@ servicioCTRL.modificarPorId = async(req, res) => {
 
         res.status(200).json({
             ok: true,
-            servicio,
+            servicio: servicioTraido,
             equiposModificados
         })
     } catch (error) {

@@ -29,7 +29,7 @@ exports.modificarEquipos = async(equipos, numero) => {
         const equiposCargados = await EquipoServicio.find({numero: numero});
 
         for(let equipo of equipos){
-            let index = equiposCargados.findIndex(equipoCargado => equipoCargado._id === equipo._id);
+            let index = equiposCargados.findIndex(equipoCargado => equipoCargado.equipo === equipo.equipo);
 
             if(index === -1){
                 equipo.numero = numero;

@@ -340,6 +340,10 @@ table tbody {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.columns-4-4fr-1fr-1fr-1fr{
+  grid-template-columns: 4fr 1fr 1fr 1fr;
+}
+
 .colums-4-1fr-4fr-1fr-1fr{
   grid-template-columns: 1fr 4fr 1fr 1fr;
 }

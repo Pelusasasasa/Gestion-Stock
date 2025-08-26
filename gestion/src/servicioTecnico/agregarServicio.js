@@ -7,10 +7,12 @@ const URL = process.env.GESTIONURL;
 
 let vendedor = getParameterByName('vendedor');
 let numeroTraido = getParameterByName('numero')
+console.log(vendedor, numeroTraido);
 
 
 const cancelar = document.getElementById('cancelar');
 const guardar = document.getElementById('guardar');
+const modificar = document.getElementById('modificar');
 
 const numero = document.getElementById('numero');
 const fecha = document.getElementById('fecha');
@@ -62,7 +64,7 @@ const cargarPagina = async() => {
     fecha.value = parsearFecha(fechaActual).slice(0, 10).split('/', 3).reverse().join('-');
 
     const  { data } = await axios.get(`${URL}numero`);
-    numero.value = `ST-${(data.Servicio + 1).toString().padStart(4, '0')}`;
+    numero.value = `ST-${(data.Servicio).toString().padStart(4, '0')}`;
 
 
     traerParaModificar();
@@ -101,9 +103,9 @@ const crearServicio = async() => {
 const eliminarEquipo = async(e) => {
     if(e.target.nodeName === 'SPAN'){
         productosAgregados.removeChild(e.target.parentNode.parentNode);
-        equipos = equipos.filter(equipo => equipo.equipo === e.target.parentNode.parentNode.children[1].innerText);
-    }
-}
+        equipos = equipos.filter(equipo => equipo.equipo !== e.target.parentNode.parentNode.children[0].innerText);
+    };
+};
 
 const listarClientes = (lista) => {
     listaClientes.innerHTML = '';
@@ -151,7 +153,7 @@ const listarServicio = (servicio, lista) => {
     });
 
     productosAgregados.innerHTML += `
-        <div class='flex justify-between w-full'>
+        <div class='grid columns-4-4fr-1fr-1fr-1fr w-full'>
             <p class='m-0'>${equipo.equipo}</p>
             <p class='m-0'>${equipo.marca}</p>
             <p class='m-0'>${equipo.serie}</p>
@@ -185,6 +187,30 @@ const listarProductos = (lista) => {
 
         listaProductos.appendChild(div);
     };
+
+};
+
+const modificarSerivicio = async() => {
+    const servicio = {
+        fecha: fechaConHora(fecha.value),
+        datosClientes: {
+            nombre: cliente.value,
+            direccion: direccion.value,
+            telefono: telefono.value
+        },
+        sugerencias: sugerencia.value,
+        vendedor
+    };
+    try {
+        const { data } = await axios.put(`${URL}servicios/${modificar.id}`, {
+            servicio,
+            equipos
+        });
+        console.log(data);
+    } catch (error) {
+        console.log(error);
+        return await Swal.fire('Error al modifiar el servicio Tecnico', error.response.data.msg, 'error');
+    }
 };
 
 const seleccionarProducto = async(e) => {
@@ -205,8 +231,7 @@ const seleccionarProducto = async(e) => {
     });
 
     productosAgregados.innerHTML += `
-        <div class='flex justify-between w-full'>
-            <p class='m-0'>${productoDiv.children[0].innerText}</p>
+        <div class='grid columns-4-4fr-1fr-1fr-1fr w-full'>
             <p class='m-0'>${productoDiv.children[1].innerText}</p>
             <p class='m-0'>${productoDiv.children[2].innerText}</p>
             <p class='m-0'>${value}</p>
@@ -235,6 +260,9 @@ const traerParaModificar = async() => {
         const { data }  = await axios.get(`${URL}servicios/numero/${numeroTraido}`);
         if(data.ok){
             listarServicio(data.servicio, data.equipos);
+            guardar.classList.add('none');
+            modificar.classList.remove('none');
+            modificar.id = data.servicio._id;
         }else{
             return await Swal.fire('Error al obtener el servicio', data.msg, 'error');
         };
@@ -245,9 +273,9 @@ const traerParaModificar = async() => {
 };
 
 cancelar.addEventListener('click', () => location.href = './servicio.html');
-
 cliente.addEventListener('keypress', buscarCliente);
+guardar.addEventListener('click', crearServicio);
+modificar.addEventListener('click', modificarSerivicio)
 producto.addEventListener('keypress', buscarProducto);
 productosAgregados.addEventListener('click', eliminarEquipo);
-guardar.addEventListener('click', crearServicio);
 window.addEventListener('load', cargarPagina);

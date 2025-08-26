@@ -35,6 +35,8 @@ const listarInfoServicio = (servicio) => {
     direccion.innerText = servicio.datosClientes?.direccion;
     telefono.innerText = servicio.datosClientes?.telefono;
 
+    sugerencia.innerText = servicio.sugerencias;
+
 };
 
 const listarEquipos = (equipos) => {
