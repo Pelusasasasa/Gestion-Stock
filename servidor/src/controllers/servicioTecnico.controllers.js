@@ -123,7 +123,7 @@ servicioCTRL.traerActivos = async(req,res)=>{
     try {
         let equipos = [];
         const servicios = await Servicio.find({activo: true})
-        .populate('vendedor', ['nombre', 'permiso']);
+        .populate('vendedor', ['nombre', 'permiso']).sort({fecha: -1});
 
         for(let servicio of servicios){
             const equipo = await EquipoServicio.find({numero: servicio.numero});

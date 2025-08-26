@@ -29,7 +29,8 @@ exports.modificarEquipos = async(equipos, numero) => {
         const equiposCargados = await EquipoServicio.find({numero: numero});
         
         for(let equipo of equipos){
-            let index = equiposCargados.findIndex(equipoCargado => equipoCargado._id === equipo._id);
+            let index = equiposCargados.findIndex(equipoCargado => equipoCargado._id == equipo._id);
+
             if(index === -1){
                 equipo.numero = numero;
                 const equipoNuevo = new EquipoServicio(equipo);
@@ -37,7 +38,6 @@ exports.modificarEquipos = async(equipos, numero) => {
                 equiposModificados.push(equipoNuevo);
             }else{
                 const equipoActualizado = await EquipoServicio.findByIdAndUpdate(equipo._id, equipo, {new: true});
-                console.log(equipoActualizado)
                 equiposModificados.push(equipoActualizado);
             };
         };

@@ -40,10 +40,10 @@ const listarInfoServicio = (servicio) => {
 
 };
 
-const listarEquipos = (equipos) => {
+const listarEquipos = (equipos = []) => {
     const fragment = document.createDocumentFragment();
     tbody.innerHTML = '';
-
+    
     for(let equipo of equipos) {
         const tr = document.createElement('tr');
         

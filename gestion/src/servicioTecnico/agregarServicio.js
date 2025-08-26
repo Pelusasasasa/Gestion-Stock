@@ -8,8 +8,6 @@ const URL = process.env.GESTIONURL;
 
 let vendedor = getParameterByName('vendedor');
 let numeroTraido = getParameterByName('numero')
-console.log(vendedor, numeroTraido);
-
 
 const cancelar = document.getElementById('cancelar');
 const guardar = document.getElementById('guardar');
@@ -150,9 +148,9 @@ const listarServicio = (servicio, lista) => {
     numero.value = `ST-${servicio.numero.toString().padStart(4, '0')}`;
     fecha.value = parsearFecha(servicio.fecha).slice(0, 10).split('/', 3).reverse().join('-');
 
-    cliente.value = servicio.datosClientes.nombre;
-    direccion.value = servicio.datosClientes.direccion;
-    telefono.value = servicio.datosClientes.telefono;
+    cliente.value = servicio?.datosClientes?.nombre ?? '';
+    direccion.value = servicio?.datosClientes?.direccion ?? '';
+    telefono.value = servicio?.datosClientes?.telefono ?? '';
 
     sugerencia.value = servicio.sugerencias;
 
@@ -226,7 +224,21 @@ const modificarSerivicio = async() => {
             servicio,
             equipos
         });
-        console.log(data);
+        
+        const { isConfirmed } = await Swal.fire({
+            title: 'Quiere Reimprimir',
+            confirmButtonText: 'Aceptar',
+            showCancelButton: true
+        });
+
+        if(isConfirmed){
+            ipcRenderer.send('imprimir-servicio', {
+                servicio: data.servicio,
+                equipos: data.equiposCargados
+            });
+        }
+
+        location.href = `./servicio.html?vendedor=${vendedor}`;
     } catch (error) {
         console.log(error);
         return await Swal.fire('Error al modifiar el servicio Tecnico', error.response.data.msg, 'error');
