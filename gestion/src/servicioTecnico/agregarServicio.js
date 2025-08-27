@@ -1,5 +1,5 @@
 const { default: Swal } = require("sweetalert2");
-const { parsearFecha, getParameterByName, fechaConHora } = require("../helpers");
+const { parsearFecha, getParameterByName, fechaConHora, masVeinticuatroHoras } = require("../helpers");
 const axios = require('axios');
 const { ipcRenderer } = require("electron");
 require('dotenv').config();
@@ -7,6 +7,7 @@ require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 let vendedor = getParameterByName('vendedor');
+let permiso = getParameterByName('permiso');
 let numeroTraido = getParameterByName('numero')
 
 const cancelar = document.getElementById('cancelar');
@@ -23,6 +24,7 @@ const sugerencia = document.getElementById('sugerencia');
 const listaClientes = document.getElementById('listaClientes');
 const listaProductos = document.getElementById('listaProductos');
 const productosAgregados = document.getElementById('productosAgregados');
+const tbody = document.getElementById('tbody');
 
 let equipos = [];
 
@@ -144,6 +146,33 @@ const listarClientes = (lista) => {
     };
 };
 
+const listarHistorial = (historial) => {
+    const fragment = document.createDocumentFragment();
+    for(let elem of historial){
+        const tr = document.createElement('tr');
+
+        const tdFecha = document.createElement('td');
+        const tdEquipo = document.createElement('td');
+        const tdEstado = document.createElement('td');
+
+        tdFecha.classList.add('border', 'text-center');
+        tdEquipo.classList.add('border', 'text-center');
+        tdEstado.classList.add('border', 'text-center');
+
+        tdFecha.innerText = parsearFecha(elem.fecha);
+        tdEquipo.innerText = elem.equipo?.slice(0, 50) ?? '';
+        tdEstado.innerText = elem.estado;
+
+        tr.appendChild(tdFecha);
+        tr.appendChild(tdEquipo);
+        tr.appendChild(tdEstado);
+
+        fragment.appendChild(tr);
+    };
+    console.log(tbody)
+    tbody.appendChild(fragment)
+}
+
 const listarServicio = (servicio, lista) => {
     numero.value = `ST-${servicio.numero.toString().padStart(4, '0')}`;
     fecha.value = parsearFecha(servicio.fecha).slice(0, 10).split('/', 3).reverse().join('-');
@@ -174,7 +203,7 @@ const listarServicio = (servicio, lista) => {
                 <option ${equipo.estado === 'Finalizado' && 'selected'} value='Finalizado'>Finalizado</option>
                 <option ${equipo.estado === 'Entregado' && 'selected'} value='Entregado'>Entregado</option>
             </select>
-            <p class='m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
+            <p class='${verDisponibilidadParaEliminar(servicio)} m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
         </div>
     `
     }
@@ -296,11 +325,20 @@ const traerParaModificar = async() => {
 
     try {
         const { data }  = await axios.get(`${URL}servicios/numero/${numeroTraido}`);
+
         if(data.ok){
             listarServicio(data.servicio, data.equipos);
+            listarHistorial(data.historial)
+
             guardar.classList.add('none');
             modificar.classList.remove('none');
             modificar.id = data.servicio._id;
+
+            if(permiso === "2"){
+                fecha.disabled = true;
+                cliente.disabled = true;
+                producto.disabled = true;
+            }
         }else{
             return await Swal.fire('Error al obtener el servicio', data.msg, 'error');
         };
@@ -310,10 +348,21 @@ const traerParaModificar = async() => {
     }
 };
 
+const verDisponibilidadParaEliminar = (servicio) => {
+    if(permiso === '2' && numeroTraido){
+        return 'none';
+    }else if(permiso === '1'){
+        const aux = masVeinticuatroHoras(servicio.fecha);
+        return aux ? 'none' : '';
+    }else{
+        return '';
+    }
+};
+
 cancelar.addEventListener('click', () => location.href = './servicio.html');
 cliente.addEventListener('keypress', buscarCliente);
 guardar.addEventListener('click', crearServicio);
-modificar.addEventListener('click', modificarSerivicio)
+modificar.addEventListener('click', modificarSerivicio);
 producto.addEventListener('keypress', buscarProducto);
 productosAgregados.addEventListener('click', cambiarEquipo);
 window.addEventListener('load', cargarPagina);

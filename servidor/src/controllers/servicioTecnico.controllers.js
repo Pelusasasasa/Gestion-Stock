@@ -1,9 +1,11 @@
 const servicioCTRL = {};
+const Servicio = require('../models/ServicioTecnico');
+const EquipoServicio = require('../models/EquipoServicio');
+const ServicioHistorial = require('../models/ServicioHistorial')
 
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { modificarEquipos, cargarEquipos } = require('../helpers/cargarEquipos');
-const EquipoServicio = require('../models/EquipoServicio');
-const Servicio = require('../models/ServicioTecnico');
+const { cargarHistoricaServicio } = require('../helpers/cargarHistoricaServicio');
 
 servicioCTRL.eliminarPorID = async(req, res) => {
     const {id} = req.params;
@@ -39,6 +41,9 @@ servicioCTRL.crearServicio = async(req, res)=>{
         const servicio = new Servicio(req.body);
     
         const equiposCargados = await cargarEquipos(equipos, req.body.numero);
+
+        const historialCargado = await cargarHistoricaServicio(equiposCargados, req.body.numero);
+
         if(!equiposCargados){
             return res.status(500).json({
                 ok: false,
@@ -53,7 +58,8 @@ servicioCTRL.crearServicio = async(req, res)=>{
         res.status(201).json({
             ok: true,
             servicio: nuevoServicio,
-            equiposCargados
+            equiposCargados,
+            historialCargado
         });
 
     } catch (error) {
@@ -72,11 +78,15 @@ servicioCTRL.traerPorId = async(req, res) => {
         .populate('vendedor', ['nombre', 'permiso']);
 
         const equipos = await EquipoServicio.find({numero: servicio.numero});
+        const historial = await ServicioHistorial.find({numero: servicio.numero});
+
         res.status(200).json({
             ok: true,
             servicio,
-            equipos
-        })
+            equipos,
+            historial
+        });
+
     } catch (error) {
         console.log(error)
         res.status(500).json({
@@ -157,10 +167,13 @@ servicioCTRL.traerPorNumero = async(req, res) => {
         });
 
         const equipos = await EquipoServicio.find({numero: numero});
+        const historial = await ServicioHistorial.find({numero: servicio.numero});
+
         res.status(200).json({
             ok: true,
             servicio,
-            equipos
+            equipos,
+            historial
         });
     } catch (error) {
         console.log(error);

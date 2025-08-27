@@ -16,17 +16,14 @@ const tbody = document.getElementById('tbody');
 const sugerencia = document.getElementById('sugerencia');
 
 
-
 ipcRenderer.on('imprimir-servicio', async(e, args) => {
-    console.log(JSON.parse(args))
     const {servicio, equipos} = JSON.parse(args);
-    console.log(equipos)
+    
     await listarInfoServicio(servicio);
     await listarEquipos(equipos);
 
     ipcRenderer.send('imprimir-ventana');
 });
-
 
 const listarInfoServicio = (servicio) => {
     fecha.innerText = parsearFecha(servicio.fecha);
@@ -52,18 +49,22 @@ const listarEquipos = (equipos = []) => {
         const tdEquipo = document.createElement('td');
         const tdMarca = document.createElement('td');
         const tdSerie = document.createElement('td');
+        const tdEstado = document.createElement('td');
 
         tdEquipo.classList.add('border');
         tdMarca.classList.add('border');
         tdSerie.classList.add('border');
+        tdEstado.classList.add('border');
 
         tdEquipo.innerText = equipo.equipo
         tdMarca.innerText = equipo.marca
         tdSerie.innerText = equipo.serie
+        tdEstado.innerText = equipo.estado
 
         tr.appendChild(tdEquipo),
         tr.appendChild(tdMarca),
         tr.appendChild(tdSerie),
+        tr.appendChild(tdEstado),
 
         fragment.appendChild(tr)
     };

@@ -1,5 +1,7 @@
 const EquipoServicio = require("../models/EquipoServicio");
 
+const {cargarHistoricaServicio} = require('./cargarHistoricaServicio')
+
 exports.cargarEquipos = async(equipos = [], numero) => {
     const nuevosEquipos = [];
 
@@ -36,9 +38,19 @@ exports.modificarEquipos = async(equipos, numero) => {
                 const equipoNuevo = new EquipoServicio(equipo);
                 await equipoNuevo.save();
                 equiposModificados.push(equipoNuevo);
+
+                await cargarHistoricaServicio([equipoNuevo], numero);
             }else{
-                const equipoActualizado = await EquipoServicio.findByIdAndUpdate(equipo._id, equipo, {new: true});
-                equiposModificados.push(equipoActualizado);
+                const equipoActualizado = await EquipoServicio.updateOne(
+                    {_id: equipo._id},
+                    {$set: equipo}
+                );
+
+                if(equipoActualizado.modifiedCount > 0){
+                    await cargarHistoricaServicio([equipo], numero);
+                }
+
+                equiposModificados.push(equipo);
             };
         };
 

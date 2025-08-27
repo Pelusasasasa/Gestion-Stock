@@ -651,5 +651,18 @@ funciones.fechaConHora = ( fecha ) => {
     const hoy = new Date();
     const fechaConHora = new Date(fecha + "T" + hoy.toTimeString().split(" ")[0]);
     return fechaConHora
+};
+
+funciones.masVeinticuatroHoras = (fechaTraida) => {
+    const fecha = new Date(fechaTraida);
+    const ahora = new Date();
+    const diffMs = ahora - fecha
+    const difHoras = diffMs / (1000 * 60 * 60);
+    
+    if(difHoras > 24){
+        return true
+    }else{
+        return false
+    }
 }
 module.exports = funciones;

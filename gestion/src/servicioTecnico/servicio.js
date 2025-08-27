@@ -5,6 +5,7 @@ const { parsearFecha, getParameterByName } = require('../helpers');
 const { ipcRenderer } = require('electron');
 
 const vendedor = getParameterByName('vendedor');
+const permiso = getParameterByName('permiso');
 
 const URL = process.env.GESTIONURL;
 
@@ -241,9 +242,16 @@ tbody.addEventListener('click', e => {
         reImprimirservicio(e);
     }else if(e.target.id === 'edit'){
         const numero = e.target.parentNode.parentNode.parentNode.children[0].innerText;
-        location.href = `./agregarServicio.html?vendedor=${vendedor}&numero=${numero}`;
+        location.href = `./agregarServicio.html?vendedor=${vendedor}&numero=${numero}&permiso=${permiso}`;
     }else if(e.target.id === 'delete'){
         eliminarServicio(e)
+    };
+});
+
+tbody.addEventListener('dblclick', e => {
+    if(e.target.nodeName === 'TD'){
+        const numero = e.target.parentNode.children[0].innerText;
+        location.href = `./agregarServicio.html?vendedor=${vendedor}&numero=${numero}&permiso=${permiso}`;
     };
 });
 
