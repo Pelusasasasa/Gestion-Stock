@@ -4,6 +4,7 @@ const dolarInstalador = document.querySelector('#dolarInstalador');
 //Identificador
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
+const codigoSecundario = document.querySelector('#codigoSecundario');
 //Informacion
 const unidad = document.querySelector('#unidad');
 const marca = document.querySelector('#marca');
@@ -89,6 +90,7 @@ guardar.addEventListener('click', async e => {
     if (verificacion) {
         producto._id = codigo.value;
         producto.descripcion = descripcion.value.trim().toUpperCase();
+        producto.codigoSecundario = codigoSecundario.value;
         producto.marca = marca.value.trim().toUpperCase();
         producto.rubro = rubro.value.trim();
         producto.provedor = provedor.value.toUpperCase().trim();

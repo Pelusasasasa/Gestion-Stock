@@ -33,7 +33,7 @@ archivo.addEventListener('change', (e) => {
         await llenarLista(res.productos);
 
         if (tipo.value === 'HIKVISION') {
-            let datos = xlsx.utils.sheet_to_json(woorbook.Sheets['MPS']);
+            let datos = xlsx.utils.sheet_to_json(woorbook.Sheets['Lista']);
             cambiarPrecioshikvision(datos, res.productos);
         }
     };
@@ -48,14 +48,24 @@ const apretarTecla = (e) => {
 }
 
 const cambiarPrecioshikvision = (datos, productos) => {
+    
     for (let producto of productos) {
-        const productoAux = datos.find(elem => producto._id == elem.EAN);
+        let productoAux = datos.find(elem => producto._id == elem.SAP);
+        if(!productoAux){
+            productoAux = datos.find(elem => elem.SAP == producto.codigoSecundario);
+            console.log(productoAux);
+        };
+        if(!productoAux) continue;
+        
+        productoAux.GREMIO = parseFloat(productoAux.GREMIO.replace('US$', ''));
 
         if (producto.costoDolar !== 0) {
-            producto.costoDolar = productoAux ? productoAux.Costo : producto.costoDolar;
+            producto.costoDolar = productoAux ? productoAux.GREMIO : producto.costoDolar;
         } else {
-            producto.costo = productoAux ? productoAux.Costo : producto.costoDolar;
+            producto.costo = productoAux ? productoAux.GREMIO : producto.costoDolar;
         };
+
+        console.log(producto);
 
         productosModificados.push(producto);
 
@@ -76,13 +86,13 @@ const cambiarPrecioshikvision = (datos, productos) => {
         tdPrecioNuevo.value = utilidad.toFixed(2);
 
         const tr = document.getElementById(producto._id);
-        porcentaje = producto.precio !== 0 ? (producto.precio - parseFloat(tr.children[3].innerText)) / parseFloat(tr.children[3].innerText) * 100 : 0;
+        porcentaje = producto.precio !== 0 ? (producto.precio - parseFloat(tr.children[4].innerText)) / parseFloat(tr.children[4].innerText) * 100 : 0;
         tdPorcentaje.value = porcentaje.toFixed(2) + " %";
 
-        tr.children[4].innerText = tdCostoNuevo.value;
-        tr.children[5].innerText = tdPrecioNuevo.value;
-        tr.children[6].innerText = tdPorcentaje.value;
-    }
+        tr.children[5].innerText = tdCostoNuevo.value;
+        tr.children[6].innerText = tdPrecioNuevo.value;
+        tr.children[7].innerText = tdPorcentaje.value;
+    };
 };
 
 const cargarArchvio = async () => {
@@ -114,14 +124,25 @@ const llenarLista = async (productos) => {
 
         const tdCodigo = document.createElement('td');
         const tdDescripcion = document.createElement('td');
+        const tdCodigoSecundario = document.createElement('td');
         const tdCosto = document.createElement('td');
         const tdPrecio = document.createElement('td');
         const tdCostoNuevo = document.createElement('td');
         const tdPrecioNuevo = document.createElement('td');
         const tdPorcentaje = document.createElement('td');
 
+        tdCodigo.classList.add('border', 'text-center');
+        tdDescripcion.classList.add('border', 'text-center');
+        tdCodigoSecundario.classList.add('border', 'text-center');
+        tdCosto.classList.add('border', 'text-center');
+        tdPrecio.classList.add('border', 'text-center');
+        tdCostoNuevo.classList.add('border', 'text-center');
+        tdPrecioNuevo.classList.add('border', 'text-center');
+        tdPorcentaje.classList.add('border', 'text-center');
+
         tdCodigo.textContent = producto._id;
         tdDescripcion.textContent = producto.descripcion.slice(0, 30);
+        tdCodigoSecundario.textContent = producto.codigoSecundario;
         tdCosto.textContent = producto.costoDolar !== 0 ? producto.costoDolar.toFixed(2) : producto.costo.toFixed(2);
         tdPrecio.textContent = producto.precio.toFixed(2);
         tdCostoNuevo.textContent = tdCosto.textContent;
@@ -131,6 +152,7 @@ const llenarLista = async (productos) => {
 
         tr.appendChild(tdCodigo);
         tr.appendChild(tdDescripcion);
+        tr.appendChild(tdCodigoSecundario);
         tr.appendChild(tdCosto);
         tr.appendChild(tdPrecio);
         tr.appendChild(tdCostoNuevo);
@@ -145,7 +167,7 @@ const llenarLista = async (productos) => {
 const mostrarMensaje = (e) => {
 
     if (e.target.value === 'HIKVISION') {
-        mensaje.innerText = 'La Columa del codigo de barra tiene que llamarse EAN y la del precio final Costo, tambien la hoja del excel tiene que llamarse MPS'
+        mensaje.innerText = 'La Columa del codigo de barra tiene que llamarse "SAP" y la del precio final "GREMIO", tambien la hoja del excel tiene que llamarse "Lista"'
     }
 
 };

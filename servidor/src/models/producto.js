@@ -7,6 +7,12 @@ const Producto = new mongoose.Schema({
         trim: true,
         set: value => value.toUpperCase()
     },
+    codigoSecundario: {
+        type: String,
+        trim: true,
+        default: '',
+        set: value => value.toUpperCase(),
+    },
     descripcion:{
         type: String,
         required:true,

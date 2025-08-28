@@ -12,8 +12,10 @@ const archivo = require('../configuracion.json')
 //Identificador
 const dolar = document.getElementById('dolar');
 const dolarInstalador = document.getElementById('dolarInstalador');
+
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
+const codigoSecundario = document.querySelector('#codigoSecundario');
 //Informacion
 const unidad = document.querySelector('#unidad');
 const marca = document.querySelector('#marca');
@@ -92,6 +94,7 @@ const llenarInputs = async (codigoProducto) => {
     const producto = (await axios.get(`${URL}productos/${id}`)).data;
 
     descripcion.value = producto.descripcion;
+    codigoSecundario.value = producto.codigoSecundario;
     unidad.value = producto.unidad;
     marca.value = producto.marca;
     select.value = producto.rubro;
@@ -120,6 +123,7 @@ modificar.addEventListener('click', async e => {
         const producto = {};
         producto._id = codigo.value;
         producto.descripcion = descripcion.value.trim().toUpperCase();
+        producto.codigoSecundario = codigoSecundario.value;
         producto.unidad = unidad.value;
         producto.marca = marca.value.trim().toUpperCase();
         producto.rubro = rubro.value;
@@ -137,9 +141,7 @@ modificar.addEventListener('click', async e => {
 
         vendedor && await agregarMovimientoVendedores(`Modifico el producto ${producto.descripcion} con el precio ${producto.precio}`, vendedor);
 
-        await sweet.fire({
-            title: mensaje
-        });
+        await sweet.fire('Producto Modificado Correctamente', '', 'success');
 
         if (estado) {
             window.close();
