@@ -228,7 +228,9 @@ const clickHistorica = async (e) => {
 
 const facturarVarios = async () => {
     let html = '';
+
     const comprobantes = document.querySelectorAll('tbody tr')
+
     for (let elem of comprobantes) {
         if (elem.children[3].innerText.toUpperCase() === "COMPROBANTE") {
             html += `
@@ -253,7 +255,7 @@ const facturarVarios = async () => {
     if (isConfirmed) {
         const chequeados = document.querySelectorAll('input[type=checkbox]');
         chequeados.forEach(elem => elem.checked && values.push(elem.id));
-
+        
         ipcRenderer.send('facturarVarios', JSON.stringify(values));
     };
 };

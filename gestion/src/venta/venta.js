@@ -661,9 +661,11 @@ ipcRenderer.on('informacion', (e, args) => {
 
 ipcRenderer.on('facturarVarios', async (e, args) => {
     cuentas = JSON.parse(args);
+    
     facturaVarios = true;
 
     const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
+    
     try {
         const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
         if (data.ok){
@@ -679,9 +681,21 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
 
     for (let elem of cuentas) {
         const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
+        
         for await (let mov of movs) {
             const res = mov.codProd.toUpperCase().replace(/\//g, '%2F');
-            let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            let producto = {}
+            if(res){
+                producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            }else{
+                producto = {
+                    descripcion: mov.producto,
+                    precio: mov.precio,
+                    impuesto: mov.iva,
+                    _id: '',
+                    marca: '',
+                };
+            };
             listarProducto(producto, mov.cantidad, mov.series);
         };
     };
