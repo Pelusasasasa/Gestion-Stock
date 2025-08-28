@@ -248,12 +248,11 @@ const modificarSerivicio = async() => {
         vendedor
     };
     try {
-        console.log(equipos)
         const { data } = await axios.put(`${URL}servicios/${modificar.id}`, {
             servicio,
-            equipos
+            equipos,
+            vendedor
         });
-        
         const { isConfirmed } = await Swal.fire({
             title: 'Quiere Reimprimir',
             confirmButtonText: 'Aceptar',
@@ -263,7 +262,7 @@ const modificarSerivicio = async() => {
         if(isConfirmed){
             ipcRenderer.send('imprimir-servicio', {
                 servicio: data.servicio,
-                equipos: data.equiposCargados
+                equipos: data.equiposModificados
             });
         }
 

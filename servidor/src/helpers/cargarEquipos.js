@@ -1,6 +1,7 @@
 const EquipoServicio = require("../models/EquipoServicio");
 
-const {cargarHistoricaServicio} = require('./cargarHistoricaServicio')
+const {cargarHistoricaServicio} = require('./cargarHistoricaServicio');
+const { crearMovimientoVendedores } = require("./crearMovimientoVendedores");
 
 exports.cargarEquipos = async(equipos = [], numero) => {
     const nuevosEquipos = [];
@@ -51,6 +52,16 @@ exports.modificarEquipos = async(equipos, numero) => {
                 }
 
                 equiposModificados.push(equipo);
+            };
+        };
+
+        for(let equipo of equiposCargados){
+            const equipoAux = equiposModificados.find(elem => elem._id == equipo._id);
+
+            if(!equipoAux){
+                equipo.estado = 'Eliminado'
+                await EquipoServicio.findByIdAndDelete(equipo._id);
+                await cargarHistoricaServicio([equipo], numero)
             };
         };
 

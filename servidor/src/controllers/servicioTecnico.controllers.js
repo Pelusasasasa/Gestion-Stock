@@ -6,12 +6,14 @@ const ServicioHistorial = require('../models/ServicioHistorial')
 const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { modificarEquipos, cargarEquipos } = require('../helpers/cargarEquipos');
 const { cargarHistoricaServicio } = require('../helpers/cargarHistoricaServicio');
+const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 
 servicioCTRL.eliminarPorID = async(req, res) => {
     const {id} = req.params;
 
     try {
         const servicio = await Servicio.findByIdAndUpdate(id, { activo: false});
+        crearMovimientoVendedores(`Elimino el servico numero ${servicio.numero} del cliente ${servicio.datosClientes.nombre}`, req.query.vendedor, 'Servicio');
 
         res.status(200).json({
             ok: true,
@@ -54,6 +56,8 @@ servicioCTRL.crearServicio = async(req, res)=>{
         await servicio.save();
 
         const nuevoServicio = await Servicio.findById(servicio._id).populate('vendedor', ['nombre']);
+
+        await crearMovimientoVendedores(`Creo el servicio numero ${servicio.numero} del cliente ${servicio.datosClientes.nombre}`, servicio.vendedor, 'Servicio')
 
         res.status(201).json({
             ok: true,
@@ -98,7 +102,7 @@ servicioCTRL.traerPorId = async(req, res) => {
 
 servicioCTRL.modificarPorId = async(req, res) => {
     const {id} = req.params;
-    const { servicio, equipos } = req.body;
+    const { servicio, equipos, vendedor } = req.body;
     try {
         const servicioTraido = await Servicio.findByIdAndUpdate(id, servicio, {new: true});
         if(!servicioTraido){
@@ -115,11 +119,14 @@ servicioCTRL.modificarPorId = async(req, res) => {
             msg: 'No se pudo modificar los equipos'
         });
 
+        await crearMovimientoVendedores(`Modifico el servicio ${servicioTraido.numero} del cliente ${servicioTraido.datosClientes.nombre}`, vendedor, 'Servicio')
+
         res.status(200).json({
             ok: true,
             servicio: servicioTraido,
             equiposModificados
-        })
+        });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({

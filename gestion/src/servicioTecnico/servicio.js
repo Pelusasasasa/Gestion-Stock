@@ -135,7 +135,9 @@ const eliminarServicio = async(e) => {
 
     try {
         
-        const { data } = await axios.delete(`${URL}servicios/${id}`);
+        const { data } = await axios.delete(`${URL}servicios/${id}`, {
+            params: {vendedor}
+        });
         if(data.ok){
             await Swal.fire('Servicio eliminado', '', 'success');
             document.getElementById(id).remove();
