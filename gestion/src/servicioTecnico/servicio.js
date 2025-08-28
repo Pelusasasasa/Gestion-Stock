@@ -26,6 +26,7 @@ const agregarHTMLServicio = (servicio = {}, equipo = {}) => {
     if(equipo.estado === 'Proceso') colorEstado = 'bg-yellow-50 text-yellow-800';
     if(equipo.estado === 'Finalizado') colorEstado = 'bg-green-50 text-green-800';
     if(equipo.estado === 'Entregado') colorEstado = 'bg-blue-50 text-blue-800';
+    if(equipo.estado === 'Sin Solucion') colorEstado = 'bg-black text-white';
 
     const parrafoEstado =  `<div class='flex justify-center items-center'><p class='m-0 ${colorEstado} justify-center px-1 text-sm rounded text-semibold rounded-full inline-flex'>${equipo?.estado ?? ''}</p></div>`
 

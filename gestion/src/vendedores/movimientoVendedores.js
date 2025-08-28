@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { verificarUsuarios } = require('../helpers');
+const { verificarUsuarios, parsearFecha } = require('../helpers');
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
@@ -55,27 +55,27 @@ window.addEventListener('load',async e=>{
 const listarVendedores = (lista)=>{
     lista.forEach(vendedor => {
         const option = document.createElement('option');
-        option.value = vendedor.nombre;
+        option.value = vendedor._id;
         option.text = vendedor.nombre;
         select.appendChild(option)
     });
 };
 
 const listarMovimientos = (lista)=>{
-    console.log(lista)
+
     tbody.innerHTML = "";
     lista.forEach(elem =>{
         const tr = document.createElement('tr');
 
-        const fecha = elem.fecha.slice(0,10).split('-',3);
+        const fecha = parsearFecha(elem.fecha);
         const hora = elem.fecha.slice(11,19).split(':',3);
         const tdFecha = document.createElement('td');
         const tdDescripcion = document.createElement('td');
         const tdHora = document.createElement('td');
         
-        tdFecha.innerHTML = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
+        tdFecha.innerHTML = fecha.slice(0, 10).split('-', 3).reverse().join('/');
         tdDescripcion.innerHTML = elem.descripcion;
-        tdHora.innerHTML = `${hora[0]}:${hora[1]}:${hora[2]}`
+        tdHora.innerHTML = fecha.slice(11, 19)
 
         tr.appendChild(tdFecha);
         tr.appendChild(tdDescripcion);

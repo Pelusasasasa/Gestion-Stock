@@ -202,7 +202,8 @@ const listarServicio = (servicio, lista) => {
                 <option ${equipo.estado === 'Proceso' && 'selected'} value='Proceso'>En Proceso</option>
                 <option ${equipo.estado === 'Finalizado' && 'selected'} value='Finalizado'>Finalizado</option>
                 <option ${equipo.estado === 'Entregado' && 'selected'} value='Entregado'>Entregado</option>
-            </select>
+                <option ${equipo.estado === 'Sin Solucion' && 'selected'} value='Sin Solucion'>Sin Solucion</option>
+                </select>
             <p class='${verDisponibilidadParaEliminar(servicio)} m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
         </div>
     `
