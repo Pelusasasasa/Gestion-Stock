@@ -3,10 +3,8 @@ const { ipcMain } = require('electron/main');
 const { mostrarMenu } = require('./menuSecundario/menuSecundario');
 const { condIva } = require('./configuracion.json');
 const path = require('path');
-const modulos = require('./config.json');
 
 require('dotenv').config();
-
 
 // Lo usamos para cuando alla un cambio en la aplicacion se reinicie
 if (process.env.NODE_ENV === 'desarrollo') {
@@ -17,7 +15,7 @@ if (process.env.NODE_ENV === 'desarrollo') {
 
 if (require('electron-squirrel-startup')) {
   app.quit();
-}
+};
 
 global.ventanaPrincipal = null;
 global.nuevaVentana = null;
@@ -38,6 +36,36 @@ const createWindow = () => {
   hacerMenu();
 };
 
+app.on('ready', createWindow);
+
+const arreglarSaldo = (e, args) => {
+  ventanaPrincipal.webContents.send('saldoArreglado', args);
+};
+
+const abrirVentana = (direccion, altura = 700, ancho = 1200, reinicio = false, show = true, maximo = false) => {
+  nuevaVentana = new BrowserWindow({
+    height: altura,
+    width: ancho,
+    modal: true,
+    parent: ventanaPrincipal,
+    show: show,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+  nuevaVentana.loadFile(path.join(__dirname, `${direccion}`));
+  nuevaVentana.setMenuBarVisibility(false);
+  maximo && nuevaVentana.maximize()
+
+  nuevaVentana.on('close', async () => {
+    if (reinicio) {
+      ventanaPrincipal.reload()
+    }
+  })
+  // nuevaVentana.setMenuBarVisibility(false);
+};
+
 const calcularPorCiento = (porCiento) => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
@@ -51,8 +79,6 @@ const calcularPorCiento = (porCiento) => {
   }
 };
 
-app.on('ready', createWindow);
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -64,10 +90,6 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-const arreglarSaldo = (e, args) => {
-  ventanaPrincipal.webContents.send('saldoArreglado', args);
-};
 
 ipcMain.on('arreglarSaldo', arreglarSaldo);
 
@@ -156,30 +178,6 @@ ipcMain.on('imprimir-historica', (e, info) => {
     nuevaVentana.webContents.send('imprimir-resumen', JSON.stringify(info));
   });
 });
-
-const abrirVentana = (direccion, altura = 700, ancho = 1200, reinicio = false, show = true, maximo = false) => {
-  nuevaVentana = new BrowserWindow({
-    height: altura,
-    width: ancho,
-    modal: true,
-    parent: ventanaPrincipal,
-    show: show,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
-  nuevaVentana.loadFile(path.join(__dirname, `${direccion}`));
-  nuevaVentana.setMenuBarVisibility(false);
-  maximo && nuevaVentana.maximize()
-
-  nuevaVentana.on('close', async () => {
-    if (reinicio) {
-      ventanaPrincipal.reload()
-    }
-  })
-  // nuevaVentana.setMenuBarVisibility(false);
-}
 
 ipcMain.on('informacion-a-ventana', (e, args) => {
   ventanaPrincipal.webContents.send('informacion-a-ventana', JSON.stringify(args));
