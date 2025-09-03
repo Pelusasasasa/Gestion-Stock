@@ -260,6 +260,7 @@ const listarCliente = async (id) => {
         lista.value = cliente.tipoCuenta ?? 'NORMAL';
 
         codBarra.focus();
+        togglePrecios();
     } else {
         codigo.value = "";
         codigo.focus();
@@ -824,7 +825,8 @@ codigo.addEventListener('keypress', async e => {
             }
             ipcRenderer.send('abrir-ventana', opciones)
         } else {
-            listarCliente(codigo.value)
+            listarCliente(codigo.value);
+            
         }
     }
 });

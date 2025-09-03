@@ -72,6 +72,10 @@ const Presupuesto = new Schema({
         type:String,
         default:"Consumidor Final"
     },
+    condicion:{
+        type:String,
+        default:"NORMAL"
+    },
     iva21:{
         type:Number,
         default:0

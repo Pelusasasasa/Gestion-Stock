@@ -99,7 +99,7 @@ presupuestoCTRL.getForMonth = async(req,res)=>{
 
 presupuestoCTRL.getForYear = async(req,res)=>{
     const {year} = req.params;
-    let now = new Date();
+    
     let inicioAño = new Date(year,0,1,-3,0,0);
     let finAño = new Date(year,11,31,20,59,59);
     const presupuestos = await Presupuesto.find({

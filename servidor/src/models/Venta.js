@@ -49,7 +49,7 @@ const Venta = new Schema({
     },
     condicion:{
         type:String,
-        default:"Normal"
+        default:"NORMAL"
     },
     F:{
         type:Boolean,
