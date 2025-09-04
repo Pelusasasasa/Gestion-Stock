@@ -103,4 +103,33 @@ remitoCTRL.putPasado = async(req, res) => {
     };
 };
 
+remitoCTRL.patchObservaciones = async(req, res) => {
+    const { id } = req.params;
+
+    try {
+        const remito = await Remito.findByIdAndUpdate(
+            id, 
+            {observaciones: req.body.observaciones},
+            {new: true}
+        );
+
+        if(!remito) return res.status(404).json({
+            ok: false,
+            msg: 'Remito no encontrado'
+        });
+
+
+        res.status(200).json({
+            ok: true,
+            remito
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'No se pudo modifcar las observaciones del remit, hable con el administrador'
+        });
+    };
+}
+
 module.exports = remitoCTRL;

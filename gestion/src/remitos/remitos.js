@@ -17,6 +17,11 @@ const tbodyMov = document.getElementById('tbodyMov');
 
 const pasarCTA = document.getElementById('pasarCTA');
 
+const modal = document.getElementById('modal');
+const cambiarObservaciones = document.getElementById('cambiarObservaciones');
+const aceptarCambioObservaciones = document.getElementById('aceptarCambioObservaciones');
+
+
 let remitos = [];
 let movs = [];
 let seleccionado = '';
@@ -45,6 +50,13 @@ const cargarPagina = async() => {
 const cambioTipoRemito = async(e) => {
     const filtro = remitos.filter(elem => elem.cliente.startsWith(buscador.value.toUpperCase()));
     listarRemitos(filtro.filter(elem => elem.pasado === remitoC.checked));
+};
+
+const clickModal = (e) => {
+    if(e.target.classList.contains('cerrarModal')){
+        cambiarObservaciones.value = '';
+        modal.classList.add('none');
+    };
 };
 
 const clickTbody = async(e) => {
@@ -83,6 +95,12 @@ const clickTbody = async(e) => {
     let aux = remitos.find( elem => elem._id === seleccionado.id);
     movs = (await axios.get(`${URL}movimiento/${aux.numero}/${aux.tipo_venta}`)).data;
     listarMovs( movs );
+};
+
+const dobleclickTbody = (e) => {
+    modal.classList.remove('none');
+    cambiarObservaciones.value = seleccionado.children[4].innerText;
+    cambiarObservaciones.focus();
 };
 
 const filtrarRemitos = async(e) => {
@@ -266,6 +284,22 @@ const listarRemitos = (lista) => {
     };
 };
 
+const modificarObservacionesRemitos = async() => {
+    try {
+        const { data } = await axios.patch(`${URL}remitos/observaciones/${seleccionado.id}`, {observaciones: cambiarObservaciones.value.toUpperCase()});
+        if(data.ok){
+            await Swal.fire(`Se modifico las observaciones del remito ${seleccionado.children[3].innerText}`, '', 'success');
+            modal.classList.add('none');
+            seleccionado.children[4].innerText = cambiarObservaciones.value.toUpperCase();
+        }else{
+            return await Swal.fire('Error al modificar las observaciones', data.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await Swal.fire('Error al modificar las observaciones', error?.response?.data?.msg, 'error');
+        
+    }
+};
 
 const pasarCuenta = async() => {
     const trSeleccinados = document.querySelectorAll('tr input[type="checkbox"]:checked');
@@ -274,11 +308,14 @@ const pasarCuenta = async() => {
     location.href = `../venta/index.html?remito=true&remitos=${JSON.stringify(idFilas)}&vendedor=${vendedor}`;
 };
 
+aceptarCambioObservaciones.addEventListener('click', modificarObservacionesRemitos);
 buscador.addEventListener('keyup', filtrarRemitos);
 document.addEventListener('keyup', apretarTecla);
+modal.addEventListener('click', clickModal)
 remitoC.addEventListener('change', cambioTipoRemito);
 pasarCTA.addEventListener('click', pasarCuenta);
 tbody.addEventListener('click', clickTbody);
+tbody.addEventListener('dblclick', dobleclickTbody);
 window.addEventListener('load', cargarPagina);
 
 volver.addEventListener('click', () => {
