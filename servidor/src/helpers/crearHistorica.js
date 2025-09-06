@@ -2,7 +2,7 @@ const Cliente = require("../models/Cliente");
 const Historica = require("../models/cuentaCorrHisto");
 
 exports.crearHistorica = async(venta) => {
-
+    const precio = venta.tipo_comp === 'Nota Credito B' || venta.tipo_comp === 'Nota Credito A' ? venta.precio * -1 : venta.precio;
     try {
         const cliente = await Cliente.findById(venta.idCliente)
         const historica = {};
@@ -11,7 +11,7 @@ exports.crearHistorica = async(venta) => {
         historica.idCliente = venta.idCliente;
         historica.nro_venta = venta.numero;
         historica.tipo_comp = venta.tipo_comp;
-        historica.debe = venta.precio;
+        historica.debe = precio;
         historica.haber = 0;
         historica.saldo = cliente.saldo;
         //Puede ser EFECTIVO o TARJETA O CHEQUE si es Recibo y si es venta NORMAL O INSTALADOR

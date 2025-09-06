@@ -434,7 +434,7 @@ funciones.agregarMovimientoVendedores = async(descripcion,vendedor = "")=>{
 };
 
 //Vemos el codigo de comprobante para las faturas
-funciones.verCodigoComprobante = async(notaCredito,cuit = "00000000",condIva)=>{
+funciones.verCodigoComprobante = async(notaCredito, cuit = "00000000", condIva)=>{
     if (archivo.condIva === "Monotributo") {
         if (notaCredito) {
             return 13

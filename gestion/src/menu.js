@@ -153,10 +153,11 @@ document.addEventListener('keyup',async e=>{
                 title:"Contraseña incorrecta"
             });
         }else{
-            ipcRenderer.send('abrir-ventana',opciones);
+            ipcRenderer.send('abrir-ventana', opciones);
         }
     }else if(e.keyCode === 117){
-        location.href = "./venta/index.html?tipoFactura=notaCredito";
+        const vendedor = await verificarUsuarios();
+        location.href = `./venta/index.html?tipoFactura=notaCredito&vendedor=${vendedor._id}`;
         ipcRenderer.send('sacar-cierre');
     }
 });

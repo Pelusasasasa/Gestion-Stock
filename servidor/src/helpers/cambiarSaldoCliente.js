@@ -1,6 +1,6 @@
 const Cliente = require("../models/Cliente");
 
-exports.cambiarSaldoCliente = async(id, precio, recibo = false) => {
+exports.cambiarSaldoCliente = async(id, precio, recibo = false, tipo) => {
 
     try {
         const cliente = await Cliente.findById(id);
@@ -9,7 +9,7 @@ exports.cambiarSaldoCliente = async(id, precio, recibo = false) => {
             ok: false
         };
 
-        if(recibo){
+        if(recibo || tipo === 'Nota Credito A' || tipo === 'Nota Credito B'){
             cliente.saldo -= precio;
         }else{
             cliente.saldo += precio;

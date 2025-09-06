@@ -171,6 +171,62 @@ const cargarRemito = async () => {
 
 };
 
+const crearHTML = async(elem) => {
+    const tr = document.createElement('tr');
+
+    const tdCodigo = document.createElement('td');
+    const tdCantidad = document.createElement('td');
+    const tdDescripcion = document.createElement('td');
+    const tdMarca = document.createElement('td');
+    const tdIva = document.createElement('td');
+    const tdPrecio = document.createElement('td');
+    const tdTotal = document.createElement('td');
+    const tdAcciones = document.createElement('td');
+
+    tdAcciones.classList.add('acciones')
+
+    tdCodigo.innerText = elem.codProd;
+    tdCantidad.innerText = elem.cantidad;
+    tdDescripcion.innerText = elem.producto;
+    tdMarca.innerText = elem.marca;
+    tdIva.innerText = elem.iva;
+    tdPrecio.innerText = elem.precio;
+    tdTotal.innerText = redondear(elem.precio * elem.cantidad, 2);
+
+    tdAcciones.innerHTML = `
+            <td class=acciones>
+                <div class=tool>
+                    <span class=material-icons>post_add</span>
+                    <p class=tooltip>Series</p>
+                </div>
+                <div class=tool>
+                    <span class=material-icons>delete</span>
+                    <p class=tooltip>Eliminar</p>
+                </div>
+            </td>
+        `
+    
+
+    tr.appendChild(tdCodigo);
+    tr.appendChild(tdCantidad);
+    tr.appendChild(tdDescripcion);
+    tr.appendChild(tdMarca);
+    tr.appendChild(tdIva);
+    tr.appendChild(tdPrecio);
+    tr.appendChild(tdTotal);
+    tr.appendChild(tdAcciones);
+
+    tbody.appendChild(tr);
+
+    const producto = await obtenerProducto(elem.codProd);
+    listaProductos.push({
+        cantidad: elem.cantidad,
+        producto,
+        series: elem?.series
+    });
+    await calcularTotal();
+}
+
 const crearProducto = () => {
     idProducto++;
     const producto = {
@@ -265,6 +321,12 @@ const listarCliente = async (id) => {
         codigo.value = "";
         codigo.focus();
     }
+};
+
+const listarMovimientos = async(lista) => {
+    for(let elem of lista){
+        crearHTML(elem);
+    };
 };
 
 //Lo que hacemos es listar el producto traido
@@ -393,6 +455,34 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     };
 
 
+};
+
+const listarVenta = async(venta) => {
+    listarCliente(venta.idCliente);
+
+    try {
+        const { data } = await axios.get(`${URL}movimiento/${venta.numero}/${venta.tipo_venta}`);
+        listarMovimientos(data)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo obtener los movimientos'
+        })
+    }
+};
+
+const obtenerProducto = async(id) => {
+    try {
+        const { data } = await axios.get(`${URL}productos/${id}`);
+        if(data){
+            return data;
+        }else{
+            return await sweet.fire('No se pudo obtener el producto', '', 'error');
+        };
+    } catch (error) {
+        return await sweet.fire('No se pudo obtener el producto', error.response.data.msg, 'error');
+    }
 };
 
 const togglePrecios = async (e) => {
@@ -578,7 +668,6 @@ facturar.addEventListener('click', async e => {
         venta.cantIva = cantIva;
         venta.facturaAnterior = facturaAnterior ? facturaAnterior : "";
 
-
         try {
             if (situacion === "blanco") {
                 alerta.classList.remove('none');
@@ -587,7 +676,6 @@ facturar.addEventListener('click', async e => {
             } else {
                 alerta.children[1].innerHTML = "Generando Venta";
             };
-
             const cliente = {};
             cliente.nombre = nombre.value;
             cliente.localidad = localidad.value;
@@ -654,70 +742,6 @@ facturar.addEventListener('click', async e => {
             alerta.classList.add('none');
         }
     }
-});
-
-ipcRenderer.on('informacion', (e, args) => {
-    dolar = args;
-});
-
-ipcRenderer.on('facturarVarios', async (e, args) => {
-    cuentas = JSON.parse(args);
-    
-    facturaVarios = true;
-
-    const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
-    
-    try {
-        const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
-        if (data.ok){
-            vendedor = data.venta.vendedor._id;
-        }else{
-            return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
-        }
-    } catch (error) {
-        console.log(error);
-        return await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
-    }
-    listarCliente(data.idCliente)
-
-    for (let elem of cuentas) {
-        const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
-        
-        for await (let mov of movs) {
-            const res = mov.codProd.toUpperCase().replace(/\//g, '%2F');
-            let producto = {}
-            if(res){
-                producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
-            }else{
-                producto = {
-                    descripcion: mov.producto,
-                    precio: mov.precio,
-                    impuesto: mov.iva,
-                    _id: '',
-                    marca: '',
-                };
-            };
-            listarProducto(producto, mov.cantidad, mov.series);
-        };
-    };
-});
-
-ipcRenderer.on('recibir', async(e, args) => {
-    const { tipo, informacion, cantidad } = JSON.parse(args);
-
-    tipo === "cliente" && listarCliente(informacion);
-    tipo === "Ningun cliente" && nombre.focus();
-
-    if(tipo === "producto"){
-        const res = informacion.toUpperCase().replace(/\//g, '%2F');
-        let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
-        listarProducto(producto, cantidad);
-    }
-});
-
-//ponemos un numero para la venta y luego mandamos a imprimirla
-ipcRenderer.on('poner-numero', async (e, args) => {
-    ponerNumero();
 });
 
 //Hacemos para que se seleccione un tr
@@ -860,18 +884,28 @@ window.addEventListener('load', async e => {
 
     if (tipoFactura === "notaCredito") {
 
-        await sweet.fire({
+        const { value, isConfirmed} = await sweet.fire({
             title: "Numero de Factura Anterior",
             input: "text",
             confirmButtonText: "Aceptar",
             showCancelButton: true
-        }).then(({ isConfirmed, value }) => {
-            if (isConfirmed) {
-                facturaAnterior = value.padStart(8, '0');
-            } else {
-                location.href = '../menu.html';
-            }
         });
+
+        if (isConfirmed) {
+            facturaAnterior = value.padStart(8, '0');
+            try {
+                const { data }= await axios.get(`${URL}ventas/porFactura/${value}`);
+                if( data.ok ){
+                    listarVenta(data.venta);
+                }else{
+                    return await sweet.fire('Error al obtener la venta', 'No se encontro una venta', 'error');
+                }
+            } catch (error) {
+                
+            }
+        } else {
+            location.href = '../menu.html';
+        }
     } else if (esRemito) {
         cargarRemito();
     };
@@ -1014,4 +1048,68 @@ porcentaje.addEventListener('focus', e => {
 
 inputRecibo.addEventListener('focus', e => {
     inputRecibo.select();
+});
+
+ipcRenderer.on('informacion', (e, args) => {
+    dolar = args;
+});
+
+ipcRenderer.on('facturarVarios', async (e, args) => {
+    cuentas = JSON.parse(args);
+    
+    facturaVarios = true;
+
+    const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
+    
+    try {
+        const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
+        if (data.ok){
+            vendedor = data.venta.vendedor._id;
+        }else{
+            return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
+        }
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
+    }
+    listarCliente(data.idCliente)
+
+    for (let elem of cuentas) {
+        const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
+        
+        for await (let mov of movs) {
+            const res = mov.codProd.toUpperCase().replace(/\//g, '%2F');
+            let producto = {}
+            if(res){
+                producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+            }else{
+                producto = {
+                    descripcion: mov.producto,
+                    precio: mov.precio,
+                    impuesto: mov.iva,
+                    _id: '',
+                    marca: '',
+                };
+            };
+            listarProducto(producto, mov.cantidad, mov.series);
+        };
+    };
+});
+
+ipcRenderer.on('recibir', async(e, args) => {
+    const { tipo, informacion, cantidad } = JSON.parse(args);
+
+    tipo === "cliente" && listarCliente(informacion);
+    tipo === "Ningun cliente" && nombre.focus();
+
+    if(tipo === "producto"){
+        const res = informacion.toUpperCase().replace(/\//g, '%2F');
+        let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
+        listarProducto(producto, cantidad);
+    }
+});
+
+//ponemos un numero para la venta y luego mandamos a imprimirla
+ipcRenderer.on('poner-numero', async (e, args) => {
+    ponerNumero();
 });

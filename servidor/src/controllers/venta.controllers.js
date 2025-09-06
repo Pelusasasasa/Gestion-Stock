@@ -51,7 +51,7 @@ ventaCTRL.cargarVenta = async(req,res)=>{
         };
 
         if(venta.tipo_venta === 'CC'){
-            const saldoModficado =  await cambiarSaldoCliente(venta.idCliente, venta.precio, false);
+            const saldoModficado =  await cambiarSaldoCliente(venta.idCliente, venta.precio, false, venta.tipo_comp);
             if(!saldoModficado.ok) return res.status(400).json({
                 msg: "Error al modificar el saldo del cliente",
                 ok: false
@@ -224,6 +224,40 @@ ventaCTRL.getbetweenDate = async(req,res)=>{
         {tipo_comp:{$ne:"Comprobante"}}
     ]});
     res.send(ventas);
+};
+
+ventaCTRL.getPorFactura = async(req, res) => {
+
+    try {
+        const { factura } = req.params;
+        const venta = await Venta.findOne({
+            $and: [
+                {"afip.numero": parseInt(factura)},
+                {$or: [
+                    {tipo_comp: 'Factura B'},
+                    {tipo_comp: 'Factura A'}
+                ]}
+            ]
+        });
+
+        if(!venta) return res.status(404).json({
+            ok: false,
+            msg: 'Factura no encontrada'
+        });
+
+        res.status(200).json({
+            ok: true,
+            venta
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'error al obtener la factura hable con el administrador'
+        })
+    }
+
 };
 
 module.exports = ventaCTRL;
