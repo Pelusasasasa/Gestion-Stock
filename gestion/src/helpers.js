@@ -112,7 +112,7 @@ funciones.cargarFactura = async (venta,notaCredito)=>{
         'ImpOpEx': 0,
         'ImpIVA': archivo.condIva === "Inscripto" ? parseFloat(redondear(venta.iva21 + venta.iva0 + venta.iva105,2)) : 0,
         'ImpTrib': 0,
-        // 'CondicionIVAReceptorId': funciones.tablaCondicionIVAReceptorId(venta.condicionIva),
+        'CondicionIVAReceptorId': funciones.tablaCondicionIVAReceptorId(venta.condicionIva),
         'MonId': 'PES',
         'PtoVta': puntoVenta,
         'MonCotiz' 	: 1,

@@ -901,7 +901,9 @@ window.addEventListener('load', async e => {
                     return await sweet.fire('Error al obtener la venta', 'No se encontro una venta', 'error');
                 }
             } catch (error) {
-                
+                console.log(error)
+                await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
+                return location.reload();
             }
         } else {
             location.href = '../menu.html';
