@@ -62,9 +62,14 @@ const agregarHTMLServicio = (servicio = {}, equipo = {}) => {
             <div class=tool>
                 <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
             </div>
-            <div class=tool>
-                <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
-            </div>
+            ${permiso === '0' ?
+                `<div class=tool>
+                    <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
+                </div>`
+                :
+                ``
+            }   
+            
         `;
 
         servicio
@@ -191,6 +196,7 @@ const traerServicios = async() => {
 
     try {
         const { data } = await axios.get(`${URL}servicios`);
+        console.log(data)
         if(data.ok){
             servicios = data.servicios;
             equipos = data.equipos;
