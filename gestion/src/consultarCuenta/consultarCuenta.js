@@ -89,7 +89,7 @@ const actualiarHistoricasSig = async (historica) => {
 
 const agregarNumeroSerie = async (e) => {
     if (e.target.innerHTML === "post_add") {
-        const movimientoSeleccionado = movimientos.find(movimiento => movimiento._id === parseInt(e.target.parentNode.parentNode.parentNode.id));
+        const movimientoSeleccionado = movimientos.find(movimiento => movimiento._id == e.target.closest('tr').id);
         let valor = "";
 
         movimientoSeleccionado.series.forEach(serie => {
@@ -205,7 +205,9 @@ const clickCuenta = async (e) => {
         dolarTomado.value = listaCompensada.find(elem => elem.nro_venta == id)?.dolar || 0;
         
         if (trSeleccionado.children[3].innerText !== "Recibo") {
-            movimientos = (await axios.get(`${URL}movimiento/${id}/CC`)).data;
+
+            const { data } = (await axios.get(`${URL}movimiento/${id}/CC`));
+            movimientos = data;
             tbodyProducto.innerHTML = "";
             listarProductos(movimientos);
         } else {
@@ -324,9 +326,11 @@ const listarVentas = async (lista) => {
 
 //Listamos los productos cuando tocamos un  en una cuenta compensada o historica
 const listarProductos = async (movimientos) => {
+    
     tbodyMovRecibo.parentNode.parentNode.classList.add('none');
     tbodyProducto.parentNode.parentNode.classList.remove('none');
     tbodyProducto.innerHTML = "";
+
     movimientos.forEach(movimiento => {
         const date = new Date(movimiento.fecha);
         let day = date.getDate();
