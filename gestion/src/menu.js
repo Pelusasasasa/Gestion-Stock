@@ -157,6 +157,12 @@ document.addEventListener('keyup',async e=>{
         }
     }else if(e.keyCode === 117){
         const vendedor = await verificarUsuarios();
+        if(!vendedor){
+            await sweet.fire({
+                title:"Contraseña incorrecta"
+            });
+            return;
+        }
         location.href = `./venta/index.html?tipoFactura=notaCredito&vendedor=${vendedor._id}`;
         ipcRenderer.send('sacar-cierre');
     }
