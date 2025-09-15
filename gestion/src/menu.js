@@ -127,34 +127,6 @@ document.addEventListener('keyup',async e=>{
             altura:550
         };
         ipcRenderer.send('abrir-ventana',opciones);
-    }else if(e.keyCode === 115){
-        const opciones = {
-            path: "productos/cambio.html",
-            ancho: 1000,
-            altura:550
-        }
-        ipcRenderer.send('abrir-ventana',opciones)
-    }else if(e.keyCode === 116){
-        const usuario = await verificarUsuarios();
-
-        const opciones = {
-            path:"gastos/gastos.html",
-            ancho:500,
-            altura:700,
-            info: usuario.nombre
-        };
-        
-        if (usuario.permiso === 2) {
-            await sweet.fire({
-                title: "No tienes permisos para acceder a gastos"
-            })
-        }else if(!usuario){
-            await sweet.fire({
-                title:"Contraseña incorrecta"
-            });
-        }else{
-            ipcRenderer.send('abrir-ventana', opciones);
-        }
     }else if(e.keyCode === 117){
         const vendedor = await verificarUsuarios();
         if(!vendedor){

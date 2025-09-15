@@ -17,11 +17,21 @@ const agregar = document.getElementById('agregar');
 const tbody = document.getElementById('tbody');
 
 const cargarPagina = async() => {
-    const id = (await axios.get(`${URL}marca/last`)).data;
-    numero.value = id + 1;
+    try {
+        const id = (await axios.get(`${URL}marca/last`)).data;
+        numero.value = id + 1;
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se puede cargar el numero siguiente', error.response?.data?.msg, 'error');
+    };
 
-    marcas = (await axios.get(`${URL}marca`)).data;
-    listarMarcas( marcas );
+    try {
+        marcas = (await axios.get(`${URL}marca`)).data;
+        listarMarcas( marcas );
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se pudo obtener las marcas ', error.response?.data?.msg, 'error');    
+    };
 };
 
 const agregarMarca = async() => {
@@ -30,15 +40,16 @@ const agregarMarca = async() => {
         nombre: nombre.value
     };
 
-    const res = (await axios.post(`${URL}marca`,marca)).data;
-
-    marcas.push(res);
-
-    listarMarcas(marcas);
-
+    try {
+        const res = (await axios.post(`${URL}marca`,marca)).data;
+        marcas.push(res);
+        listarMarcas(marcas);
+    } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se pudo agregar la marca', error.response?.data?.msg, 'error');
+    };
     nombre.value = '';
     numero.value = parseInt(numero.value) + 1;
-
 };
 
 const clickTr = async(e) => {
@@ -72,10 +83,15 @@ const clickTr = async(e) => {
         });
 
         if ( isConfirmed ){
-            await axios.delete(`${URL}marca/forId/${seleccionado.id}`);
-            marcas = marcas.filter(marca => marca._id !== seleccionado.id);
-            tbody.removeChild(seleccionado);
-            seleccionado = null;
+            try {
+                await axios.delete(`${URL}marca/forId/${seleccionado.id}`);
+                marcas = marcas.filter(marca => marca._id !== seleccionado.id);
+                tbody.removeChild(seleccionado);
+                seleccionado = null;
+            } catch (error) {
+                console.log(error);
+                return await sweet.fire('No se puedo eliminar la marca', error.response?.data?.msg, 'error');
+            }
         };
     };
 
@@ -92,7 +108,12 @@ const clickTr = async(e) => {
             const aux = marcas.find( elem => elem._id === seleccionado.id);
             aux.nombre = value.toUpperCase().trim();
 
-            await axios.put(`${URL}marca/forId/${seleccionado.id}`, aux);
+            try {
+                await axios.put(`${URL}marca/forId/${seleccionado.id}`, aux);
+            } catch (error) {
+                console.log(error);
+                return await sweet.fire('No se pudo modificar la marca', error.response?.data?.msg, 'error');
+            }
             
             listarMarcas(marcas);
         };
@@ -125,12 +146,10 @@ const listarMarcas = async(lista) => {
         tdNombre.innerText = elem.nombre;
         tdAcciones.innerHTML = `
             <div class=tool>
-                <span class=material-icons>edit</span>
-                <p class=tooltip>Modificar</p>
+                <span class=material-icons title='Modificar'>edit</span>
             </div>
             <div class=tool>
-                <span class=material-icons>delete</span>
-                <p class=tooltip>Eliminar</p>
+                <span class=material-icons title='Eliminar'>delete</span>
             </div>
         `;
 
@@ -139,11 +158,10 @@ const listarMarcas = async(lista) => {
         tr.appendChild(tdAcciones);
 
         tbody.appendChild(tr);
-     
+    
     }
     
 };
-
 
 document.addEventListener('keyup', cerrarVentana);
 
