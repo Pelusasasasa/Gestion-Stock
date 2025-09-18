@@ -31,22 +31,21 @@ const modificar = document.getElementById('modificar');
 const salir = document.getElementById('salir');
 
 codigo.addEventListener('keypress',async e=>{
-<<<<<<< HEAD
-    if (e.keyCode === 13 && descripcion.value !== "") {
-=======
     if (e.keyCode === 13 && codigo.value !== "") {
->>>>>>> frontend
-        const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
-        if (producto) {
-            listarProducto(producto);
+        try {
+            const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+            if (producto) {
+                listarProducto(producto);
+            }else{
+                descripcion.value = '';
+                stock.value = '';
+            };
+        } catch (error) {
+            console.log(error);
+            await sweet.fire('No se pudo obtener el producto', error.response?.data?.msg, 'error');
         }
-    }
-<<<<<<< HEAD
-        descripcion.focus();
-
-=======
+    };
     descripcion.focus();
->>>>>>> frontend
 });
 
 descripcion.addEventListener('keypress',e=>{
@@ -138,11 +137,8 @@ agregar.addEventListener('click',async e=>{
         vendedor.value && await agregarMovimientoVendedores(`Agrego el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor)
         window.close();
     } catch (error) {
-        sweet.fire({
-            title:"No se pudo cargar el pedido"
-        })
-    }
-
+        await sweet.fire('No se pudo cargar el pedido', error.response?.data?.msg, 'error');
+    };
 });
 
 modificar.addEventListener('click',async e=>{
@@ -161,9 +157,7 @@ modificar.addEventListener('click',async e=>{
         vendedor.value && await agregarMovimientoVendedores(`Modifico el pedido ${pedido.producto} al cliente ${pedido.cliente}`,pedido.vendedor);
         window.close();
     } catch (error) {
-        sweet.fire({
-            title:"No se pudo modificar El pedido"
-        })
+        sweet.fire('No se pudo modificar El pedido', error.response?.data?.msg, 'error');
     }
 });
 
@@ -173,12 +167,18 @@ salir.addEventListener('click',e=>{
 
 ipcRenderer.on('informacion',async (e,args)=>{
     if (args.informacion) {
-        const pedido = (await axios.get(`${URL}pedidos/id/${args.informacion}`)).data;
-        title.innerHTML = "Modificar Pedido"
-        agregar.classList.add('none');
-        modificar.classList.remove('none');
-        modificar.id = args.informacion;
-        listarPedido(pedido);
+        try {
+            const { data } = (await axios.get(`${URL}pedidos/id/${args.informacion}`));
+            const pedido = data;
+            title.innerHTML = "Modificar Pedido"
+            agregar.classList.add('none');
+            modificar.classList.remove('none');
+            modificar.id = args.informacion;
+            listarPedido(pedido);
+        } catch (error) {
+            console.log(error)
+            await sweet.fire('Error al obtener el pedido', error.response?.data?.msg, 'errro')
+        }
     }
     if (args.vendedor) {
         vendedor.value = args.vendedor;

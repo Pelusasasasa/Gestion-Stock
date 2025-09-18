@@ -34,7 +34,13 @@ window.addEventListener('load',async e=>{
             location.href = "../menu.html";
         }
     }
-    pedidos = (await axios.get(`${URL}pedidos`)).data;
+    try {
+        const { data } = await axios.get(`${URL}pedidos`);
+        pedidos = data;
+    } catch (error) {
+        console.log(error);
+        await sweet.fire('No se pudo obtener los pedidos', error.response?.data?.msg, 'error');
+    };
     await listarPedidos(pedidos);
 });
 
@@ -125,8 +131,13 @@ tbody.addEventListener('click',async e=>{
     inputSeleccionado.addEventListener('change',async e=>{
         const pedido = pedidos.find(pedido => pedido._id === seleccionado.id);
         pedido.estadoPedido = inputSeleccionado.value.toUpperCase();
-        await axios.put(`${URL}pedidos/id/${seleccionado.id}`,pedido);
-        location.reload();
+        try {
+            await axios.put(`${URL}pedidos/id/${seleccionado.id}`,pedido);
+            location.reload();
+        } catch (error) {
+            console.log(error);
+            await sweet.fire('Error al actualizar el producto', error.response?.data?.msg, 'error');
+        }
     });
 
     e.target.nodeName === "INPUT" && e.target.select();

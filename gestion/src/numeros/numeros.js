@@ -57,8 +57,14 @@ window.addEventListener('load',async e=>{
         }
     }
 
-    const { data } = (await axios.get(`${URL}numero`));
-    console.log(data);
+    try {
+        const { data } = (await axios.get(`${URL}numero`));
+        numeros = data;
+    } catch (error) {
+        console.log(error)
+        await sweet.fire(('No se pudo obtener los numeros', error.response?.data?.msg, 'error'));
+    };
+
     try {
         setTimeout(async()=>{
             let facturas = await ultimaC();
@@ -91,19 +97,6 @@ ipcRenderer.on('informacion', (e,args) => {
     usuario =  args.info;
 });
 
-//aca lo que hacemos es poner un boton para que si los numeros no estan cargados se carguen por primera vez
-cargar.addEventListener('click',async e=>{
-    const numero = {
-        "Cuenta Corriente": 0,
-        "Contado": 0,
-        "Recibo": 0,
-        "Dolar":0,
-        "Presupuesto":0
-    }
-    await axios.post(`${URL}numero`,numero);
-    location.reload();
-});
-
 //cuando apretamos habilitamos para que se modifiquen los numeros
 modificar.addEventListener('click',e=>{
     modificar.classList.add('none');
@@ -126,7 +119,7 @@ guardar.addEventListener('click',async e=>{
         await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
         const pc = await verNombrePc();
         agregarMovimientoVendedores(`Cambio el Dolar de ${dolarTraido} a ${dolar.value} en la Computadora ${pc}`, usuario);
-    }
+    };
 
     try {
         await axios.put(`${URL}numero`,numero);
