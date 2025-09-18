@@ -57,8 +57,8 @@ window.addEventListener('load',async e=>{
         }
     }
 
-    const numeros =(await axios.get(`${URL}numero`)).data;
-
+    const { data } = (await axios.get(`${URL}numero`));
+    console.log(data);
     try {
         setTimeout(async()=>{
             let facturas = await ultimaC();

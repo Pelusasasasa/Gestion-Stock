@@ -23,7 +23,7 @@ const backUpMongoLocal = () => {
             }
 
             if(stderr){
-                console.error(`Error en stderr: ${stderr}`);
+                console.log(`Error en stderr: ${stderr}`);
                 return
             }
 
