@@ -7,6 +7,8 @@ const { ipcRenderer } = require('electron');
 const vendedor = getParameterByName('vendedor');
 const permiso = getParameterByName('permiso');
 
+console.log(vendedor);
+
 const URL = process.env.GESTIONURL;
 
 const volver = document.getElementById('volver');
@@ -121,7 +123,7 @@ const reImprimirservicio = async(e) => {
             return Swal.fire('Error al cargar el servicio', data.msg, 'error');
         };
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return Swal.fire(`Error al obtener el servicio`, error?.response?.data?.msg, 'error');
     }
 };
@@ -157,7 +159,7 @@ const eliminarServicio = async(e) => {
             await Swal.fire('Error al eliminar el servicio', data.msg, 'error');
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return await Swal.fire('Error al eliminar servicio', error?.response?.data?.msg, 'error');
     } 
 };
@@ -187,7 +189,7 @@ const imprimirNuevoServicio = async(e) => {
             return await Swal.fire('Error al cargar el servicio', data.msg, 'error');
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return await Swal.fire('error al cargar el servicio', error?.response?.data?.msg, 'error');
     }
 };
@@ -196,7 +198,6 @@ const traerServicios = async() => {
 
     try {
         const { data } = await axios.get(`${URL}servicios`);
-        console.log(data)
         if(data.ok){
             servicios = data.servicios;
             equipos = data.equipos;
@@ -205,7 +206,7 @@ const traerServicios = async() => {
             await Swal.fire('Error al traer los servicios tecnicos', data.msg, 'error');
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         await Swal.fire('Error al traer los servicios tecnicos', error?.response?.data?.msg, 'error');
     }
 

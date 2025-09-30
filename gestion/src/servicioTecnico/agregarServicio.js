@@ -359,7 +359,7 @@ const verDisponibilidadParaEliminar = (servicio) => {
     }
 };
 
-cancelar.addEventListener('click', () => location.href = './servicio.html');
+cancelar.addEventListener('click', () => location.href = `./servicio.html?vendedor=${vendedor}`);
 cliente.addEventListener('keypress', buscarCliente);
 guardar.addEventListener('click', crearServicio);
 modificar.addEventListener('click', modificarSerivicio);
