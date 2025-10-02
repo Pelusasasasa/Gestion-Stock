@@ -356,10 +356,10 @@ const listarVentas = async (comprobantes)=>{
         let movimientos;
         if (venta.tipo_comp !== "Recibo") {
             movimientos = (await axios.get(`${URL}movimiento/${tdNumero.innerHTML}/${venta.tipo_venta}`)).data;
-            listarMovimientoComprobante(movimientos,venta._id);
+            await listarMovimientoComprobante(movimientos,venta._id);
         }else{
             movimientos = (await axios.get(`${URL}movRecibo/forNumber/${venta.numero}`)).data;
-            listarMovimientoRecibo(movimientos,venta._id);
+            await listarMovimientoRecibo(movimientos,venta._id);
         };
 
         totalVenta += venta.tipo_comp === "Nota Credito C" ? venta.precio * -1 : venta.precio;
