@@ -3,7 +3,7 @@ const sweet = require('sweetalert2');
 require("dotenv").config();
 
 const { ipcRenderer } = require('electron');
-const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName, sacarIva } = require('../helpers');
+const { apretarEnter, redondear, sacarCosto, cargarFactura, ponerNumero, verCodigoComprobante, verTipoComprobante, verSiHayInternet, verTipoComprobanteNegro, agregarMovimientoVendedores, getParameterByName, sacarIva, verPrecioConCantidad } = require('../helpers');
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
 
@@ -822,18 +822,29 @@ tbody.addEventListener('dblclick', async se => {
         if (isConfirmed) {
             const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
             //Borramos el total anterior
-            totalGlobal = parseFloat(redondear(totalGlobal - (producto.producto.precio * producto.cantidad), 2));
+            totalGlobal = parseFloat(redondear(totalGlobal - verPrecioConCantidad(producto, lista.value, dolar), 2));
 
             producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
             producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
-            producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
+            if(lista.value === 'INSTALADOR'){
+                if(producto.producto.costoDolar !== 0){
+                    producto.producto.costoDolar = parseFloat(document.getElementById('precioCambio').value) / dolar;
+                    
+                }else{
+                    producto.producto.costo = parseFloat(document.getElementById('precioCambio').value);
+                    console.log("a");
+                };
+            }else{
+                producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
+            };
 
             seleccionado.children[1].innerHTML = producto.cantidad.toFixed(2);
             seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
             seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
             seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad, 2);
 
-            totalGlobal = parseFloat(redondear(totalGlobal + (producto.producto.precio * producto.cantidad), 2));
+            totalGlobal = parseFloat(redondear(totalGlobal + verPrecioConCantidad(producto, lista.value, dolar), 2));
+            
             total.value = totalGlobal.toFixed(2);
         }
     })

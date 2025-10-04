@@ -664,5 +664,27 @@ funciones.masVeinticuatroHoras = (fechaTraida) => {
     }else{
         return false
     }
-}
+};
+
+funciones.verPrecioConCantidad = ({producto, cantidad}, tipoCliente = 'Normal', dolar) => {
+    if(producto.costoDolar !== 0){
+        if(tipoCliente === 'INSTALADOR'){
+            return (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar * cantidad
+        }else{
+            return producto.precio * cantidad
+        };
+    }else{
+        if(tipoCliente === 'INSTALADOR'){
+            return (producto.costo + producto.costo * producto.impuesto / 100) * cantidad
+        }else{
+            return producto.precio  * cantidad
+        };
+    };
+
+
+
+
+
+};
+
 module.exports = funciones;

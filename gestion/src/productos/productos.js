@@ -82,7 +82,7 @@ const listar = (productos)=>{
         tdAcciones.classList.add('acciones')
 
         tdId.innerHTML = _id;
-        tdDescripcion.innerHTML = descripcion;
+        tdDescripcion.innerHTML = descripcion.slice(0,80);
         tdPrecio.innerHTML = redondear(precio,2);
         tdStock.innerHTML = redondear(stock,2);
         tdMarca.innerHTML = marca;
