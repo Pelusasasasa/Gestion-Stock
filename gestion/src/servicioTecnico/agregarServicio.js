@@ -20,6 +20,7 @@ const cliente = document.getElementById('cliente');
 const direccion = document.getElementById('direccion');
 const telefono = document.getElementById('telefono');
 const producto = document.getElementById('producto');
+const agregarManual = document.getElementById('agregarManual');
 const sugerencia = document.getElementById('sugerencia');
 const listaClientes = document.getElementById('listaClientes');
 const listaProductos = document.getElementById('listaProductos');
@@ -27,6 +28,45 @@ const productosAgregados = document.getElementById('productosAgregados');
 const tbody = document.getElementById('tbody');
 
 let equipos = [];
+
+const agregarEquipoHTML = (equipo, marca, serie) => {
+    productosAgregados.innerHTML += `
+        <div class='grid columns-5-4fr-1fr-1fr-1fr-1fr w-full'>
+            <p class='m-0'>${equipo}</p>
+            <p class='m-0 text-center'>${marca}</p>
+            <p class='m-0 text-center'>${serie}</p>
+            <select class='m-0 text-xs h-fit-content'>
+                <option selected>Sin Revisar</option>
+                <option>En Proceso</option>
+                <option>Finalizado</option>
+                <option>Entregado</option>
+            </select>
+            <p class='m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
+        </div>
+    `
+}
+
+const agregarProductoManual = async() => {
+    const { isConfirmed, value } = await Swal.fire({
+        title: 'Numero Serie',
+        confirmButtonText: 'Agregar',
+        showCancelButton: true,
+        input: 'text'
+    });
+
+    if(!isConfirmed) return;
+
+    equipos.push({
+        equipo: producto.value.toUpperCase(),
+        marca: '',
+        serie: value
+    });
+
+    agregarEquipoHTML(producto.value.toUpperCase(), '', value)
+
+    listaProductos.parentNode.classList.add('none')
+    producto.value = '';
+};
 
 const buscarCliente = async(e) => {
     if(e.key === 'Enter'){
@@ -291,20 +331,7 @@ const seleccionarProducto = async(e) => {
         serie: value,
     });
 
-    productosAgregados.innerHTML += `
-        <div class='grid columns-5-4fr-1fr-1fr-1fr-1fr w-full'>
-            <p class='m-0'>${productoDiv.children[1].innerText}</p>
-            <p class='m-0 text-center'>${productoDiv.children[2].innerText}</p>
-            <p class='m-0 text-center'>${value}</p>
-            <select class='m-0 text-xs h-fit-content'>
-                <option selected>Sin Revisar</option>
-                <option>En Proceso</option>
-                <option>Finalizado</option>
-                <option>Entregado</option>
-            </select>
-            <p class='m-0 text-center cursor-pointer'><span class=material-icons-outlined id=delete>delete</span></p>
-        </div>
-    `
+    agregarEquipoHTML(productoDiv.children[1].innerText, productoDiv.children[2].innerText, value );
 
     listaProductos.parentNode.classList.add('none');
     producto.value = '';
@@ -359,6 +386,7 @@ const verDisponibilidadParaEliminar = (servicio) => {
     }
 };
 
+agregarManual.addEventListener('click', agregarProductoManual);
 cancelar.addEventListener('click', () => location.href = `./servicio.html?vendedor=${vendedor}`);
 cliente.addEventListener('keypress', buscarCliente);
 guardar.addEventListener('click', crearServicio);
