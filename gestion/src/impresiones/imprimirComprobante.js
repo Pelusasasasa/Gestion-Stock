@@ -60,7 +60,7 @@ const ponerDatosVenta = (datos, auxDolar)=>{
     condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
 
     if(datos.tipo_venta !== 'RT' && datos.tipoVenta !== 'RT'){
-        subTotal.innerText = auxDolar ? ((datos.precio + datos.descuento) / parseFloat(datos.dolar)).toFixed(2) : (datos.precio + datos.descuento).toFixed(2);
+        subTotal.innerText = auxDolar ? ((datos.precio - datos.descuento) / parseFloat(datos.dolar)).toFixed(2) : (datos.precio - datos.descuento).toFixed(2);
         descuento.innerText = datos?.descuento?.toFixed(2);
         total.innerText = auxDolar ? (datos.precio / parseFloat(datos.dolar)).toFixed(2) : datos.precio.toFixed(2);
     };

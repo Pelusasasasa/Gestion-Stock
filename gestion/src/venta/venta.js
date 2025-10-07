@@ -955,13 +955,29 @@ porcentaje.addEventListener('change', async e => {
     porcentaje.value = porcentaje.value === "" ? "0.00" : porcentaje.value;
     descuento = redondear(parseFloat(total.value) * parseFloat(porcentaje.value) / 100, 2);
     for await (let { cantidad, producto } of listaProductos) {
-        totalGlobal -= parseFloat(redondear(producto.precio * cantidad, 2))
-        producto.precio = parseFloat(redondear(producto.precio / (porcentajeH / 100 + 1), 2));
-        producto.precio = parseFloat(redondear(producto.precio + producto.precio * parseFloat(porcentaje.value) / 100, 2));
-        const tr = document.getElementById(producto.idTabla)
-        tr.children[4].innerHTML = producto.precio.toFixed(2);
-        tr.children[5].innerHTML = redondear(producto.precio * cantidad, 2);
-        totalGlobal = parseFloat(redondear(totalGlobal + producto.precio * cantidad, 2));
+        const tr = document.getElementById(producto.idTabla);
+
+        totalGlobal -= verPrecioConCantidad({producto, cantidad}, lista.value, dolarInstalador)
+        //6931847170943
+        if(lista.value === 'INSTALADOR'){
+            if(producto.costoDolar !== 0){
+                producto.costoDolar = producto.costoDolar + producto.costoDolar * parseFloat(porcentaje.value) / 100;
+                tr.children[5].innerHTML = ((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador).toFixed(2);
+                tr.children[6].innerHTML = ((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * cantidad).toFixed(2);
+                totalGlobal = totalGlobal + parseFloat(tr.children[6].innerText)
+            }else{
+                producto.costo = producto.costo + producto.costo * parseFloat(porcentaje.value) / 100;
+                tr.children[5].innerHTML = (producto.costo + producto.costo * producto.impuesto / 100).toFixed(2);
+                tr.children[6].innerHTML = ((producto.costo + producto.costo * producto.impuesto / 100) * cantidad).toFixed(2);
+                totalGlobal = totalGlobal + parseFloat(tr.children[6].innerText)
+            }
+        }else{
+            producto.precio = producto.precio + producto.precio * parseFloat(porcentaje.value) / 100
+            tr.children[5].innerHTML = producto.precio.toFixed(2);
+            tr.children[6].innerHTML = redondear(producto.precio * cantidad, 2);
+            totalGlobal = parseFloat(redondear(totalGlobal + producto.precio * cantidad, 2));
+        };
+
         total.value = totalGlobal.toFixed(2);
     }
     porcentajeH = parseFloat(porcentaje.value);
