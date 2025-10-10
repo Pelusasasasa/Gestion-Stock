@@ -897,15 +897,34 @@ window.addEventListener('load', async e => {
 
         const { value, isConfirmed} = await sweet.fire({
             title: "Numero de Factura Anterior",
-            input: "text",
+            html: `
+                <input id="numeroFactura" type="number" class="swal2-input" placeholder="Número de factura">
+                <select id="tipoFactura" class="swal2-select">
+                    <option value="Factura A">Factura A</option>
+                    <option value="Factura B">Factura B</option>
+                </select>
+            `,
+            focusConfirm: true,
             confirmButtonText: "Aceptar",
-            showCancelButton: true
+            showCancelButton: true,
+            preConfirm: () => {
+                const numero = document.getElementById('numeroFactura').value;
+                const tipo = document.getElementById('tipoFactura').value;
+
+                if(!numero){
+                    Swal.showValidationMessage('Por favor Ingresar el numero de factura sin el punto de venta');
+                    return false
+                };
+
+                return {numero, tipo}
+            }
+
         });
 
         if (isConfirmed) {
-            facturaAnterior = value.padStart(8, '0');
+            facturaAnterior = value.numero.padStart(8, '0');
             try {
-                const { data }= await axios.get(`${URL}ventas/porFactura/${value}`);
+                const { data }= await axios.get(`${URL}ventas/porFactura/${value.numero}/${value.tipo}`);
                 if( data.ok ){
                     listarVenta(data.venta);
                 }else{

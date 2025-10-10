@@ -20,6 +20,6 @@ router.route('/anio/:fecha')
     .get(ventaAnio)
 router.route('/porFecha/:desde/:hasta')
     .get(getbetweenDate)
-router.route('/porFactura/:factura')
+router.route('/porFactura/:factura/:tipo')
     .get(getPorFactura)
 module.exports = router;

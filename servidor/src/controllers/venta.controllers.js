@@ -229,14 +229,11 @@ ventaCTRL.getbetweenDate = async(req,res)=>{
 ventaCTRL.getPorFactura = async(req, res) => {
 
     try {
-        const { factura } = req.params;
+        const { factura, tipo } = req.params;
         const venta = await Venta.findOne({
             $and: [
                 {"afip.numero": parseInt(factura)},
-                {$or: [
-                    {tipo_comp: 'Factura B'},
-                    {tipo_comp: 'Factura A'}
-                ]}
+                {tipo_comp: tipo}
             ]
         });
 
