@@ -46,9 +46,18 @@ productoCTRL.descontarStock = async (req, res) => {
 
 productoCTRL.getsProductos = async (req, res) => {
     const { descripcion, condicion } = req.params;
+    
     let productos;
     if (descripcion === "textoVacio") {
         productos = await Producto.find({}).limit(50);
+    } else if(condicion === '_id'){
+        const re = new RegExp(`^${descripcion}`);
+        productos = await Producto.find({
+            $or: [
+                {_id: {$regex: re, $options: 'i'}},
+                {codigoSecundario: {$regex: re, $options: 'i'}}
+            ]
+        });
     } else {
         let re;
         try {
