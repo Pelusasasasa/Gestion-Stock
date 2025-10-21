@@ -17,10 +17,13 @@ movimientoCTRL.getAll = async(req,res)=>{
 
 movimientoCTRL.getForNameAndDate = async(req,res)=>{
     const {name,desde} = req.params;
-    const fecha = new Date(desde);
+
+    const fechaBase = new Date(`${desde}T00:00:00-03:00`);
+    const inicioDia = new Date(fechaBase);
+
     const movimientos = await Movimiento.find({
         $and:[
-            {fecha:{$gte:desde}},
+            {fecha:{$gte:inicioDia}},
             {vendedor:name}
         ]
     });

@@ -265,7 +265,7 @@ ipcRenderer.on('libroIva',async (e,args)=>{
 
 ipcRenderer.on('verificarUsuario', async(e,args) => {
     let path = '';
-    const {permiso,nombre} = await verificarUsuarios();
+    const {permiso,nombre, _id} = await verificarUsuarios();
     
     if (args === 'numeros') {
         path = `numeros/numeros.html`
@@ -280,7 +280,7 @@ ipcRenderer.on('verificarUsuario', async(e,args) => {
             path: path,
             ancho:1000,
             altura:700,
-            info: nombre
+            info: _id
         });
     }else if(permiso === 1 && args === 'numeros'){
 
