@@ -67,7 +67,7 @@ const listarMovimientos = (lista)=>{
     lista.forEach(elem =>{
         const tr = document.createElement('tr');
 
-        const fecha = parsearFecha(elem.fecha);
+        const fecha = elem.fecha;
         const hora = elem.fecha.slice(11,19).split(':',3);
         const tdFecha = document.createElement('td');
         const tdDescripcion = document.createElement('td');

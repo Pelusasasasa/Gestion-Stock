@@ -29,6 +29,7 @@ const salir = document.querySelector('.salir');
 
 let id;
 let dolarTraido;
+let dolarTraidoInstalador;
 let usuario = ''
 
 
@@ -85,6 +86,7 @@ window.addEventListener('load',async e=>{
         id = numeros._id;
         dolarTraido = numeros.Dolar;
         dolar.value = numeros.Dolar.toFixed(2);
+        dolarTraidoInstalador = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
         dolarInstalador.value = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
         presupuesto.value = numeros.Presupuesto.toString().padStart(8,'0');
         contado.value = numeros.Contado.toString().padStart(8,'0');
@@ -120,6 +122,11 @@ guardar.addEventListener('click',async e=>{
         const pc = await verNombrePc();
         agregarMovimientoVendedores(`Cambio el Dolar de ${dolarTraido} a ${dolar.value} en la Computadora ${pc}`, usuario);
     };
+
+    if(dolarTraidoInstalador !== parseFloat(dolarInstalador.value)) {
+        const pc = await verNombrePc();
+        agregarMovimientoVendedores(`Cambio el Dolar Instalador de ${dolarTraidoInstalador} a ${dolarInstalador.value} en la Computadora ${pc}`, usuario);
+    }
 
     try {
         await axios.put(`${URL}numero`,numero);
