@@ -83,9 +83,9 @@ const arreglarSaldo = async (id) => {
 
     try {
         const { data } = await axios.get(`${URL}clientes/id/${id}`);
-        if(data.ok){
+        if (data.ok) {
             cliente = data.cliente
-        }else{
+        } else {
             return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
         }
     } catch (error) {
@@ -120,22 +120,22 @@ const cargarRemito = async () => {
     let aux = 0;
 
     for (let elem of remitosTraidos) {
-       let remito = {};
+        let remito = {};
 
-       try {
-         const { data } = (await axios.get(`${URL}remitos/forId/${elem}`));
-         if(data.ok){
-            remito = data.remito;
-         }else{
-            return await sweet.fire('No se pudo obtener los remito', data.msg, 'error');
-         }
-       } catch (error) {
-        console.log(error);
-        return await sweet.fire('No se pudo obtener los remitos', error?.response?.data?.msg, 'error');
-       };
+        try {
+            const { data } = (await axios.get(`${URL}remitos/forId/${elem}`));
+            if (data.ok) {
+                remito = data.remito;
+            } else {
+                return await sweet.fire('No se pudo obtener los remito', data.msg, 'error');
+            }
+        } catch (error) {
+            console.log(error);
+            return await sweet.fire('No se pudo obtener los remitos', error?.response?.data?.msg, 'error');
+        };
 
         const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
-       console.log(mov);
+        console.log(mov);
         textoObservaciones += remito.observaciones + ' ';
         movimientosRemitos.push(...mov);
 
@@ -145,10 +145,10 @@ const cargarRemito = async () => {
     for await (let elem of movimientosRemitos) {
         let producto;
         const res = elem.codProd.toUpperCase().replace(/\//g, '%2F');
-        
-        if(res) {
+
+        if (res) {
             producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
-        }else{
+        } else {
             producto = {};
             producto._id = elem.codProd;
             producto.descripcion = elem.producto;
@@ -158,10 +158,10 @@ const cargarRemito = async () => {
         }
         producto.idTabla = aux;
         aux++;
-        
+
         await listarProducto(producto, elem.cantidad)
         const pro = listaProductos.find(({ producto }) => producto._id === elem.codProd);
-        if(pro){
+        if (pro) {
             pro.series = elem?.series;
         }
     };
@@ -171,7 +171,7 @@ const cargarRemito = async () => {
 
 };
 
-const crearHTML = async(elem) => {
+const crearHTML = async (elem) => {
     const tr = document.createElement('tr');
 
     const tdCodigo = document.createElement('td');
@@ -205,7 +205,7 @@ const crearHTML = async(elem) => {
                 </div>
             </td>
         `
-    
+
 
     tr.appendChild(tdCodigo);
     tr.appendChild(tdCantidad);
@@ -294,9 +294,9 @@ const listarCliente = async (id) => {
     let cliente = {};
     try {
         const { data } = (await axios.get(`${URL}clientes/id/${id}`));
-        if(data.ok){
+        if (data.ok) {
             cliente = data.cliente
-        }else{
+        } else {
             return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
         };
     } catch (error) {
@@ -323,18 +323,18 @@ const listarCliente = async (id) => {
     }
 };
 
-const listarMovimientos = async(lista) => {
-    for(let elem of lista){
+const listarMovimientos = async (lista) => {
+    for (let elem of lista) {
         crearHTML(elem);
     };
 };
 
 //Lo que hacemos es listar el producto traido
 const listarProducto = async (producto, cant = 1, series = []) => {
-    if(!producto) return await Swal.fire('Producto no encontrado', `No se encontro producto con el codigo ${codBarra.value}`, 'error');
+    if (!producto) return await Swal.fire('Producto no encontrado', `No se encontro producto con el codigo ${codBarra.value}`, 'error');
 
     cantidad.value = cant;
-    
+
 
     if (!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad') {
         descripcion.value = producto.descripcion;
@@ -358,12 +358,12 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     //Buscamos si el produto ya esta cargado
     if (producto !== "") {
         const productoYaUsado = listaProductos.find(({ producto: product }) => {
-            if(product._id === '' && (product.idTabla === producto.idTabla)){
+            if (product._id === '' && (product.idTabla === producto.idTabla)) {
                 return product
-            }else if (product._id !== '' && (product._id === producto._id)) {
+            } else if (product._id !== '' && (product._id === producto._id)) {
                 return product
             };
-            
+
         });
 
         //Esto sucede si el producto No esta cargado
@@ -381,9 +381,9 @@ const listarProducto = async (producto, cant = 1, series = []) => {
             listaProductos.push({ cantidad: parseFloat(cantidad.value), producto, series });
 
             codBarra.value = producto._id;
-            
+
             precioU.value = lista.value === "NORMAL" ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador);
-            
+
             idProducto++;
             producto.idTabla = `${idProducto}`;
 
@@ -425,13 +425,13 @@ const listarProducto = async (producto, cant = 1, series = []) => {
             tr.children[1].innerHTML = redondear(parseFloat(tr.children[1].innerHTML) + parseFloat(cantidad.value), 2);
             let precio = tr.children[6];
             const cantidadNueva = parseFloat(tr.children[1].innerHTML).toFixed(2);
-            
-            if(parseFloat(cantidadNueva) === 0){
+
+            if (parseFloat(cantidadNueva) === 0) {
                 tbody.removeChild(tr);
                 listaProductos = listaProductos.filter(elem => elem.producto.idTabla !== producto.idTabla);
             };
 
-            
+
             //Si la lista de de cliente normal se redonde el precio y sino el costo mas iva por el dolar intalador
             if (lista.value === "NORMAL") {
                 precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio, 2);
@@ -457,7 +457,7 @@ const listarProducto = async (producto, cant = 1, series = []) => {
 
 };
 
-const listarVenta = async(venta) => {
+const listarVenta = async (venta) => {
     listarCliente(venta.idCliente);
 
     try {
@@ -472,12 +472,12 @@ const listarVenta = async(venta) => {
     }
 };
 
-const obtenerProducto = async(id) => {
+const obtenerProducto = async (id) => {
     try {
         const { data } = await axios.get(`${URL}productos/${id}`);
-        if(data){
+        if (data) {
             return data;
-        }else{
+        } else {
             return await sweet.fire('No se pudo obtener el producto', '', 'error');
         };
     } catch (error) {
@@ -488,7 +488,7 @@ const obtenerProducto = async(id) => {
 const togglePrecios = async (e) => {
     for await (let { cantidad, producto } of listaProductos) {
         console.log(producto);
-        if(producto?._id){
+        if (producto?._id) {
             const tr = document.getElementById(`${producto.idTabla}`);
 
             if (lista.value === "NORMAL") {
@@ -685,7 +685,7 @@ facturar.addEventListener('click', async e => {
             cliente._id = codigo.value;
 
             if (venta.tipo_venta === "PP") {
-                const { data} = await axios.post(`${URL}Presupuesto`, venta);
+                const { data } = await axios.post(`${URL}Presupuesto`, venta);
                 ventaTraida = data.venta;
                 movimientos.push(...data.movimientos);
             } else if (venta.tipo_venta === "RT") {
@@ -711,7 +711,7 @@ facturar.addEventListener('click', async e => {
                 for (let elem of remitosTraidos) {
                     try {
                         const { data } = await axios.put(`${URL}remitos/pasado/${elem}`);
-                        if(!data.ok){
+                        if (!data.ok) {
                             return await sweet.fire('No se pudo quitar los remitos pero se paso la venta', data?.msg, 'error');
                         };
                     } catch (error) {
@@ -826,15 +826,15 @@ tbody.addEventListener('dblclick', async se => {
 
             producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
             producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
-            if(lista.value === 'INSTALADOR'){
-                if(producto.producto.costoDolar !== 0){
+            if (lista.value === 'INSTALADOR') {
+                if (producto.producto.costoDolar !== 0) {
                     producto.producto.costoDolar = parseFloat(document.getElementById('precioCambio').value) / dolar;
-                    
-                }else{
+
+                } else {
                     producto.producto.costo = parseFloat(document.getElementById('precioCambio').value);
                     console.log("a");
                 };
-            }else{
+            } else {
                 producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
             };
 
@@ -844,7 +844,7 @@ tbody.addEventListener('dblclick', async se => {
             seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad, 2);
 
             totalGlobal = parseFloat(redondear(totalGlobal + verPrecioConCantidad(producto, lista.value, dolar), 2));
-            
+
             total.value = totalGlobal.toFixed(2);
         }
     })
@@ -861,7 +861,7 @@ codigo.addEventListener('keypress', async e => {
             ipcRenderer.send('abrir-ventana', opciones)
         } else {
             listarCliente(codigo.value);
-            
+
         }
     }
 });
@@ -895,7 +895,7 @@ window.addEventListener('load', async e => {
 
     if (tipoFactura === "notaCredito") {
 
-        const { value, isConfirmed} = await sweet.fire({
+        const { value, isConfirmed } = await sweet.fire({
             title: "Numero de Factura Anterior",
             html: `
                 <input id="numeroFactura" type="number" class="swal2-input" placeholder="Número de factura">
@@ -911,12 +911,12 @@ window.addEventListener('load', async e => {
                 const numero = document.getElementById('numeroFactura').value;
                 const tipo = document.getElementById('tipoFactura').value;
 
-                if(!numero){
+                if (!numero) {
                     Swal.showValidationMessage('Por favor Ingresar el numero de factura sin el punto de venta');
                     return false
                 };
 
-                return {numero, tipo}
+                return { numero, tipo }
             }
 
         });
@@ -924,10 +924,10 @@ window.addEventListener('load', async e => {
         if (isConfirmed) {
             facturaAnterior = value.numero.padStart(8, '0');
             try {
-                const { data }= await axios.get(`${URL}ventas/porFactura/${value.numero}/${value.tipo}`);
-                if( data.ok ){
+                const { data } = await axios.get(`${URL}ventas/porFactura/${value.numero}/${value.tipo}`);
+                if (data.ok) {
                     listarVenta(data.venta);
-                }else{
+                } else {
                     return await sweet.fire('Error al obtener la venta', 'No se encontro una venta', 'error');
                 }
             } catch (error) {
@@ -976,21 +976,21 @@ porcentaje.addEventListener('change', async e => {
     for await (let { cantidad, producto } of listaProductos) {
         const tr = document.getElementById(producto.idTabla);
 
-        totalGlobal -= verPrecioConCantidad({producto, cantidad}, lista.value, dolarInstalador)
+        totalGlobal -= verPrecioConCantidad({ producto, cantidad }, lista.value, dolarInstalador)
         //6931847170943
-        if(lista.value === 'INSTALADOR'){
-            if(producto.costoDolar !== 0){
+        if (lista.value === 'INSTALADOR') {
+            if (producto.costoDolar !== 0) {
                 producto.costoDolar = producto.costoDolar + producto.costoDolar * parseFloat(porcentaje.value) / 100;
                 tr.children[5].innerHTML = ((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador).toFixed(2);
                 tr.children[6].innerHTML = ((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * cantidad).toFixed(2);
                 totalGlobal = totalGlobal + parseFloat(tr.children[6].innerText)
-            }else{
+            } else {
                 producto.costo = producto.costo + producto.costo * parseFloat(porcentaje.value) / 100;
                 tr.children[5].innerHTML = (producto.costo + producto.costo * producto.impuesto / 100).toFixed(2);
                 tr.children[6].innerHTML = ((producto.costo + producto.costo * producto.impuesto / 100) * cantidad).toFixed(2);
                 totalGlobal = totalGlobal + parseFloat(tr.children[6].innerText)
             }
-        }else{
+        } else {
             producto.precio = producto.precio + producto.precio * parseFloat(porcentaje.value) / 100
             tr.children[5].innerHTML = producto.precio.toFixed(2);
             tr.children[6].innerHTML = redondear(producto.precio * cantidad, 2);
@@ -1104,16 +1104,16 @@ ipcRenderer.on('informacion', (e, args) => {
 
 ipcRenderer.on('facturarVarios', async (e, args) => {
     cuentas = JSON.parse(args);
-    
+
     facturaVarios = true;
 
     const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
-    
+
     try {
         const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
-        if (data.ok){
+        if (data.ok) {
             vendedor = data.venta.vendedor._id;
-        }else{
+        } else {
             return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
         }
     } catch (error) {
@@ -1124,33 +1124,27 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
 
     for (let elem of cuentas) {
         const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
-        
+
         for await (let mov of movs) {
-            const res = mov.codProd.toUpperCase().replace(/\//g, '%2F');
-            let producto = {}
-            if(res){
-                producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
-            }else{
-                producto = {
-                    descripcion: mov.producto,
-                    precio: mov.precio,
-                    impuesto: mov.iva,
-                    _id: '',
-                    marca: '',
-                };
+            producto = {
+                descripcion: mov.producto,
+                precio: mov.precio,
+                impuesto: mov.iva,
+                _id: '',
+                marca: '',
             };
             listarProducto(producto, mov.cantidad, mov.series);
         };
     };
 });
 
-ipcRenderer.on('recibir', async(e, args) => {
+ipcRenderer.on('recibir', async (e, args) => {
     const { tipo, informacion, cantidad } = JSON.parse(args);
 
     tipo === "cliente" && listarCliente(informacion);
     tipo === "Ningun cliente" && nombre.focus();
 
-    if(tipo === "producto"){
+    if (tipo === "producto") {
         const res = informacion.toUpperCase().replace(/\//g, '%2F');
         let producto = (await axios.get(`${URL}productos/${res}`)).data;//buscamos el producto por codigo
         listarProducto(producto, cantidad);
