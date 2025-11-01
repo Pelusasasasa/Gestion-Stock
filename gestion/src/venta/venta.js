@@ -627,6 +627,13 @@ document.addEventListener('keydown', e => {
 
 facturar.addEventListener('click', async e => {
     let verificado = await vefiricarVenta();
+    let bandera = listaProductos.find(({ producto }) => producto.impuesto === 0);
+    if (bandera) {
+        return await sweet.fire({
+            title: "No se puede hacer una venta con un producto que no tiene iva",
+            confirmButtonText: 'Aceptar'
+        });
+    };
 
     if (verificado) {
         alerta.classList.remove('none');
