@@ -1,67 +1,69 @@
-
-.cliente{
-   display: flex;
-   flex-direction: column;
-   margin-bottom: 2rem;
+.cliente {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
 }
 
-.nombre,.fecha{
+.nombre,
+.fecha {
     display: flex;
     justify-content: space-around;
 }
 
-#nombre{
+#nombre {
     width: 50rem;
 }
 
-.input{
+.input {
     display: flex;
     flex-direction: column;
 }
 
-.tabla{
+.tabla {
     overflow: scroll;
     height: 65vh;
     background-color: white;
 }
 
-table{
+table {
     width: 100%;
     border-collapse: collapse;
 }
 
-tr th{
+tr th {
     border: .1rem solid black;
 }
 
-table tbody tr td{
+table tbody tr td {
     text-align: center;
     border: .1rem solid black;
 }
 
-table tbody tr td input{
+table tbody tr td input {
     width: 100%;
 }
 
-footer{
+footer {
     margin-top: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
 }
 
-.saldos{
+.saldos {
     display: flex;
     justify-content: space-around;
 }
 
-.saldos #tarjeta, .saldos #cheque{
+.saldos #tarjeta,
+.saldos #cheque,
+.saldos #retencion {
     padding: 2rem;
     font-size: 1.5rem;
     transform: scale(2);
 }
 
-.observacionesAlerta{
+.observacionesAlerta {
     color: white;
     background-color: red;
     border: none;
@@ -69,6 +71,7 @@ footer{
 }
 
 
-#observaciones{
-    pointer-events: none;;
+#observaciones {
+    pointer-events: none;
+    ;
 }

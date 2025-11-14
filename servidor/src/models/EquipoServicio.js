@@ -8,6 +8,7 @@ const EquipoServicio = new Schema({
     equipo: {
         type: String,
         required: true,
+        trim: true
     },
     marca: {
         type: String,

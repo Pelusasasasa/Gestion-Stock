@@ -3,7 +3,7 @@ require("dotenv").config();
 const sweet = require('sweetalert2');
 const axios = require('axios');
 const { ipcRenderer } = require("electron");
-const { recorrerFlechas,copiar, redondear, agregarMovimientoVendedores, verificarUsuarios, getParameterByName, parsearFecha } = require("../helpers");
+const { recorrerFlechas, copiar, redondear, agregarMovimientoVendedores, verificarUsuarios, getParameterByName, parsearFecha } = require("../helpers");
 
 const URL = process.env.GESTIONURL;
 
@@ -26,27 +26,27 @@ const ingresarMov = document.querySelector('.ingresarMov');
 const salir = document.querySelector('.salir');
 const buscador = document.querySelector('#buscarProducto');
 
-const filtrar = async()=>{
+const filtrar = async () => {
     tbody.innerHTML = '';
     let condicion = seleccion.value;
     if (condicion === "codigo") {
-        condicion="_id";
+        condicion = "_id";
     };
     const descripcion = buscador.value !== "" ? buscador.value : "textoVacio";
     const producto = (await axios.get(`${URL}productos/${descripcion}/${condicion}`)).data;
     producto.length !== 0 && listar(producto);
 };
 
-const ingresarMovimiento = async(e) => {
+const ingresarMovimiento = async (e) => {
 
     if (!seleccionado) return (await sweet.fire({
         title: "Elegir un producto"
     }));
 
     const vendedor = await verificarUsuarios();
-    
-    if(vendedor === undefined) return;
-    
+
+    if (vendedor === undefined) return;
+
     if (vendedor) {
         ipcRenderer.send('abrir-ventana', {
             path: 'productos/ingresarMovimiento.html',
@@ -56,16 +56,16 @@ const ingresarMovimiento = async(e) => {
             vendedor: vendedor,
             permiso: permiso
         });
-    }else{
+    } else {
         await sweet.fire({
             title: "Contraseña Incorrecta"
         })
     }
 };
 
-const listar = (productos)=>{
+const listar = (productos) => {
     tbody.innerHTML = "";
-    for(let {_id,descripcion,marca,rubro,stock,precio} of productos){
+    for (let { _id, descripcion, marca, rubro, stock, precio } of productos) {
         const tr = document.createElement('tr');
         tr.id = _id;
 
@@ -76,15 +76,15 @@ const listar = (productos)=>{
         const tdRubro = document.createElement('td');
         const tdMarca = document.createElement('td');
         const tdAcciones = document.createElement('td');
-        
+
         tdPrecio.classList.add('text-rigth');
         tdStock.classList.add('text-rigth');
         tdAcciones.classList.add('acciones')
 
         tdId.innerHTML = _id;
-        tdDescripcion.innerHTML = descripcion.slice(0,80);
-        tdPrecio.innerHTML = redondear(precio,2);
-        tdStock.innerHTML = redondear(stock,2);
+        tdDescripcion.innerHTML = descripcion.slice(0, 80);
+        tdPrecio.innerHTML = redondear(precio, 2);
+        tdStock.innerHTML = redondear(stock, 2);
         tdMarca.innerHTML = marca;
         tdRubro.innerText = rubro;
         tdAcciones.innerHTML = `
@@ -106,7 +106,7 @@ const listar = (productos)=>{
         tr.appendChild(tdMarca);
         tr.appendChild(tdRubro);
         tr.appendChild(tdAcciones)
-        
+
         tbody.appendChild(tr);
     }
 };
@@ -114,7 +114,7 @@ const listar = (productos)=>{
 const listarMovimientos = (lista) => {
     historicaMovTable.innerHTML = "";
 
-    for(let elem of lista){
+    for (let elem of lista) {
         const tr = document.createElement('tr');
         tr.id = elem._id;
 
@@ -125,7 +125,7 @@ const listarMovimientos = (lista) => {
         const tdCantidad = document.createElement('td');
         const tdPrecio = document.createElement('td');
         const tdTotal = document.createElement('td');
-        
+
         tdFecha.innerText = parsearFecha(elem.fecha);
         tdCodCliente.innerText = elem.cliente;
         tdCliente.innerText = elem.nombreCliente;
@@ -146,15 +146,19 @@ const listarMovimientos = (lista) => {
     }
 }
 
-window.addEventListener('load',async e=>{
+window.addEventListener('load', async e => {
     filtrar();
     copiar();
+
+    if (permiso !== 0) {
+        agregar.classList.add('none')
+    }
 });
 
 //Vemos si llega una informacion de que se abrio desde otra ventana 
-ipcRenderer.on('informacion',(e,args)=>{
+ipcRenderer.on('informacion', (e, args) => {
     const botones = args.botones;
-    if(!botones){
+    if (!botones) {
         const botones = document.querySelector('.botones');
         botones.classList.add('none');
         ventanaSecundaria = true;
@@ -162,7 +166,7 @@ ipcRenderer.on('informacion',(e,args)=>{
     }
 });
 
-ipcRenderer.on('informacion-a-ventana',(e,args)=>{
+ipcRenderer.on('informacion-a-ventana', (e, args) => {
     const producto = JSON.parse(args);
     const trModificado = document.getElementById(producto._id);
     trModificado.children[1].innerText = producto.descripcion;
@@ -171,18 +175,18 @@ ipcRenderer.on('informacion-a-ventana',(e,args)=>{
     trModificado.children[4].innerText = producto.marca ? producto.marca : trModificado.children[4].innerText;
 });
 
-buscador.addEventListener('keyup',e=>{
+buscador.addEventListener('keyup', e => {
     if ((buscador.value === "" && e.keyCode === 40) || (buscador.value === "" && e.keyCode === 39)) {
         buscador.blur();
     }
 });
 
-buscador.addEventListener('change',e=>{
+buscador.addEventListener('change', e => {
     filtrar();
 });
 
 //cuando ahcemos un click en un tr lo ponemos como que esta seleccionado
-tbody.addEventListener('click',async e=>{
+tbody.addEventListener('click', async e => {
     seleccionado && seleccionado.classList.toggle('seleccionado');
     subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
 
@@ -190,10 +194,10 @@ tbody.addEventListener('click',async e=>{
         seleccionado = e.target.parentNode;
         subSeleccionado = e.target;
 
-    }else if(e.target.nodeName === "DIV"){
+    } else if (e.target.nodeName === "DIV") {
         seleccionado = e.target.parentNode.parentNode;
         subSeleccionado = e.target.parentNode;
-    }else if(e.target.nodeName === "SPAN"){
+    } else if (e.target.nodeName === "SPAN") {
         seleccionado = e.target.parentNode.parentNode.parentNode;
         subSeleccionado = e.target.parentNode.parentNode;
     };
@@ -203,38 +207,38 @@ tbody.addEventListener('click',async e=>{
 
     if (e.target.innerHTML === "delete") {
         sweet.fire({
-            title:"Seguro Borrar " + seleccionado.children[1].innerHTML,
-            "showCancelButton":true,
-            "confirmButtonText":"Aceptar"
-        }).then(async (result)=>{
+            title: "Seguro Borrar " + seleccionado.children[1].innerHTML,
+            "showCancelButton": true,
+            "confirmButtonText": "Aceptar"
+        }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
                     const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
-                    await sweet.fire({title:mensaje});
+                    await sweet.fire({ title: mensaje });
                     tbody.removeChild(seleccionado);
-                    vendedor && await agregarMovimientoVendedores(`Elimino el producto ${seleccionado.children[1].innerHTML} con el precio ${seleccionado.children[2].innerHTML}`,vendedor);
+                    vendedor && await agregarMovimientoVendedores(`Elimino el producto ${seleccionado.children[1].innerHTML} con el precio ${seleccionado.children[2].innerHTML}`, vendedor);
                 } catch (error) {
                     console.log(error);
                     sweet.fire({
-                        title:"No se pudo borrar el producto"
+                        title: "No se pudo borrar el producto"
                     })
                 }
             }
         })
-    }else if(e.target.innerHTML === "edit"){
+    } else if (e.target.innerHTML === "edit") {
         const opciones = {
             path: "./productos/modificarProducto.html",
-            botones:true,
-            informacion:seleccionado.id,
-            altura:600,
-            vendedor:vendedor
+            botones: true,
+            informacion: seleccionado.id,
+            altura: 600,
+            vendedor: vendedor
         }
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else if(e.target.innerHTML === 'visibility'){
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.target.innerHTML === 'visibility') {
         historicaMovDiv.classList.remove('none');
         try {
-            const {data} = await axios.get(`${URL}movimiento/porProducto/${seleccionado.id}`);
-            if(data.ok){
+            const { data } = await axios.get(`${URL}movimiento/porProducto/${seleccionado.id}`);
+            if (data.ok) {
                 listarMovimientos(data.movimientos);
             }
         } catch (error) {
@@ -244,20 +248,20 @@ tbody.addEventListener('click',async e=>{
     };
 });
 
-agregar.addEventListener('click',e=>{
+agregar.addEventListener('click', e => {
     const opciones = {
         path: "./productos/agregarProducto.html",
-        botones:true,
-        altura:600,
-        vendedor:vendedor
+        botones: true,
+        altura: 600,
+        vendedor: vendedor
     }
-    ipcRenderer.send('abrir-ventana',opciones);
+    ipcRenderer.send('abrir-ventana', opciones);
 });
 
 ingresarMov.addEventListener('click', ingresarMovimiento);
 
-body.addEventListener('keypress',async e => {
-    if (e.key === "Enter" && ventanaSecundaria){    
+body.addEventListener('keypress', async e => {
+    if (e.key === "Enter" && ventanaSecundaria) {
         if (seleccionado && document.activeElement.nodeName !== "INPUT") {
 
             const { isConfirmed, value } = await sweet.fire({
@@ -266,10 +270,10 @@ body.addEventListener('keypress',async e => {
             });
 
             if (isConfirmed) {
-                ipcRenderer.send('enviar',{
-                        tipo:"producto",
-                        informacion:seleccionado.id,
-                        cantidad: value ? value : 1,
+                ipcRenderer.send('enviar', {
+                    tipo: "producto",
+                    informacion: seleccionado.id,
+                    cantidad: value ? value : 1,
                 });
                 window.close();
             }
@@ -277,10 +281,10 @@ body.addEventListener('keypress',async e => {
     }
 });
 
-document.addEventListener("keydown",e=>{
+document.addEventListener("keydown", e => {
     if (e.key === "Escape" && ventanaSecundaria) {
         window.close();
-    }else if(e.key === "Escape" && !ventanaSecundaria){
+    } else if (e.key === "Escape" && !ventanaSecundaria) {
         location.href = "../menu.html";
     }
     recorrerFlechas(e.keyCode);
@@ -290,6 +294,6 @@ cerrarMovLista.addEventListener('click', () => {
     historicaMovDiv.classList.add('none');
 });
 
-salir.addEventListener('click',e=>{
+salir.addEventListener('click', e => {
     location.href = "../menu.html";
 });

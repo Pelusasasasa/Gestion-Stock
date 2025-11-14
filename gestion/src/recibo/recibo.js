@@ -16,6 +16,7 @@ const URL = process.env.GESTIONURL;
 const { ipcRenderer } = require('electron');
 const { apretarEnter, cargarFactura, redondear, cargarMovCaja } = require('../helpers');
 const sweet = require('sweetalert2');
+const { default: Swal } = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
 const nombre = document.querySelector('#nombre');
@@ -31,6 +32,7 @@ const total = document.querySelector('#total');
 const imprimir = document.querySelector('.imprimir');
 const entregado = document.querySelector('#entregado');
 const cheque = document.querySelector('#cheque');
+const retencion = document.querySelector('#retencion');
 const cancelar = document.querySelector('.cancelar');
 
 const tarjeta = document.querySelector('#tarjeta');
@@ -60,15 +62,14 @@ ipcRenderer.on('recibir-ventana-secundaria', (e, args) => {
     location.href = "../menu.html";
 })
 
-
 //Todas las compensadas que se modificaron las modificamos
 const modificarCuentaCompensadas = async () => {
-const trs = document.querySelectorAll('tbody tr');
+    const trs = document.querySelectorAll('tbody tr');
     let numeros = [];
     for await (let tr of trs) {
         const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : "";
         const pagado = parseFloat(tr.children[5].children[0].value);
-        numero !== '' && numeros.push({numero, pagado});
+        numero !== '' && numeros.push({ numero, pagado });
     };
     return numeros;
 };
@@ -78,10 +79,10 @@ const ponerInputs = async (id) => {
     let cliente = {};
 
     try {
-        const { data} = await axios.get(`${URL}clientes/id/${id}`);
-        if(data.ok){
+        const { data } = await axios.get(`${URL}clientes/id/${id}`);
+        if (data.ok) {
             cliente = data.cliente
-        }else{
+        } else {
             return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
         }
     } catch (error) {
@@ -99,10 +100,10 @@ const ponerInputs = async (id) => {
 
         try {
             const { data } = await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`);
-        
-            if(data.ok){
+
+            if (data.ok) {
                 compensadas = data.compensadas;
-            }else{
+            } else {
                 await sweet.fire('No se pudo obtener las compensadas', data.msg, 'error');
             };
         } catch (error) {
@@ -180,11 +181,11 @@ const ponerVenta = async (cuenta) => {
 };
 
 const verValorRecibo = () => {
-    if(cheque.checked){
+    if (cheque.checked) {
         return `CHEQUE`
-    }else if(tarjeta.checked){
+    } else if (tarjeta.checked) {
         return `TARJETA`
-    }else{
+    } else {
         return 'EFECTIVO';
     }
 };
@@ -277,7 +278,7 @@ imprimir.addEventListener('click', async e => {
     recibo.caja = archivo.caja;
     recibo.compensadas = await modificarCuentaCompensadas();
     recibo.valorRecibido = verValorRecibo();
-    
+
     // try {
     //     const { data } = await axios.get(`${URL}tipoCuenta/forText/Recibo`);
     //     await cargarMovCaja(recibo.cliente, '000R', recibo.numero, data.tipo._id, recibo.precio, "639dbc31dfdb8a1d243d19c2");
@@ -287,7 +288,7 @@ imprimir.addEventListener('click', async e => {
 
     try {
         const { data } = (await axios.post(`${URL}recibo`, recibo));
-        if(data.ok){
+        if (data.ok) {
             if (cheque.checked) {
                 await ipcRenderer.send('abrir-ventana', {
                     path: './cheque/agregarCheque.html',
@@ -296,7 +297,7 @@ imprimir.addEventListener('click', async e => {
                     reinicio: false,
                     informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false])
                 });
-            }else if (tarjeta.checked) {
+            } else if (tarjeta.checked) {
                 await ipcRenderer.send('abrir-ventana', {
                     path: './tarjeta/agregarTarjeta.html',
                     altura: 800,
@@ -304,11 +305,31 @@ imprimir.addEventListener('click', async e => {
                     reinicio: false,
                     informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false])
                 });
+            } else if (retencion.checked) {
+
+                const { isConfirmed, value } = await Swal.fire({
+                    showCancelButton: true,
+                    confirmButtonText: 'Aceptar',
+                    input: 'number',
+                    title: 'Retencion'
+                });
+
+                if (isConfirmed) {
+                    const { data: retencion } = await axios.post(`${URL}retencion`, {
+                        importe: value,
+                        reciboId: data.recibo._id,
+                        nro_comp: data.recibo.numero,
+                    });
+                    data.recibo.retencion = retencion.retencion;
+
+                    ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
+                    location.href = "../menu.html";
+                }
             } else {
                 ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
                 location.href = "../menu.html";
             };
-        }else{
+        } else {
             await sweet.fire('Error al generar el recibo', data?.msg, 'error');
         };
     } catch (error) {

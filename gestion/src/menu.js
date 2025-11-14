@@ -12,15 +12,15 @@ const filePath = path.join(__dirname, 'config.json');
 let modulos = '';
 
 const moduloCreate = {
-  "ventas": true,
-  "clientes": true,
-  "productos": true,
-  "caja": true,
-  "recibos": true,
-  "consultas": true,
-  "remitos": true,
-  "gastos": true,
-  "servicioTecnico": true
+    "ventas": true,
+    "clientes": true,
+    "productos": true,
+    "caja": true,
+    "recibos": true,
+    "consultas": true,
+    "remitos": true,
+    "gastos": true,
+    "servicioTecnico": true
 };
 
 try {
@@ -32,7 +32,7 @@ try {
 
 ipcRenderer.send('poner-cierre');
 
-const {ponerNumero, cargarVendedor, verificarUsuarios} = require('./helpers');
+const { ponerNumero, cargarVendedor, verificarUsuarios } = require('./helpers');
 
 const ventas = document.querySelector('.ventas');
 const clientes = document.querySelector('.clientes');
@@ -50,88 +50,88 @@ const atajoNotaCredito = document.getElementById('atajoNotaCredito');
 
 let verVendedores;
 
-window.addEventListener('load',async e=>{
+window.addEventListener('load', async e => {
 
     const vendedores = (await axios.get(`${URL}vendedores`)).data;
     if (!vendedores.find(vendedor => vendedor.permiso === 0)) {
         sweet.fire({
-            title:"Cargar un Vendedor con permiso en 0 inicial",
+            title: "Cargar un Vendedor con permiso en 0 inicial",
             html: await cargarVendedor(),
-            confirmButtonText:"Aceptar",
-            showCancelButton:true
-        }).then(async({isConfirmed})=>{
+            confirmButtonText: "Aceptar",
+            showCancelButton: true
+        }).then(async ({ isConfirmed }) => {
             if (isConfirmed) {
                 const nuevoVendedor = {};
                 nuevoVendedor.codigo = document.getElementById('codigo').value;
                 nuevoVendedor.nombre = document.getElementById('nombre').value.toUpperCase();
                 nuevoVendedor.permiso = document.getElementById('permisos').value;
                 try {
-                    await axios.post(`${URL}vendedores`,nuevoVendedor);
+                    await axios.post(`${URL}vendedores`, nuevoVendedor);
                 } catch (error) {
                     sweet.fire({
-                        title:"no se pudo cargar el vendedor"
+                        title: "no se pudo cargar el vendedor"
                     })
                 }
-            }else{
+            } else {
                 location.reload();
             }
         })
     };
 
-    if(modulos.ventas){
+    if (modulos.ventas) {
         ventas.classList.remove('hidden');
         atajoVentas.classList.remove('hidden');
         atajoNotaCredito.classList.remove('hidden');
     };
-    if(modulos.clientes){
+    if (modulos.clientes) {
         clientes.classList.remove('hidden');
         atajoAgregarCliente.classList.remove('hidden');
     };
-    if(modulos.productos){
+    if (modulos.productos) {
         productos.classList.remove('hidden');
         atajoAgregarProducto.classList.remove('hidden');
         atajoCambioProducto.classList.remove('hidden');
     };
-    if(modulos.caja){
+    if (modulos.caja) {
         caja.classList.remove('hidden');
     };
-    if(modulos.consultas){
+    if (modulos.consultas) {
         consulta.classList.remove('hidden');
     };
-    if(modulos.recibos){
+    if (modulos.recibos) {
         recibo.classList.remove('hidden');
     };
-    if(modulos.remitos){
+    if (modulos.remitos) {
         remitos.classList.remove('hidden');
     };
-    if(modulos.servicioTecnico){
+    if (modulos.servicioTecnico) {
         servicioTecnico.classList.remove('hidden');
     };
 });
 
 //Al tocar el atajo de teclado, abrimos ventanas
-document.addEventListener('keyup',async e=>{
+document.addEventListener('keyup', async e => {
     if (e.keyCode === 112) {
         ventas.click()
-    }else if(e.keyCode === 113){
+    } else if (e.keyCode === 113) {
         const opciones = {
-            path:"clientes/agregarCliente.html",
-            ancho:1200,
-            altura:500
+            path: "clientes/agregarCliente.html",
+            ancho: 1200,
+            altura: 500
         }
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else if(e.keyCode === 114){
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.keyCode === 114) {
         const opciones = {
-            path:"productos/agregarProducto.html",
-            ancho:1200,
-            altura:550
+            path: "productos/agregarProducto.html",
+            ancho: 1200,
+            altura: 550
         };
-        ipcRenderer.send('abrir-ventana',opciones);
-    }else if(e.keyCode === 117){
+        ipcRenderer.send('abrir-ventana', opciones);
+    } else if (e.keyCode === 117) {
         const vendedor = await verificarUsuarios();
-        if(!vendedor){
+        if (!vendedor) {
             await sweet.fire({
-                title:"Contraseña incorrecta"
+                title: "Contraseña incorrecta"
             });
             return;
         }
@@ -140,99 +140,95 @@ document.addEventListener('keyup',async e=>{
     }
 });
 
-ventas.addEventListener('click',async e=>{
-        const vendedor = await verificarUsuarios();
-        if (vendedor) {
-            location.href = `./venta/index.html?vendedor=${vendedor._id}`;
-            ipcRenderer.send('sacar-cierre');
-        }else if(vendedor === ""){
-            await sweet.fire({
-                title:"Contraseña incorrecta"
-            })
-            ventas.click()
-        };
+ventas.addEventListener('click', async e => {
+    const vendedor = await verificarUsuarios();
+    if (vendedor) {
+        location.href = `./venta/index.html?vendedor=${vendedor._id}`;
+        ipcRenderer.send('sacar-cierre');
+    } else if (vendedor === "") {
+        await sweet.fire({
+            title: "Contraseña incorrecta"
+        })
+        ventas.click()
+    };
 });
 
-clientes.addEventListener('click',async e=>{
+clientes.addEventListener('click', async e => {
     const vendedor = await verificarUsuarios();
-    
+
     if (vendedor) {
         location.href = `./clientes/clientes.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
         ipcRenderer.send('sacar-cierre');
-    }else if(vendedor === ""){
+    } else if (vendedor === "") {
         await sweet.fire({
-            title:"Contraseña incorrecta"
+            title: "Contraseña incorrecta"
         });
         clientes.click();
     };
-    
-    
+
+
 });
 
-productos.addEventListener('click',async e=>{
-    if (verVendedores) {
-        const vendedor = await verificarUsuarios();
-        if (vendedor) {
-            location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
-            ipcRenderer.send('sacar-cierre');
-        }else if(vendedor === ""){
-            await sweet.fire({
-                title:"Contraseña incorrecta"
-            })
-            productos.click()
-        }
-    }else{
-        location.href = `./productos/productos.html`;
+productos.addEventListener('click', async e => {
+    const vendedor = await verificarUsuarios();
+
+    if (vendedor) {
+        location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
         ipcRenderer.send('sacar-cierre');
+    } else if (vendedor === "") {
+        await sweet.fire({
+            title: "Contraseña incorrecta"
+        })
+        productos.click()
     }
 });
 
-caja.addEventListener('click',async e=>{
-        const vendedor = await verificarUsuarios();
+caja.addEventListener('click', async e => {
+    const vendedor = await verificarUsuarios();
 
-        if (vendedor) {
+    if (vendedor) {
 
-            if (vendedor.permiso !== 0) {
-                await sweet.fire({
-                    title:"No tiene Permisos para ingresar a Caja"
-                });
-            }else{
-                location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;    
-            }
-        }else if(vendedor === ""){
-
+        if (vendedor.permiso !== 0) {
             await sweet.fire({
-                title:"Contraseña incorrecta"
+                title: "No tiene Permisos para ingresar a Caja"
             });
-            caja.click();
-        };
+        } else {
+            location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
+        }
+    } else if (vendedor === "") {
+
+        await sweet.fire({
+            title: "Contraseña incorrecta"
+        });
+        caja.click();
+    };
 });
 
-consulta.addEventListener('click',e=>{
+consulta.addEventListener('click', e => {
     location.href = "./consultarCuenta/consultarCuenta.html";
 });
 
-recibo.addEventListener('click',async e=>{
+recibo.addEventListener('click', async e => {
     const vendedor = await verificarUsuarios();
-    
-        if (vendedor) {
-            location.href = `./recibo/recibo.html?vendedor=${vendedor._id}`;
-            ipcRenderer.send('sacar-cierre');
-        }else if(vendedor === ""){
-            await sweet.fire({
-                title:"Contraseña incorrecta"
-            })
-            clientes.click()
-        };
+
+    if (vendedor) {
+        location.href = `./recibo/recibo.html?vendedor=${vendedor._id}`;
+        ipcRenderer.send('sacar-cierre');
+    } else if (vendedor === "") {
+        await sweet.fire({
+            title: "Contraseña incorrecta"
+        })
+        clientes.click()
+    };
 });
 
 remitos.addEventListener('click', async e => {
     const vendedor = await verificarUsuarios();
-    if(vendedor){
+    if (vendedor) {
         location.href = `./remitos/remitos.html?vendedor=${vendedor._id}`;
-    }else if(vendedor === ''){
+    } else if (vendedor === '') {
         await sweet.fire({
-            title:"Contraseña incorrecta"
+            title: "Contraseña incorrecta"
         })
         remitos.click();
     };
@@ -241,71 +237,71 @@ remitos.addEventListener('click', async e => {
 servicioTecnico.addEventListener('click', async e => {
     const vendedor = await verificarUsuarios();
 
-    if(vendedor){
+    if (vendedor) {
         location.href = `./servicioTecnico/servicio.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
-    }else if(vendedor === ''){
+    } else if (vendedor === '') {
         await sweet.fire({
             title: 'Contraseña Incorrecta'
         });
         servicioTecnico.click();
     };
 
-    
+
 });
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
-ipcRenderer.on('poner-numero',async (e,args)=>{
+ipcRenderer.on('poner-numero', async (e, args) => {
     ponerNumero();
 });
 
-ipcRenderer.on('libroIva',async (e,args)=>{
+ipcRenderer.on('libroIva', async (e, args) => {
     location.href = "./libroIva/libroIva.html";
 });
 
 
-ipcRenderer.on('verificarUsuario', async(e,args) => {
+ipcRenderer.on('verificarUsuario', async (e, args) => {
     let path = '';
-    const {permiso,nombre, _id} = await verificarUsuarios();
-    
+    const { permiso, nombre, _id } = await verificarUsuarios();
+
     if (args === 'numeros') {
         path = `numeros/numeros.html`
-    }else if(args === 'infoVendedores'){
+    } else if (args === 'infoVendedores') {
         path = 'vendedores/vendedores.html'
-    }else if(args === 'movVendedores'){
+    } else if (args === 'movVendedores') {
         path = 'vendedores/movimientoVendedores.html';
     };
 
     if (permiso === 0) {
-        ipcRenderer.send('abrir-ventana',{
+        ipcRenderer.send('abrir-ventana', {
             path: path,
-            ancho:1000,
-            altura:700,
+            ancho: 1000,
+            altura: 700,
             info: _id
         });
-    }else if(permiso === 1 && args === 'numeros'){
+    } else if (permiso === 1 && args === 'numeros') {
 
-        ipcRenderer.send('abrir-ventana',{
+        ipcRenderer.send('abrir-ventana', {
             path: path,
-            ancho:1000,
-            altura:700,
+            ancho: 1000,
+            altura: 700,
             info: nombre
         });
 
-    }else{
+    } else {
         await sweet.fire({
             title: "No tiene Permisos"
         })
     }
 });
 
-ipcRenderer.on('configuracionModulos', async() => {
-    const {value, isConfirmed} = await sweet.fire({
+ipcRenderer.on('configuracionModulos', async () => {
+    const { value, isConfirmed } = await sweet.fire({
         title: 'Ingrese Contraseña',
         input: 'password',
         showCancelButton: true,
     });
 
-    if (value === '2580Repetto2580') {  
+    if (value === '2580Repetto2580') {
         const options = {
             path: 'configuracion/modulos.html',
             altura: 700,
@@ -313,6 +309,6 @@ ipcRenderer.on('configuracionModulos', async() => {
             reinicio: true,
         };
 
-        ipcRenderer.send('abrir-ventana', options);  
+        ipcRenderer.send('abrir-ventana', options);
     };
 });

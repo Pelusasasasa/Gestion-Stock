@@ -142,7 +142,7 @@ ipcMain.on('imprimir', (e, args) => {
 
 ipcMain.on('imprimir-recibo', (e, args) => {
   const [, , , show] = args;
-  abrirVentana("impresiones/imprimirRecibo.html", 800, 500, false, show);
+  abrirVentana("impresiones/imprimirRecibo.html", 800, 500, false, true);
   nuevaVentana.webContents.on('did-finish-load', function () {
     nuevaVentana.webContents.send('imprimir-recibo', JSON.stringify(args));
   })
@@ -152,7 +152,7 @@ ipcMain.on('imprimir-servicio', (e, args) => {
   const servicio = args;
   abrirVentana("impresiones/imprimirServicio.html", 800, 500, false, false);
 
-  nuevaVentana.webContents.on('did-finish-load', function(){
+  nuevaVentana.webContents.on('did-finish-load', function () {
     nuevaVentana.webContents.send('imprimir-servicio', JSON.stringify(servicio));
   })
 });
@@ -255,7 +255,7 @@ const hacerMenu = () => {
         {
           label: "Cuentas",
           click() {
-            const {width, height} = calcularPorCiento(0.4);
+            const { width, height } = calcularPorCiento(0.4);
             abrirVentana("cuentas/cuentas.html", height, width)
           }
         },
@@ -283,21 +283,21 @@ const hacerMenu = () => {
         {
           label: "Aumento Por Marcas",
           click() {
-            const {width, height} = calcularPorCiento(0.3);
+            const { width, height } = calcularPorCiento(0.3);
             abrirVentana('productos/marcas.html', height, width, true);
           }
         },
         {
           label: "Aumento Por Provedores",
           click() {
-            const {width, height} = calcularPorCiento(0.4);
+            const { width, height } = calcularPorCiento(0.4);
             abrirVentana('productos/aumentoPorProvedor.html', height, width, true);
           }
         },
         {
           label: "Cambio de precio por lista",
           click() {
-            const {width, height} = calcularPorCiento(0.9);
+            const { width, height } = calcularPorCiento(0.9);
             abrirVentana('productos/cambioPrecioLista.html', height, width, false, true);
           },
         },
@@ -310,14 +310,14 @@ const hacerMenu = () => {
         {
           label: "Lista de Precios",
           click() {
-            const {width, height} = calcularPorCiento(0.9);
+            const { width, height } = calcularPorCiento(0.9);
             abrirVentana('productos/listaPrecios.html', height, width)
           }
         },
         {
           label: "Modificar Codigo",
           click() {
-            const {width, height} = calcularPorCiento(0.6);
+            const { width, height } = calcularPorCiento(0.6);
             abrirVentana("productos/modificarCodigo.html", height, width)
           }
         }

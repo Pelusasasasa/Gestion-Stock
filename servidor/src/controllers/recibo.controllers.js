@@ -6,47 +6,48 @@ const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
 const { cargarMovsRecibos } = require('../helpers/cargarMovsRecibos');
 const { crearHistorica } = require('../helpers/crearHistorica');
 const Recibo = require('../models/Recibo');
+const Retencion = require('../models/Retencion');
 
 
-reciboCTRL.cargarRecibo = async(req,res)=>{
+reciboCTRL.cargarRecibo = async (req, res) => {
     try {
-        
+
         const nuevoRecibo = new Recibo(req.body);
-        
+
         const numeroActualizado = await actualizarNumero(nuevoRecibo.tipo_venta)
-        if(numeroActualizado.ok){
+        if (numeroActualizado.ok) {
             nuevoRecibo.numero = numeroActualizado.numero;
-        }else{
+        } else {
             return res.status(400).json({
                 ok: false,
                 msg: "Error al actualizar el numero del recibo"
             });
         };
-        
+
         const saldoModificado = await cambiarSaldoCliente(nuevoRecibo.idCliente, nuevoRecibo.precio, true);
-        if(!saldoModificado.ok){
+        if (!saldoModificado.ok) {
             return res.status(400).json({
                 ok: false,
                 msg: "Error al modificar el saldo del cliente"
             });
         };
         const historica = await crearHistorica(nuevoRecibo);
-        if(!historica){
+        if (!historica) {
             return res.status(400).json({
                 ok: false,
                 msg: "Error al crear la historica"
             });
         };
-        
+
         const compensadasModificadas = await actualizarCompensadas(req.body.compensadas, nuevoRecibo);
-    
-        if(!compensadasModificadas.ok) return res.status(400).json({
+
+        if (!compensadasModificadas.ok) return res.status(400).json({
             ok: false,
             msg: 'Error al modificar las compensadas'
         });
-        
+
         const movsRecibos = await cargarMovsRecibos(compensadasModificadas.compensadas, numeroActualizado.numero);
-        if(!movsRecibos.ok) return res.status(400).json({
+        if (!movsRecibos.ok) return res.status(400).json({
             ok: false,
             msg: 'Error al cargar los movimientos de los recibos'
         });
@@ -66,57 +67,69 @@ reciboCTRL.cargarRecibo = async(req,res)=>{
     }
 }
 
-reciboCTRL.recibosDia = async(req,res)=>{
-    const {fecha} = req.params;
+reciboCTRL.recibosDia = async (req, res) => {
+    const { fecha } = req.params;
     const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
     const inicioDia = new Date(fechaBase);
     const finDia = new Date(fechaBase);
     finDia.setHours(23, 59, 59, 999);
-    
+
     const recibos = await Recibo.find({
-        $and:[
-            {fecha:{$gte:inicioDia}},
-            {fecha:{$lte:finDia}}
+        $and: [
+            { fecha: { $gte: inicioDia } },
+            { fecha: { $lte: finDia } }
         ]
     })
     res.send(recibos);
 };
 
-reciboCTRL.recibosMes = async(req,res)=>{
-    const {fecha} = req.params;
+reciboCTRL.recibosMes = async (req, res) => {
+    const { fecha } = req.params;
     let mes = parseFloat(fecha);
     let hoy = new Date();
-    mes = mes>12 ? 1 : mes;
+    mes = mes > 12 ? 1 : mes;
 
     let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`)
     let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
     const recibos = await Recibo.find({
-        $and:[
-            {fecha:{$gte:fechaConMes}},
-            {fecha:{$lte:fechaConMesSig}}
+        $and: [
+            { fecha: { $gte: fechaConMes } },
+            { fecha: { $lte: fechaConMesSig } }
         ]
     });
     res.send(recibos);
 };
 
-reciboCTRL.recibosAnio = async(req,res)=>{
-    const {fecha} = req.params;
+reciboCTRL.recibosAnio = async (req, res) => {
+    const { fecha } = req.params;
     const hoy = new Date();
     const esteAnio = new Date(`${fecha}-1-1`);
     const anioSig = new Date(`${parseFloat(fecha) + 1}-1-1`);
     const recibos = await Recibo.find({
-        $and:[
-            {fecha:{$gte:esteAnio}},
-            {fecha:{$lte:anioSig}}
+        $and: [
+            { fecha: { $gte: esteAnio } },
+            { fecha: { $lte: anioSig } }
         ]
     });
     res.send(recibos);
 };
 
-reciboCTRL.getForNumber = async(req,res)=>{
-    const {number} = req.params;
-    const recibo = await Recibo.findOne({numero:number});
-    res.send(recibo)
+reciboCTRL.getForNumber = async (req, res) => {
+    const { number } = req.params;
+    let retorno = {};
+
+    const recibo = await Recibo.findOne({ numero: number });
+
+    // Buscar retención asociada, si existe
+    let retencion = await Retencion.findOne({ reciboId: recibo?._id });
+
+    // Armar respuesta combinada con la info del recibo y la retención (si hay)
+    retorno = {
+        ...recibo?._doc,  // Asegura que los fields del recibo estén en objeto plano
+        ...(retencion ? { retencion } : {})
+    };
+
+    res.send(retorno)
 };
 
 module.exports = reciboCTRL;

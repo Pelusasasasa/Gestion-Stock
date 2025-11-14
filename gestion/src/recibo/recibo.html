@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="../assets/global.css">
     <link rel="stylesheet" href="./recibo.css">
 </head>
+
 <body>
     <section class="cliente">
         <div class="nombre">
@@ -34,7 +36,7 @@
                 <label for="direccion">Direccion</label>
                 <input type="text" id="direccion" name="direccion" disabled>
             </div>
-    
+
             <div class="input">
                 <label for="fecha">Fecha</label>
                 <input type="date" id="fecha" name="fecha" disabled>
@@ -62,7 +64,7 @@
                 </tr>
             </thead>
             <tbody>
-                
+
             </tbody>
         </table>
     </section>
@@ -76,12 +78,17 @@
 
             <main class="cheque">
                 <label for="cheque">Cheque</label>
-                <input type="radio" name="cheque"  id="cheque">
+                <input type="radio" name="cheque" id="cheque">
+            </main>
+
+            <main class="retencion">
+                <label for="retencion">Retencion</label>
+                <input type="radio" name="retencion" id="retencion">
             </main>
 
             <main>
                 <label for="tarjeta">Tarjeta</label>
-                <input type="radio" name="tarjeta" id="tarjeta" >
+                <input type="radio" name="tarjeta" id="tarjeta">
             </main>
             <main class="total">
                 <label for="total">Total</label>
@@ -95,4 +102,5 @@
     </footer>
 </body>
 <script src="./recibo.js"></script>
+
 </html>
