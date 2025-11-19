@@ -39,6 +39,8 @@ const tarjeta = document.querySelector('#tarjeta');
 
 let cuentaAFavor;
 let nroCheque = "";
+let retencionValor;
+let retencionBrutos;
 
 const hoy = new Date();
 let d = hoy.getDate();
@@ -51,12 +53,12 @@ m = m === 13 ? 1 : m;
 
 fecha.value = `${a}-${m}-${d}`;
 
-ipcRenderer.on('recibir-ventana-secundaria', (e, args) => {
+ipcRenderer.on('recibir-ventana-secundaria', async (e, args) => {
     const [res, cliente, lista] = JSON.parse(JSON.parse(args).informacion);
-
+    const { data } = await axios.get(`${URL}recibo/id/${res.numero}`);
     if (res) {
 
-        ipcRenderer.send('imprimir-recibo', [res, cliente, lista, false]);
+        ipcRenderer.send('imprimir-recibo', [data, cliente, lista, false]);
     };
 
     location.href = "../menu.html";
@@ -288,7 +290,30 @@ imprimir.addEventListener('click', async e => {
 
     try {
         const { data } = (await axios.post(`${URL}recibo`, recibo));
+
         if (data.ok) {
+            data.recibo.retencion = [];
+            if (retencionValor) {
+                const { data: retencion } = await axios.post(`${URL}retencion`, {
+                    importe: retencionValor,
+                    reciboId: data.recibo._id,
+                    nro_comp: data.recibo.numero,
+                    descripcion: 'Retenciones Imp a las Ganancias'
+                });
+                data.recibo.retencion.push(retencion.retencion);
+            };
+
+            if (retencionBrutos) {
+                const { data: retencion } = await axios.post(`${URL}retencion`, {
+                    importe: retencionBrutos,
+                    reciboId: data.recibo._id,
+                    nro_comp: data.recibo.numero,
+                    descripcion: 'Retencones IIBB - ATER Contribuyente'
+                });
+                data.recibo.retencion.push(retencion.retencion);
+            };
+
+
             if (cheque.checked) {
                 await ipcRenderer.send('abrir-ventana', {
                     path: './cheque/agregarCheque.html',
@@ -297,6 +322,7 @@ imprimir.addEventListener('click', async e => {
                     reinicio: false,
                     informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false])
                 });
+                
             } else if (tarjeta.checked) {
                 await ipcRenderer.send('abrir-ventana', {
                     path: './tarjeta/agregarTarjeta.html',
@@ -305,26 +331,6 @@ imprimir.addEventListener('click', async e => {
                     reinicio: false,
                     informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false])
                 });
-            } else if (retencion.checked) {
-
-                const { isConfirmed, value } = await Swal.fire({
-                    showCancelButton: true,
-                    confirmButtonText: 'Aceptar',
-                    input: 'number',
-                    title: 'Retencion'
-                });
-
-                if (isConfirmed) {
-                    const { data: retencion } = await axios.post(`${URL}retencion`, {
-                        importe: value,
-                        reciboId: data.recibo._id,
-                        nro_comp: data.recibo.numero,
-                    });
-                    data.recibo.retencion = retencion.retencion;
-
-                    ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
-                    location.href = "../menu.html";
-                }
             } else {
                 ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
                 location.href = "../menu.html";
@@ -419,6 +425,43 @@ observaciones.parentElement.addEventListener('dblclick', async e => {
     }
 });
 
+retencion.addEventListener('click', async (e) => {
+
+    if (!e.target.checked) {
+        retencionValor = null;
+        retencionBrutos = null;
+        return;
+    };
+
+    const { isConfirmed, value } = await Swal.fire({
+        title: 'Retenciones',
+        html:
+            `<div class="mb-2">
+                <label class="font-bold text-xl" htmlFor="">Retencion Ganancias</label>
+                <input id="swal-input-ganancias" class="swal2-input" type="number" placeholder="Retención de Ganancias" value="${retencionValor ? retencionValor : 0}">
+            </div>` +
+            `
+                <div class="mb-2">
+                <label class="font-bold text-xl" htmlFor="">Retencion Brutos</label>
+                <input id="swal-input-brutos" class="swal2-input" type="number" placeholder="Ingresos Brutos" value="${retencionBrutos ? retencionBrutos : 0}">`, // Assuming ingresosBrutosValor is defined elsewhere
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        preConfirm: () => {
+            const ganancias = document.getElementById('swal-input-ganancias').value;
+            const brutos = document.getElementById('swal-input-brutos').value;
+            return [parseFloat(ganancias || 0), parseFloat(brutos || 0)];
+        }
+    });
+
+    if (isConfirmed) {
+        const [gananciasValue, brutosValue] = value;
+        retencionValor = gananciasValue;
+        retencionBrutos = brutosValue;
+    }
+
+});
+
 setInterval(() => {
     if (observaciones.value !== "") {
         observaciones.classList.toggle('observacionesAlerta');
@@ -429,3 +472,5 @@ ipcRenderer.on('recibir', (e, args) => {
     const { informacion } = JSON.parse(args);
     ponerInputs(informacion);
 });
+
+

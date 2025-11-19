@@ -10,17 +10,17 @@ const direccion = document.getElementById('direccion');
 const localidad = document.getElementById('localidad');
 const iva = document.getElementById('iva');
 const valores = document.getElementById('valores');
-const retencionText = document.getElementById('retencionText');
 const total = document.getElementById('total');
+const tbodyFormaPago = document.getElementById('tbodyFormaPago');
 
 const tbody = document.getElementById('tbody');
+
+let diferencia = 0;
 
 ipcRenderer.on('imprimir-recibo', listar);
 
 async function listar(e, args) {
-
     const [recibo, cliente, lista] = JSON.parse(args);
-
     await listarDatosRecibo(recibo);
     await listarCliente(cliente);
     await listarcomprobantes(lista);
@@ -34,12 +34,43 @@ function listarDatosRecibo(recibo) {
 
     date.innerText = fechaParseada;
     numeroRecibo.innerText = "R" + recibo.numero;
-    valores.innerText = recibo.valorRecibido;
-    total.innerText = recibo.precio.toFixed(2);
 
-    if (recibo.retencion) {
-        retencionText.innerText = `Retenciones cobradas: $${recibo?.retencion?.importe.toFixed(2)}`
-    }
+    diferencia += recibo.retencion?.map(retencion => retencion.importe).reduce((acc, retencion) => acc + retencion, 0) ?? 0;
+    
+
+    // Suma de importes de cheques
+    diferencia += recibo?.cheques ? recibo.cheques.reduce((acc, cheque) => acc + (cheque.importe || 0), 0) : 0;
+
+    tbodyFormaPago.innerHTML += `
+        ${recibo.retencion && recibo.retencion.length > 0 ?
+            recibo.retencion.map(retencion => `
+                <tr>
+                    <td>RETENCIONES</td>
+                    <td>${retencion.descripcion}</td>
+                    <td class='font-bold'>$${retencion.importe.toFixed(2)}</td>
+                </tr>
+            `).join('')
+            : ''
+        }
+        ${recibo.cheques ? recibo?.cheques?.map(cheque => `
+                <tr class="mx-2">
+                    <td>CHEQUE</td>
+                    <td>${cheque.numero}</td>
+                    <td class="font-bold">$${cheque.importe.toFixed(2)}</td>
+                </tr>
+            `).join('')
+            : ''
+        }
+
+        ${diferencia === recibo.precio
+            ? ''
+            : `<tr>
+                <td>EFECTIVO</td>
+                <td></td>
+                <td class='font-bold'>$${(recibo.precio - diferencia).toFixed(2)}</td>
+            </tr>`
+        }
+`
 };
 
 function listarCliente(cliente) {
@@ -57,13 +88,13 @@ function listarcomprobantes(lista) {
 
     lista.map(elem => {
         tbody.innerHTML += `
-            <tr>
+    <tr>
                 <td>${elem.fecha.slice(0, 10).split('-', 3).reverse().join('/')}</td>
                 <td>${elem.tipo}</td>
                 <td>${elem.numero.padStart(8, '0')}</td>
                 <td>${elem.precio.toFixed(2)}</td>
                 <td>${elem.saldo.toFixed(2)}</td>
-            </tr>
-        `
+            </tr >
+    `
     })
 };

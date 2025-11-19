@@ -1,42 +1,42 @@
-const {Schema, model, Types} = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const Recibo = new Schema({
-    fecha:{
-        type:Date,
+    fecha: {
+        type: Date,
         default: Date.now
     },
-    cliente:{
+    cliente: {
         type: String,
-        required:true
+        required: true
     },
-    idCliente:{
+    idCliente: {
         type: Schema.Types.Number,
         ref: 'Cliente',
-        required:true
+        required: true
     },
-    numero:{
-        type:Number,
-        required:true
-    },
-    precio:{
+    numero: {
         type: Number,
-        required:true
+        required: true
     },
-    descuento:{
-        type:Number,
-        default:0
+    precio: {
+        type: Number,
+        required: true
     },
-    tipo_comp:{
-        type:String,
+    descuento: {
+        type: Number,
+        default: 0
+    },
+    tipo_comp: {
+        type: String,
         default: "Recibo"
     },
-    tipo_venta:{
-        type:String,
-        default:"RB"
+    tipo_venta: {
+        type: String,
+        default: "RB"
     },
-    valorRecibido:{
-        type:String,
-        required:true
+    valorRecibido: {
+        type: String,
+        required: true
     },
     vendedor: {
         type: Types.ObjectId,
@@ -46,4 +46,4 @@ const Recibo = new Schema({
 
 });
 
-module.exports = model("Recibo",Recibo);
+module.exports = model("Recibo", Recibo);

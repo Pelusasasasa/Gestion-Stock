@@ -27,7 +27,8 @@ const chequeSchema = z.object({
     tipo: z.string().optional().default(''),
     fechaPago: z.string().optional().default(''),
     vendedor: z.string().optional().default(''),
-    pc: z.string().optional().default('')
+    pc: z.string().optional().default(''),
+    comprobanteId: z.string().optional(),
 });
 
 async function validateCheque(input) {

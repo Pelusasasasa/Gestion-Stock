@@ -1,8 +1,8 @@
-.none{
+.none {
     display: none;
 }
 
-header{
+header {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -12,25 +12,28 @@ header{
     border: .1rem solid black;
 }
 
-header main{
+header main {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-header p,header h1{
+header p,
+header h1 {
     margin: 0;
 }
 
-header h1,.cliente h2{
+header h1,
+.cliente h2 {
     font-size: 1rem;
 }
 
-header p,.cliente p{
+header p,
+.cliente p {
     font-size: 0.8rem;
 }
 
-.cliente{
+.cliente {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -40,75 +43,97 @@ header p,.cliente p{
     padding: 0.5rem 2rem 1rem;
 }
 
-.cliente main{
+.cliente main {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.cliente p,.cliente h4{
+.cliente p,
+.cliente h4 {
     margin: 0;
 }
 
-.cliente main:last-child p{
+.cliente main:last-child p {
     font-weight: bold;
 }
 
-.cliente main:last-child span{
+.cliente main:last-child span {
     font-weight: normal;
 }
 
-.bold{
+.bold {
     font-weight: bold;
 }
 
-.text-normal{
+.text-normal {
     font-weight: normal;
 }
 
-#texto{
+#texto {
     margin-left: 2rem;
     padding-bottom: .5rem;
 }
 
-#texto p{
+#texto p {
     margin: 0;
 }
 
-#lista{
-    border: .1rem solid black;
-    margin: 0rem 2rem 0rem;
-    min-height: 22vh;
+#lista {
+    border-bottom: .1rem solid black;
+    margin: 0rem 2rem 2rem;
+    height: auto;
 }
 
-#lista table{
+#lista table {
     width: 100%;
     border-collapse: collapse;
 }
 
 
-#lista thead tr th{
+#lista thead tr th {
     border: .1rem solid black;
 }
 
-#lista tbody tr td{
+#lista tbody tr td,
+#formaPago tbody tr td {
     text-align: center;
+    padding: 0.5rem;
+    font-size: 0.7rem;
+    background-color: rgb(241, 239, 239);
 }
 
 
-th,td{
+th,
+td {
     font-size: 0.8rem;
 }
 
-.total main{
+.total h3 {
+    text-align: center;
+}
+
+.total main {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
 }
 
-.total main p:last-child{
+
+#formaPago {
+    width: 100%;
+
+
+    table {
+        border-collapse: collapse;
+
+
+        tr {
+            border-bottom: .1rem solid black;
+            text-align: center;
+        }
+    }
+}
+
+.font-bold {
     font-weight: bold;
-}
-
-.total main p:last-child span{
-    font-weight: normal;
 }

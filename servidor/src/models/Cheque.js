@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const Cheque = new Schema({
     f_recibido: {
@@ -67,6 +67,9 @@ const Cheque = new Schema({
         type: String,
         trim: true,
         default: ''
+    },
+    comprobanteId: {
+        type: Types.ObjectId
     }
 });
 

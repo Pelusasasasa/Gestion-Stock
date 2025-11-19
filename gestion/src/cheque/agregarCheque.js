@@ -19,6 +19,7 @@ const observaciones = document.getElementById('observaciones');
 const cancelar = document.getElementById('cancelar');
 const agregar = document.getElementById('agregar');
 let informacion = '';
+let id;
 
 ipcRenderer.on('informacion', (e, args) => {
     informacion = args;
@@ -27,13 +28,14 @@ ipcRenderer.on('informacion', (e, args) => {
     fecha.value = venta.fecha.slice(0, 10);
     importe.value = venta.precio.toFixed(2);
     entregado_por.value = cliente.nombre;
+    id = venta._id;
 
 });
 
 
 const guardar = async () => {
     if (! await validarDatos()) return;
-    
+
     const cheque = {};
     cheque.f_recibido = fecha.value;
     cheque.numero = numero.value;
@@ -45,6 +47,7 @@ const guardar = async () => {
     cheque.domicilio = domicilio.value;
     cheque.telefono = telefono.value;
     cheque.observacion = observaciones.value;
+    cheque.comprobanteId = id;
 
 
     const { data } = await axios.post(`${URL}cheques`, cheque);

@@ -5,6 +5,7 @@ const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
 const { cargarMovsRecibos } = require('../helpers/cargarMovsRecibos');
 const { crearHistorica } = require('../helpers/crearHistorica');
+const Cheque = require('../models/Cheque');
 const Recibo = require('../models/Recibo');
 const Retencion = require('../models/Retencion');
 
@@ -121,11 +122,14 @@ reciboCTRL.getForNumber = async (req, res) => {
     const recibo = await Recibo.findOne({ numero: number });
 
     // Buscar retención asociada, si existe
-    let retencion = await Retencion.findOne({ reciboId: recibo?._id });
+    let retencion = await Retencion.find({ reciboId: recibo?._id });
+
+    let cheques = await Cheque.find({ comprobanteId: recibo?.id });
 
     // Armar respuesta combinada con la info del recibo y la retención (si hay)
     retorno = {
-        ...recibo?._doc,  // Asegura que los fields del recibo estén en objeto plano
+        ...recibo?._doc,
+        ...(cheques && cheques.length > 0 ? { cheques } : {}),
         ...(retencion ? { retencion } : {})
     };
 
