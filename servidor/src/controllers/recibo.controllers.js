@@ -8,6 +8,7 @@ const { crearHistorica } = require('../helpers/crearHistorica');
 const Cheque = require('../models/Cheque');
 const Recibo = require('../models/Recibo');
 const Retencion = require('../models/Retencion');
+const Tarjeta = require('../models/Tarjeta');
 
 
 reciboCTRL.cargarRecibo = async (req, res) => {
@@ -125,11 +126,13 @@ reciboCTRL.getForNumber = async (req, res) => {
     let retencion = await Retencion.find({ reciboId: recibo?._id });
 
     let cheques = await Cheque.find({ comprobanteId: recibo?.id });
+    let tarjetas = await Tarjeta.find({ comprobanteId: recibo?.id }).populate('tarjeta', {nombre: 1});
 
     // Armar respuesta combinada con la info del recibo y la retención (si hay)
     retorno = {
         ...recibo?._doc,
         ...(cheques && cheques.length > 0 ? { cheques } : {}),
+        ...(tarjetas && tarjetas.length > 0 ? { tarjetas } : {}),
         ...(retencion ? { retencion } : {})
     };
 

@@ -40,6 +40,8 @@ function listarDatosRecibo(recibo) {
 
     // Suma de importes de cheques
     diferencia += recibo?.cheques ? recibo.cheques.reduce((acc, cheque) => acc + (cheque.importe || 0), 0) : 0;
+    diferencia += recibo?.tarjetas ? recibo.tarjetas.reduce((acc, tarjeta) => acc + (tarjeta.importe || 0), 0) : 0;
+
 
     tbodyFormaPago.innerHTML += `
         ${recibo.retencion && recibo.retencion.length > 0 ?
@@ -57,6 +59,15 @@ function listarDatosRecibo(recibo) {
                     <td>CHEQUE</td>
                     <td>${cheque.numero}</td>
                     <td class="font-bold">$${cheque.importe.toFixed(2)}</td>
+                </tr>
+            `).join('')
+            : ''
+        }
+        ${recibo.tarjetas ? recibo?.tarjetas?.map(tarjeta => `
+                <tr class="mx-2">
+                    <td>TARJETA</td>
+                    <td>${tarjeta.tarjeta?.nombre ?? ''}</td>
+                    <td class="font-bold">$${tarjeta.importe.toFixed(2)}</td>
                 </tr>
             `).join('')
             : ''

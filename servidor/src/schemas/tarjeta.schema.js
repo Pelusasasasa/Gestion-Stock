@@ -22,6 +22,7 @@ const tarjetaSchema = z.object({
         required_error: 'La tarjeta es obligatorio'
     }),
     tipo: z.string(),
+    comprobanteId: z.string()
 });
 
 

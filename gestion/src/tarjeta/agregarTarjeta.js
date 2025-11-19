@@ -14,6 +14,7 @@ const agregar = document.getElementById('agregar');
 const cancelar = document.getElementById('cancelar');
 
 let informacion = '';
+let id;
 
 const cargarPagina = async () => {
 
@@ -40,6 +41,7 @@ const guardar = async () => {
     tarj.importe = importe.value;
     tarj.tarjeta = tarjeta.value;
     tarj.tipo = tipo.value;
+    tarj.comprobanteId = id;
 
     try {
         const { data } = await axios.post(`${URL}tarjetas`, tarj);
@@ -85,6 +87,7 @@ ipcRenderer.on('informacion', (e, args) => {
     nombre.value = cliente.nombre.slice(0, 40);
     importe.value = venta.precio.toFixed(2);
     tipo.value = venta.tipo_comp;
+    id = venta._id;
 });
 
 agregar.addEventListener('click', guardar);

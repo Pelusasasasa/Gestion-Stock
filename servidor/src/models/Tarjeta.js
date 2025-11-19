@@ -34,6 +34,10 @@ const Tarjeta = new Schema({
     pc: {
         type: String,
         default: ''
+    },
+    comprobanteId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Recibo'
     }
 });
 
