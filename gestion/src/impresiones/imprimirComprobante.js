@@ -47,7 +47,7 @@ const ponerDatosVenta = (datos, auxDolar)=>{
     const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
     const fechaParseada = `${fechaUTC3.slice(0, 10).split('-', 3).reverse().join('/')} ${fechaUTC3.slice(11, 19)}`
     
-    if(datos.condicion === 'INSTALADOR'){
+    if(datos.condicion === 'Instalador'){
         dolar.innerText = datos?.dolar?.toFixed(2);
     }else{
         dolar.parentElement.style.display = 'none';
@@ -57,7 +57,7 @@ const ponerDatosVenta = (datos, auxDolar)=>{
     date.innerText = fechaParseada;
     tipoPago.innerText = datos.tipoVenta ?? datos.tipo_venta;
     vendedor.innerText = datos?.vendedor?.nombre ?? '';
-    condicion.innerText = datos.condicion === 'Instalador' ? datos.condicion : '';
+    condicion.innerText = datos.condicion === 'Instalador' ? 'Preferencial' : '';
 
     if(datos.tipo_venta !== 'RT' && datos.tipoVenta !== 'RT'){
         subTotal.innerText = auxDolar ? ((datos.precio - datos.descuento) / parseFloat(datos.dolar)).toFixed(2) : (datos.precio - datos.descuento).toFixed(2);

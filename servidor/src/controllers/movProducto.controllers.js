@@ -116,4 +116,33 @@ movimientoCTRL.post = async (req, res) => {
 
 };
 
+movimientoCTRL.modificar = async(req, res) => {
+    const { id , tipoVenta } = req.params;
+    try {
+        const movimiento = await movProducto.findOneAndUpdate({
+            _id: id,
+            tipo_venta: tipoVenta
+        },
+        { $set: req.body },
+        {new: true}
+    );
+
+    if(!movimiento) return res.status(404).json({
+        ok: false,
+        msg: 'No se encontro el movimiento'
+    })
+
+    res.status(200).json({
+        ok: true,
+        movimiento
+    })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo modificar el movimiento, hable con el administrador'
+        })
+    }
+}
+
 module.exports = movimientoCTRL;

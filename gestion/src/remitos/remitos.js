@@ -192,6 +192,8 @@ const listarMovs = (lista) => {
         tdTotal.innerText = (elem.precio * elem.cantidad).toFixed(2);
         textAreaSerie.innerText = elem.series;
 
+        textAreaSerie.addEventListener('keyup', modificarNroSerie);
+
 
         tdSerie.appendChild(textAreaSerie);
 
@@ -299,6 +301,12 @@ const modificarObservacionesRemitos = async() => {
         return await Swal.fire('Error al modificar las observaciones', error?.response?.data?.msg, 'error');
         
     }
+};
+
+const modificarNroSerie = async(e) => {
+    const valor = e.target.value.split('\n');
+    const id = e.currentTarget.parentNode.parentNode.id;
+    await axios.patch(`${URL}movimiento/${id}/RT`, {series: valor});
 };
 
 const pasarCuenta = async() => {
