@@ -79,9 +79,9 @@ ipcRenderer.on('informacion', async (e, args) => {
     
     const { informacion } = args;
     vendedor = args.vendedor;
-    traerRubros();
-    traerProvedor();
-    traerMarcas();
+    await traerRubros();
+    await traerProvedor();
+    await traerMarcas();
 
     llenarInputs(informacion);
 });
