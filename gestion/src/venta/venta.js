@@ -306,7 +306,7 @@ const listarCliente = async (id) => {
 
     if (cliente !== "") {
         nombre.value = cliente.nombre;
-        saldo.value = cliente.saldo;
+        saldo.value = cliente.saldo.toFixed(2);
         cuit.value = cliente.cuit === "" ? "00000000" : cliente.cuit;
         telefono.value = cliente.telefono;
         localidad.value = cliente.localidad;
@@ -833,24 +833,23 @@ tbody.addEventListener('dblclick', async se => {
 
             producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
             producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
+            
             if (lista.value === 'INSTALADOR') {
                 if (producto.producto.costoDolar !== 0) {
-                    producto.producto.costoDolar = parseFloat(document.getElementById('precioCambio').value) / dolar;
-
+                    producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
+                    producto.producto.costoDolar = calcularcosto(producto.producto.precio, producto.producto.impuesto, dolarInstalador);
                 } else {
                     producto.producto.costo = parseFloat(document.getElementById('precioCambio').value);
-                    console.log("a");
                 };
             } else {
                 producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
             };
-
             seleccionado.children[1].innerHTML = producto.cantidad.toFixed(2);
             seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
             seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
             seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad, 2);
-
-            totalGlobal = parseFloat(redondear(totalGlobal + verPrecioConCantidad(producto, lista.value, dolar), 2));
+            
+            totalGlobal = parseFloat(redondear(totalGlobal + parseFloat(document.getElementById('precioCambio').value) * producto.cantidad, 2));
 
             total.value = totalGlobal.toFixed(2);
         }
@@ -1162,3 +1161,9 @@ ipcRenderer.on('recibir', async (e, args) => {
 ipcRenderer.on('poner-numero', async (e, args) => {
     ponerNumero();
 });
+
+
+const calcularcosto = (precio, impuesto, dolar) => {
+    console.log(precio, impuesto, dolar)
+    return (precio / (1 + (impuesto / 100)) / dolar);
+}

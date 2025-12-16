@@ -669,15 +669,17 @@ funciones.masVeinticuatroHoras = (fechaTraida) => {
 funciones.verPrecioConCantidad = ({ producto, cantidad }, tipoCliente = 'Normal', dolar) => {
     if (producto.costoDolar !== 0) {
         if (tipoCliente === 'INSTALADOR') {
-            return (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar * cantidad
+            const retorno = (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolarInstalador * cantidad;
+            
+            return retorno
         } else {
-            return producto.precio * cantidad
+            return parseFloat((producto.precio * cantidad).toFixed(2))
         };
     } else {
         if (tipoCliente === 'INSTALADOR') {
             return (producto.costo + producto.costo * producto.impuesto / 100) * cantidad
         } else {
-            return producto.precio * cantidad
+            return parseFloat((producto.precio * cantidad).toFixed(2))
         };
     };
 
