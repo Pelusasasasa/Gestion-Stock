@@ -310,8 +310,10 @@ funciones.ponerNumero = async () => {
         const numero = document.getElementById('numero');
         const checkboxDolar = document.getElementById('dolar');
 
-        let dolar = (await axios.get(`${URL}numero`)).data.Dolar;
-
+        const {data} = (await axios.get(`${URL}numero`));
+        let dolar =  data.Dolar;
+        let dolarInstalador = data.dolarInstalador;
+        
         let cliente;
         let movimientos;
         let venta;
@@ -349,12 +351,12 @@ funciones.ponerNumero = async () => {
             };
 
             if (checkboxDolar.checked) {
-
+                
                 movimientos.forEach(mov => {
-                    mov.precio = mov.precio / dolar;
+                    mov.precio = venta.condicion === 'INSTALADOR' ? mov.precio / dolarInstalador : mov.precio / dolar;
                 });
-                venta.subtotal = (venta.precio + venta.descuento) / dolar;
-                venta.precio = venta.precio / dolar;
+                venta.subtotal = venta.condicion === 'INSTALADOR' ? (venta.precio + venta.descuento) / dolarInstalador : (venta.precio + venta.descuento) / dolar;
+                venta.precio = venta.condicion === 'INSTALADOR' ? venta.precio / dolarInstalador : venta.precio / dolar;
             }
 
             movimientos = tipo.value === "RC" ? (await axios.get(`${URL}movRecibo/forNumber/${numero.value}`)).data : movimientos;
