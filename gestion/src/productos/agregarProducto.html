@@ -79,31 +79,56 @@
 
         <fieldset>
             <legend>Precios</legend>
-
             <section class="precios">
+        
                 <div class="input">
-                    <label for="costo">costo *</label>
-                    <input type="number" value="0.00" name="costo" id="costo"> 
+                    <label for="costo">Costo *</label>
+                    <input type="text" name="costo" id="costo">
                 </div>
+        
                 <div class="input">
                     <label for="costoDolar">Costo Dolar *</label>
-                    <input type="number" value="0.00" name="costoDolar" id="costoDolar"> 
+                    <input type="text" name="costoDolar" id="costoDolar">
                 </div>
+        
+                <div class="input">
+                    <label for="utilidad">Utilidad</label>
+                    <input type="text" value="0.00" name="utilidad" id="utilidad">
+                </div>
+                <div class="input">
+                    <label for="costoUtilidad">Costo + Utilidad</label>
+                    <input type="text" disabled value="0.00" name="costoUtilidad" id="costoUtilidad">
+                </div>
+        
                 <div class="input">
                     <label for="impuesto">Impuesto%</label>
-                    <input type="number" value="0.00" name="impuesto" id="impuesto"> 
-                </div>
-                <div class="input">
-                    <label for="costoIva">Costo + Iva</label>
-                    <input type="number" disabled value="0.00" name="costoIva" id="costoIva"> 
-                </div>
-
-                <div class="input">
-                    <label for="costoIvaInstalador">Costo + Iva (Instalador)</label>
-                    <input type="number" disabled value="0.00" name="costoIvaInstalador" id="costoIvaInstalador"> 
+                    <input type="text" name="impuesto" id="impuesto">
                 </div>
             </section>
         </fieldset>
+
+        <div class="flex w-full justify-around">
+            <fieldset class="w-50porcentaje">
+                <legend>Precio Instalador</legend>
+                <section class="precios">
+        
+                    <div class="input">
+                        <label for="costoIvaInstalador">Costo + Iva (Instalador)</label>
+                        <input type="number" class="text-rigth" disabled name="costoIvaInstalador" id="costoIvaInstalador">
+                    </div>
+                </section>
+            </fieldset>
+        
+            <fieldset class="w-50porcentaje">
+                <legend>Precio Final</legend>
+                <section class="precios">
+                    <div class="input">
+                        <label for="costoIva">Costo + Iva</label>
+                        <input type="number" class="text-rigth" disabled name="costoIva" id="costoIva">
+                    </div>
+                </section>
+            </fieldset>
+        </div>
         
         <fieldset>
             <legend>Total</legend>

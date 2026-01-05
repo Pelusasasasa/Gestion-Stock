@@ -451,6 +451,10 @@ table tbody {
   width: 50rem;
 }
 
+.w-50porcentaje{
+  width: 50%;
+}
+
 .w-20 {
   width: 20rem;
 }
@@ -704,7 +708,7 @@ table tbody {
 }
 
 #edit{
-  color: rgb(85, 85, 85)
+  color: hwb(0 33% 67%)
 }
 
 #visibility{
@@ -717,4 +721,16 @@ table tbody {
 
 .azul{
   color: #155ddf
+}
+
+#modificar{
+  background-color: #155ddf;
+  color: white;
+  border-radius: 0.5rem;
+}
+
+#comun{
+  background-color: #555555;
+  color: white;
+  border-radius: 0.5rem;
 }
