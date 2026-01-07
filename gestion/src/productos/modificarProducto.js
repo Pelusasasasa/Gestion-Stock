@@ -105,7 +105,7 @@ const llenarInputs = async (codigoProducto) => {
   impuesto.value = producto.impuesto.toFixed(2);
 
   if (producto.costoDolar !== 0) {
-    costoUtilidad.value = redondear(producto.costoDolar + (producto.costoDolar * producto.utilidad) / 100, 2);
+    costoUtilidad.value = redondear(producto.costoDolar + (producto.costoDolar * (producto.utilidad ?? 0)) / 100, 2);
     costoIva.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolar.value), 2);
     costoIvaInstalador.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolarInstalador.value), 2);
   } else {
