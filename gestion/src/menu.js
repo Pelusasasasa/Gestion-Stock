@@ -1,10 +1,10 @@
 const axios = require('axios');
-const { ipcRenderer } = require("electron");
+const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const sweet = require('sweetalert2');
 
-require("dotenv").config();
+require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
 
@@ -12,22 +12,22 @@ const filePath = path.join(__dirname, 'config.json');
 let modulos = '';
 
 const moduloCreate = {
-    "ventas": true,
-    "clientes": true,
-    "productos": true,
-    "caja": true,
-    "recibos": true,
-    "consultas": true,
-    "remitos": true,
-    "gastos": true,
-    "servicioTecnico": true
+  ventas: true,
+  clientes: true,
+  productos: true,
+  caja: true,
+  recibos: true,
+  consultas: true,
+  remitos: true,
+  gastos: true,
+  servicioTecnico: true,
 };
 
 try {
-    modulos = require('./config.json');
+  modulos = require('./config.json');
 } catch (error) {
-    fs.writeFileSync(filePath, JSON.stringify(moduloCreate), 'utf-8');
-    location.reload();
+  fs.writeFileSync(filePath, JSON.stringify(moduloCreate), 'utf-8');
+  location.reload();
 }
 
 ipcRenderer.send('poner-cierre');
@@ -50,265 +50,257 @@ const atajoNotaCredito = document.getElementById('atajoNotaCredito');
 
 let verVendedores;
 
-window.addEventListener('load', async e => {
+window.addEventListener('load', async (e) => {
+  const vendedores = (await axios.get(`${URL}vendedores`)).data;
+  if (!vendedores.find((vendedor) => vendedor.permiso === 0)) {
+    sweet
+      .fire({
+        title: 'Cargar un Vendedor con permiso en 0 inicial',
+        html: await cargarVendedor(),
+        confirmButtonText: 'Aceptar',
+        showCancelButton: true,
+      })
+      .then(async ({ isConfirmed }) => {
+        if (isConfirmed) {
+          const nuevoVendedor = {};
+          nuevoVendedor.codigo = document.getElementById('codigo').value;
+          nuevoVendedor.nombre = document.getElementById('nombre').value.toUpperCase();
+          nuevoVendedor.permiso = document.getElementById('permisos').value;
+          try {
+            await axios.post(`${URL}vendedores`, nuevoVendedor);
+          } catch (error) {
+            sweet.fire({
+              title: 'no se pudo cargar el vendedor',
+            });
+          }
+        } else {
+          location.reload();
+        }
+      });
+  }
 
-    const vendedores = (await axios.get(`${URL}vendedores`)).data;
-    if (!vendedores.find(vendedor => vendedor.permiso === 0)) {
-        sweet.fire({
-            title: "Cargar un Vendedor con permiso en 0 inicial",
-            html: await cargarVendedor(),
-            confirmButtonText: "Aceptar",
-            showCancelButton: true
-        }).then(async ({ isConfirmed }) => {
-            if (isConfirmed) {
-                const nuevoVendedor = {};
-                nuevoVendedor.codigo = document.getElementById('codigo').value;
-                nuevoVendedor.nombre = document.getElementById('nombre').value.toUpperCase();
-                nuevoVendedor.permiso = document.getElementById('permisos').value;
-                try {
-                    await axios.post(`${URL}vendedores`, nuevoVendedor);
-                } catch (error) {
-                    sweet.fire({
-                        title: "no se pudo cargar el vendedor"
-                    })
-                }
-            } else {
-                location.reload();
-            }
-        })
-    };
-
-    if (modulos.ventas) {
-        ventas.classList.remove('hidden');
-        atajoVentas.classList.remove('hidden');
-        atajoNotaCredito.classList.remove('hidden');
-    };
-    if (modulos.clientes) {
-        clientes.classList.remove('hidden');
-        atajoAgregarCliente.classList.remove('hidden');
-    };
-    if (modulos.productos) {
-        productos.classList.remove('hidden');
-        atajoAgregarProducto.classList.remove('hidden');
-        atajoCambioProducto.classList.remove('hidden');
-    };
-    if (modulos.caja) {
-        caja.classList.remove('hidden');
-    };
-    if (modulos.consultas) {
-        consulta.classList.remove('hidden');
-    };
-    if (modulos.recibos) {
-        recibo.classList.remove('hidden');
-    };
-    if (modulos.remitos) {
-        remitos.classList.remove('hidden');
-    };
-    if (modulos.servicioTecnico) {
-        servicioTecnico.classList.remove('hidden');
-    };
+  if (modulos.ventas) {
+    ventas.classList.remove('hidden');
+    atajoVentas.classList.remove('hidden');
+    atajoNotaCredito.classList.remove('hidden');
+  }
+  if (modulos.clientes) {
+    clientes.classList.remove('hidden');
+    atajoAgregarCliente.classList.remove('hidden');
+  }
+  if (modulos.productos) {
+    productos.classList.remove('hidden');
+    atajoAgregarProducto.classList.remove('hidden');
+    atajoCambioProducto.classList.remove('hidden');
+  }
+  if (modulos.caja) {
+    caja.classList.remove('hidden');
+  }
+  if (modulos.consultas) {
+    consulta.classList.remove('hidden');
+  }
+  if (modulos.recibos) {
+    recibo.classList.remove('hidden');
+  }
+  if (modulos.remitos) {
+    remitos.classList.remove('hidden');
+  }
+  if (modulos.servicioTecnico) {
+    servicioTecnico.classList.remove('hidden');
+  }
 });
 
 //Al tocar el atajo de teclado, abrimos ventanas
-document.addEventListener('keyup', async e => {
-    if (e.keyCode === 112) {
-        ventas.click()
-    } else if (e.keyCode === 113) {
-        const opciones = {
-            path: "clientes/agregarCliente.html",
-            ancho: 1200,
-            altura: 500
-        }
-        ipcRenderer.send('abrir-ventana', opciones);
-    } else if (e.keyCode === 114) {
-        const opciones = {
-            path: "productos/agregarProducto.html",
-            ancho: 1200,
-            altura: 550
-        };
-        ipcRenderer.send('abrir-ventana', opciones);
-    } else if (e.keyCode === 117) {
-        const vendedor = await verificarUsuarios();
-        if (!vendedor) {
-            await sweet.fire({
-                title: "Contraseña incorrecta"
-            });
-            return;
-        }
-        location.href = `./venta/index.html?tipoFactura=notaCredito&vendedor=${vendedor._id}`;
-        ipcRenderer.send('sacar-cierre');
+document.addEventListener('keyup', async (e) => {
+  if (e.keyCode === 112) {
+    ventas.click();
+  } else if (e.keyCode === 113) {
+    const opciones = {
+      path: 'clientes/agregarCliente.html',
+      ancho: 1200,
+      altura: 500,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (e.keyCode === 114) {
+    const opciones = {
+      path: 'productos/agregarProducto.html',
+      ancho: 1200,
+      altura: 550,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (e.keyCode === 117) {
+    const vendedor = await verificarUsuarios();
+    if (!vendedor) {
+      await sweet.fire({
+        title: 'Contraseña incorrecta',
+      });
+      return;
     }
+    location.href = `./venta/index.html?tipoFactura=notaCredito&vendedor=${vendedor._id}`;
+    ipcRenderer.send('sacar-cierre');
+  }
 });
 
-ventas.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
-    if (vendedor) {
-        location.href = `./venta/index.html?vendedor=${vendedor._id}`;
-        ipcRenderer.send('sacar-cierre');
-    } else if (vendedor === "") {
-        await sweet.fire({
-            title: "Contraseña incorrecta"
-        })
-        ventas.click()
-    };
+ventas.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
+  if (vendedor) {
+    location.href = `./venta/index.html?vendedor=${vendedor._id}`;
+    ipcRenderer.send('sacar-cierre');
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    ventas.click();
+  }
 });
 
-clientes.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
+clientes.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
 
-    if (vendedor) {
-        location.href = `./clientes/clientes.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
-        ipcRenderer.send('sacar-cierre');
-    } else if (vendedor === "") {
-        await sweet.fire({
-            title: "Contraseña incorrecta"
-        });
-        clientes.click();
-    };
-
-
+  if (vendedor) {
+    location.href = `./clientes/clientes.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
+    ipcRenderer.send('sacar-cierre');
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    clientes.click();
+  }
 });
 
-productos.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
+productos.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
 
-    if (vendedor) {
-        location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
-        ipcRenderer.send('sacar-cierre');
-    } else if (vendedor === "") {
-        await sweet.fire({
-            title: "Contraseña incorrecta"
-        })
-        productos.click()
+  if (vendedor) {
+    location.href = `./productos/productos.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
+    ipcRenderer.send('sacar-cierre');
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    productos.click();
+  }
+});
+
+caja.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
+
+  if (vendedor) {
+    if (vendedor.permiso !== 0) {
+      await sweet.fire({
+        title: 'No tiene Permisos para ingresar a Caja',
+      });
+    } else {
+      location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
     }
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    caja.click();
+  }
 });
 
-caja.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
-
-    if (vendedor) {
-
-        if (vendedor.permiso !== 0) {
-            await sweet.fire({
-                title: "No tiene Permisos para ingresar a Caja"
-            });
-        } else {
-            location.href = `./caja/caja.html?vendedor=${vendedor.nombre}&permiso=${vendedor.permiso}`;
-        }
-    } else if (vendedor === "") {
-
-        await sweet.fire({
-            title: "Contraseña incorrecta"
-        });
-        caja.click();
-    };
+consulta.addEventListener('click', (e) => {
+  location.href = './consultarCuenta/consultarCuenta.html';
 });
 
-consulta.addEventListener('click', e => {
-    location.href = "./consultarCuenta/consultarCuenta.html";
+recibo.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
+
+  if (vendedor) {
+    location.href = `./recibo/recibo.html?vendedor=${vendedor._id}`;
+    ipcRenderer.send('sacar-cierre');
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    clientes.click();
+  }
 });
 
-recibo.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
-
-    if (vendedor) {
-        location.href = `./recibo/recibo.html?vendedor=${vendedor._id}`;
-        ipcRenderer.send('sacar-cierre');
-    } else if (vendedor === "") {
-        await sweet.fire({
-            title: "Contraseña incorrecta"
-        })
-        clientes.click()
-    };
+remitos.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
+  if (vendedor) {
+    location.href = `./remitos/remitos.html?vendedor=${vendedor._id}`;
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    remitos.click();
+  }
 });
 
-remitos.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
-    if (vendedor) {
-        location.href = `./remitos/remitos.html?vendedor=${vendedor._id}`;
-    } else if (vendedor === '') {
-        await sweet.fire({
-            title: "Contraseña incorrecta"
-        })
-        remitos.click();
-    };
-});
+servicioTecnico.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
 
-servicioTecnico.addEventListener('click', async e => {
-    const vendedor = await verificarUsuarios();
-
-    if (vendedor) {
-        location.href = `./servicioTecnico/servicio.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
-    } else if (vendedor === '') {
-        await sweet.fire({
-            title: 'Contraseña Incorrecta'
-        });
-        servicioTecnico.click();
-    };
-
-
+  if (vendedor) {
+    location.href = `./servicioTecnico/servicio.html?vendedor=${vendedor._id}&permiso=${vendedor.permiso}`;
+  } else if (vendedor === '') {
+    await sweet.fire({
+      title: 'Contraseña Incorrecta',
+    });
+    servicioTecnico.click();
+  }
 });
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
 ipcRenderer.on('poner-numero', async (e, args) => {
-    ponerNumero();
+  ponerNumero();
 });
 
 ipcRenderer.on('libroIva', async (e, args) => {
-    location.href = "./libroIva/libroIva.html";
+  location.href = './libroIva/libroIva.html';
 });
 
-
 ipcRenderer.on('verificarUsuario', async (e, args) => {
-    let path = '';
-    const { permiso, nombre, _id } = await verificarUsuarios();
+  let path = '';
+  const { permiso, nombre, _id } = await verificarUsuarios();
 
-    if (args === 'numeros') {
-        path = `numeros/numeros.html`
-    } else if (args === 'infoVendedores') {
-        path = 'vendedores/vendedores.html'
-    } else if (args === 'movVendedores') {
-        path = 'vendedores/movimientoVendedores.html';
-    };
+  if (args === 'numeros') {
+    path = `numeros/numeros.html`;
+  } else if (args === 'infoVendedores') {
+    path = 'vendedores/vendedores.html';
+  } else if (args === 'movVendedores') {
+    path = 'vendedores/movimientoVendedores.html';
+  }
 
-    if (permiso === 0) {
-        ipcRenderer.send('abrir-ventana', {
-            path: path,
-            ancho: 1000,
-            altura: 700,
-            info: _id
-        });
-    } else if (permiso === 1 && args === 'numeros') {
-
-        ipcRenderer.send('abrir-ventana', {
-            path: path,
-            ancho: 1000,
-            altura: 700,
-            info: nombre
-        });
-
-    } else {
-        await sweet.fire({
-            title: "No tiene Permisos"
-        })
-    }
+  if (permiso === 0) {
+    ipcRenderer.send('abrir-ventana', {
+      path: path,
+      ancho: 1000,
+      altura: 700,
+      info: _id,
+    });
+  } else if (permiso === 1 && args === 'numeros') {
+    ipcRenderer.send('abrir-ventana', {
+      path: path,
+      ancho: 1000,
+      altura: 700,
+      info: nombre,
+    });
+  } else {
+    await sweet.fire({
+      title: 'No tiene Permisos',
+    });
+  }
 });
 
 ipcRenderer.on('configuracionModulos', async () => {
-    const { value, isConfirmed } = await sweet.fire({
-        title: 'Ingrese Contraseña',
-        input: 'password',
-        showCancelButton: true,
-    });
+  const { value, isConfirmed } = await sweet.fire({
+    title: 'Ingrese Contraseña',
+    input: 'password',
+    showCancelButton: true,
+  });
 
-    if (value === '2580Repetto2580') {
-        const options = {
-            path: 'configuracion/modulos.html',
-            altura: 700,
-            ancho: 700,
-            reinicio: true,
-        };
-
-        ipcRenderer.send('abrir-ventana', options);
+  if (value === '2580Repetto2580') {
+    const options = {
+      path: 'configuracion/modulos.html',
+      altura: 700,
+      ancho: 700,
+      reinicio: true,
     };
+
+    ipcRenderer.send('abrir-ventana', options);
+  }
 });

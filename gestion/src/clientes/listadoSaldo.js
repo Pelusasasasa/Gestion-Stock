@@ -1,8 +1,8 @@
 const { ipcRenderer } = require('electron');
-const { cerrarVentana } = require('../helpers')
+const { cerrarVentana } = require('../helpers');
 const axios = require('axios');
 
-require('dotenv').config()
+require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
 
@@ -15,50 +15,48 @@ let total = 0;
 let clientes = [];
 
 const exportarExcel = async () => {
-    let clientesAux = [];
+  let clientesAux = [];
 
-    clientes.forEach(elem => {
-        let clienteAux = {};
+  clientes.forEach((elem) => {
+    let clienteAux = {};
 
-        clienteAux.CODIGO = elem._id;
-        clienteAux.NOMBRE = elem.nombre;
-        clienteAux.CONDICION_IVA = elem.condicionIva;
-        clienteAux.CUIT = elem.cuit;
-        clienteAux.DIRECCION = elem.direccion;
-        clienteAux.SALDO = elem.saldo;
+    clienteAux.CODIGO = elem._id;
+    clienteAux.NOMBRE = elem.nombre;
+    clienteAux.CONDICION_IVA = elem.condicionIva;
+    clienteAux.CUIT = elem.cuit;
+    clienteAux.DIRECCION = elem.direccion;
+    clienteAux.SALDO = elem.saldo;
 
-        clientesAux.push(clienteAux);
-    })
+    clientesAux.push(clienteAux);
+  });
 
-    let XLSX = require('xlsx');
+  let XLSX = require('xlsx');
 
-    let path = await ipcRenderer.invoke('saveDialog');
-    let wb = XLSX.utils.book_new();
+  let path = await ipcRenderer.invoke('saveDialog');
+  let wb = XLSX.utils.book_new();
 
-    let extencion = 'xlsx';
+  let extencion = 'xlsx';
 
-    wb.Props = {
-        Title: 'Saldos',
-        Subject: 'Saldos Clientes',
-        Author: 'Gestor'
-    };
+  wb.Props = {
+    Title: 'Saldos',
+    Subject: 'Saldos Clientes',
+    Author: 'Gestor',
+  };
 
+  let newWs = XLSX.utils.json_to_sheet(clientesAux);
 
+  XLSX.utils.book_append_sheet(wb, newWs, 'Movimientos');
 
-    let newWs = XLSX.utils.json_to_sheet(clientesAux);
-
-    XLSX.utils.book_append_sheet(wb, newWs, "Movimientos");
-
-    XLSX.writeFile(wb, path + "." + extencion);
+  XLSX.writeFile(wb, path + '.' + extencion);
 };
 
 const listar = async () => {
-    clientes = (await axios.get(`${URL}clientes/clientesConSaldo`)).data;
+  clientes = (await axios.get(`${URL}clientes/clientesConSaldo`)).data;
 
-    for await (let cliente of clientes) {
-        const { nombre, _id, direccion, saldo, cuit, condicionIva } = cliente;
-        total += saldo;
-        tbody.innerHTML += `
+  for await (let cliente of clientes) {
+    const { nombre, _id, direccion, saldo, cuit, condicionIva } = cliente;
+    total += saldo;
+    tbody.innerHTML += `
             <tr>
                 <td>${_id}</td>
                 <td>${nombre.slice(0, 50)}</td>
@@ -67,10 +65,10 @@ const listar = async () => {
                 <td>${condicionIva}</td>
                 <td>${direccion}</td>
             </tr>
-        `
-    }
-    saldo.value = total.toFixed(2);
-}
+        `;
+  }
+  saldo.value = total.toFixed(2);
+};
 
 listar();
 const date = new Date();
@@ -86,6 +84,6 @@ fecha.innerHTML = `${day}/${month}/${year}`;
 
 excel.addEventListener('click', exportarExcel);
 
-document.addEventListener('keyup', e => {
-    cerrarVentana(e)
+document.addEventListener('keyup', (e) => {
+  cerrarVentana(e);
 });

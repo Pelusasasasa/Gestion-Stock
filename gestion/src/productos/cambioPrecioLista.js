@@ -20,156 +20,146 @@ let productosModificados = [];
 let dolar = 0;
 
 archivo.addEventListener('change', (e) => {
+  let selectedFile = e.target.files[0];
+  let fileReader = new FileReader();
 
-    let selectedFile = e.target.files[0];
-    let fileReader = new FileReader();
+  fileReader.onload = async (e) => {
+    let data = e.target.result;
+    let woorbook = xlsx.read(data, { type: 'binary' });
 
-    fileReader.onload = async (e) => {
-        let data = e.target.result;
-        let woorbook = xlsx.read(data, { type: 'binary' });
+    let { data: res } = await axios.get(`${URL}productos/porMarca/${tipo.value}`);
 
-        let { data: res } = await axios.get(`${URL}productos/porMarca/${tipo.value}`);
+    await llenarLista(res.productos);
 
-        await llenarLista(res.productos);
+    if (tipo.value === 'HIKVISION') {
+      let datos = xlsx.utils.sheet_to_json(woorbook.Sheets['Lista']);
+      cambiarPrecioshikvision(datos, res.productos);
+    }
+  };
 
-        if (tipo.value === 'HIKVISION') {
-            let datos = xlsx.utils.sheet_to_json(woorbook.Sheets['Lista']);
-            cambiarPrecioshikvision(datos, res.productos);
-        }
-    };
-
-    fileReader.readAsBinaryString(selectedFile);
+  fileReader.readAsBinaryString(selectedFile);
 });
 
 const apretarTecla = (e) => {
-    if (e.keyCode === 27) {
-        window.close();
-    }
-}
+  if (e.keyCode === 27) {
+    window.close();
+  }
+};
 
 const cambiarPrecioshikvision = (datos, productos) => {
-    
-    for (let producto of productos) {
-        let productoAux = datos.find(elem => producto._id == elem.SAP);
-        if(!productoAux){
-            productoAux = datos.find(elem => elem.SAP == producto.codigoSecundario);
-            console.log(productoAux);
-        };
-        if(!productoAux) continue;
-        
-        productoAux.GREMIO = parseFloat(productoAux.GREMIO.replace('US$', ''));
+  for (let producto of productos) {
+    let productoAux = datos.find((elem) => producto._id == elem.SAP);
+    if (!productoAux) {
+      productoAux = datos.find((elem) => elem.SAP == producto.codigoSecundario);
+      console.log(productoAux);
+    }
+    if (!productoAux) continue;
 
-        if (producto.costoDolar !== 0) {
-            producto.costoDolar = productoAux ? productoAux.GREMIO : producto.costoDolar;
-        } else {
-            producto.costo = productoAux ? productoAux.GREMIO : producto.costoDolar;
-        };
+    productoAux.GREMIO = parseFloat(productoAux.GREMIO.replace('US$', ''));
 
-        console.log(producto);
+    if (producto.costoDolar !== 0) {
+      producto.costoDolar = productoAux ? productoAux.GREMIO : producto.costoDolar;
+    } else {
+      producto.costo = productoAux ? productoAux.GREMIO : producto.costoDolar;
+    }
 
-        productosModificados.push(producto);
+    console.log(producto);
 
-        const tdCostoNuevo = document.createElement('td');
-        const tdPrecioNuevo = document.createElement('td');
-        const tdPorcentaje = document.createElement('td');
+    productosModificados.push(producto);
 
-        const costo_Iva = producto.costoDolar !== 0
-            ? (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * dolar
-            : (producto.costoDolar + (producto.costoDolar * producto.impuesto / 100));
+    const tdCostoNuevo = document.createElement('td');
+    const tdPrecioNuevo = document.createElement('td');
+    const tdPorcentaje = document.createElement('td');
 
-        const utilidad = (costo_Iva + (costo_Iva * producto.ganancia / 100));
+    const costo_Iva =
+      producto.costoDolar !== 0 ? (producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) * dolar : producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100;
 
-        producto.precio = parseFloat(utilidad.toFixed(2));
-        let porcentaje = 0;
+    const utilidad = costo_Iva + (costo_Iva * producto.ganancia) / 100;
 
-        tdCostoNuevo.value = producto.costoDolar.toFixed(2);
-        tdPrecioNuevo.value = utilidad.toFixed(2);
+    producto.precio = parseFloat(utilidad.toFixed(2));
+    let porcentaje = 0;
 
-        const tr = document.getElementById(producto._id);
-        porcentaje = producto.precio !== 0 ? (producto.precio - parseFloat(tr.children[4].innerText)) / parseFloat(tr.children[4].innerText) * 100 : 0;
-        tdPorcentaje.value = porcentaje.toFixed(2) + " %";
+    tdCostoNuevo.value = producto.costoDolar.toFixed(2);
+    tdPrecioNuevo.value = utilidad.toFixed(2);
 
-        tr.children[5].innerText = tdCostoNuevo.value;
-        tr.children[6].innerText = tdPrecioNuevo.value;
-        tr.children[7].innerText = tdPorcentaje.value;
-    };
+    const tr = document.getElementById(producto._id);
+    porcentaje = producto.precio !== 0 ? ((producto.precio - parseFloat(tr.children[4].innerText)) / parseFloat(tr.children[4].innerText)) * 100 : 0;
+    tdPorcentaje.value = porcentaje.toFixed(2) + ' %';
+
+    tr.children[5].innerText = tdCostoNuevo.value;
+    tr.children[6].innerText = tdPrecioNuevo.value;
+    tr.children[7].innerText = tdPorcentaje.value;
+  }
 };
 
 const cargarArchvio = async () => {
-    const { data } = await axios.get(`${URL}numero`);
-    dolar = data.Dolar;
+  const { data } = await axios.get(`${URL}numero`);
+  dolar = data.Dolar;
 };
 
 const guardarCambios = async () => {
+  if (productosModificados.length === 0) return swet.fire('No hay productos a modificar');
 
-    if (productosModificados.length === 0) return swet.fire('No hay productos a modificar');
+  const { data } = await axios.put(`${URL}productos`, productosModificados);
 
-    const { data } = await axios.put(`${URL}productos`, productosModificados);
+  if (data.ok) {
+    await swet.fire('Modificar Varios Productos', `${data.msg}`, 'success');
+  } else {
+    await swet.fire('Modificar Varios Productos', `${data.msg}`, 'error');
+  }
 
-    if (data.ok) {
-        await swet.fire('Modificar Varios Productos', `${data.msg}`, 'success');
-    } else {
-        await swet.fire('Modificar Varios Productos', `${data.msg}`, 'error');
-    };
-
-    window.close();
-
+  window.close();
 };
 
 const llenarLista = async (productos) => {
+  for (let producto of productos) {
+    const tr = document.createElement('tr');
+    tr.id = producto._id;
 
-    for (let producto of productos) {
-        const tr = document.createElement('tr');
-        tr.id = producto._id;
+    const tdCodigo = document.createElement('td');
+    const tdDescripcion = document.createElement('td');
+    const tdCodigoSecundario = document.createElement('td');
+    const tdCosto = document.createElement('td');
+    const tdPrecio = document.createElement('td');
+    const tdCostoNuevo = document.createElement('td');
+    const tdPrecioNuevo = document.createElement('td');
+    const tdPorcentaje = document.createElement('td');
 
-        const tdCodigo = document.createElement('td');
-        const tdDescripcion = document.createElement('td');
-        const tdCodigoSecundario = document.createElement('td');
-        const tdCosto = document.createElement('td');
-        const tdPrecio = document.createElement('td');
-        const tdCostoNuevo = document.createElement('td');
-        const tdPrecioNuevo = document.createElement('td');
-        const tdPorcentaje = document.createElement('td');
+    tdCodigo.classList.add('border', 'text-center');
+    tdDescripcion.classList.add('border', 'text-center');
+    tdCodigoSecundario.classList.add('border', 'text-center');
+    tdCosto.classList.add('border', 'text-center');
+    tdPrecio.classList.add('border', 'text-center');
+    tdCostoNuevo.classList.add('border', 'text-center');
+    tdPrecioNuevo.classList.add('border', 'text-center');
+    tdPorcentaje.classList.add('border', 'text-center');
 
-        tdCodigo.classList.add('border', 'text-center');
-        tdDescripcion.classList.add('border', 'text-center');
-        tdCodigoSecundario.classList.add('border', 'text-center');
-        tdCosto.classList.add('border', 'text-center');
-        tdPrecio.classList.add('border', 'text-center');
-        tdCostoNuevo.classList.add('border', 'text-center');
-        tdPrecioNuevo.classList.add('border', 'text-center');
-        tdPorcentaje.classList.add('border', 'text-center');
+    tdCodigo.textContent = producto._id;
+    tdDescripcion.textContent = producto.descripcion.slice(0, 30);
+    tdCodigoSecundario.textContent = producto.codigoSecundario;
+    tdCosto.textContent = producto.costoDolar !== 0 ? producto.costoDolar.toFixed(2) : producto.costo.toFixed(2);
+    tdPrecio.textContent = producto.precio.toFixed(2);
+    tdCostoNuevo.textContent = tdCosto.textContent;
+    tdPrecioNuevo.textContent = tdPrecio.textContent;
+    tdPorcentaje.textContent = '0.00';
 
-        tdCodigo.textContent = producto._id;
-        tdDescripcion.textContent = producto.descripcion.slice(0, 30);
-        tdCodigoSecundario.textContent = producto.codigoSecundario;
-        tdCosto.textContent = producto.costoDolar !== 0 ? producto.costoDolar.toFixed(2) : producto.costo.toFixed(2);
-        tdPrecio.textContent = producto.precio.toFixed(2);
-        tdCostoNuevo.textContent = tdCosto.textContent;
-        tdPrecioNuevo.textContent = tdPrecio.textContent;
-        tdPorcentaje.textContent = '0.00';
+    tr.appendChild(tdCodigo);
+    tr.appendChild(tdDescripcion);
+    tr.appendChild(tdCodigoSecundario);
+    tr.appendChild(tdCosto);
+    tr.appendChild(tdPrecio);
+    tr.appendChild(tdCostoNuevo);
+    tr.appendChild(tdPrecioNuevo);
+    tr.appendChild(tdPorcentaje);
 
-
-        tr.appendChild(tdCodigo);
-        tr.appendChild(tdDescripcion);
-        tr.appendChild(tdCodigoSecundario);
-        tr.appendChild(tdCosto);
-        tr.appendChild(tdPrecio);
-        tr.appendChild(tdCostoNuevo);
-        tr.appendChild(tdPrecioNuevo);
-        tr.appendChild(tdPorcentaje);
-
-        tbody.appendChild(tr);
-    };
-
+    tbody.appendChild(tr);
+  }
 };
 
 const mostrarMensaje = (e) => {
-
-    if (e.target.value === 'HIKVISION') {
-        mensaje.innerText = 'La Columa del codigo de barra tiene que llamarse "SAP" y la del precio final "GREMIO", tambien la hoja del excel tiene que llamarse "Lista"'
-    }
-
+  if (e.target.value === 'HIKVISION') {
+    mensaje.innerText = 'La Columa del codigo de barra tiene que llamarse "SAP" y la del precio final "GREMIO", tambien la hoja del excel tiene que llamarse "Lista"';
+  }
 };
 
 document.addEventListener('keyup', apretarTecla);

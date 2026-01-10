@@ -1,12 +1,12 @@
 const axios = require('axios');
-require("dotenv").config();
+require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
-const {vendedores,condIva} = require('../configuracion.json')
+const { vendedores, condIva } = require('../configuracion.json');
 
-const {cerrarVentana, ultimaC, verificarUsuarios, ultimaAB, agregarMovimientoVendedores, verNombrePc} = require('../helpers');
+const { cerrarVentana, ultimaC, verificarUsuarios, ultimaAB, agregarMovimientoVendedores, verNombrePc } = require('../helpers');
 const { ipcRenderer } = require('electron');
 
 const dolar = document.querySelector('#dolar');
@@ -30,136 +30,135 @@ const salir = document.querySelector('.salir');
 let id;
 let dolarTraido;
 let dolarTraidoInstalador;
-let usuario = ''
+let usuario = '';
 
-
-window.addEventListener('load',async e=>{
-    if (condIva === "Inscripto") {
-        facturaC.parentNode.classList.add('none');
-        notaC.parentNode.classList.add('none');
-    }else{
-        facturaA.parentNode.classList.add('none');
-        notaA.parentNode.classList.add('none');
-        facturaB.parentNode.classList.add('none');
-        notaB.parentNode.classList.add('none');
+window.addEventListener('load', async (e) => {
+  if (condIva === 'Inscripto') {
+    facturaC.parentNode.classList.add('none');
+    notaC.parentNode.classList.add('none');
+  } else {
+    facturaA.parentNode.classList.add('none');
+    notaA.parentNode.classList.add('none');
+    facturaB.parentNode.classList.add('none');
+    notaB.parentNode.classList.add('none');
+  }
+  if (vendedores) {
+    const vendedor = await verificarUsuarios();
+    if (vendedor === '') {
+      await sweet.fire({
+        title: 'Contraseña Incorrecta',
+      });
+      location.reload();
+    } else if (vendedor.permiso !== 0) {
+      await sweet.fire({
+        title: 'Acceso denegado',
+      });
+      window.close();
     }
-    if (vendedores) {
-        const vendedor = await verificarUsuarios();
-        if (vendedor === "") {
-            await sweet.fire({
-                title:"Contraseña Incorrecta"
-            });
-            location.reload();
-        }else if (vendedor.permiso !== 0) {
-            await sweet.fire({
-                title:"Acceso denegado"
-            })
-            window.close();
-        }
-    }
+  }
 
-    try {
-        const { data } = (await axios.get(`${URL}numero`));
-        numeros = data;
-    } catch (error) {
-        console.log(error)
-        await sweet.fire(('No se pudo obtener los numeros', error.response?.data?.msg, 'error'));
-    };
+  try {
+    const { data } = await axios.get(`${URL}numero`);
+    numeros = data;
+  } catch (error) {
+    console.log(error);
+    await sweet.fire(('No se pudo obtener los numeros', error.response?.data?.msg, 'error'));
+  }
 
-    try {
-        setTimeout(async()=>{
-            let facturas = await ultimaC();
-            let facturasAB = await ultimaAB();
-            facturaA.value = facturasAB.facturaA;
-            facturaB.value = facturasAB.facturaB;
-            facturaC.value = facturas.facturaC;
-            notaA.value = facturasAB.notaA;
-            notaB.value = facturasAB.notaB;
-            notaC.value = facturas.notaC;
-        },0)
-    } catch (error) {
-        console.log(error)
-    }
+  try {
+    setTimeout(async () => {
+      let facturas = await ultimaC();
+      let facturasAB = await ultimaAB();
+      facturaA.value = facturasAB.facturaA;
+      facturaB.value = facturasAB.facturaB;
+      facturaC.value = facturas.facturaC;
+      notaA.value = facturasAB.notaA;
+      notaB.value = facturasAB.notaB;
+      notaC.value = facturas.notaC;
+    }, 0);
+  } catch (error) {
+    console.log(error);
+  }
 
-    (numeros.Contado === 0 || numeros["Cuenta Corriente"] === 0 || numeros.Recibo === 0 || numeros !== "") && cargar.classList.add('none');
-    if (numeros !== "") {
-        id = numeros._id;
-        dolarTraido = numeros.Dolar;
-        dolar.value = numeros.Dolar.toFixed(2);
-        dolarTraidoInstalador = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
-        dolarInstalador.value = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
-        presupuesto.value = numeros.Presupuesto.toString().padStart(8,'0');
-        contado.value = numeros.Contado.toString().padStart(8,'0');
-        recibo.value = numeros.Recibo.toString().padStart(8,'0');
-        cuentaCorriente.value = numeros["Cuenta Corriente"].toString().padStart(8,'0');
-    }
+  (numeros.Contado === 0 || numeros['Cuenta Corriente'] === 0 || numeros.Recibo === 0 || numeros !== '') && cargar.classList.add('none');
+  if (numeros !== '') {
+    id = numeros._id;
+    dolarTraido = numeros.Dolar;
+    dolar.value = numeros.Dolar.toFixed(2);
+    dolarTraidoInstalador = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
+    dolarInstalador.value = numeros.dolarInstalador?.toFixed(2) ?? '0.00';
+    presupuesto.value = numeros.Presupuesto.toString().padStart(8, '0');
+    contado.value = numeros.Contado.toString().padStart(8, '0');
+    recibo.value = numeros.Recibo.toString().padStart(8, '0');
+    cuentaCorriente.value = numeros['Cuenta Corriente'].toString().padStart(8, '0');
+  }
 });
 
-ipcRenderer.on('informacion', (e,args) => {
-    usuario =  args.info;
+ipcRenderer.on('informacion', (e, args) => {
+  usuario = args.info;
 });
 
 //cuando apretamos habilitamos para que se modifiquen los numeros
-modificar.addEventListener('click',e=>{
-    modificar.classList.add('none');
-    guardar.classList.remove('none');
-    dolar.removeAttribute('disabled');
-    dolarInstalador.removeAttribute('disabled');
+modificar.addEventListener('click', (e) => {
+  modificar.classList.add('none');
+  guardar.classList.remove('none');
+  dolar.removeAttribute('disabled');
+  dolarInstalador.removeAttribute('disabled');
 });
 
 //Aca cuando modificamos los numeros despues los guardamos
-guardar.addEventListener('click',async e=>{
-    const numero = {};
-    numero._id = id;
-    numero.Contado = parseInt(contado.value);
-    numero.Recibo = parseInt(recibo.value);
-    numero["Cuenta Corriente"] = parseInt(cuentaCorriente.value);
-    numero.Dolar = dolar.value;
-    numero.dolarInstalador = dolarInstalador.value;
+guardar.addEventListener('click', async (e) => {
+  const numero = {};
+  numero._id = id;
+  numero.Contado = parseInt(contado.value);
+  numero.Recibo = parseInt(recibo.value);
+  numero['Cuenta Corriente'] = parseInt(cuentaCorriente.value);
+  numero.Dolar = dolar.value;
+  numero.dolarInstalador = dolarInstalador.value;
 
-    if (dolarTraido !== parseFloat(dolar.value)) {
-        await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
-        const pc = await verNombrePc();
-        agregarMovimientoVendedores(`Cambio el Dolar de ${dolarTraido} a ${dolar.value} en la Computadora ${pc}`, usuario);
-    };
+  if (dolarTraido !== parseFloat(dolar.value)) {
+    await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
+    const pc = await verNombrePc();
+    agregarMovimientoVendedores(`Cambio el Dolar de ${dolarTraido} a ${dolar.value} en la Computadora ${pc}`, usuario);
+  }
 
-    if(dolarTraidoInstalador !== parseFloat(dolarInstalador.value)) {
-        const pc = await verNombrePc();
-        agregarMovimientoVendedores(`Cambio el Dolar Instalador de ${dolarTraidoInstalador} a ${dolarInstalador.value} en la Computadora ${pc}`, usuario);
-    }
+  if (dolarTraidoInstalador !== parseFloat(dolarInstalador.value)) {
+    const pc = await verNombrePc();
+    agregarMovimientoVendedores(`Cambio el Dolar Instalador de ${dolarTraidoInstalador} a ${dolarInstalador.value} en la Computadora ${pc}`, usuario);
+  }
 
-    try {
-        await axios.put(`${URL}numero`,numero);
-        ipcRenderer.send('send-ventanaPrincipal',parseFloat(dolar.value));
-        window.close();
-    } catch (error) {
-        console.log(error);
-        sweet.fire({
-            title:"No se pudo modificar la venta"
-        })
-    }
-});
-
-dolar.addEventListener('focus',e=>{
-    dolar.select();
-});
-
-contado.addEventListener('focus',e=>{
-    contado.select();
-});
-
-cuentaCorriente.addEventListener('focus',e=>{
-    cuentaCorriente.select();
-});
-
-recibo.addEventListener('focus',e=>{
-    recibo.select();
-});
-
-salir.addEventListener('click',e=>{
+  try {
+    await axios.put(`${URL}numero`, numero);
+    ipcRenderer.send('send-ventanaPrincipal', parseFloat(dolar.value));
     window.close();
+  } catch (error) {
+    console.log(error);
+    sweet.fire({
+      title: 'No se pudo modificar la venta',
+    });
+  }
 });
 
-document.addEventListener('keyup',e=>{
-    cerrarVentana(e)
+dolar.addEventListener('focus', (e) => {
+  dolar.select();
+});
+
+contado.addEventListener('focus', (e) => {
+  contado.select();
+});
+
+cuentaCorriente.addEventListener('focus', (e) => {
+  cuentaCorriente.select();
+});
+
+recibo.addEventListener('focus', (e) => {
+  recibo.select();
+});
+
+salir.addEventListener('click', (e) => {
+  window.close();
+});
+
+document.addEventListener('keyup', (e) => {
+  cerrarVentana(e);
 });

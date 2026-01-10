@@ -5,7 +5,7 @@ const URL = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
-const {vendedores:verVendedores} = require('../configuracion.json');
+const { vendedores: verVendedores } = require('../configuracion.json');
 
 const fecha = document.getElementById('fecha');
 const select = document.getElementById('vendedores');
@@ -16,105 +16,103 @@ const tbody = document.querySelector('tbody');
 let movimientos;
 let vendedores;
 
-window.addEventListener('load',async e=>{
-
-    if (verVendedores) {
-        const vendedor = await verificarUsuarios();
-        if (vendedor === "") {
-            await sweet.fire({
-                title:"Contraseña Incorrecta"
-            });
-            location.reload();
-        }else if (!vendedor) {
-            window.close();
-        }else if(vendedor.permiso !== 0){
-            await sweet.fire({title:"Permisos Denegados"});
-            window.close();
-        };
+window.addEventListener('load', async (e) => {
+  if (verVendedores) {
+    const vendedor = await verificarUsuarios();
+    if (vendedor === '') {
+      await sweet.fire({
+        title: 'Contraseña Incorrecta',
+      });
+      location.reload();
+    } else if (!vendedor) {
+      window.close();
+    } else if (vendedor.permiso !== 0) {
+      await sweet.fire({ title: 'Permisos Denegados' });
+      window.close();
     }
+  }
 
-    const date = new Date()
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
+  const date = new Date();
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
 
-    month = month === 13 ? 1 : month
+  month = month === 13 ? 1 : month;
 
-    day = day < 10 ? `0${day}` : day;
-    month = month < 10 ? `0${month}` : month;
+  day = day < 10 ? `0${day}` : day;
+  month = month < 10 ? `0${month}` : month;
 
-    fecha.value = `${year}-${month}-${day}`;
+  fecha.value = `${year}-${month}-${day}`;
 
-    vendedores = (await axios.get(`${URL}vendedores`)).data;
-    await listarVendedores(vendedores);
+  vendedores = (await axios.get(`${URL}vendedores`)).data;
+  await listarVendedores(vendedores);
 
-    movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
-    listarMovimientos(movimientos)
+  movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+  listarMovimientos(movimientos);
 });
 
-const listarVendedores = (lista)=>{
-    lista.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor._id;
-        option.text = vendedor.nombre;
-        select.appendChild(option)
-    });
+const listarVendedores = (lista) => {
+  lista.forEach((vendedor) => {
+    const option = document.createElement('option');
+    option.value = vendedor._id;
+    option.text = vendedor.nombre;
+    select.appendChild(option);
+  });
 };
 
-const listarMovimientos = (lista)=>{
+const listarMovimientos = (lista) => {
+  tbody.innerHTML = '';
+  lista.forEach((elem) => {
+    const tr = document.createElement('tr');
 
-    tbody.innerHTML = "";
-    lista.forEach(elem =>{
-        const tr = document.createElement('tr');
+    const fecha = elem.fecha;
+    const hora = elem.fecha.slice(11, 19).split(':', 3);
+    const tdFecha = document.createElement('td');
+    const tdDescripcion = document.createElement('td');
+    const tdHora = document.createElement('td');
 
-        const fecha = elem.fecha;
-        const hora = elem.fecha.slice(11,19).split(':',3);
-        const tdFecha = document.createElement('td');
-        const tdDescripcion = document.createElement('td');
-        const tdHora = document.createElement('td');
-        
-        tdFecha.innerHTML = fecha.slice(0, 10).split('-', 3).reverse().join('/');
-        tdDescripcion.innerHTML = elem.descripcion;
-        tdHora.innerHTML = fecha.slice(11, 19)
+    tdFecha.innerHTML = fecha.slice(0, 10).split('-', 3).reverse().join('/');
+    tdDescripcion.innerHTML = elem.descripcion;
+    tdHora.innerHTML = fecha.slice(11, 19);
 
-        tr.appendChild(tdFecha);
-        tr.appendChild(tdDescripcion);
-        tr.appendChild(tdHora);
+    tr.appendChild(tdFecha);
+    tr.appendChild(tdDescripcion);
+    tr.appendChild(tdHora);
 
-        tbody.appendChild(tr)
-    });
+    tbody.appendChild(tr);
+  });
 };
 
 const listarConTipo = (lista, tipo) => {
-    let movAux = [];
+  let movAux = [];
 
-    movAux = lista.filter(mov => mov.tipo === tipo);
+  movAux = lista.filter((mov) => mov.tipo === tipo);
 
-    listarMovimientos(movAux);
-}
+  listarMovimientos(movAux);
+};
 
-select.addEventListener('change',async ()=>{
-    movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
-    listarMovimientos(movimientos);
+select.addEventListener('change', async () => {
+  movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+  listarMovimientos(movimientos);
 });
 
-fecha.addEventListener('change',async ()=>{
-    const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
-    listarMovimientos(movimientos);
+fecha.addEventListener('change', async () => {
+  const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+  listarMovimientos(movimientos);
 });
 
-tipo.addEventListener('change', async (e) =>{
-    listarConTipo(movimientos, e.target.value);
+tipo.addEventListener('change', async (e) => {
+  listarConTipo(movimientos, e.target.value);
 });
 
-fecha.addEventListener('keypress',e=>{
-    if (e.keyCode === 13) {
-        select.focus();
-    }
+fecha.addEventListener('keypress', (e) => {
+  if (e.keyCode === 13) {
+    select.focus();
+  }
 });
 
-document.addEventListener('keyup',e=>{
-    if (e.keyCode === 27) {
-        window.close();
-    }
-})
+document.addEventListener('keyup', (e) => {
+  if (e.keyCode === 27) {
+    window.close();
+  }
+});

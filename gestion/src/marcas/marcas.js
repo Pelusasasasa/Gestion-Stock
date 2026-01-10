@@ -1,4 +1,4 @@
-const { cerrarVentana } = require("../helpers");
+const { cerrarVentana } = require('../helpers');
 
 require('dotenv').config();
 const axios = require('axios');
@@ -16,135 +16,132 @@ const agregar = document.getElementById('agregar');
 
 const tbody = document.getElementById('tbody');
 
-const cargarPagina = async() => {
-    try {
-        const id = (await axios.get(`${URL}marca/last`)).data;
-        numero.value = id + 1;
-    } catch (error) {
-        console.log(error);
-        return await sweet.fire('No se puede cargar el numero siguiente', error.response?.data?.msg, 'error');
-    };
+const cargarPagina = async () => {
+  try {
+    const id = (await axios.get(`${URL}marca/last`)).data;
+    numero.value = id + 1;
+  } catch (error) {
+    console.log(error);
+    return await sweet.fire('No se puede cargar el numero siguiente', error.response?.data?.msg, 'error');
+  }
 
-    try {
-        marcas = (await axios.get(`${URL}marca`)).data;
-        listarMarcas( marcas );
-    } catch (error) {
-        console.log(error);
-        return await sweet.fire('No se pudo obtener las marcas ', error.response?.data?.msg, 'error');    
-    };
+  try {
+    marcas = (await axios.get(`${URL}marca`)).data;
+    listarMarcas(marcas);
+  } catch (error) {
+    console.log(error);
+    return await sweet.fire('No se pudo obtener las marcas ', error.response?.data?.msg, 'error');
+  }
 };
 
-const agregarMarca = async() => {
-    const marca = {
-        codigo: numero.value,
-        nombre: nombre.value
-    };
+const agregarMarca = async () => {
+  const marca = {
+    codigo: numero.value,
+    nombre: nombre.value,
+  };
 
-    try {
-        const res = (await axios.post(`${URL}marca`,marca)).data;
-        marcas.push(res);
-        listarMarcas(marcas);
-    } catch (error) {
-        console.log(error);
-        return await sweet.fire('No se pudo agregar la marca', error.response?.data?.msg, 'error');
-    };
-    nombre.value = '';
-    numero.value = parseInt(numero.value) + 1;
+  try {
+    const res = (await axios.post(`${URL}marca`, marca)).data;
+    marcas.push(res);
+    listarMarcas(marcas);
+  } catch (error) {
+    console.log(error);
+    return await sweet.fire('No se pudo agregar la marca', error.response?.data?.msg, 'error');
+  }
+  nombre.value = '';
+  numero.value = parseInt(numero.value) + 1;
 };
 
-const clickTr = async(e) => {
-    seleccionado?.classList.remove('seleccionado');
-    subSeleccionado?.classList.remove('subSeleccionado');
+const clickTr = async (e) => {
+  seleccionado?.classList.remove('seleccionado');
+  subSeleccionado?.classList.remove('subSeleccionado');
 
-    if (e.target.nodeName === 'SPAN'){
-        seleccionado = e.target.parentNode.parentNode.parentNode;
-        subSeleccionado = e.target.parentNode.parentNode;
-    };
+  if (e.target.nodeName === 'SPAN') {
+    seleccionado = e.target.parentNode.parentNode.parentNode;
+    subSeleccionado = e.target.parentNode.parentNode;
+  }
 
-    if (e.target.nodeName === 'TD'){
-        seleccionado = e.target.parentNode;
-        subSeleccionado = e.target;
-    };
+  if (e.target.nodeName === 'TD') {
+    seleccionado = e.target.parentNode;
+    subSeleccionado = e.target;
+  }
 
-    if (e.target.nodeName === 'TR'){
-        seleccionado = e.target;
-        subSeleccionado = e.target.children[0];
-    };
+  if (e.target.nodeName === 'TR') {
+    seleccionado = e.target;
+    subSeleccionado = e.target.children[0];
+  }
 
-    seleccionado.classList.add('seleccionado');
-    subSeleccionado.classList.add('subSeleccionado');
+  seleccionado.classList.add('seleccionado');
+  subSeleccionado.classList.add('subSeleccionado');
 
-    if (e.target.nodeName === 'SPAN' && e.target.innerText === 'delete'){
+  if (e.target.nodeName === 'SPAN' && e.target.innerText === 'delete') {
+    const { isConfirmed } = await sweet.fire({
+      title: `Seguro quiere eliminar ${seleccionado.children[1].innerText}`,
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+    });
 
-        const { isConfirmed } = await sweet.fire({
-            title: `Seguro quiere eliminar ${seleccionado.children[1].innerText}`,
-            showCancelButton: true,
-            confirmButtonText: 'Eliminar'
-        });
+    if (isConfirmed) {
+      try {
+        await axios.delete(`${URL}marca/forId/${seleccionado.id}`);
+        marcas = marcas.filter((marca) => marca._id !== seleccionado.id);
+        tbody.removeChild(seleccionado);
+        seleccionado = null;
+      } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se puedo eliminar la marca', error.response?.data?.msg, 'error');
+      }
+    }
+  }
 
-        if ( isConfirmed ){
-            try {
-                await axios.delete(`${URL}marca/forId/${seleccionado.id}`);
-                marcas = marcas.filter(marca => marca._id !== seleccionado.id);
-                tbody.removeChild(seleccionado);
-                seleccionado = null;
-            } catch (error) {
-                console.log(error);
-                return await sweet.fire('No se puedo eliminar la marca', error.response?.data?.msg, 'error');
-            }
-        };
-    };
+  if (e.target.nodeName === 'SPAN' && e.target.innerText === 'edit') {
+    const { isConfirmed, value } = await sweet.fire({
+      title: `Modificar ${seleccionado.children[1].innerText}`,
+      showCancelButton: true,
+      input: 'text',
+      confirmButtonText: 'Modificar',
+    });
 
-    if (e.target.nodeName === 'SPAN' && e.target.innerText === 'edit'){
+    if (isConfirmed) {
+      const aux = marcas.find((elem) => elem._id === seleccionado.id);
+      aux.nombre = value.toUpperCase().trim();
 
-        const { isConfirmed, value } = await sweet.fire({
-            title: `Modificar ${seleccionado.children[1].innerText}`,
-            showCancelButton: true,
-            input: 'text',
-            confirmButtonText: 'Modificar'
-        });
+      try {
+        await axios.put(`${URL}marca/forId/${seleccionado.id}`, aux);
+      } catch (error) {
+        console.log(error);
+        return await sweet.fire('No se pudo modificar la marca', error.response?.data?.msg, 'error');
+      }
 
-        if ( isConfirmed ){
-            const aux = marcas.find( elem => elem._id === seleccionado.id);
-            aux.nombre = value.toUpperCase().trim();
+      listarMarcas(marcas);
+    }
+  }
+};
 
-            try {
-                await axios.put(`${URL}marca/forId/${seleccionado.id}`, aux);
-            } catch (error) {
-                console.log(error);
-                return await sweet.fire('No se pudo modificar la marca', error.response?.data?.msg, 'error');
-            }
-            
-            listarMarcas(marcas);
-        };
-    };
-}
+const listarMarcas = async (lista) => {
+  tbody.innerHTML = ``;
 
-const listarMarcas = async(lista) => {
-    
-    tbody.innerHTML = ``;
+  for await (let elem of lista) {
+    const tr = document.createElement('tr');
 
-    for await(let elem of lista){
-        const tr = document.createElement('tr');
+    tr.addEventListener('click', clickTr);
 
-        tr.addEventListener('click', clickTr);
+    tr.id = elem._id;
 
-        tr.id = elem._id;
+    tr.classList.add('cursor-pointer');
 
-        tr.classList.add('cursor-pointer');
+    const tdNumero = document.createElement('td');
+    const tdNombre = document.createElement('td');
+    const tdAcciones = document.createElement('td');
 
-        const tdNumero = document.createElement('td');
-        const tdNombre = document.createElement('td');
-        const tdAcciones = document.createElement('td');
+    tdNumero.classList.add('border');
+    tdNombre.classList.add('border');
+    tdAcciones.classList.add('border');
+    tdAcciones.classList.add('acciones');
 
-        tdNumero.classList.add('border');
-        tdNombre.classList.add('border');
-        tdAcciones.classList.add('border');
-        tdAcciones.classList.add('acciones');
-
-        tdNumero.innerText = elem.codigo;
-        tdNombre.innerText = elem.nombre;
-        tdAcciones.innerHTML = `
+    tdNumero.innerText = elem.codigo;
+    tdNombre.innerText = elem.nombre;
+    tdAcciones.innerHTML = `
             <div class=tool>
                 <span class=material-icons title='Modificar'>edit</span>
             </div>
@@ -153,14 +150,12 @@ const listarMarcas = async(lista) => {
             </div>
         `;
 
-        tr.appendChild(tdNumero);
-        tr.appendChild(tdNombre);
-        tr.appendChild(tdAcciones);
+    tr.appendChild(tdNumero);
+    tr.appendChild(tdNombre);
+    tr.appendChild(tdAcciones);
 
-        tbody.appendChild(tr);
-    
-    }
-    
+    tbody.appendChild(tr);
+  }
 };
 
 document.addEventListener('keyup', cerrarVentana);
@@ -168,5 +163,3 @@ document.addEventListener('keyup', cerrarVentana);
 window.addEventListener('load', cargarPagina);
 
 agregar.addEventListener('click', agregarMarca);
-
-

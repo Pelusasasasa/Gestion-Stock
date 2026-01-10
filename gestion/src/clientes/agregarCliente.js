@@ -1,10 +1,10 @@
-const {cerrarVentana,apretarEnter} = require('../helpers');
+const { cerrarVentana, apretarEnter } = require('../helpers');
 const sweet = require('sweetalert2');
 
 const axios = require('axios');
-const {default:validarCuit} = require('cuit-validator')
+const { default: validarCuit } = require('cuit-validator');
 const { ipcRenderer } = require('electron');
-require("dotenv").config();
+require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 const codigo = document.querySelector('#codigo');
@@ -23,104 +23,104 @@ const salir = document.querySelector('.salir');
 
 let vendedor;
 
-window.addEventListener('load',async e=>{
-    const id = (await axios.get(`${URL}clientes`)).data;
-    codigo.value = id;
+window.addEventListener('load', async (e) => {
+  const id = (await axios.get(`${URL}clientes`)).data;
+  codigo.value = id;
 });
 
-ipcRenderer.on('informacion',(e,args)=>{
-    vendedor = args.vendedor;
+ipcRenderer.on('informacion', (e, args) => {
+  vendedor = args.vendedor;
 });
 
-agregar.addEventListener('click',async e=>{
-    if(tipoCuenta.value === '') return await sweet.fire('El campo tipo de cuenta es obligatorio', 'No se pudo cargar el cliente', 'error');
-        if(nombre.value === '') return await sweet.fire('El campo nombre es obligatorio', 'No se pudo cargar el cliente', 'error');
+agregar.addEventListener('click', async (e) => {
+  if (tipoCuenta.value === '') return await sweet.fire('El campo tipo de cuenta es obligatorio', 'No se pudo cargar el cliente', 'error');
+  if (nombre.value === '') return await sweet.fire('El campo nombre es obligatorio', 'No se pudo cargar el cliente', 'error');
 
-    const cliente = {};
-    cliente._id = codigo.value;
-    cliente.nombre = nombre.value.trim().toUpperCase();
-    cliente.cuit = cuit.value;
-    cliente.localidad = localidad.value.trim().toUpperCase();
-    cliente.telefono = telefono.value.trim();
-    cliente.direccion = direccion.value.trim().toUpperCase();
-    cliente.condicionIva = condicionIva.value;
-    cliente.condicionFacturacion = condicionFacturacion.value;
-    cliente.tipoCuenta = tipoCuenta.value;
-    cliente.observaciones = observaciones.value.trim().toUpperCase();
-    cliente.vendedor = vendedor;
-    console.log(vendedor);
+  const cliente = {};
+  cliente._id = codigo.value;
+  cliente.nombre = nombre.value.trim().toUpperCase();
+  cliente.cuit = cuit.value;
+  cliente.localidad = localidad.value.trim().toUpperCase();
+  cliente.telefono = telefono.value.trim();
+  cliente.direccion = direccion.value.trim().toUpperCase();
+  cliente.condicionIva = condicionIva.value;
+  cliente.condicionFacturacion = condicionFacturacion.value;
+  cliente.tipoCuenta = tipoCuenta.value;
+  cliente.observaciones = observaciones.value.trim().toUpperCase();
+  cliente.vendedor = vendedor;
+  console.log(vendedor);
 
-    try {
-        const {data} = (await axios.post(`${URL}clientes`, cliente));
+  try {
+    const { data } = await axios.post(`${URL}clientes`, cliente);
 
-        if(data.ok){
-            await sweet.fire(`Cliente ${data.cliente.nombre} Agregado`, 'Cliente agregado correctamente', 'success');
-            await ipcRenderer.send('informacion-a-ventana-principal',cliente);
-            window.close();
-        }else{
-            await sweet.fire('No se pudo cargar el cliente', data?.msg, 'error');
-        };
-    } catch (error) {
-        console.log(error);
-        await sweet.fire('No se pudo cargar el cliente', error.response?.data?.msg, 'error');
+    if (data.ok) {
+      await sweet.fire(`Cliente ${data.cliente.nombre} Agregado`, 'Cliente agregado correctamente', 'success');
+      await ipcRenderer.send('informacion-a-ventana-principal', cliente);
+      window.close();
+    } else {
+      await sweet.fire('No se pudo cargar el cliente', data?.msg, 'error');
     }
+  } catch (error) {
+    console.log(error);
+    await sweet.fire('No se pudo cargar el cliente', error.response?.data?.msg, 'error');
+  }
 });
 
-nombre.addEventListener('keypress',e=>{
-    apretarEnter(e,cuit);
+nombre.addEventListener('keypress', (e) => {
+  apretarEnter(e, cuit);
 });
 
-cuit.addEventListener('blur',async e=>{
-    if (cuit.value.length === 11) {
-        if (!validarCuit(cuit.value)) {
-            await sweet.fire({
-                title:"El cuit no es correcto"
-            });
-            cuit.value = "";
-            cuit.focus();
-        }
+cuit.addEventListener('blur', async (e) => {
+  if (cuit.value.length === 11) {
+    if (!validarCuit(cuit.value)) {
+      await sweet.fire({
+        title: 'El cuit no es correcto',
+      });
+      cuit.value = '';
+      cuit.focus();
     }
+  }
 });
 
-cuit.addEventListener('keypress',e=>{
-    apretarEnter(e,localidad);
+cuit.addEventListener('keypress', (e) => {
+  apretarEnter(e, localidad);
 });
 
-localidad.addEventListener('keypress',e=>{
-    apretarEnter(e,telefono);
+localidad.addEventListener('keypress', (e) => {
+  apretarEnter(e, telefono);
 });
 
-telefono.addEventListener('keypress',e=>{
-    apretarEnter(e,direccion);
+telefono.addEventListener('keypress', (e) => {
+  apretarEnter(e, direccion);
 });
 
-direccion.addEventListener('keypress',e=>{
-    apretarEnter(e,condicionFacturacion);
+direccion.addEventListener('keypress', (e) => {
+  apretarEnter(e, condicionFacturacion);
 });
 
-condicionFacturacion.addEventListener('keypress',e=>{
-    e.preventDefault();
-    apretarEnter(e,condicionIva);
+condicionFacturacion.addEventListener('keypress', (e) => {
+  e.preventDefault();
+  apretarEnter(e, condicionIva);
 });
 
-condicionIva.addEventListener('keypress',e=>{
-    e.preventDefault();
-    apretarEnter(e,tipoCuenta);
+condicionIva.addEventListener('keypress', (e) => {
+  e.preventDefault();
+  apretarEnter(e, tipoCuenta);
 });
 
-tipoCuenta.addEventListener('keypress',e=>{
-    e.preventDefault();
-    apretarEnter(e,observaciones);
+tipoCuenta.addEventListener('keypress', (e) => {
+  e.preventDefault();
+  apretarEnter(e, observaciones);
 });
 
-observaciones.addEventListener('keypress',e=>{
-    apretarEnter(e,agregar);
+observaciones.addEventListener('keypress', (e) => {
+  apretarEnter(e, agregar);
 });
 
-document.addEventListener('keydown',e=>{
-    cerrarVentana(e)
+document.addEventListener('keydown', (e) => {
+  cerrarVentana(e);
 });
 
-salir.addEventListener('click',e=>{
-    window.close();
+salir.addEventListener('click', (e) => {
+  window.close();
 });

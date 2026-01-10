@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
@@ -12,28 +11,27 @@ const next = document.getElementById('next');
 
 let arreglo = [];
 
-
-window.addEventListener('load', async() => {
-    arreglo = (await axios.get(`${URL}cuenta`)).data;
-    ponerPrimerCuenta(arreglo);
+window.addEventListener('load', async () => {
+  arreglo = (await axios.get(`${URL}cuenta`)).data;
+  ponerPrimerCuenta(arreglo);
 });
 
 prev.addEventListener('click', () => {
-    antCuenta();
+  antCuenta();
 });
 
 next.addEventListener('click', () => {
-    sigCuenta();
+  sigCuenta();
 });
 
-agregar.addEventListener('click', async() => {
-    const sweet = require('sweetalert2');
+agregar.addEventListener('click', async () => {
+  const sweet = require('sweetalert2');
 
-    const {isConfirmed} = await sweet.fire({
-        title: 'Nueva Cuenta',
-        confirmButtonText: 'Crear Cuenta',
-        showCancelButton: true,
-        html: `
+  const { isConfirmed } = await sweet.fire({
+    title: 'Nueva Cuenta',
+    confirmButtonText: 'Crear Cuenta',
+    showCancelButton: true,
+    html: `
             <section class="agregarCuenta">
                 <div>
                     <label htmlFor="cuenta">Cuenta</label>
@@ -51,68 +49,65 @@ agregar.addEventListener('click', async() => {
                     </select>
                 </div>
             </section>
-        `
-    });
+        `,
+  });
 
-    if (isConfirmed) {
-        const cuenta = {};
+  if (isConfirmed) {
+    const cuenta = {};
 
-        cuenta.cuenta = document.getElementById('cuenta').value.toUpperCase().trim();
-        cuenta.idCuenta = document.getElementById('codigo').value.toUpperCase().trim();
-        cuenta.tipo = document.getElementById('tipo').value.toUpperCase();
+    cuenta.cuenta = document.getElementById('cuenta').value.toUpperCase().trim();
+    cuenta.idCuenta = document.getElementById('codigo').value.toUpperCase().trim();
+    cuenta.tipo = document.getElementById('tipo').value.toUpperCase();
 
-        await axios.post(`${URL}cuenta`,cuenta);
+    await axios.post(`${URL}cuenta`, cuenta);
 
-        arreglo.push(cuenta);
-    };
-
+    arreglo.push(cuenta);
+  }
 });
 
-borrar.addEventListener('click', async() => {
-    const sweet = require('sweetalert2');
-    
-    const {isConfirmed} = await sweet.fire({
-        title:"Seguro quiere eliminar la cuenta ",
-        confirmButtonText: 'Aceptar',
-        showCancelButton: true
-    });
+borrar.addEventListener('click', async () => {
+  const sweet = require('sweetalert2');
 
-    if (isConfirmed) {
-        await axios.delete(`${URL}cuenta/idCuenta/${cuentas.id}`);
-        const aux = arreglo.findIndex( elem => elem.idCuenta === cuentas.id);
-        arreglo = arreglo.filter(elem => elem.idCuenta !== cuentas.id);
-        if (arreglo[ aux + 1]) {
-            sigCuenta();   
-        }else{
-            antCuenta();
-        }
+  const { isConfirmed } = await sweet.fire({
+    title: 'Seguro quiere eliminar la cuenta ',
+    confirmButtonText: 'Aceptar',
+    showCancelButton: true,
+  });
+
+  if (isConfirmed) {
+    await axios.delete(`${URL}cuenta/idCuenta/${cuentas.id}`);
+    const aux = arreglo.findIndex((elem) => elem.idCuenta === cuentas.id);
+    arreglo = arreglo.filter((elem) => elem.idCuenta !== cuentas.id);
+    if (arreglo[aux + 1]) {
+      sigCuenta();
+    } else {
+      antCuenta();
     }
-
+  }
 });
 
 const ponerPrimerCuenta = (lista) => {
-    if(lista.length === 0) return;
-    cuentas.value = lista[0].cuenta + ' - ' + lista[0].idCuenta;
-    cuentas.id = lista[0].idCuenta;
+  if (lista.length === 0) return;
+  cuentas.value = lista[0].cuenta + ' - ' + lista[0].idCuenta;
+  cuentas.id = lista[0].idCuenta;
 };
 
 const sigCuenta = () => {
-    const aux = cuentas.value.split('-', 2)[0].trim();
-    const i = arreglo.findIndex( elem => elem.cuenta === aux);
-    cuentas.value = arreglo[i + 1] ? arreglo[i + 1].cuenta + ' - ' + arreglo[i + 1].idCuenta : cuentas.value;
-    cuentas.id = arreglo[i + 1] ? arreglo[i + 1].idCuenta : cuentas.id;
+  const aux = cuentas.value.split('-', 2)[0].trim();
+  const i = arreglo.findIndex((elem) => elem.cuenta === aux);
+  cuentas.value = arreglo[i + 1] ? arreglo[i + 1].cuenta + ' - ' + arreglo[i + 1].idCuenta : cuentas.value;
+  cuentas.id = arreglo[i + 1] ? arreglo[i + 1].idCuenta : cuentas.id;
 };
 
 const antCuenta = () => {
-    const aux = cuentas.value.split('-', 2)[0].trim();
-    const i = arreglo.findIndex( elem => elem.cuenta === aux);
-    cuentas.value = arreglo[i - 1] ? arreglo[i - 1].cuenta + ' - ' + arreglo[i - 1].idCuenta : cuentas.value;
-    cuentas.id = arreglo[i - 1] ? arreglo[i - 1].idCuenta : cuentas.id;
+  const aux = cuentas.value.split('-', 2)[0].trim();
+  const i = arreglo.findIndex((elem) => elem.cuenta === aux);
+  cuentas.value = arreglo[i - 1] ? arreglo[i - 1].cuenta + ' - ' + arreglo[i - 1].idCuenta : cuentas.value;
+  cuentas.id = arreglo[i - 1] ? arreglo[i - 1].idCuenta : cuentas.id;
 };
 
-
-document.addEventListener('keydown', e => {
-    if(e.key === 'Escape'){
-        window.close();
-    }
-})
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    window.close();
+  }
+});
