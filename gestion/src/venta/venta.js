@@ -230,7 +230,18 @@ const crearHTML = async (elem) => {
 
   tbody.appendChild(tr);
 
-  const producto = await obtenerProducto(elem.codProd);
+  let producto = await obtenerProducto(elem.codProd);
+
+  if (!producto) {
+    producto = {
+      _id: elem.codProd,
+      descripcion: elem.producto,
+      precio: elem.precio,
+      marca: elem.marca,
+      impuesto: elem.iva,
+    };
+  }
+  console.log(producto);
   listaProductos.push({
     cantidad: elem.cantidad,
     producto,
@@ -485,7 +496,8 @@ const obtenerProducto = async (id) => {
       return await sweet.fire('No se pudo obtener el producto', '', 'error');
     }
   } catch (error) {
-    return await sweet.fire('No se pudo obtener el producto', error.response.data.msg, 'error');
+    //await sweet.fire('No se pudo obtener el producto', error.response.data.msg, 'error');
+    return null;
   }
 };
 
@@ -674,6 +686,7 @@ facturar.addEventListener('click', async (e) => {
     venta.num_doc = cuit.value !== '' ? cuit.value : '00000000';
     venta.cod_doc = await verCodigoDocumento(cuit.value);
     venta.condicionIva = condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value;
+    console.log(listaProductos);
 
     const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, venta.condicion); //sacamos el iva de los productos
     venta.iva21 = iva21;
@@ -700,7 +713,7 @@ facturar.addEventListener('click', async (e) => {
       cliente.condicionIva = condicionIva.value;
       cliente.direccion = direccion.value;
       cliente._id = codigo.value;
-
+      console.log(venta);
       if (venta.tipo_venta === 'PP') {
         const { data } = await axios.post(`${URL}Presupuesto`, venta);
         ventaTraida = data.venta;
@@ -713,14 +726,9 @@ facturar.addEventListener('click', async (e) => {
         ventaTraida = data.venta;
         movimientos.push(...data.movimientos);
       } else {
-        try {
-          const { data } = await axios.post(`${URL}ventas`, venta);
-          ventaTraida = data.venta;
-          movimientos.push(...data.movimientos);
-        } catch (error) {
-          console.log(error);
-          return await sweet.fire('No se pudo generar la venta', error?.response?.data?.msg, 'error');
-        }
+        const { data } = await axios.post(`${URL}ventas`, venta);
+        ventaTraida = data.venta;
+        movimientos.push(...data.movimientos);
       }
 
       //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado

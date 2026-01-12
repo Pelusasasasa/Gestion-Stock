@@ -91,6 +91,7 @@ funciones.tablaCondicionIVAReceptorId = (condicion) => {
 };
 
 funciones.cargarFactura = async (venta, notaCredito) => {
+  console.log(venta);
   const fecha = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
   const { AppServer, AuthServer, DbServer } = await afip.ElectronicBilling.getServerStatus();
   console.log('Estado del servidor');

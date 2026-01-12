@@ -201,8 +201,16 @@ caja.addEventListener('click', async (e) => {
   }
 });
 
-consulta.addEventListener('click', (e) => {
-  location.href = './consultarCuenta/consultarCuenta.html';
+consulta.addEventListener('click', async (e) => {
+  const vendedor = await verificarUsuarios();
+  if (vendedor) {
+    location.href = `./consultarCuenta/consultarCuenta.html?vendedor=${vendedor.nombre}`;
+  } else {
+    await sweet.fire({
+      title: 'Contraseña incorrecta',
+    });
+    consulta.click();
+  }
 });
 
 recibo.addEventListener('click', async (e) => {
