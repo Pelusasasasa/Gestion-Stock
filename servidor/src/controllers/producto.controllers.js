@@ -1,345 +1,383 @@
 const productoCTRL = {};
 
-const Producto = require('../models/producto');
-const Numero = require('../models/Numero');
-const { default: mongoose } = require('mongoose');
-const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
-const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
-
+const Producto = require("../models/producto");
+const Numero = require("../models/Numero");
+const { default: mongoose } = require("mongoose");
+const {
+  crearMovimientoVendedores,
+} = require("../helpers/crearMovimientoVendedores");
+const { crearNumeroSeries } = require("../helpers/crearNumeroSeries");
 
 productoCTRL.descontarStock = async (req, res) => {
-    const { id } = req.params;
-    const { stock, tipo, descripcion, vendedor, series } = req.body
-    try {
-        const producto = await Producto.findByIdAndUpdate(id, { stock }, {new: true});
+  const { id } = req.params;
+  console.log(id);
+  const { stock, tipo, descripcion, vendedor, series } = req.body;
+  try {
+    const producto = await Producto.findByIdAndUpdate(
+      id,
+      { stock },
+      { new: true }
+    );
 
-        const movimientoVendedor = await crearMovimientoVendedores(tipo === 'resta' ? `Resto el stock a ${stock} del producto ${descripcion}}` : `Sumo el stock a ${stock} del producto ${descripcion}`, vendedor);
-        
-        if(!movimientoVendedor) return res.status(404).json({
-            ok: false,
-            msg: 'Error al crear el movimiento del vendedor'
-        });
+    const movimientoVendedor = await crearMovimientoVendedores(
+      tipo === "resta"
+        ? `Resto el stock a ${stock} del producto ${descripcion}}`
+        : `Sumo el stock a ${stock} del producto ${descripcion}`,
+      vendedor
+    );
 
+    if (!movimientoVendedor)
+      return res.status(404).json({
+        ok: false,
+        msg: "Error al crear el movimiento del vendedor",
+      });
 
-        const movimientoSeries = await crearNumeroSeries(series);
-        console.log(movimientoSeries)
+    const movimientoSeries = await crearNumeroSeries(series);
+    console.log(movimientoSeries);
 
-        if(!movimientoSeries) return res.status(404).json({
-            ok: false,
-            msg: 'Error al crear el numero de serie'
-        });
+    if (!movimientoSeries)
+      return res.status(404).json({
+        ok: false,
+        msg: "Error al crear el numero de serie",
+      });
 
-        res.status(200).json({
-            ok: true,
-            producto
-        });
-
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            ok: false,
-            msg: 'Error al descontrar stock, hable con el administrador'
-        });
-    }
+    res.status(200).json({
+      ok: true,
+      producto,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al descontrar stock, hable con el administrador",
+    });
+  }
 };
 
 productoCTRL.getsProductos = async (req, res) => {
-    const { descripcion, condicion } = req.params;
-    
-    let productos;
-    if (descripcion === "textoVacio") {
-        productos = await Producto.find({}).limit(50);
-    } else if(condicion === '_id'){
-        const re = new RegExp(`^${descripcion}`);
-        productos = await Producto.find({
-            $or: [
-                {_id: {$regex: re, $options: 'i'}},
-                {codigoSecundario: {$regex: re, $options: 'i'}}
-            ]
-        });
-    } else {
-        let re;
-        try {
-            if (descripcion[0] === "*") {
-                re = new RegExp(`${descripcion.substr(1)}`);
-            } else {
-                re = new RegExp(`^${descripcion}`);
-            }
-            productos = await Producto.find({ [condicion]: { $regex: re, $options: "i" } }).limit(50);
-        } catch (error) {
-            re = descripcion;
-            productos = await Producto.find().limit(50);
-        }
+  const { descripcion, condicion } = req.params;
+
+  let productos;
+  if (descripcion === "textoVacio") {
+    productos = await Producto.find({}).limit(50);
+  } else if (condicion === "_id") {
+    const re = new RegExp(`^${descripcion}`);
+    productos = await Producto.find({
+      $or: [
+        { _id: { $regex: re, $options: "i" } },
+        { codigoSecundario: { $regex: re, $options: "i" } },
+      ],
+    });
+  } else {
+    let re;
+    try {
+      if (descripcion[0] === "*") {
+        re = new RegExp(`${descripcion.substr(1)}`);
+      } else {
+        re = new RegExp(`^${descripcion}`);
+      }
+      productos = await Producto.find({
+        [condicion]: { $regex: re, $options: "i" },
+      }).limit(50);
+    } catch (error) {
+      re = descripcion;
+      productos = await Producto.find().limit(50);
     }
-    res.send(productos);
+  }
+  res.send(productos);
 };
 
 productoCTRL.traerPrecio = async (req, res) => {
-    const { id } = req.params
-    const producto = (await Producto.find({ _id: id }, { precio: 1, _id: 0 }))[0];
-    res.send(`${producto.precio}`);
+  const { id } = req.params;
+  const producto = (await Producto.find({ _id: id }, { precio: 1, _id: 0 }))[0];
+  res.send(`${producto.precio}`);
 };
 
 productoCTRL.traerProducto = async (req, res) => {
-    const { id } = req.params;
-    let producto = [];
-    if (id === "rubro") {
-        rubros = await Producto.find({}, { rubro: 1, _id: 0 });
-        rubros.forEach(rubro => {
-            producto.push(rubro.rubro);
-        });
-    } else {
-        producto = (await Producto.findOne({ _id: id }));
-    }
-    res.send(producto);
+  const { id } = req.params;
+  let producto = [];
+  if (id === "rubro") {
+    rubros = await Producto.find({}, { rubro: 1, _id: 0 });
+    rubros.forEach((rubro) => {
+      producto.push(rubro.rubro);
+    });
+  } else {
+    producto = await Producto.findOne({ _id: id });
+  }
+  res.send(producto);
 };
 
 productoCTRL.traerProductoPorNombre = async (req, res) => {
-    const { nombre } = req.params;
-    const producto = await Producto.findOne({ descripcion: nombre });
-    res.send(producto);
+  const { nombre } = req.params;
+  const producto = await Producto.findOne({ descripcion: nombre });
+  res.send(producto);
 };
 
 productoCTRL.modificarProducto = async (req, res) => {
-    const { id } = req.params;
-    let producto;
-    let mensaje;
-    let estado;
+  const { id } = req.params;
+  let producto;
+  let mensaje;
+  let estado;
 
-    const now = new Date();
-    req.body.ultimaModificacion = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-    try {
-        producto = await Producto.findOneAndUpdate({ _id: id }, req.body);
-        mensaje = `Producto ${producto.descripcion} Modificado`;
-        estado = true
-    } catch (error) {
-        mensaje = `Producto ${producto.descripcion} No se modifico`
-        estado = false
-    }
-    res.send(JSON.stringify({
-        estado,
-        mensaje
-    }));
-
+  const now = new Date();
+  req.body.ultimaModificacion = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  ).toISOString();
+  try {
+    producto = await Producto.findOneAndUpdate({ _id: id }, req.body);
+    mensaje = `Producto ${producto.descripcion} Modificado`;
+    estado = true;
+  } catch (error) {
+    mensaje = `Producto ${producto.descripcion} No se modifico`;
+    estado = false;
+  }
+  res.send(
+    JSON.stringify({
+      estado,
+      mensaje,
+    })
+  );
 };
 
-productoCTRL.updateProducto = async(req, res) => {
+productoCTRL.updateProducto = async (req, res) => {
+  const { codigo } = req.params;
 
-    const { codigo } = req.params;
+  try {
+    const productUpdate = await Producto.findOneAndUpdate(
+      { _id: codigo },
+      req.body,
+      { new: true }
+    );
 
-    try {
-        const productUpdate = await Producto.findOneAndUpdate({_id: codigo}, req.body, { new: true });
-
-        if(!productUpdate) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'Producto no encontrado'
-            });
-        };
-
-        res.status(200).json({
-            ok: true,
-            productUpdate
-        })
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'No se puedo modificar el producto',
-            error
-        })
+    if (!productUpdate) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Producto no encontrado",
+      });
     }
+
+    res.status(200).json({
+      ok: true,
+      productUpdate,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "No se puedo modificar el producto",
+      error,
+    });
+  }
 };
 
 productoCTRL.cargarProducto = async (req, res) => {
-    let producto;
-    let mensaje;
-    let estado;
+  let producto;
+  let mensaje;
+  let estado;
 
-    try {
-        producto = new Producto(req.body);
-        await producto.save();
-        mensaje = `Producto ${producto.descripcion} cargado`;
-        estado = true;
-    } catch (error) {
-        console.error(error)
-    };
+  try {
+    producto = new Producto(req.body);
+    await producto.save();
+    mensaje = `Producto ${producto.descripcion} cargado`;
+    estado = true;
+  } catch (error) {
+    console.error(error);
+  }
 
-    console.log(mensaje);
+  console.log(mensaje);
 
-    res.send(JSON.stringify({
-        mensaje,
-        estado
-    }));
+  res.send(
+    JSON.stringify({
+      mensaje,
+      estado,
+    })
+  );
 };
 
 productoCTRL.eliminarProducto = async (req, res) => {
-    const { id } = req.params;
-    const producto = await Producto.findOneAndDelete({ _id: id });
-    res.send(`Producto ${producto.descripcion} eliminado`);
+  const { id } = req.params;
+  const producto = await Producto.findOneAndDelete({ _id: id });
+  res.send(`Producto ${producto.descripcion} eliminado`);
 };
 
 productoCTRL.traerMarcas = async (req, res) => {
-    const productos = await Producto.find({}, { _id: 0, marca: 1 });
-    let marcas = [];
-    productos.filter(ele => {
-        if (!marcas.includes(ele.marca)) {
-            marcas.push(ele.marca);
-        }
-    })
-    res.send(marcas);
+  const productos = await Producto.find({}, { _id: 0, marca: 1 });
+  let marcas = [];
+  productos.filter((ele) => {
+    if (!marcas.includes(ele.marca)) {
+      marcas.push(ele.marca);
+    }
+  });
+  res.send(marcas);
 };
 
 productoCTRL.putMarcas = async (req, res) => {
-    const { porcentaje, marca } = req.body;
-    const productos = await Producto.find({ marca: marca });
-    for await (let producto of productos) {
-        producto.costo = (producto.costo + producto.costo * porcentaje / 100).toFixed(2);
-        const impuesto = producto.costo + producto.costo * producto.impuesto / 100;
-        const ganancia = impuesto * producto.ganancia / 100;
-        producto.precio = (impuesto + ganancia).toFixed(2);
-        await Producto.findOneAndUpdate({ _id: producto._id }, producto);
-    }
-    res.send(JSON.stringify({
-        mensaje: "Producto Modificados",
-        estado: true
-    }))
+  const { porcentaje, marca } = req.body;
+  const productos = await Producto.find({ marca: marca });
+  for await (let producto of productos) {
+    producto.costo = (
+      producto.costo +
+      (producto.costo * porcentaje) / 100
+    ).toFixed(2);
+    const impuesto =
+      producto.costo + (producto.costo * producto.impuesto) / 100;
+    const ganancia = (impuesto * producto.ganancia) / 100;
+    producto.precio = (impuesto + ganancia).toFixed(2);
+    await Producto.findOneAndUpdate({ _id: producto._id }, producto);
+  }
+  res.send(
+    JSON.stringify({
+      mensaje: "Producto Modificados",
+      estado: true,
+    })
+  );
 };
 
 productoCTRL.cambioPreciosPorDolar = async (req, res) => {
-    const { dolar } = req.params;
-    const productos = await Producto.find({ costoDolar: { $ne: 0 } });
+  const { dolar } = req.params;
+  const productos = await Producto.find({ costoDolar: { $ne: 0 } });
 
-    for (let producto of productos) {
-        const costoIva = parseFloat((producto.costoDolar + (producto.costoDolar * producto.impuesto / 100)) * parseFloat(dolar).toFixed(2))
-        producto.precio = (costoIva * producto.ganancia / 100 + costoIva).toFixed(2);
-        await Producto.findOneAndUpdate({ _id: producto._id }, producto);
-    }
-    console.log("Cambios el precio de los productos con dolares");
-    res.end();
+  for (let producto of productos) {
+    const costoIva = parseFloat(
+      (producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) *
+        parseFloat(dolar).toFixed(2)
+    );
+    producto.precio = ((costoIva * producto.ganancia) / 100 + costoIva).toFixed(
+      2
+    );
+    await Producto.findOneAndUpdate({ _id: producto._id }, producto);
+  }
+  console.log("Cambios el precio de los productos con dolares");
+  res.end();
 };
 
 productoCTRL.productosPorMarcas = async (req, res) => {
-    let { lista } = req.params;
-    lista = JSON.parse(lista);
-    let arreglo = [];
-    for await (let marca of lista) {
-        const productos = await Producto.find({ marca: marca });
-        arreglo.push(...productos);
-    };
-    res.send(arreglo)
+  let { lista } = req.params;
+  lista = JSON.parse(lista);
+  let arreglo = [];
+  for await (let marca of lista) {
+    const productos = await Producto.find({ marca: marca });
+    arreglo.push(...productos);
+  }
+  res.send(arreglo);
 };
 
 productoCTRL.traerProvedores = async (req, res) => {
-    let provedores = [];
-    const productos = await Producto.find({}, { _id: 1, provedor: 1 });
-    productos.forEach(producto => {
-        if (!provedores.includes(producto.provedor)) {
-            provedores.push(producto);
-        }
-    });
-    res.send(JSON.stringify(provedores));
+  let provedores = [];
+  const productos = await Producto.find({}, { _id: 1, provedor: 1 });
+  productos.forEach((producto) => {
+    if (!provedores.includes(producto.provedor)) {
+      provedores.push(producto);
+    }
+  });
+  res.send(JSON.stringify(provedores));
 };
 
 productoCTRL.putForProvedor = async (req, res) => {
-    const { provedor, porcentaje } = req.body;
-    const productos = await Producto.find({ provedor: provedor });
+  const { provedor, porcentaje } = req.body;
+  const productos = await Producto.find({ provedor: provedor });
 
-    productos.forEach(async producto => {
-        producto.costo = producto.costo + (producto.costo * porcentaje / 100);
-        const costoMasIva = parseFloat((producto.costo + (producto.costo * producto.impuesto / 100)).toFixed(2));
-        producto.precio = (costoMasIva + (costoMasIva * producto.ganancia / 100)).toFixed(2)
-        await Producto.findOneAndUpdate({ _id: producto._id }, producto);
-    });
-    console.log(`Productos de provedor ${provedor} Modificados`);
-    res.send("Productos modificados");
+  productos.forEach(async (producto) => {
+    producto.costo = producto.costo + (producto.costo * porcentaje) / 100;
+    const costoMasIva = parseFloat(
+      (producto.costo + (producto.costo * producto.impuesto) / 100).toFixed(2)
+    );
+    producto.precio = (
+      costoMasIva +
+      (costoMasIva * producto.ganancia) / 100
+    ).toFixed(2);
+    await Producto.findOneAndUpdate({ _id: producto._id }, producto);
+  });
+  console.log(`Productos de provedor ${provedor} Modificados`);
+  res.send("Productos modificados");
 };
 
-productoCTRL.traerCosto = async (req, res) => {
-    const { id } = req.params;
-    const producto = await Producto.findOne({ _id: id });
-    if (producto.costo !== 0) {
-        res.send(`${producto.costo}`);
-    } else {
-        const dolar = (await Numero.findOne()).Dolar;
-        res.send(`${producto.costoDolar * dolar}`);
-    }
+productoCTRL.traerCostoImpuesto = async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  const producto = await Producto.findOne({ _id: id });
+
+  if (producto.costo !== 0) {
+    res.status(200).json({
+      ok: true,
+      costo: producto.costo,
+      impuesto: producto.impuesto,
+    });
+  } else {
+    const dolar = (await Numero.findOne()).Dolar;
+    res.status(200).json({
+      ok: true,
+      costo: producto.costoDolar * dolar,
+      impuesto: producto.impuesto,
+    });
+  }
 };
 
 productoCTRL.traerImpuesto = async (req, res) => {
-    const { id } = req.params;
-    const producto = await Producto.findOne({ _id: id });
+  const { id } = req.params;
+  const producto = await Producto.findOne({ _id: id });
 
-    res.send(`${producto.impuesto}`);
+  res.send(`${producto.impuesto}`);
 };
 
 productoCTRL.traerModificados = async (req, res) => {
-    const { fecha } = req.params;
-    const desde = new Date(fecha + 'T00:00:00.000Z');
-    const hasta = new Date(fecha + 'T23:59:59.000Z');
-    const productos = await Producto.find({
-        $and:
-            [
-                { ultimaModificacion: { $gte: desde } },
-                { ultimaModificacion: { $lte: hasta } }
-            ]
-    });
-    res.send(productos);
+  const { fecha } = req.params;
+  const desde = new Date(fecha + "T00:00:00.000Z");
+  const hasta = new Date(fecha + "T23:59:59.000Z");
+  const productos = await Producto.find({
+    $and: [
+      { ultimaModificacion: { $gte: desde } },
+      { ultimaModificacion: { $lte: hasta } },
+    ],
+  });
+  res.send(productos);
 };
 
 productoCTRL.getProductosPorMarca = async (req, res) => {
+  const { marca } = req.params;
 
-    const { marca } = req.params;
-
-    try {
-
-        const productos = await Producto.find({ marca: marca });
-        res.json({
-            ok: true,
-            productos
-        });
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            ok: false,
-            msg: 'Hablar con el administrador'
-        })
-    }
-
-
+  try {
+    const productos = await Producto.find({ marca: marca });
+    res.json({
+      ok: true,
+      productos,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Hablar con el administrador",
+    });
+  }
 };
 
 //Modificamos Varios Productos
 productoCTRL.modificarVarios = async (req, res) => {
-    const productos = req.body;
+  const productos = req.body;
 
-    try {
-        //Creamos un array de operaciones de actualizaion
-        const operaciones = productos.map((producto) => ({
-            updateOne: {
-                filter: { _id: producto._id },
-                update: { $set: producto }
-            }
-        }))
+  try {
+    //Creamos un array de operaciones de actualizaion
+    const operaciones = productos.map((producto) => ({
+      updateOne: {
+        filter: { _id: producto._id },
+        update: { $set: producto },
+      },
+    }));
 
-        const resultados = await Producto.bulkWrite(operaciones)
+    const resultados = await Producto.bulkWrite(operaciones);
 
-        res.status(200).json({
-            ok: true,
-            msg: 'Productos Modificados con exito',
-            resultados
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Hable con el administrador'
-        })
-    }
+    res.status(200).json({
+      ok: true,
+      msg: "Productos Modificados con exito",
+      resultados,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Hable con el administrador",
+    });
+  }
 };
 
-module.exports = productoCTRL
+module.exports = productoCTRL;
