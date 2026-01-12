@@ -20,6 +20,7 @@ const {
 } = require('../helpers');
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
+const { getClienteById, putCliente } = require('../services/clientesService');
 
 const URL = process.env.GESTIONURL;
 
@@ -94,20 +95,13 @@ const arreglarSaldo = async (id) => {
     saldoADescontar += compensada.importe;
   }
 
-  try {
-    const { data } = await axios.get(`${URL}clientes/id/${id}`);
-    if (data.ok) {
-      cliente = data.cliente;
-    } else {
-      return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
-  }
+  cliente = await getClienteById(id);
+
+  if (!cliente) return await Swal.fire('No se pudo obtener el cliente', 'error');
+
   cliente.saldo = (cliente.saldo - saldoADescontar).toFixed(2);
 
-  await axios.put(`${URL}clientes/id/${id}`, cliente);
+  await putCliente(id, cliente, vendedor);
 };
 
 const calcularTotal = async () => {
@@ -313,18 +307,9 @@ const eliminarCuentas = async () => {
 //Lo que hacemos es listar el cliente traido
 const listarCliente = async (id) => {
   codigo.value = id;
-  let cliente = {};
-  try {
-    const { data } = await axios.get(`${URL}clientes/id/${id}`);
-    if (data.ok) {
-      cliente = data.cliente;
-    } else {
-      return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
-  }
+  let cliente = await getClienteById(id);
+
+  if (!cliente) return await Swal.fire('No se pudo obtener el cliente', 'error');
 
   if (cliente !== '') {
     nombre.value = cliente.nombre;

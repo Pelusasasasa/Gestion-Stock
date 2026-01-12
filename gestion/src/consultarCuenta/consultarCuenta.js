@@ -18,7 +18,7 @@ const { getClienteById, putCliente } = require('../services/clientesService');
 const { getPrecio, getCostoImpuesto } = require('../services/productosService');
 const { putMovimientos, getMovimientoForNumberAndType } = require('../services/movProductosService');
 const { listarVentas, listarProductos } = require('../ui/consultar');
-const { getVentaForNumberAndType, putVentaForNumeroAndType } = require('../services/ventaService');
+const { getVentaForNumberAndType, putVentaForNumeroAndType } = require('../services/ventasService');
 
 require('dotenv').config();
 const URL = process.env.GESTIONURL;

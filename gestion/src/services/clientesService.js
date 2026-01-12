@@ -14,15 +14,32 @@ const getClienteById = async (id) => {
 const putCliente = async (id, cliente, vendedor) => {
   try {
     const { data } = await axios.put(`${URL}clientes/id/${id}`, { ...cliente, vendedor });
+    console.log(data);
     if (!data.ok) return await sweet.fire('Error al modificar el cliente', data.msg, 'error');
-    return data.cliente;
+    return { cliente: data.cliente };
   } catch (error) {
     console.log(error);
     return await sweet.fire('Error al modificar el cliente', `${error?.response?.data?.msg}`, 'error');
   }
 };
+
+const deleteCliente = async (id, vendedor) => {
+  try {
+    const { data } = await axios.delete(`${URL}clientes/id/${id}`, {
+      params: { vendedor },
+    });
+    if (!data.ok) return await sweet.fire('Error al eliminar el cliente', data.msg, 'error');
+    return data.ok;
+  } catch (error) {
+    console.log(error);
+    return await sweet.fire('Error al eliminar el cliente', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
 module.exports = {
   getClienteById,
 
   putCliente,
+
+  deleteCliente,
 };

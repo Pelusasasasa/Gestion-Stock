@@ -3,6 +3,7 @@ const sweet = require('sweetalert2');
 
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
+const { getClienteById } = require('../services/clientesService');
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
@@ -40,21 +41,10 @@ window.addEventListener('DOMContentLoaded', async (e) => {
 });
 
 codigo.addEventListener('keyup', async (e) => {
-  console.log(e.keyCode);
   if (e.keyCode === 13 && codigo.value !== '') {
     cliente = {};
 
-    try {
-      const { data } = await axios.get(`${URL}clientes/id/${codigo.value}`);
-      if (data.ok) {
-        cliente = data.cliente;
-      } else {
-        await sweet.fire('Error al obtener cliente', data.msg, 'error');
-      }
-    } catch (error) {
-      console.log(error);
-      await sweet.fire('Error al obtener cliente', error.response?.data?.msg, 'error');
-    }
+    cliente = await getClienteById(codigo.value);
     if (cliente) {
       listarCliente(cliente);
       saldoNuevo.focus();
@@ -72,9 +62,9 @@ modificar.addEventListener('click', async (e) => {
   try {
     cliente.saldo = saldoNuevo.value;
     cliente.vendedor = vendedor;
-    const { data } = await axios.put(`${URL}clientes/id/${cliente._id}`, cliente);
+    const data = await putCliente(cliente._id, cliente, vendedor);
 
-    if (data.ok) {
+    if (data) {
       ipcRenderer.send('arreglarSaldo', JSON.stringify(cliente));
       window.close();
     } else {

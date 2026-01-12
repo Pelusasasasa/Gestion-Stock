@@ -4,6 +4,7 @@ const URL = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
 const { default: Swal } = require('sweetalert2');
+const { getClienteById } = require('../services/clientesService');
 
 const tbody = document.getElementById('tbody');
 const nombre = document.getElementById('nombre');
@@ -20,16 +21,10 @@ ipcRenderer.on('imprimir-resumen', async (e, info) => {
 
 async function datosCliente(idCliente) {
   let cliente = {};
-  try {
-    const { data } = await axios.get(`${URL}clientes/id/${idCliente}`);
-    if (data.ok) {
-      cliente = data.cliente;
-    } else {
-      return await Swal.fire('Error al obtener el cliente', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await Swal.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+  cliente = await getClienteById(idCliente);
+
+  if (!cliente) {
+    return await Swal.fire('Error al obtener el cliente', 'No se pudo cargar el cliente', 'error');
   }
 
   nombre.innerText = cliente.nombre;

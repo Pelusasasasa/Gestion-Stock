@@ -17,6 +17,7 @@ require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 const { recorrerFlechas, copiar } = require('../helpers');
+const { deleteCliente } = require('../services/clientesService');
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
@@ -154,20 +155,12 @@ tbody.addEventListener('click', async (e) => {
       })
       .then(async ({ isConfirmed }) => {
         if (isConfirmed) {
-          try {
-            const { data } = await axios.delete(`${URL}clientes/id/${seleccionado.id}`, {
-              params: { vendedor },
-            });
-            console.log(data);
+          const ok = await deleteCliente(seleccionado.id, vendedor);
 
-            await sweet.fire('Cliente Eliminado', data.msg, 'success');
+          if (ok) {
+            await sweet.fire('Cliente Eliminado', 'Cliente Eliminado', 'success');
 
             tbody.removeChild(seleccionado);
-          } catch (error) {
-            console.log(error);
-            sweet.fire({
-              title: 'No se pudo Eliminar el cliente',
-            });
           }
         }
       });

@@ -14,6 +14,7 @@ const URL = process.env.GESTIONURL;
 let puntoVenta = archivo.puntoVenta;
 
 let internetAvalible = require('internet-available');
+const { getClienteById } = require('./services/clientesService');
 
 //Sirve para ver si hay internet o no
 funciones.verSiHayInternet = () => {
@@ -341,16 +342,11 @@ funciones.ponerNumero = async () => {
           }
         }
 
-        try {
-          const { data } = await axios.get(`${URL}clientes/id/${recibo ? recibo.idCliente : venta.idCliente}`);
-          if (data.ok) {
-            cliente = data.cliente;
-          } else {
-            await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
-          }
-        } catch (error) {
-          console.log(error);
-          await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+        cliente = await getClienteById(recibo ? recibo.idCliente : venta.idCliente);
+
+        if (!cliente) {
+          await sweet.fire('Error al obtener el cliente', 'No se pudo obtener el cliente', 'error');
+          return;
         }
 
         movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;

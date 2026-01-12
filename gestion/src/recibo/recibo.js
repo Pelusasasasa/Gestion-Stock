@@ -17,6 +17,7 @@ const { ipcRenderer } = require('electron');
 const { apretarEnter, cargarFactura, redondear, cargarMovCaja } = require('../helpers');
 const sweet = require('sweetalert2');
 const { default: Swal } = require('sweetalert2');
+const { getClienteById } = require('../services/clientesService');
 
 const codigo = document.querySelector('#codigo');
 const borrarCliente = document.querySelector('#borrarCliente');
@@ -80,16 +81,10 @@ const modificarCuentaCompensadas = async () => {
 const ponerInputs = async (id) => {
   let cliente = {};
 
-  try {
-    const { data } = await axios.get(`${URL}clientes/id/${id}`);
-    if (data.ok) {
-      cliente = data.cliente;
-    } else {
-      return await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
+  cliente = await getClienteById(id);
+
+  if (!cliente) {
+    return await sweet.fire('Cliente no encontrado', 'error');
   }
 
   if (cliente !== '') {

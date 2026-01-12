@@ -2,6 +2,7 @@ const axios = require('axios');
 const Swal = require('sweetalert2');
 const { ipcRenderer } = require('electron');
 const { getParameterByName, parsearFecha } = require('../helpers');
+const { getClienteById } = require('../services/clientesService');
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -125,17 +126,10 @@ const imprimirRemito = async (e) => {
 
     if (!data.ok) return await Swal.fire('No se pudo obtener el remito', data.msg, 'error');
 
-    try {
-      const { data: clienteTraido } = await axios.get(`${URL}clientes/id/${data.remito.idCliente}`);
-      if (clienteTraido.ok) {
-        cliente = clienteTraido.cliente;
-      } else {
-        return await Swal.fire('Error al obtener el cliente', clienteTraido.msg, 'error');
-      }
-    } catch (error) {
-      console.log(error);
-      return await Swal.fire('Error al obtener el cliente', error?.response?.clienteTraido?.msg, 'error');
-    }
+    cliente = await getClienteById(data.remito.idCliente);
+
+    if (!cliente) return await Swal.fire('No se pudo obtener el cliente', 'error');
+
     const { data: movs } = await axios.get(`${URL}movimiento/${data.remito.numero}/RT`);
     ipcRenderer.send('imprimir', ['negro', data.remito, cliente, movs, false]);
   }

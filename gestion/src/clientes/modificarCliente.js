@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { cerrarVentana, apretarEnter } = require('../helpers');
 
 const axios = require('axios');
+const { getClienteById, putCliente } = require('../services/clientesService');
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
@@ -30,17 +31,8 @@ const salir = document.querySelector('.salir');
 const ponerInputs = async (id) => {
   codigo.value = id;
   let cliente = {};
-  try {
-    const { data } = await axios.get(`${URL}clientes/id/${id}`);
-    if (data.ok) {
-      cliente = data.cliente;
-    } else {
-      await sweet.fire('Error al obtener el cliente', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    await sweet.fire('Error al obtener el cliente', error?.response?.data?.msg, 'error');
-  }
+
+  cliente = await getClienteById(id);
 
   nombre.value = cliente.nombre;
   cuit.value = cliente.cuit ? cliente.cuit : '';
@@ -69,19 +61,13 @@ modificar.addEventListener('click', async (e) => {
   cliente.tipoCuenta = tipoCuenta.value;
   cliente.observaciones = observaciones.value.toUpperCase();
   cliente.vendedor = vendedor;
-  try {
-    const { data } = await axios.put(`${URL}clientes/id/${cliente._id}`, cliente);
 
-    if (data.ok) {
-      await sweet.fire('Cliente modificado', `Se modifico el cliente ${data.cliente.nombre} correctamente`, 'success');
-      ipcRenderer.send('enviar-ventana-principal', cliente);
-      window.close();
-    } else {
-      await sweet.fire('No se pudo modificar el cliente', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    await sweet.fire('No se pudo modificar el cliente', error.response?.data?.msg, 'error');
+  const { cliente: clienteModificado } = await putCliente(cliente._id, cliente, vendedor);
+
+  if (clienteModificado) {
+    await sweet.fire('Cliente modificado', `Se modifico el cliente ${clienteModificado.nombre} correctamente`, 'success');
+    ipcRenderer.send('enviar-ventana-principal', clienteModificado);
+    window.close();
   }
 });
 
