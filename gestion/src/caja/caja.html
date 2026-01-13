@@ -35,10 +35,14 @@
             <button id="botonMes" class="botonMes">Mes</button>
             <button id="botonAnio" class="botonAnio">Año</button>
         </div>
-        <main class="fechas">
+        <main class="fechas flex gap-2">
             <div class="dia">
-                <label for="fecha">Fecha</label>
-                <input type="date" name="fecha" id="fecha">
+                <label for="desde">Desde</label>
+                <input type="date" name="desde" id="desde">
+            </div>
+            <div class="hasta flex flex-col items-center">
+                <label for="hasta">Hasta</label>
+                <input type="date" name="hasta" id="hasta">
             </div>
             <div class="mes none">
                 <label for="mes">Mes</label>

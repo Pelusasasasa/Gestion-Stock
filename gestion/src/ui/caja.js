@@ -64,7 +64,7 @@ const listarVentas = async (comprobantes) => {
     tdFecha.innerText = fecha;
     tdCliente.innerText = venta.cliente;
     tdCodProducto.innerText = venta.tipo_comp;
-    tdProducto.innerText = venta.tipo_comp === 'Recibo' ? venta.valorRecibido : '';
+    tdProducto.innerText = venta.tipo_comp === 'Recibo' ? venta.valorRecibido.slice(0, 30) : '';
     tdPrecioTotal.innerText = venta.tipo_comp === 'Nota Credito C' ? redondear(venta.precio * -1, 2) : venta.precio.toFixed(2);
     tdVendedor.innerText = venta.vendedor ? venta.vendedor.nombre : '';
     tdAcciones.innerHTML = `

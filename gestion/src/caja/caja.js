@@ -4,7 +4,7 @@ const sweet = require('sweetalert2');
 const { vendedores } = require('../configuracion.json');
 const { deleteVentaForNumeroAndType } = require('../services/ventasService');
 const { getPresupuestoForFecha } = require('../services/presupuestoService');
-const { getCajaForFecha } = require('../services/cajaService');
+const { getCajaForFecha, getCajaForDia } = require('../services/cajaService');
 const { listarGastos, listarVentas } = require('../ui/caja');
 
 let vendedor = getParameterByName('vendedor');
@@ -23,7 +23,8 @@ const anio = document.querySelector('.anio');
 
 let botonSeleccionado = document.querySelector('.seleccionado');
 
-const fecha = document.querySelector('#fecha');
+const desde = document.querySelector('#desde');
+const hasta = document.querySelector('#hasta');
 const selectMes = document.querySelector('#mes');
 const inputAnio = document.querySelector('#anio');
 
@@ -94,7 +95,8 @@ pestaña.addEventListener('click', async (e) => {
 });
 
 window.addEventListener('load', async (e) => {
-  fecha.value = parsearFecha(new Date()).slice(0, 10).split('/', 3).reverse().join('-');
+  desde.value = parsearFecha(new Date()).slice(0, 10).split('/', 3).reverse().join('-');
+  hasta.value = parsearFecha(new Date()).slice(0, 10).split('/', 3).reverse().join('-');
   selectMes.value = parsearFecha(new Date()).slice(0, 10).split('/', 3)[1];
   inputAnio.value = parsearFecha(new Date()).slice(0, 10).split('/', 3)[2];
 
@@ -167,7 +169,14 @@ botonAnio.addEventListener('click', async (e) => {
   buscar();
 });
 
-fecha.addEventListener('keypress', async (e) => {
+desde.addEventListener('keypress', async (e) => {
+  if (e.key === 'Enter') {
+    tipoFecha = 'dia';
+    hasta.focus();
+  }
+});
+
+hasta.addEventListener('keypress', async (e) => {
   if (e.key === 'Enter') {
     tipoFecha = 'dia';
     buscar();
@@ -239,7 +248,7 @@ tbodyGastos.addEventListener('click', (e) => {
 
 const buscar = async () => {
   if (tipoFecha === 'dia') {
-    date = fecha.value;
+    date = desde.value;
   } else if (tipoFecha === 'mes') {
     date = selectMes.value;
   } else if (tipoFecha === 'anio') {
@@ -248,7 +257,7 @@ const buscar = async () => {
 
   //vemos que tipo de filtro es y ahi vemos si traemos los ingresos o gastos
   if (filtro === 'Ingresos' || filtro === 'Cuenta Corriente') {
-    const { ventas, recibos, cuentaCorrientes, ok, gastos } = await getCajaForFecha(tipoFecha, date);
+    const { ventas, recibos, cuentaCorrientes, ok, gastos } = tipoFecha === 'dia' ? await getCajaForDia(tipoFecha, date, hasta.value) : await getCajaForFecha(tipoFecha, date);
 
     if (!ok) return await sweet.fire('Error al obtener las ventas', 'No se pudieron obterner las ventas del mes', 'error');
 

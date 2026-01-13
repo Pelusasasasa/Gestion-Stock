@@ -5,36 +5,34 @@ const Movimiento = require("../models/movProducto");
 const MovRecibo = require("../models/MovRecibos");
 
 exports.traerInformacionCajaDelDia = async (req, res) => {
-  const { fecha } = req.params;
+  const { desde, hasta } = req.params;
   try {
-    const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
-    const inicioDia = new Date(fechaBase);
-    const finDia = new Date(fechaBase);
-    finDia.setHours(23, 59, 59, 999);
+    const fechaBase = new Date(`${desde}T00:00:00-03:00`);
+    const fechaFin = new Date(`${hasta}T23:59:59-03:00`);
 
     const ventas = await Venta.find({
-      $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     })
       .populate("vendedor", "nombre")
       .lean();
 
     const recibos = await Recibo.find({
-      $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     })
       .populate("vendedor", "nombre")
       .lean();
 
     const gastos = await Gasto.find({
-      $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     });
 
     // Buscar movimientos del día una sola vez
     const movimientos = await Movimiento.find({
-      $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     }).lean();
 
     const movRecibos = await MovRecibo.find({
-      $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     }).lean();
 
     // Asociar movimientos a sus ventas correspondientes
@@ -69,17 +67,57 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
 exports.traerInformacionCajaDelMes = async (req, res) => {
   const { month } = req.params;
   let mes = parseInt(month);
+  let year = new Date().getFullYear();
 
   mes = mes > 12 ? 1 : mes;
 
   try {
     const ventas = await Venta.find({
-      $expr: { $eq: [{ $month: "$fecha" }, mes] },
-    }).populate("vendedor", "nombre");
+      $expr: {
+        $eq: [{ $month: "$fecha" }, mes],
+        $eq: [{ $year: "$fecha" }, year],
+      },
+    })
+      .populate("vendedor", "nombre")
+      .lean();
 
     const recibos = await Recibo.find({
-      $expr: { $eq: [{ $month: "$fecha" }, mes] },
-    }).populate("vendedor", "nombre");
+      $expr: {
+        $eq: [{ $month: "$fecha" }, mes],
+        $eq: [{ $year: "$fecha" }, year],
+      },
+    })
+      .populate("vendedor", "nombre")
+      .lean();
+
+    const movimientos = await Movimiento.find({
+      $expr: {
+        $eq: [{ $month: "$fecha" }, mes],
+        $eq: [{ $year: "$fecha" }, year],
+      },
+    }).lean();
+
+    const movRecibos = await MovRecibo.find({
+      $expr: {
+        $eq: [{ $month: "$fecha" }, mes],
+        $eq: [{ $year: "$fecha" }, year],
+      },
+    }).lean();
+
+    // Asociar movimientos a sus ventas correspondientes
+    ventas.forEach((venta) => {
+      venta.movimientos = movimientos.filter(
+        (mov) => mov.nro_venta == venta.numero
+      );
+    });
+
+    recibos.forEach((recibo) => {
+      recibo.movimientos = movRecibos.filter(
+        (mov) => mov.numeroRecibo == recibo.numero
+      );
+    });
+
+    console.log(recibos);
 
     res.status(200).json({
       ok: true,
