@@ -697,4 +697,16 @@ funciones.verPrecioConCantidad = ({ producto, cantidad }, tipoCliente = 'Normal'
   }
 };
 
+funciones.fechaActual = () => {
+  const hoy = new Date();
+  let d = hoy.getDate();
+  let m = hoy.getMonth() + 1;
+  let a = hoy.getFullYear();
+
+  d = d < 10 ? `0${d}` : d;
+  m = m < 10 ? `0${m}` : m;
+  m = m === 13 ? 1 : m;
+
+  return `${a}-${m}-${d}`;
+};
 module.exports = funciones;

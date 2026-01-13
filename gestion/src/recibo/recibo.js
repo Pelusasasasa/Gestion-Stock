@@ -9,15 +9,15 @@ function getParameterByName(name) {
 let vendedor = getParameterByName('vendedor');
 const archivo = require('../configuracion.json');
 
-const axios = require('axios');
-require('dotenv').config();
-const URL = process.env.GESTIONURL;
-
 const { ipcRenderer } = require('electron');
-const { apretarEnter, cargarFactura, redondear, cargarMovCaja } = require('../helpers');
-const sweet = require('sweetalert2');
-const { default: Swal } = require('sweetalert2');
+const { apretarEnter, cargarFactura, redondear, cargarMovCaja, fechaActual } = require('../helpers');
+
 const { getClienteById } = require('../services/clientesService');
+const { getReciboById, postRecibo } = require('../services/reciboService');
+const { getCompensadas, putCompensadaObservaciones } = require('../services/cuentasService');
+const { postRetencion } = require('../services/retencionService');
+
+const { default: Swal } = require('sweetalert2');
 
 const codigo = document.querySelector('#codigo');
 const borrarCliente = document.querySelector('#borrarCliente');
@@ -44,20 +44,11 @@ let nroCheque = '';
 let retencionValor;
 let retencionBrutos;
 
-const hoy = new Date();
-let d = hoy.getDate();
-let m = hoy.getMonth() + 1;
-let a = hoy.getFullYear();
-
-d = d < 10 ? `0${d}` : d;
-m = m < 10 ? `0${m}` : m;
-m = m === 13 ? 1 : m;
-
-fecha.value = `${a}-${m}-${d}`;
+fecha.value = fechaActual();
 
 ipcRenderer.on('recibir-ventana-secundaria', async (e, args) => {
   const [res, cliente, lista] = JSON.parse(JSON.parse(args).informacion);
-  const { data } = await axios.get(`${URL}recibo/id/${res.numero}`);
+  const data = await getReciboById(res.numero);
   if (res) {
     ipcRenderer.send('imprimir-recibo', [data, cliente, lista, false]);
   }
@@ -69,8 +60,8 @@ ipcRenderer.on('recibir-ventana-secundaria', async (e, args) => {
 const modificarCuentaCompensadas = async () => {
   const trs = document.querySelectorAll('tbody tr');
   let numeros = [];
-  for await (let tr of trs) {
-    const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerHTML : '';
+  for (let tr of trs) {
+    const numero = parseFloat(tr.children[5].children[0].value) !== 0 ? tr.children[1].innerText : '';
     const pagado = parseFloat(tr.children[5].children[0].value);
     numero !== '' && numeros.push({ numero, pagado });
   }
@@ -80,11 +71,11 @@ const modificarCuentaCompensadas = async () => {
 //Pnemos los valores del cliente traido
 const ponerInputs = async (id) => {
   let cliente = {};
-
   cliente = await getClienteById(id);
+  console.log(cliente);
 
   if (!cliente) {
-    return await sweet.fire('Cliente no encontrado', 'error');
+    return await Swal.fire('Cliente no encontrado', 'error');
   }
 
   if (cliente !== '') {
@@ -95,18 +86,8 @@ const ponerInputs = async (id) => {
     direccion.value = cliente.direccion;
     let compensadas = [];
 
-    try {
-      const { data } = await axios.get(`${URL}compensada/traerCompensadas/${cliente._id}`);
-
-      if (data.ok) {
-        compensadas = data.compensadas;
-      } else {
-        await sweet.fire('No se pudo obtener las compensadas', data.msg, 'error');
-      }
-    } catch (error) {
-      console.log(error);
-      await sweet.fire('No se pudo traer las compensadas', error?.response?.data?.msg, 'error');
-    }
+    const data = await getCompensadas(cliente._id);
+    compensadas = data;
     tbody.innerHTML = '';
 
     let i = 1;
@@ -119,7 +100,7 @@ const ponerInputs = async (id) => {
       ponerVenta(compensada);
     });
   } else {
-    await sweet.fire('Cliente no encontrado');
+    await Swal.fire('Cliente no encontrado');
     codigo.value = '';
     nombre.value = '';
     saldo.value = '';
@@ -152,12 +133,12 @@ const ponerVenta = async (cuenta) => {
   const inputActual = document.createElement('input');
   const tdSaldo = document.createElement('td');
 
-  tdFecha.innerHTML = `${dia}/${mes}/${anio}`;
-  tdNumero.innerHTML = cuenta.nro_venta;
-  tdTipoComp.innerHTML = `${cuenta.tipo_comp} ${cuenta.nro_factura}`;
-  tdImporte.innerHTML = cuenta.tipo_comp === 'Nota Credito C' ? redondear(cuenta.importe * -1, 2) : redondear(cuenta.importe, 2);
-  tdPagado.innerHTML = redondear(cuenta.pagado, 2);
-  tdSaldo.innerHTML = cuenta.tipo_comp === 'Nota Credito C' ? redondear(cuenta.saldo * -1, 2) : redondear(cuenta.saldo, 2);
+  tdFecha.innerText = `${dia}/${mes}/${anio}`;
+  tdNumero.innerText = cuenta.nro_venta;
+  tdTipoComp.innerText = `${cuenta.tipo_comp} ${cuenta.nro_factura}`;
+  tdImporte.innerText = cuenta.tipo_comp === 'Nota Credito C' ? redondear(cuenta.importe * -1, 2) : redondear(cuenta.importe, 2);
+  tdPagado.innerText = redondear(cuenta.pagado, 2);
+  tdSaldo.innerText = cuenta.tipo_comp === 'Nota Credito C' ? redondear(cuenta.saldo * -1, 2) : redondear(cuenta.saldo, 2);
   inputActual.value = '0.00';
   inputActual.type = 'number';
   inputActual.id = cuenta.nro_venta;
@@ -204,8 +185,8 @@ tbody.addEventListener('click', (e) => {
 
 //cuando cambiamos el valor del input, tambien cambiamos el valor de las demas columnas y el total del recibo
 inputSeleccionado.addEventListener('change', (e) => {
-  total.value = parseFloat(total.value) - (parseFloat(trSeleccionado.children[3].innerHTML) - parseFloat(trSeleccionado.children[4].innerHTML) - parseFloat(trSeleccionado.children[6].innerHTML));
-  trSeleccionado.children[6].innerHTML = (parseFloat(trSeleccionado.children[3].innerHTML) - parseFloat(trSeleccionado.children[4].innerHTML) - parseFloat(inputSeleccionado.value)).toFixed(2);
+  total.value = parseFloat(total.value) - (parseFloat(trSeleccionado.children[3].innerText) - parseFloat(trSeleccionado.children[4].innerText) - parseFloat(trSeleccionado.children[6].innerText));
+  trSeleccionado.children[6].innerText = (parseFloat(trSeleccionado.children[3].innerText) - parseFloat(trSeleccionado.children[4].innerText) - parseFloat(inputSeleccionado.value)).toFixed(2);
   total.value = redondear(parseFloat(total.value) + parseFloat(inputSeleccionado.value), 2);
   if (trSeleccionado.nextElementSibling) {
     trSeleccionado = trSeleccionado.nextElementSibling;
@@ -224,21 +205,21 @@ entregado.addEventListener('change', async (e) => {
   const trs = document.querySelectorAll('tbody tr');
   if (entregado.value !== '' && parseFloat(entregado.value) !== 0) {
     let saldo = parseFloat(entregado.value);
-    for await (let tr of trs) {
+    for (let tr of trs) {
       const hijo = tr.children;
       if (saldo !== 0) {
-        if (saldo >= parseFloat(hijo[3].innerHTML) - parseFloat(hijo[4].innerHTML)) {
-          hijo[5].children[0].value = redondear(parseFloat(hijo[3].innerHTML) - parseFloat(hijo[4].innerHTML), 2);
-          hijo[6].innerHTML = redondear(parseFloat(hijo[3].innerHTML) - parseFloat(hijo[4].innerHTML) - parseFloat(hijo[5].children[0].value), 2);
+        if (saldo >= parseFloat(hijo[3].innerText) - parseFloat(hijo[4].innerText)) {
+          hijo[5].children[0].value = redondear(parseFloat(hijo[3].innerText) - parseFloat(hijo[4].innerText), 2);
+          hijo[6].innerText = redondear(parseFloat(hijo[3].innerText) - parseFloat(hijo[4].innerText) - parseFloat(hijo[5].children[0].value), 2);
           saldo = parseFloat(redondear((saldo - parseFloat(hijo[5].children[0].value)).toFixed(2), 2));
         } else {
           hijo[5].children[0].value = saldo;
-          hijo[6].innerHTML = redondear(parseFloat(hijo[3].innerHTML) - parseFloat(hijo[4].innerHTML) - parseFloat(hijo[5].children[0].value), 2);
+          hijo[6].innerText = redondear(parseFloat(hijo[3].innerText) - parseFloat(hijo[4].innerText) - parseFloat(hijo[5].children[0].value), 2);
           saldo = 0;
         }
       } else {
         hijo[5].children[0].value = saldo;
-        hijo[6].innerHTML = redondear(parseFloat(hijo[3].innerHTML) - parseFloat(hijo[4].innerHTML) - parseFloat(hijo[5].children[0].value), 2);
+        hijo[6].innerText = redondear(parseFloat(hijo[3].innerText) - parseFloat(hijo[4].innerText) - parseFloat(hijo[5].children[0].value), 2);
       }
     }
     if (saldo > 0) {
@@ -249,10 +230,10 @@ entregado.addEventListener('change', async (e) => {
     }
     total.value = entregado.value;
   } else if (parseFloat(entregado.value) === 0 || entregado.value === '') {
-    for await (let tr of trs) {
+    for (let tr of trs) {
       const hijo = tr.children;
       hijo[5].children[0].value = 0;
-      hijo[6].innerHTML = (parseFloat(hijo[3].innerHTML) - parseFloat(hijo[4].innerHTML)).toFixed(2);
+      hijo[6].innerText = (parseFloat(hijo[3].innerText) - parseFloat(hijo[4].innerText)).toFixed(2);
     }
     total.value = entregado.value;
   }
@@ -273,20 +254,13 @@ imprimir.addEventListener('click', async (e) => {
   recibo.compensadas = await modificarCuentaCompensadas();
   recibo.valorRecibido = verValorRecibo();
 
-  // try {
-  //     const { data } = await axios.get(`${URL}tipoCuenta/forText/Recibo`);
-  //     await cargarMovCaja(recibo.cliente, '000R', recibo.numero, data.tipo._id, recibo.precio, "639dbc31dfdb8a1d243d19c2");
-  // } catch (error) {
-  //     console.log(error)
-  // }
-
   try {
-    const { data } = await axios.post(`${URL}recibo`, recibo);
+    const data = await postRecibo(recibo);
 
     if (data.ok) {
       data.recibo.retencion = [];
       if (retencionValor) {
-        const { data: retencion } = await axios.post(`${URL}retencion`, {
+        const retencion = await postRetencion({
           importe: retencionValor,
           reciboId: data.recibo._id,
           nro_comp: data.recibo.numero,
@@ -296,7 +270,7 @@ imprimir.addEventListener('click', async (e) => {
       }
 
       if (retencionBrutos) {
-        const { data: retencion } = await axios.post(`${URL}retencion`, {
+        const retencion = await postRetencion({
           importe: retencionBrutos,
           reciboId: data.recibo._id,
           nro_comp: data.recibo.numero,
@@ -326,7 +300,7 @@ imprimir.addEventListener('click', async (e) => {
         location.href = '../menu.html';
       }
     } else {
-      await sweet.fire('Error al generar el recibo', data?.msg, 'error');
+      await Swal.fire('Error al generar el recibo', data?.msg, 'error');
     }
   } catch (error) {
     console.log(error);
@@ -385,7 +359,7 @@ codigo.addEventListener('keypress', async (e) => {
 });
 
 observaciones.parentElement.addEventListener('dblclick', async (e) => {
-  const { isConfirmed, value } = await sweet.fire({
+  const { isConfirmed, value } = await Swal.fire({
     title: 'Observaciones',
     input: 'textarea',
     inputValue: observaciones.value.split(';').join(';\n'),
@@ -394,9 +368,10 @@ observaciones.parentElement.addEventListener('dblclick', async (e) => {
   });
 
   if (isConfirmed) {
+    console.log(value);
     const valores = value.split(';');
 
-    valores.map(async (valor) => {
+    const promesas = valores.map(async (valor) => {
       let aux = '';
       let auxText = '';
 
@@ -407,14 +382,14 @@ observaciones.parentElement.addEventListener('dblclick', async (e) => {
           auxText += valor[i];
         }
       }
-
       if (aux) {
-        await axios.put(`${URL}compensada/observaciones/${aux}`, {
-          observaciones: auxText.trim(),
-        });
+        console.log(aux);
         observaciones.value = value.toUpperCase();
+        return putCompensadaObservaciones(aux, auxText.trim());
       }
     });
+
+    await Promise.all(promesas);
   }
 });
 

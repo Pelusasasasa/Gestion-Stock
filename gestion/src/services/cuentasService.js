@@ -1,5 +1,8 @@
-const sweet = require('sweetalert2');
 const axios = require('axios');
+require('dotenv').config();
+const URL = process.env.GESTIONURL;
+
+const { Swal } = require('sweetalert2');
 
 const getCompensadas = async (idCliente) => {
   try {
@@ -8,11 +11,11 @@ const getCompensadas = async (idCliente) => {
     if (data.ok) {
       return data.compensadas;
     } else {
-      await sweet.fire('No se pudo obtener las compensadas', data.msg, 'error');
+      await Swal.fire('No se pudo obtener las compensadas', data.msg, 'error');
     }
   } catch (error) {
     console.log(error);
-    await sweet.fire('No se pudo traer las compensadas', error?.response?.data?.msg, 'error');
+    await Swal.fire('No se pudo traer las compensadas', error?.response?.data?.msg, 'error');
   }
 };
 
@@ -22,12 +25,12 @@ const getCompensada = async (id) => {
     if (data.ok) {
       return data.compensada;
     } else {
-      await sweet.fire('No se pudo obtener la compensada', data.msg, 'error');
+      await Swal.fire('No se pudo obtener la compensada', data.msg, 'error');
       return null;
     }
   } catch (error) {
     console.log(error);
-    await sweet.fire('No se pudo traer la compensada', error?.response?.data?.msg, 'error');
+    await Swal.fire('No se pudo traer la compensada', error?.response?.data?.msg, 'error');
     return null;
   }
 };
@@ -38,7 +41,19 @@ const putCompensadaForId = async (id, compensada) => {
     return data;
   } catch (error) {
     console.log(error);
-    await sweet.fire('No se pudo traer la compensada', error?.response?.data?.msg, 'error');
+    await Swal.fire('No se pudo traer la compensada', error?.response?.data?.msg, 'error');
+    return null;
+  }
+};
+
+const putCompensadaObservaciones = async (aux, observaciones) => {
+  try {
+    const { data } = await axios.put(`${URL}compensada/observaciones/${aux}`, { observaciones });
+    console.log(aux);
+    return data;
+  } catch (error) {
+    console.log(error);
+    await Swal.fire('No se pudo traer la compensada', error?.response?.data?.msg, 'error');
     return null;
   }
 };
@@ -136,6 +151,7 @@ module.exports = {
   getHistoricaForNumberAndType,
 
   putCompensadaForId,
+  putCompensadaObservaciones,
   putHistoricaForId,
 
   deleteCompensada,
