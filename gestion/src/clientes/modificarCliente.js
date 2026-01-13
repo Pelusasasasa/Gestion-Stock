@@ -1,6 +1,6 @@
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
-const { cerrarVentana, apretarEnter } = require('../helpers');
+const { cerrarVentana, apretarEnter, saltarEnter } = require('../helpers');
 
 const axios = require('axios');
 const { getClienteById, putCliente } = require('../services/clientesService');
@@ -72,42 +72,42 @@ modificar.addEventListener('click', async (e) => {
 });
 
 nombre.addEventListener('keypress', (e) => {
-  apretarEnter(e, cuit);
+  saltarEnter(e, cuit);
 });
 
 cuit.addEventListener('keypress', (e) => {
-  apretarEnter(e, localidad);
+  saltarEnter(e, localidad);
 });
 
 localidad.addEventListener('keypress', (e) => {
-  apretarEnter(e, telefono);
+  saltarEnter(e, telefono);
 });
 
 telefono.addEventListener('keypress', (e) => {
-  apretarEnter(e, direccion);
+  saltarEnter(e, direccion);
 });
 
 direccion.addEventListener('keypress', (e) => {
-  apretarEnter(e, condicionFacturacion);
+  saltarEnter(e, condicionFacturacion);
 });
 
 condicionFacturacion.addEventListener('keypress', (e) => {
   e.preventDefault();
-  apretarEnter(e, condicionIva);
+  saltarEnter(e, condicionIva);
 });
 
 condicionIva.addEventListener('keypress', (e) => {
   e.preventDefault();
-  apretarEnter(e, tipoCuenta);
+  saltarEnter(e, tipoCuenta);
 });
 
 tipoCuenta.addEventListener('keypress', (e) => {
   e.preventDefault();
-  apretarEnter(e, observaciones);
+  saltarEnter(e, observaciones);
 });
 
 observaciones.addEventListener('keypress', (e) => {
-  apretarEnter(e, modificar);
+  saltarEnter(e, modificar);
 });
 
 nombre.addEventListener('focus', (e) => {

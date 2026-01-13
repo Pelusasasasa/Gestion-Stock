@@ -12,12 +12,8 @@ permiso = permiso === '' ? 0 : parseInt(permiso);
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
 
-const axios = require('axios');
-require('dotenv').config();
-const URL = process.env.GESTIONURL;
-
 const { recorrerFlechas, copiar } = require('../helpers');
-const { deleteCliente } = require('../services/clientesService');
+const { deleteCliente, searchClientes } = require('../services/clientesService');
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
@@ -39,19 +35,8 @@ window.addEventListener('load', (e) => {
 
 const filtrar = async () => {
   tbody.innerHTML = '';
-  let clientes;
+  let clientes = await searchClientes(nombre.value);
 
-  try {
-    const { data } = await axios.get(`${URL}clientes/buscar/${nombre.value === '' ? 'NADA' : nombre.value}`);
-    if (data.ok) {
-      clientes = data.clientes;
-    } else {
-      return await sweet.fire(`Error al obtener los clientes`, data.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await sweet.fire(`Error al obtener los clientes`, error?.response?.data?.msg, 'error');
-  }
   listarClientes(clientes);
 };
 
@@ -77,7 +62,7 @@ agregar.addEventListener('click', (e) => {
 
 //listamos los clientes, con sus datos
 const listarClientes = async (clientes) => {
-  for await (let { _id, nombre, telefono, direccion, localidad, cuit, condicionIva, saldo } of clientes) {
+  for (let { _id, nombre, telefono, direccion, localidad, cuit, condicionIva, saldo } of clientes) {
     const tr = document.createElement('tr');
     tr.id = _id;
 

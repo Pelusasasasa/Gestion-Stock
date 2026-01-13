@@ -4,6 +4,19 @@ const URL = process.env.GESTIONURL;
 
 const { Swal } = require('sweetalert2');
 
+const getUltimoId = async () => {
+  try {
+    const { data } = await axios.get(`${URL}clientes`);
+    console.log(data);
+
+    if (!data.ok) return await Swal.fire('Error al obtener el ultimo id', data.msg, 'error');
+    return data.id;
+  } catch (error) {
+    console.log(error);
+    return await Swal.fire('Error al obtener el ultimo id', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
 const getClienteById = async (id) => {
   try {
     const { data } = await axios.get(`${URL}clientes/id/${id}`);
@@ -13,6 +26,20 @@ const getClienteById = async (id) => {
   } catch (error) {
     console.log(error);
     return await Swal.fire('Error al obtener el cliente', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
+const searchClientes = async (nombre) => {
+  try {
+    const { data } = await axios.get(`${URL}clientes/buscar/${nombre === '' ? 'NADA' : nombre}`);
+    if (data.ok) {
+      return data.clientes;
+    } else {
+      return await Swal.fire(`Error al obtener los clientes`, data.msg, 'error');
+    }
+  } catch (error) {
+    console.log(error);
+    return await Swal.fire(`Error al obtener los clientes`, error?.response?.data?.msg, 'error');
   }
 };
 
@@ -41,10 +68,26 @@ const deleteCliente = async (id, vendedor) => {
   }
 };
 
+const postCliente = async (cliente) => {
+  try {
+    const { data } = await axios.post(`${URL}clientes`, cliente);
+    console.log(data);
+    if (!data.ok) return await Swal.fire('Error al agregar el cliente', data.msg, 'error');
+    return { cliente: data.cliente, ok: true };
+  } catch (error) {
+    console.log(error);
+    return await Swal.fire('Error al agregar el cliente', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
 module.exports = {
   getClienteById,
+  getUltimoId,
+  searchClientes,
 
   putCliente,
+
+  postCliente,
 
   deleteCliente,
 };
