@@ -1,4 +1,5 @@
 export * from './clienteService';
+export * from './chequeService';
 export * from './cuentasService';
 export * from './movProductosService';
 export * from './productosService';

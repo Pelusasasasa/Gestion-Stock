@@ -709,4 +709,13 @@ funciones.fechaActual = () => {
 
   return `${a}-${m}-${d}`;
 };
+
+funciones.saltarEnter = (origen, destino) => {
+  if (origen.keyCode === 13) {
+    origen.preventDefault();
+    destino.focus();
+    destino.select();
+  }
+};
+
 module.exports = funciones;

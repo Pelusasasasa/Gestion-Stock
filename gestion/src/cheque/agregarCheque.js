@@ -1,8 +1,7 @@
-const axios = require('axios');
 const Swal = require('sweetalert2');
 const { ipcRenderer } = require('electron');
-require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const { postCheque } = require('../services/chequeService');
+const { saltarEnter } = require('../helpers');
 
 const fecha = document.getElementById('fecha');
 const numero = document.getElementById('numero');
@@ -46,7 +45,7 @@ const guardar = async () => {
   cheque.observacion = observaciones.value;
   cheque.comprobanteId = id;
 
-  const { data } = await axios.post(`${URL}cheques`, cheque);
+  const { data } = await postCheque(cheque);
 
   const { isConfirmed } = await Swal.fire({
     title: 'Agregar otro cheque',
@@ -103,70 +102,41 @@ cancelar.addEventListener('click', (e) => {
 });
 
 fecha.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    numero.focus();
-    numero.select();
-  }
+  saltarEnter(e, numero);
 });
 
 numero.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    banco.focus();
-    banco.select();
-  }
+  saltarEnter(e, banco);
 });
 
 banco.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    importe.focus();
-    importe.select();
-  }
+  saltarEnter(e, importe);
 });
 
 importe.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    fecha_cheque.focus();
-    fecha_cheque.select();
-  }
+  saltarEnter(e, fecha_cheque);
 });
 
 fecha_cheque.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    entregado_por.focus();
-    entregado_por.select();
-  }
+  saltarEnter(e, entregado_por);
 });
 
 entregado_por.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    entregado_a.focus();
-    entregado_a.select();
-  }
+  saltarEnter(e, entregado_a);
 });
 
 entregado_a.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    domicilio.focus();
-    domicilio.select();
-  }
+  saltarEnter(e, domicilio);
 });
 
 domicilio.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    telefono.focus();
-    telefono.select();
-  }
+  saltarEnter(e, telefono);
 });
 
 telefono.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    observaciones.focus();
-    observaciones.select();
-  }
+  saltarEnter(e, observaciones);
 });
 
 observaciones.addEventListener('keypress', (e) => {
-  if (e.keyCode === 13) {
-    agregar.focus();
-  }
+  saltarEnter(e, agregar);
 });
