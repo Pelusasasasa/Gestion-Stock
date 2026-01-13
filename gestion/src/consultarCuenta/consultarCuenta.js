@@ -112,7 +112,7 @@ const borrarCuentaCompHist = async (e) => {
     });
 
     if (isConfirmed) {
-      const saldoAModificar = parseFloat(trSeleccionado.children[6].innerHTML);
+      const saldoAModificar = parseFloat(trSeleccionado.children[6].innerText);
       clienteTraido.saldo = (clienteTraido.saldo - saldoAModificar).toFixed(2);
 
       await putCliente(clienteTraido._id, clienteTraido, vendedor); //Arreglamos el saldo de los clientes
@@ -309,19 +309,23 @@ actualizar.addEventListener('click', async (e) => {
 
     let total = 0;
 
-    for await (let movimiento of movimientos) {
+    const promesasPrecios = movimientos.map(async (movimiento) => {
       let precio;
-      if (cuentaCompensada.condicion === 'Normal') {
+      if (cuentaCompensada.condicion === 'NORMAL') {
         precio = await getPrecio(movimiento.codProd);
       } else {
         const { impuesto, costo } = await getCostoImpuesto(movimiento.codProd);
-
         precio = parseFloat(redondear(costo + (costo * impuesto) / 100, 2));
       }
+      return precio !== '' ? precio : movimiento.precio;
+    });
 
-      movimiento.precio = precio !== '' ? precio : movimiento.precio;
-      total += movimiento.precio * movimiento.cantidad;
-    }
+    const nuevosPrecios = await Promise.all(promesasPrecios);
+
+    nuevosPrecios.forEach((precio, index) => {
+      movimientos[index].precio = precio;
+      total += precio * movimientos[index].cantidad;
+    });
 
     venta.precio = total;
 
@@ -355,11 +359,14 @@ actualizar.addEventListener('click', async (e) => {
           cliente.saldo = (cliente.saldo + cuentaCompensada.importe).toFixed(2);
           //esto sirve para poner en las nuevas cuentas historicas el saldo
           let saldoAnterior = cuentaHistorica.saldo;
-          for await (let cuenta of cuentasHistoricasRestantes) {
+
+          const promesasActualizacion = cuentasHistoricasRestantes.map((cuenta) => {
             cuenta.saldo = cuenta.tipo_comp === 'Recibo' ? parseFloat((saldoAnterior - cuenta.haber).toFixed(2)) : parseFloat((saldoAnterior + cuenta.debe).toFixed(2));
             saldoAnterior = cuenta.saldo;
-            await putHistoricaForId(cuenta.nro_venta, cuenta);
-          }
+            return putHistoricaForId(cuenta.nro_venta, cuenta);
+          });
+
+          await Promise.all(promesasActualizacion);
 
           await putMovimientos(movimientos);
           await putCliente(cliente._id, cliente, vendedor);
@@ -370,8 +377,8 @@ actualizar.addEventListener('click', async (e) => {
           const cuentaModificada = await getCompensada(trSeleccionado.id);
 
           listarProductos(movimientos);
-          trSeleccionado.children[4].innerHTML = cuentaModificada.importe;
-          trSeleccionado.children[6].innerHTML = cuentaModificada.saldo;
+          trSeleccionado.children[4].innerText = cuentaModificada.importe;
+          trSeleccionado.children[6].innerText = cuentaModificada.saldo;
           saldo.value = cliente.saldo;
         }
       });
