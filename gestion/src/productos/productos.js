@@ -266,7 +266,7 @@ body.addEventListener('keypress', async (e) => {
     if (seleccionado && document.activeElement.nodeName !== 'INPUT') {
       const { isConfirmed, value } = await sweet.fire({
         title: 'Cantidad ',
-        input: 'number',
+        input: 'text',
       });
 
       if (isConfirmed) {
