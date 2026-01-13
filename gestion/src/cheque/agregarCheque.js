@@ -45,7 +45,7 @@ const guardar = async () => {
   cheque.observacion = observaciones.value;
   cheque.comprobanteId = id;
 
-  const { data } = await postCheque(cheque);
+  const data = await postCheque(cheque);
 
   const { isConfirmed } = await Swal.fire({
     title: 'Agregar otro cheque',
