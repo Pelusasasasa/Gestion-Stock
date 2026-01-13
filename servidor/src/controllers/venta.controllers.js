@@ -142,7 +142,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
 ventaCTRL.VentasDia = async (req, res) => {
   const { fecha } = req.params;
-
+  console.log(fecha);
   try {
     const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
     const inicioDia = new Date(fechaBase);
@@ -152,6 +152,9 @@ ventaCTRL.VentasDia = async (req, res) => {
     const ventas = await Venta.find({
       $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
     }).populate("vendedor", "nombre");
+
+    console.log(ventas);
+
     res.send(ventas);
   } catch (error) {
     console.error(error);
