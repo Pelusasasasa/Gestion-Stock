@@ -6,7 +6,10 @@ const Swal = require('sweetalert2');
 const getRemitoById = async (id) => {
   try {
     const { data } = await axios.get(`${URL}remitos/forId/${id}`);
-    return data;
+    if (data.ok) {
+      return data.remito;
+    }
+    return null;
   } catch (error) {
     console.log(error);
     await Swal.fire('No se pudo traer el remito', error?.response?.data?.msg, 'error');

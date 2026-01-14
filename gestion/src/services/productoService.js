@@ -17,6 +17,7 @@ const getProductoById = async (id) => {
 const getProductoByNombre = async (nombre) => {
   try {
     const { data } = await axios.get(`${URL}productos/nombre/${nombre}`);
+    console.log('a');
     return data;
   } catch (error) {
     console.log(error);

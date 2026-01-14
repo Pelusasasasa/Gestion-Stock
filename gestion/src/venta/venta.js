@@ -1,29 +1,14 @@
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron');
-const {
-  apretarEnter,
-  redondear,
-  cargarFactura,
-  ponerNumero,
-  verCodigoComprobante,
-  verTipoComprobante,
-  verSiHayInternet,
-  verTipoComprobanteNegro,
-  getParameterByName,
-  sacarIva,
-  verPrecioConCantidad,
-  calcularPrecio,
-  prepararObjetoVenta,
-} = require('../helpers');
+const { apretarEnter, redondear, cargarFactura, ponerNumero, verSiHayInternet, getParameterByName, verPrecioConCantidad, calcularPrecio, prepararObjetoVenta } = require('../helpers');
 
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
 const { getClienteById, putCliente } = require('../services/clientesService');
 const { getCompensada, deleteCompensada, deleteHistorica } = require('../services/cuentasService');
-const { getRemitoById, postRemito, putRemitoPasado } = require('../services/remitoService');
+const { getRemitoById, putRemitoPasado } = require('../services/remitoService');
 const { getMovimientoForNumberAndType, deleteMovimientos } = require('../services/movProductosService');
-const { getProductoById, getProductoByNombre } = require('../services/productoService');
-const { postPresupuesto } = require('../services/presupuestoService');
+const { getProductoById } = require('../services/productoService');
 const { postVenta, getVentaPorFactura, getVentaForIdAndType } = require('../services/ventasService');
 const { getNumero } = require('../services/numeroService');
 const { crearHTML, crearProducto } = require('../ui/venta');
@@ -136,18 +121,13 @@ const cargarRemito = async () => {
     const promesasMovimientos = remitos.map(async (remito) => {
       textoObservaciones += remito.observaciones + ' ';
       idCliente = remito.idCliente;
-      const { data } = await getMovimientoForNumberAndType(remito.numero, 'RT');
-      return data; // Assuming getMovimiento returns { data: [...] } based on usage elsewhere or fix if it returns array directly
+      const data = await getMovimientoForNumberAndType(remito.numero, 'RT');
+      return data;
     });
 
     const resultadosMovimientos = await Promise.all(promesasMovimientos);
 
-    // Flatten the array of arrays
     movimientosRemitos = resultadosMovimientos.flat();
-
-    // Parallel fetch for product details could also be done here, but let's stick to the plan for now or optimize further.
-    // The previous loop was "for await", implying sequential processing for DOM addition.
-    // We can fetch data in parallel but should probably append to DOM sequentially to keep order, or just Promise.all processing.
 
     const productosProcesados = await Promise.all(
       movimientosRemitos.map(async (elem) => {
@@ -170,7 +150,6 @@ const cargarRemito = async () => {
           };
         }
 
-        // Return enhanced logic object to be rendered
         return { producto, cantidad: elem.cantidad, series: elem?.series, codProd: elem.codProd };
       })
     );
@@ -262,7 +241,6 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     return;
   }
 
-  producto = producto === '' ? await getProductoByNombre(producto) : producto; //buscamos el producto por descripcion
   //ponemos el precio del producto con un descuento si es que hay
   producto.precioAux = parseFloat(redondear(producto.precioAux + (producto.precioAux * parseFloat(porcentaje.value)) / 100, 2));
 
@@ -384,30 +362,6 @@ const togglePrecios = async (e) => {
     }
   }
   calcularTotal();
-};
-
-//Ver Codigo Documento
-const verCodigoDocumento = async (cuit) => {
-  if (cuit !== '00000000' && cuit !== '') {
-    if (cuit.length === 8) {
-      return 96;
-    } else {
-      return 80;
-    }
-  }
-
-  return 99;
-};
-
-//Vemos que input tipo radio esta seleccionado
-const verTipoVenta = () => {
-  let retornar;
-  radio.forEach((input) => {
-    if (input.checked) {
-      retornar = input.value;
-    }
-  });
-  return retornar;
 };
 
 //Vefiricamos si la venta tiene los datos base para hacerla
@@ -649,7 +603,7 @@ lista.addEventListener('change', togglePrecios);
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load', async (e) => {
-  const { dolar: dolarTraido, dolarInstalador: dolarInstaladorTraido } = await getNumero();
+  const { Dolar: dolarTraido, dolarInstalador: dolarInstaladorTraido } = await getNumero();
   dolar = dolarTraido;
   dolarInstalador = dolarInstaladorTraido;
 
@@ -886,34 +840,6 @@ document.addEventListener('keydown', (e) => {
       },
       { once: true }
     );
-  } else if (e.keyCode === 113) {
-    const opciones = {
-      path: 'clientes/agregarCliente.html',
-      ancho: 900,
-      altura: 600,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 114) {
-    const opciones = {
-      path: 'productos/agregarProducto.html',
-      ancho: 900,
-      altura: 650,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 115) {
-    const opciones = {
-      path: 'productos/cambio.html',
-      ancho: 1000,
-      altura: 550,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 116) {
-    const opciones = {
-      path: 'gastos/gastos.html',
-      ancho: 500,
-      altura: 400,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
   } else if (e.keyCode === 117) {
     impresion.checked = !impresion.checked;
   } else if (e.keyCode === 118) {

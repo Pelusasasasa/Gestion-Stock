@@ -450,7 +450,7 @@ funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, factura
   venta.num_doc = cuit.value !== '' ? cuit.value : '00000000';
   venta.condicionIva = condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value;
 
-  const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, venta.condicion);
+  const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await funciones.sacarIva(listaProductos, venta.condicion);
 
   venta.iva21 = iva21;
   venta.iva0 = iva0;
