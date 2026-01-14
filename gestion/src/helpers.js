@@ -32,6 +32,40 @@ funciones.verSiHayInternet = () => {
   return retorno;
 };
 
+funciones.calcularPrecio = (lista, producto, dolar) => {
+  if (lista === 'NORMAL') return producto.precio;
+
+  if (producto.costoDolar !== 0) {
+    const costoUtilidad = (producto.costoDolar + (producto.costoDolar * (producto.utilidad ?? 0)) / 100) * dolar;
+    const precio = costoUtilidad + (costoUtilidad * producto.impuesto) / 100;
+    return precio;
+  } else {
+    const costoUtilidad = producto.costoDolar + (producto.costoDolar * (producto.utilidad ?? 0)) / 100;
+    const precio = costoUtilidad + (costoUtilidad * producto.impuesto) / 100;
+    return precio;
+  }
+};
+
+funciones.cargarVendedor = async () => {
+  const html = `
+    <section>
+        <main>
+            <label htmlFor="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre" />
+        </main>
+        <main>
+            <label htmlFor="codigo">Codigo</label>
+            <input type="text" name="codigo" id="codigo" />
+        </main>
+        <main>
+            <label htmlFor="permisos">Permisos</label>
+            <input type="number" name="permisos" id="permisos" />
+        </main>
+    </section>
+    `;
+  return html;
+};
+
 funciones.getParameterByName = (name) => {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
@@ -39,16 +73,16 @@ funciones.getParameterByName = (name) => {
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+funciones.apretarEnter = async (e, input) => {
+  if (e.key === 'Enter') {
+    input.focus();
+  }
+};
+
 //cerramos la ventana al apretrar escape
 funciones.cerrarVentana = (e) => {
   if (e.key === 'Escape') {
     window.close();
-  }
-};
-
-funciones.apretarEnter = async (e, input) => {
-  if (e.key === 'Enter') {
-    input.focus();
   }
 };
 
@@ -69,14 +103,64 @@ funciones.copiar = async () => {
   });
 };
 
-funciones.selecciona_value = (idInput) => {
-  const seleccionado = document.getElementById(idInput);
-  seleccionado.select();
+funciones.recorrerFlechas = (code) => {
+  if (code === 40 && seleccionado.nextElementSibling) {
+    let aux = 0;
+    let i = 0;
+    const tds = document.querySelectorAll('.seleccionado td');
+
+    for (let td of tds) {
+      if (td.classList.contains('subSeleccionado')) {
+        aux = i;
+      }
+      i++;
+    }
+
+    seleccionado && seleccionado.classList.remove('seleccionado');
+    seleccionado = seleccionado.nextElementSibling;
+    seleccionado.classList.add('seleccionado');
+
+    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+    subSeleccionado = seleccionado.children[aux];
+    subSeleccionado.classList.add('subSeleccionado');
+  } else if (code === 38 && seleccionado.previousElementSibling) {
+    let aux = 0;
+    let i = 0;
+    const tds = document.querySelectorAll('.seleccionado td');
+
+    for (let td of tds) {
+      if (td.classList.contains('subSeleccionado')) {
+        aux = i;
+      }
+      i++;
+    }
+
+    seleccionado && seleccionado.classList.remove('seleccionado');
+    seleccionado = seleccionado.previousElementSibling;
+    seleccionado.classList.add('seleccionado');
+
+    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+    subSeleccionado = seleccionado.children[aux];
+    subSeleccionado.classList.add('subSeleccionado');
+  } else if (code === 37 && subSeleccionado.previousElementSibling) {
+    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+    subSeleccionado = subSeleccionado.previousElementSibling;
+    subSeleccionado.classList.add('subSeleccionado');
+  } else if (code === 39 && subSeleccionado.nextElementSibling) {
+    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
+    subSeleccionado = subSeleccionado.nextElementSibling;
+    subSeleccionado.classList.add('subSeleccionado');
+  }
 };
 
 funciones.redondear = (numero, decimales) => {
   const signo = numero >= 0 ? 1 : -1;
   return parseFloat(Math.round(numero * Math.pow(10, decimales) + signo * 0.0001) / Math.pow(10, decimales)).toFixed(decimales);
+};
+
+funciones.selecciona_value = (idInput) => {
+  const seleccionado = document.getElementById(idInput);
+  seleccionado.select();
 };
 
 funciones.tablaCondicionIVAReceptorId = (condicion) => {
@@ -196,56 +280,6 @@ async function generarQR(texto) {
   const QR = await qrCode.toDataURL(url);
   return QR;
 }
-
-funciones.recorrerFlechas = (code) => {
-  if (code === 40 && seleccionado.nextElementSibling) {
-    let aux = 0;
-    let i = 0;
-    const tds = document.querySelectorAll('.seleccionado td');
-
-    for (let td of tds) {
-      if (td.classList.contains('subSeleccionado')) {
-        aux = i;
-      }
-      i++;
-    }
-
-    seleccionado && seleccionado.classList.remove('seleccionado');
-    seleccionado = seleccionado.nextElementSibling;
-    seleccionado.classList.add('seleccionado');
-
-    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-    subSeleccionado = seleccionado.children[aux];
-    subSeleccionado.classList.add('subSeleccionado');
-  } else if (code === 38 && seleccionado.previousElementSibling) {
-    let aux = 0;
-    let i = 0;
-    const tds = document.querySelectorAll('.seleccionado td');
-
-    for (let td of tds) {
-      if (td.classList.contains('subSeleccionado')) {
-        aux = i;
-      }
-      i++;
-    }
-
-    seleccionado && seleccionado.classList.remove('seleccionado');
-    seleccionado = seleccionado.previousElementSibling;
-    seleccionado.classList.add('seleccionado');
-
-    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-    subSeleccionado = seleccionado.children[aux];
-    subSeleccionado.classList.add('subSeleccionado');
-  } else if (code === 37 && subSeleccionado.previousElementSibling) {
-    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-    subSeleccionado = subSeleccionado.previousElementSibling;
-    subSeleccionado.classList.add('subSeleccionado');
-  } else if (code === 39 && subSeleccionado.nextElementSibling) {
-    subSeleccionado && subSeleccionado.classList.remove('subSeleccionado');
-    subSeleccionado = subSeleccionado.nextElementSibling;
-    subSeleccionado.classList.add('subSeleccionado');
-  }
-};
 
 //devolvemos la ultimaFactura C y ultima Nota de credito C
 funciones.ultimaC = async () => {
@@ -389,24 +423,45 @@ funciones.ponerNumero = async () => {
     });
 };
 
-funciones.cargarVendedor = async () => {
-  const html = `
-    <section>
-        <main>
-            <label htmlFor="nombre">Nombre</label>
-            <input type="text" name="nombre" id="nombre" />
-        </main>
-        <main>
-            <label htmlFor="codigo">Codigo</label>
-            <input type="text" name="codigo" id="codigo" />
-        </main>
-        <main>
-            <label htmlFor="permisos">Permisos</label>
-            <input type="number" name="permisos" id="permisos" />
-        </main>
-    </section>
-    `;
-  return html;
+funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, facturaAnterior) => {
+  const venta = {};
+
+  venta.fecha = new Date();
+
+  venta.idCliente = codigo.value;
+  venta.cliente = nombre.value;
+  venta.direccion = direccion.value;
+  venta.localidad = localidad.value;
+  venta.condicion = condicion.value;
+  venta.vendedor = vendedor ?? '';
+  venta.caja = require('./configuracion.json').caja;
+
+  venta.precio = parseFloat(total.value);
+  venta.descuento = parseFloat(descuento.value ?? 0);
+
+  venta.tipo_venta = funciones.verTipoVenta();
+  venta.listaProductos = listaProductos;
+
+  venta.checkboxDolar = checkboxDolar.checked;
+  venta.dolar = lista.value === 'NORMAL' ? dolar : dolarInstalador;
+
+  venta.cod_comp = situacion === 'blanco' ? await funciones.verCodigoComprobante(tipoFactura, cuit.value, condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value) : 0;
+  venta.tipo_comp = situacion === 'blanco' ? await funciones.verTipoComprobante(venta.cod_comp) : await funciones.verTipoComprobanteNegro(venta.tipo_venta);
+  venta.num_doc = cuit.value !== '' ? cuit.value : '00000000';
+  venta.condicionIva = condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value;
+
+  const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, venta.condicion);
+
+  venta.iva21 = iva21;
+  venta.iva0 = iva0;
+  venta.gravado21 = gravado21;
+  venta.gravado0 = gravado0;
+  venta.iva105 = iva105;
+  venta.gravado105 = gravado105;
+  venta.cantIva = cantIva;
+  venta.facturaAnterior = facturaAnterior && '';
+
+  return venta;
 };
 
 funciones.verificarUsuarios = async () => {
@@ -506,17 +561,14 @@ funciones.verTipoComprobanteNegro = async (tipo) => {
   }
 };
 
-//Funcion que sirve para sacar el costo mas iva de los productos por si lo usamos
-funciones.sacarCosto = (costo, costoDolar, impuesto = 0, dolar, utilidad = 0) => {
-  if (costoDolar !== 0) {
-    let costoUtilidad = costoDolar + (costoDolar * utilidad) / 100;
-    const retorno = redondear((costoUtilidad + (costoUtilidad * impuesto) / 100) * dolar, 2);
-    return retorno;
-  } else {
-    let costoUtilidad = costo + (costo * utilidad) / 100;
-    const retorno = redondear(costoUtilidad + (costoUtilidad * impuesto) / 100, 2);
-    return retorno;
-  }
+funciones.verTipoVenta = () => {
+  let retornar;
+  radio.forEach((input) => {
+    if (input.checked) {
+      retornar = input.value;
+    }
+  });
+  return retornar;
 };
 
 funciones.sacarIva = (lista, condicion) => {

@@ -70,6 +70,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
         false,
         venta.tipo_comp
       );
+
       if (!saldoModficado.ok)
         return res.status(400).json({
           msg: "Error al modificar el saldo del cliente",
@@ -142,7 +143,6 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
 ventaCTRL.VentasDia = async (req, res) => {
   const { fecha } = req.params;
-  console.log(fecha);
   try {
     const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
     const inicioDia = new Date(fechaBase);

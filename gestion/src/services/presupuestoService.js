@@ -7,7 +7,6 @@ const URL = process.env.GESTIONURL;
 const getPresupuestoForFecha = async (tipoFecha, fecha) => {
   try {
     const { data } = await axios.get(`${URL}presupuesto/${tipoFecha}/${fecha}`);
-    console.log(data);
     return data;
   } catch (error) {
     console.log(error);
@@ -15,6 +14,19 @@ const getPresupuestoForFecha = async (tipoFecha, fecha) => {
   }
 };
 
+const postPresupuesto = async (presupuesto) => {
+  try {
+    const { data } = await axios.post(`${URL}presupuesto`, presupuesto);
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return await Swal.fire('Error al crear el presupuesto', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
 module.exports = {
   getPresupuestoForFecha,
+
+  postPresupuesto,
 };

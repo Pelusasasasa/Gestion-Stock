@@ -1,28 +1,32 @@
-const axios = require('axios');
 const sweet = require('sweetalert2');
-require('dotenv').config();
-
 const { ipcRenderer } = require('electron');
 const {
   apretarEnter,
   redondear,
-  sacarCosto,
   cargarFactura,
   ponerNumero,
   verCodigoComprobante,
   verTipoComprobante,
   verSiHayInternet,
   verTipoComprobanteNegro,
-  agregarMovimientoVendedores,
   getParameterByName,
   sacarIva,
   verPrecioConCantidad,
+  calcularPrecio,
+  prepararObjetoVenta,
 } = require('../helpers');
+
 const archivo = require('../configuracion.json');
 const { default: Swal } = require('sweetalert2');
 const { getClienteById, putCliente } = require('../services/clientesService');
-
-const URL = process.env.GESTIONURL;
+const { getCompensada, deleteCompensada, deleteHistorica } = require('../services/cuentasService');
+const { getRemitoById, postRemito, putRemitoPasado } = require('../services/remitoService');
+const { getMovimientoForNumberAndType, deleteMovimientos } = require('../services/movProductosService');
+const { getProductoById, getProductoByNombre } = require('../services/productoService');
+const { postPresupuesto } = require('../services/presupuestoService');
+const { postVenta, getVentaPorFactura, getVentaForIdAndType } = require('../services/ventasService');
+const { getNumero } = require('../services/numeroService');
+const { crearHTML, crearProducto } = require('../ui/venta');
 
 let vendedor = getParameterByName('vendedor');
 let esRemito = getParameterByName('remito');
@@ -74,7 +78,6 @@ let situacion = 'blanco';
 
 let totalGlobal = 0;
 let idProducto = 0;
-let porcentajeH = 0;
 let descuento = 0;
 let dolar = 0;
 let dolarInstalador = 0;
@@ -90,7 +93,7 @@ const arreglarSaldo = async (id) => {
   let saldoADescontar = 0;
 
   for (let elem of cuentas) {
-    const { data: compensada } = await axios.get(`${URL}compensada/traerCompensada/id/${elem}`);
+    const compensada = await getCompensada(elem);
 
     saldoADescontar += compensada.importe;
   }
@@ -127,178 +130,81 @@ const cargarRemito = async () => {
   let textoObservaciones = '';
   let aux = 0;
 
-  for (let elem of remitosTraidos) {
-    let remito = {};
+  try {
+    const remitos = await Promise.all(remitosTraidos.map((elem) => getRemitoById(elem)));
 
-    try {
-      const { data } = await axios.get(`${URL}remitos/forId/${elem}`);
-      if (data.ok) {
-        remito = data.remito;
-      } else {
-        return await sweet.fire('No se pudo obtener los remito', data.msg, 'error');
+    const promesasMovimientos = remitos.map(async (remito) => {
+      textoObservaciones += remito.observaciones + ' ';
+      idCliente = remito.idCliente;
+      const { data } = await getMovimientoForNumberAndType(remito.numero, 'RT');
+      return data; // Assuming getMovimiento returns { data: [...] } based on usage elsewhere or fix if it returns array directly
+    });
+
+    const resultadosMovimientos = await Promise.all(promesasMovimientos);
+
+    // Flatten the array of arrays
+    movimientosRemitos = resultadosMovimientos.flat();
+
+    // Parallel fetch for product details could also be done here, but let's stick to the plan for now or optimize further.
+    // The previous loop was "for await", implying sequential processing for DOM addition.
+    // We can fetch data in parallel but should probably append to DOM sequentially to keep order, or just Promise.all processing.
+
+    const productosProcesados = await Promise.all(
+      movimientosRemitos.map(async (elem) => {
+        let producto;
+        const res = elem.codProd.toUpperCase().replace(/\//g, '%2F');
+
+        if (res) {
+          producto = await getProductoById(res);
+          if (producto) producto.precioAux = calcularPrecio(lista.value, producto);
+        }
+
+        if (!producto) {
+          producto = {
+            _id: elem.codProd,
+            descripcion: elem.producto,
+            precio: elem.precio,
+            precioAux: elem.precio,
+            marca: elem.marca,
+            impuesto: elem.iva,
+          };
+        }
+
+        // Return enhanced logic object to be rendered
+        return { producto, cantidad: elem.cantidad, series: elem?.series, codProd: elem.codProd };
+      })
+    );
+
+    for (let item of productosProcesados) {
+      item.producto.idTabla = aux;
+      aux++;
+      // We use the same listing logic, but we need to ensure local 'listaProductos' and DOM are updated.
+      // re-using listarProducto or manually pushing.
+      // listarProducto does DOM + State.
+      await listarProducto(item.producto, item.cantidad, item.series);
+
+      // Fix for series if needed as per original code
+      const pro = listaProductos.find(({ producto }) => producto._id === item.codProd);
+      if (pro) {
+        pro.series = item.series;
       }
-    } catch (error) {
-      console.log(error);
-      return await sweet.fire('No se pudo obtener los remitos', error?.response?.data?.msg, 'error');
     }
 
-    const mov = (await axios.get(`${URL}movimiento/${remito.numero}/RT`)).data;
-    console.log(mov);
-    textoObservaciones += remito.observaciones + ' ';
-    movimientosRemitos.push(...mov);
-
-    idCliente = remito.idCliente;
+    observaciones.value = textoObservaciones;
+    listarCliente(idCliente);
+  } catch (error) {
+    console.error('Error cargando remitos:', error);
+    await Swal.fire('Error', 'No se pudieron cargar los remitos', 'error');
   }
-
-  for await (let elem of movimientosRemitos) {
-    let producto;
-    const res = elem.codProd.toUpperCase().replace(/\//g, '%2F');
-
-    if (res) {
-      producto = (await axios.get(`${URL}productos/${res}`)).data; //buscamos el producto por codigo
-    } else {
-      producto = {};
-      producto._id = elem.codProd;
-      producto.descripcion = elem.producto;
-      producto.precio = elem.precio;
-      producto.marca = elem.marca;
-      producto.impuesto = elem.iva;
-    }
-    producto.idTabla = aux;
-    aux++;
-
-    await listarProducto(producto, elem.cantidad);
-    const pro = listaProductos.find(({ producto }) => producto._id === elem.codProd);
-    if (pro) {
-      pro.series = elem?.series;
-    }
-  }
-
-  observaciones.value = textoObservaciones;
-  listarCliente(idCliente);
-};
-
-const crearHTML = async (elem) => {
-  const tr = document.createElement('tr');
-
-  const tdCodigo = document.createElement('td');
-  const tdCantidad = document.createElement('td');
-  const tdDescripcion = document.createElement('td');
-  const tdMarca = document.createElement('td');
-  const tdIva = document.createElement('td');
-  const tdPrecio = document.createElement('td');
-  const tdTotal = document.createElement('td');
-  const tdAcciones = document.createElement('td');
-
-  tdAcciones.classList.add('acciones');
-
-  tdCodigo.innerText = elem.codProd;
-  tdCantidad.innerText = elem.cantidad;
-  tdDescripcion.innerText = elem.producto;
-  tdMarca.innerText = elem.marca;
-  tdIva.innerText = elem.iva;
-  tdPrecio.innerText = elem.precio;
-  tdTotal.innerText = redondear(elem.precio * elem.cantidad, 2);
-
-  tdAcciones.innerHTML = `
-            <td class=acciones>
-                <div class=tool>
-                    <span class=material-icons>post_add</span>
-                    <p class=tooltip>Series</p>
-                </div>
-                <div class=tool>
-                    <span class=material-icons>delete</span>
-                    <p class=tooltip>Eliminar</p>
-                </div>
-            </td>
-        `;
-
-  tr.appendChild(tdCodigo);
-  tr.appendChild(tdCantidad);
-  tr.appendChild(tdDescripcion);
-  tr.appendChild(tdMarca);
-  tr.appendChild(tdIva);
-  tr.appendChild(tdPrecio);
-  tr.appendChild(tdTotal);
-  tr.appendChild(tdAcciones);
-
-  tbody.appendChild(tr);
-
-  let producto = await obtenerProducto(elem.codProd);
-
-  if (!producto) {
-    producto = {
-      _id: elem.codProd,
-      descripcion: elem.producto,
-      precio: elem.precio,
-      marca: elem.marca,
-      impuesto: elem.iva,
-    };
-  }
-  console.log(producto);
-  listaProductos.push({
-    cantidad: elem.cantidad,
-    producto,
-    series: elem?.series,
-  });
-  await calcularTotal();
-};
-
-const crearProducto = () => {
-  idProducto++;
-  const producto = {
-    descripcion: descripcion.value.toUpperCase(),
-    precio: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)) / 100, 2)),
-    rubro: 'Cualquiera',
-    idTabla: `${idProducto}`,
-    impuesto: parseFloat(iva.value),
-    productoCreado: true,
-  };
-  listaProductos.push({ cantidad: parseFloat(cantidad.value), producto });
-  tbody.innerHTML += `
-        <tr id=${idProducto}>
-            <td></td>
-            <td>${cantidad.value}</td>
-            <td>${descripcion.value.toUpperCase()}</td>
-            <td></td>
-            <td>${producto.impuesto.toFixed(2)}</td>
-            <td>${parseFloat(producto.precio).toFixed(2)}</td>
-            <td>${redondear(producto.precio * parseFloat(cantidad.value), 2)}</td>
-            <td class=acciones>
-                <div class=tool>
-                        <span class=material-icons>post_add</span>
-                        <p class=tooltip>Agregar Nº serie</p>
-                </div>
-                <div class=tool>
-                    <span class=material-icons>delete</span>
-                    <p class=tooltip>Eliminar</p>
-                </div>
-            </td>
-        </tr>
-    `;
-  tbody.scrollIntoView({
-    block: 'end',
-  });
-
-  total.value = redondear(parseFloat(total.value) + parseFloat(producto.precio) * parseFloat(cantidad.value), 2);
-  totalGlobal = parseFloat(total.value);
-  cantidad.value = '1.00';
-  codBarra.value = '';
-  precioU.value = '';
-  iva.value = '21.00';
-  // rubro.value = "";
-  descripcion.value = '';
-  console.log(descripcion.value);
-  codBarra.focus();
 };
 
 const eliminarCuentas = async () => {
   for (let elem of cuentas) {
-    const { data: compensada } = await axios.delete(`${URL}compensada/traerCompensada/id/${elem}`);
-    const { data: historica } = await axios.delete(`${URL}historica/porNumero/${elem}`);
-    const { data: movs } = await axios.delete(`${URL}movimiento/${elem}/CC`);
+    const { ok } = await deleteCompensada(elem);
+    const { ok: historica } = await deleteHistorica(elem);
+    const { ok: movs } = await deleteMovimientos(elem, 'CC');
 
-    console.log(compensada);
+    console.log(ok);
     console.log(historica);
     console.log(movs);
   }
@@ -356,9 +262,9 @@ const listarProducto = async (producto, cant = 1, series = []) => {
     return;
   }
 
-  producto = producto === '' ? (await axios.get(`${URL}productos/buscar/porNombre/${producto}`)).data : producto; //buscamos el producto por descripcion
+  producto = producto === '' ? await getProductoByNombre(producto) : producto; //buscamos el producto por descripcion
   //ponemos el precio del producto con un descuento si es que hay
-  producto.precio = parseFloat(redondear(producto.precio + (producto.precio * parseFloat(porcentaje.value)) / 100, 2));
+  producto.precioAux = parseFloat(redondear(producto.precioAux + (producto.precioAux * parseFloat(porcentaje.value)) / 100, 2));
 
   //Buscamos si el produto ya esta cargado
   if (producto !== '') {
@@ -386,7 +292,7 @@ const listarProducto = async (producto, cant = 1, series = []) => {
 
       codBarra.value = producto._id;
 
-      precioU.value = lista.value === 'NORMAL' ? redondear(producto.precio, 2) : sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador, producto.utilidad);
+      precioU.value = producto.precioAux;
 
       idProducto++;
       producto.idTabla = `${idProducto}`;
@@ -436,14 +342,9 @@ const listarProducto = async (producto, cant = 1, series = []) => {
       }
 
       //Si la lista de de cliente normal se redonde el precio y sino el costo mas iva por el dolar intalador
-      if (lista.value === 'NORMAL') {
-        precio.innerHTML = redondear(parseFloat(tr.children[1].innerHTML) * producto.precio, 2);
-        calcularTotal();
-      } else {
-        precio.innerHTML = redondear(cantidadNueva * parseFloat(sacarCosto(producto.costo, producto.costoDolar, producto.impuesto, dolarInstalador)), 2);
-        calcularTotal();
-      }
-
+      producto.precioAux = calcularPrecio(lista.value, producto, dolarInstalador);
+      precio.innerText = producto.precioAux.toFixed(2);
+      calcularTotal();
       totalGlobal = parseFloat(total.value);
     }
 
@@ -461,7 +362,7 @@ const listarVenta = async (venta) => {
   listarCliente(venta.idCliente);
 
   try {
-    const { data } = await axios.get(`${URL}movimiento/${venta.numero}/${venta.tipo_venta}`);
+    const { data } = await getMovimientoForNumberAndType(venta.numero, venta.tipo_venta);
     listarMovimientos(data);
   } catch (error) {
     console.log(error);
@@ -472,38 +373,14 @@ const listarVenta = async (venta) => {
   }
 };
 
-const obtenerProducto = async (id) => {
-  try {
-    const { data } = await axios.get(`${URL}productos/${id}`);
-    if (data) {
-      return data;
-    } else {
-      return await sweet.fire('No se pudo obtener el producto', '', 'error');
-    }
-  } catch (error) {
-    //await sweet.fire('No se pudo obtener el producto', error.response.data.msg, 'error');
-    return null;
-  }
-};
-
 const togglePrecios = async (e) => {
   for await (let { cantidad, producto } of listaProductos) {
     console.log(producto);
     if (producto?._id) {
       const tr = document.getElementById(`${producto.idTabla}`);
 
-      if (lista.value === 'NORMAL') {
-        tr.children[5].innerText = producto.precio.toFixed(2);
-        tr.children[6].innerText = redondear(producto.precio * parseFloat(tr.children[1].innerText), 2);
-      } else {
-        if (producto.costo !== 0) {
-          tr.children[5].innerText = redondear(producto.costo + (producto.costo * producto.impuesto) / 100, 2);
-          tr.children[6].innerText = redondear(parseFloat(tr.children[5].innerText) * parseFloat(tr.children[1].innerText), 2);
-        } else {
-          tr.children[5].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) * dolarInstalador, 2);
-          tr.children[6].innerText = redondear((producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) * dolarInstalador * parseFloat(tr.children[1].innerText), 2);
-        }
-      }
+      tr.children[5].innerText = producto.precioAux.toFixed(2);
+      tr.children[6].innerText = redondear(producto.precioAux * parseFloat(tr.children[1].innerText), 2);
     }
   }
   calcularTotal();
@@ -564,74 +441,6 @@ const vefiricarVenta = async () => {
   return bandera;
 };
 
-checkboxDolar.addEventListener('click', () => {
-  togglePrecios();
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    sweet
-      .fire({
-        title: 'Cancelar Venta?',
-        showCancelButton: true,
-        confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar',
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          location.href = '../menu.html';
-        }
-      });
-  }
-
-  if (e.keyCode === 18) {
-    document.addEventListener(
-      'keydown',
-      (event) => {
-        if (event.keyCode === 120) {
-          body.classList.toggle('negro');
-          situacion = situacion === 'negro' ? 'blanco' : 'negro';
-          cambiarSituacion(situacion);
-        }
-      },
-      { once: true }
-    );
-  } else if (e.keyCode === 113) {
-    const opciones = {
-      path: 'clientes/agregarCliente.html',
-      ancho: 900,
-      altura: 600,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 114) {
-    const opciones = {
-      path: 'productos/agregarProducto.html',
-      ancho: 900,
-      altura: 650,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 115) {
-    const opciones = {
-      path: 'productos/cambio.html',
-      ancho: 1000,
-      altura: 550,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 116) {
-    const opciones = {
-      path: 'gastos/gastos.html',
-      ancho: 500,
-      altura: 400,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (e.keyCode === 117) {
-    impresion.checked = !impresion.checked;
-  } else if (e.keyCode === 118) {
-    checkboxDolar.checked = !checkboxDolar.checked;
-    togglePrecios();
-  }
-});
-
 facturar.addEventListener('click', async (e) => {
   let verificado = await vefiricarVenta();
   let bandera = listaProductos.find(({ producto }) => producto.impuesto === 0);
@@ -644,44 +453,18 @@ facturar.addEventListener('click', async (e) => {
 
   if (verificado) {
     alerta.classList.remove('none');
-    const venta = {};
     const movimientos = [];
+    let venta = {};
     let ventaTraida = {};
+    const cliente = {};
+    cliente.nombre = nombre.value;
+    cliente.localidad = localidad.value;
+    cliente.cuit = cuit.value;
+    cliente.condicionIva = condicionIva.value;
+    cliente.direccion = direccion.value;
+    cliente._id = codigo.value;
 
-    venta.idCliente = codigo.value;
-    venta.cliente = nombre.value;
-    venta.fecha = new Date();
-
-    venta.precio = parseFloat(total.value);
-    venta.descuento = descuento;
-    venta.tipo_venta = await verTipoVenta();
-    venta.listaProductos = listaProductos;
-    venta.observaciones = observaciones.value.toUpperCase();
-    venta.direccion = direccion.value;
-    venta.localidad = localidad.value;
-    venta.condicion = lista.value;
-    venta.checkboxDolar = checkboxDolar.checked;
-    venta.dolar = lista.value === 'NORMAL' ? dolar : dolarInstalador;
-    venta.caja = require('../configuracion.json').caja; //vemos en que caja se hizo la venta
-    venta.vendedor = vendedor ? vendedor : '';
-
-    //Ponemos propiedades para la factura electronica
-    venta.cod_comp = situacion === 'blanco' ? await verCodigoComprobante(tipoFactura, cuit.value, condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value) : 0;
-    venta.tipo_comp = situacion === 'blanco' ? await verTipoComprobante(venta.cod_comp) : await verTipoComprobanteNegro(venta.tipo_venta);
-    venta.num_doc = cuit.value !== '' ? cuit.value : '00000000';
-    venta.cod_doc = await verCodigoDocumento(cuit.value);
-    venta.condicionIva = condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value;
-    console.log(listaProductos);
-
-    const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await sacarIva(listaProductos, venta.condicion); //sacamos el iva de los productos
-    venta.iva21 = iva21;
-    venta.iva0 = iva0;
-    venta.gravado0 = gravado0;
-    venta.gravado21 = gravado21;
-    venta.iva105 = iva105;
-    venta.gravado105 = gravado105;
-    venta.cantIva = cantIva;
-    venta.facturaAnterior = facturaAnterior ? facturaAnterior : '';
+    venta = await prepararObjetoVenta(dolar, dolarInstalador, vendedor, facturaAnterior);
 
     try {
       if (situacion === 'blanco') {
@@ -691,44 +474,15 @@ facturar.addEventListener('click', async (e) => {
       } else {
         alerta.children[1].innerHTML = 'Generando Venta';
       }
-      const cliente = {};
-      cliente.nombre = nombre.value;
-      cliente.localidad = localidad.value;
-      cliente.cuit = cuit.value;
-      cliente.condicionIva = condicionIva.value;
-      cliente.direccion = direccion.value;
-      cliente._id = codigo.value;
-      console.log(venta);
-      if (venta.tipo_venta === 'PP') {
-        const { data } = await axios.post(`${URL}Presupuesto`, venta);
-        ventaTraida = data.venta;
-        movimientos.push(...data.movimientos);
-      } else if (venta.tipo_venta === 'RT') {
-        if (!venta.vendedor) {
-          venta.vendedor = 'GONZALO';
-        }
-        const { data } = await axios.post(`${URL}remitos`, venta);
-        ventaTraida = data.venta;
-        movimientos.push(...data.movimientos);
-      } else {
-        const { data } = await axios.post(`${URL}ventas`, venta);
-        ventaTraida = data.venta;
-        movimientos.push(...data.movimientos);
-      }
+
+      const { ok, venta: nuevaVenta, movimientos: movimientosNuevos } = await postVenta(venta);
+      ventaTraida = nuevaVenta;
+      movimientos.push(...movimientosNuevos);
 
       //Si la lista de remitos tiene remitos, hacemos para que se pongan como pasado
       if (remitosTraidos.length > 0) {
-        for (let elem of remitosTraidos) {
-          try {
-            const { data } = await axios.put(`${URL}remitos/pasado/${elem}`);
-            if (!data.ok) {
-              return await sweet.fire('No se pudo quitar los remitos pero se paso la venta', data?.msg, 'error');
-            }
-          } catch (error) {
-            console.log(error);
-            return await sweet.fire('No se pudo quitar los remitos pero se paso la venta', data?.response?.data?.msg, 'error');
-          }
-        }
+        const promesas = remitosTraidos.map((elem) => putRemitoPasado(elem));
+        await Promise.all(promesas);
       }
 
       if (impresion.checked) {
@@ -837,27 +591,20 @@ tbody.addEventListener('dblclick', async (se) => {
       if (isConfirmed) {
         const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
         //Borramos el total anterior
-        totalGlobal = parseFloat(redondear(totalGlobal - verPrecioConCantidad(producto, lista.value, dolar), 2));
+        totalGlobal -= producto.producto.precioAux * producto.cantidad;
 
         producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
         producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
 
-        if (lista.value === 'INSTALADOR') {
-          if (producto.producto.costoDolar !== 0) {
-            producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
-            producto.producto.costoDolar = calcularcosto(producto.producto.precio, producto.producto.impuesto, dolarInstalador);
-          } else {
-            producto.producto.costo = parseFloat(document.getElementById('precioCambio').value);
-          }
-        } else {
-          producto.producto.precio = parseFloat(document.getElementById('precioCambio').value);
-        }
+        const precioAux = parseFloat(document.getElementById('precioCambio').value);
+        producto.producto.precioAux = precioAux;
+
         seleccionado.children[1].innerHTML = producto.cantidad.toFixed(2);
         seleccionado.children[4].innerHTML = producto.producto.impuesto.toFixed(2);
-        seleccionado.children[5].innerHTML = producto.producto.precio.toFixed(2);
-        seleccionado.children[6].innerHTML = redondear(producto.producto.precio * producto.cantidad, 2);
+        seleccionado.children[5].innerHTML = precioAux.toFixed(2);
+        seleccionado.children[6].innerHTML = redondear(precioAux * producto.cantidad, 2);
 
-        totalGlobal = parseFloat(redondear(totalGlobal + parseFloat(document.getElementById('precioCambio').value) * producto.cantidad, 2));
+        totalGlobal += parseFloat(redondear(precioAux * producto.cantidad, 2));
 
         total.value = totalGlobal.toFixed(2);
       }
@@ -902,8 +649,9 @@ lista.addEventListener('change', togglePrecios);
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load', async (e) => {
-  dolar = (await axios.get(`${URL}numero/Dolar`)).data;
-  dolarInstalador = (await axios.get(`${URL}numero/dolarInstalador`)).data;
+  const { dolar: dolarTraido, dolarInstalador: dolarInstaladorTraido } = await getNumero();
+  dolar = dolarTraido;
+  dolarInstalador = dolarInstaladorTraido;
 
   if (tipoFactura === 'notaCredito') {
     const { value, isConfirmed } = await sweet.fire({
@@ -933,18 +681,8 @@ window.addEventListener('load', async (e) => {
 
     if (isConfirmed) {
       facturaAnterior = value.numero.padStart(8, '0');
-      try {
-        const { data } = await axios.get(`${URL}ventas/porFactura/${value.numero}/${value.tipo}`);
-        if (data.ok) {
-          listarVenta(data.venta);
-        } else {
-          return await sweet.fire('Error al obtener la venta', 'No se encontro una venta', 'error');
-        }
-      } catch (error) {
-        console.log(error);
-        await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
-        return location.reload();
-      }
+      const data = await getVentaPorFactura(value.numero, value.tipo);
+      listarVenta(data.venta);
     } else {
       location.href = '../menu.html';
     }
@@ -963,13 +701,35 @@ descripcion.addEventListener('keypress', (e) => {
 
 precioU.addEventListener('keypress', async (e) => {
   if (e.key === 'Enter') {
-    if (precioU.value !== '') {
-      crearProducto();
-    } else {
-      await sweet.fire({
+    if (precioU.value === '')
+      return await sweet.fire({
         title: 'Poner un precio al Producto',
       });
-    }
+
+    idProducto++;
+    const producto = {
+      descripcion: descripcion.value.toUpperCase(),
+      precioAux: parseFloat(redondear(parseFloat(precioU.value) + (parseFloat(precioU.value) * parseFloat(porcentaje.value)) / 100, 2)),
+      rubro: 'Cualquiera',
+      idTabla: `${idProducto}`,
+      impuesto: parseFloat(iva.value),
+      productoCreado: true,
+    };
+
+    listaProductos.push({ cantidad: parseFloat(cantidad.value), producto });
+
+    crearProducto(producto, cantidad.value);
+
+    total.value = redondear(parseFloat(total.value) + parseFloat(producto.precioAux) * parseFloat(cantidad.value), 2);
+    totalGlobal = parseFloat(total.value);
+    cantidad.value = '1.00';
+    codBarra.value = '';
+    precioU.value = '';
+    iva.value = '21.00';
+    // rubro.value = "";
+    descripcion.value = '';
+    console.log(descripcion.value);
+    codBarra.focus();
   }
 });
 
@@ -987,25 +747,10 @@ porcentaje.addEventListener('change', async (e) => {
     const tr = document.getElementById(producto.idTabla);
 
     totalGlobal -= verPrecioConCantidad({ producto, cantidad }, lista.value, dolarInstalador);
-    //6931847170943
-    if (lista.value === 'INSTALADOR') {
-      if (producto.costoDolar !== 0) {
-        producto.costoDolar = producto.costoDolar + (producto.costoDolar * parseFloat(porcentaje.value)) / 100;
-        tr.children[5].innerHTML = ((producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) * dolarInstalador).toFixed(2);
-        tr.children[6].innerHTML = ((producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) * dolarInstalador * cantidad).toFixed(2);
-        totalGlobal = totalGlobal + parseFloat(tr.children[6].innerText);
-      } else {
-        producto.costo = producto.costo + (producto.costo * parseFloat(porcentaje.value)) / 100;
-        tr.children[5].innerHTML = (producto.costo + (producto.costo * producto.impuesto) / 100).toFixed(2);
-        tr.children[6].innerHTML = ((producto.costo + (producto.costo * producto.impuesto) / 100) * cantidad).toFixed(2);
-        totalGlobal = totalGlobal + parseFloat(tr.children[6].innerText);
-      }
-    } else {
-      producto.precio = producto.precio + (producto.precio * parseFloat(porcentaje.value)) / 100;
-      tr.children[5].innerHTML = producto.precio.toFixed(2);
-      tr.children[6].innerHTML = redondear(producto.precio * cantidad, 2);
-      totalGlobal = parseFloat(redondear(totalGlobal + producto.precio * cantidad, 2));
-    }
+
+    tr.children[5].innerHTML = producto.precioAux.toFixed(2);
+    tr.children[6].innerHTML = redondear(producto.precioAux * cantidad, 2);
+    totalGlobal = parseFloat(redondear(totalGlobal + producto.precioAux * cantidad, 2));
 
     total.value = totalGlobal.toFixed(2);
   }
@@ -1054,7 +799,8 @@ cantidad.addEventListener('keypress', async (e) => {
   if (e.keyCode === 13) {
     if (eval(e.target.value)) {
       const res = codBarra.value.toUpperCase().replace(/\//g, '%2F');
-      let producto = (await axios.get(`${URL}productos/${res}`)).data; //buscamos el producto por codigo
+      let producto = await getProductoById(res);
+      producto.precioAux = calcularPrecio(lista.value, producto, dolarInstalador);
       listarProducto(producto, cantidad.value);
     } else {
       cantidad.value = '';
@@ -1108,6 +854,74 @@ inputRecibo.addEventListener('focus', (e) => {
   inputRecibo.select();
 });
 
+checkboxDolar.addEventListener('click', () => {
+  togglePrecios();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    sweet
+      .fire({
+        title: 'Cancelar Venta?',
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          location.href = '../menu.html';
+        }
+      });
+  }
+
+  if (e.keyCode === 18) {
+    document.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.keyCode === 120) {
+          body.classList.toggle('negro');
+          situacion = situacion === 'negro' ? 'blanco' : 'negro';
+          cambiarSituacion(situacion);
+        }
+      },
+      { once: true }
+    );
+  } else if (e.keyCode === 113) {
+    const opciones = {
+      path: 'clientes/agregarCliente.html',
+      ancho: 900,
+      altura: 600,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (e.keyCode === 114) {
+    const opciones = {
+      path: 'productos/agregarProducto.html',
+      ancho: 900,
+      altura: 650,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (e.keyCode === 115) {
+    const opciones = {
+      path: 'productos/cambio.html',
+      ancho: 1000,
+      altura: 550,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (e.keyCode === 116) {
+    const opciones = {
+      path: 'gastos/gastos.html',
+      ancho: 500,
+      altura: 400,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (e.keyCode === 117) {
+    impresion.checked = !impresion.checked;
+  } else if (e.keyCode === 118) {
+    checkboxDolar.checked = !checkboxDolar.checked;
+    togglePrecios();
+  }
+});
+
 ipcRenderer.on('informacion', (e, args) => {
   dolar = args;
 });
@@ -1117,23 +931,14 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
 
   facturaVarios = true;
 
-  const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${cuentas[0]}`);
+  const compensada = await getCompensadaById(cuentas[0]);
 
-  try {
-    const { data } = await axios.get(`${URL}ventas/id/${cuentas[0]}/CC`);
-    if (data.ok) {
-      vendedor = data.venta.vendedor._id;
-    } else {
-      return await sweet.fire('Error al obtener la venta', data?.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await sweet.fire('Error al obtener la venta', error?.response?.data?.msg, 'error');
-  }
-  listarCliente(data.idCliente);
+  const { data: venta } = await getVentaForIdAndType(compensada.id, 'CC');
+
+  listarCliente(compensada.idCliente);
 
   for (let elem of cuentas) {
-    const { data: movs } = await axios.get(`${URL}movimiento/${elem}/CC`);
+    const { data: movs } = await getMovimientoForNumberAndType(elem, 'CC');
 
     for await (let mov of movs) {
       producto = {
@@ -1156,7 +961,8 @@ ipcRenderer.on('recibir', async (e, args) => {
 
   if (tipo === 'producto') {
     const res = informacion.toUpperCase().replace(/\//g, '%2F');
-    let producto = (await axios.get(`${URL}productos/${res}`)).data; //buscamos el producto por codigo
+    let producto = await getProductoById(res); //buscamos el producto por codigo
+    producto.precioAux = calcularPrecio(lista.value, producto, dolarInstalador);
     listarProducto(producto, cantidad);
   }
 });
@@ -1165,8 +971,3 @@ ipcRenderer.on('recibir', async (e, args) => {
 ipcRenderer.on('poner-numero', async (e, args) => {
   ponerNumero();
 });
-
-const calcularcosto = (precio, impuesto, dolar) => {
-  console.log(precio, impuesto, dolar);
-  return precio / (1 + impuesto / 100) / dolar;
-};

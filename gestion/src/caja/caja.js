@@ -6,6 +6,8 @@ const { deleteVentaForNumeroAndType } = require('../services/ventasService');
 const { getPresupuestoForFecha } = require('../services/presupuestoService');
 const { getCajaForFecha, getCajaForDia } = require('../services/cajaService');
 const { listarGastos, listarVentas } = require('../ui/caja');
+const { getInfoImprimir } = require('../services/imprimirService');
+const { ipcRenderer } = require('electron');
 
 let vendedor = getParameterByName('vendedor');
 let permiso = getParameterByName('permiso');
@@ -210,7 +212,7 @@ tbody.addEventListener('click', async (e) => {
 
   seleccionado.classList.add('seleccionado');
 
-  if (e.target.innerHTML === 'delete') {
+  if (e.target.innerText === 'delete') {
     sweet
       .fire({
         title: 'Seguro quiere borrar la Venta',
@@ -219,14 +221,17 @@ tbody.addEventListener('click', async (e) => {
       })
       .then(async ({ isConfirmed }) => {
         if (isConfirmed) {
-          const venta = await deleteVentaForNumeroAndType(id, seleccionado.children[3].innerHTML, vendedor);
+          const venta = await deleteVentaForNumeroAndType(id, seleccionado.children[3].innerText, vendedor);
           if (venta) {
             tbody.removeChild(seleccionado);
             total.value = redondear(parseFloat(total.value) - parseFloat(seleccionado.children[7].innerHTML), 2);
           }
         }
       });
-  } else if (e.target.innerHTML === 'edit') {
+  } else if (e.target.innerHTML === 'print') {
+    const { venta, cliente, movimientos } = await getInfoImprimir(seleccionado.id);
+
+    ipcRenderer.send('imprimir', ['negro', venta, cliente, movimientos, false]);
   }
 
   const trs = document.querySelectorAll('tbody .venta' + id);

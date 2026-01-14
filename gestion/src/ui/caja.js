@@ -72,6 +72,9 @@ const listarVentas = async (comprobantes) => {
                     <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
                 </div>
             <div class=tool>
+                    <span class=material-icons-outlined title='Re-Imprimir' id='print'>print</span>
+                </div>
+            <div class=tool>
                 <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
             </div>
         `;

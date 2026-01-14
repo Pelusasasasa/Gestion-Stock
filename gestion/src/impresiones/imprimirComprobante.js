@@ -31,7 +31,6 @@ window.addEventListener('load', (e) => {
     let datosVenta = JSON.parse(args)[1];
     let movimientos = JSON.parse(args)[3];
     let auxDolar = JSON.parse(args)[4];
-
     await ponerDatosVenta(datosVenta, auxDolar);
     await ponerDatosClientes(datosClientes);
     await ponerDatosArticulos(movimientos, auxDolar, datosVenta);
