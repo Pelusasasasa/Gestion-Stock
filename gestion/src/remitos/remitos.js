@@ -97,26 +97,18 @@ const filtrarRemitos = async (e) => {
 };
 
 const modificarObservacionesRemitos = async () => {
-  try {
-    const data = await putObservaciones(seleccionado.id, cambiarObservaciones.value.toUpperCase());
-    console.log(data);
-    if (data.ok) {
-      await Swal.fire(`Se modifico las observaciones del remito ${seleccionado.children[3].innerText}`, '', 'success');
-      modal.classList.add('none');
-      seleccionado.children[4].innerText = data.remito.observaciones;
-    } else {
-      return await Swal.fire('Error al modificar las observaciones', data.msg, 'error');
-    }
-  } catch (error) {
-    console.log(error);
-    return await Swal.fire('Error al modificar las observaciones', error?.response?.data?.msg, 'error');
+  const data = await putObservaciones(seleccionado.id, cambiarObservaciones.value.toUpperCase());
+  if (data.ok) {
+    modal.classList.add('none');
+    seleccionado.children[4].innerText = data.remito.observaciones;
   }
 };
 
 const pasarCuenta = async () => {
-  const trSeleccinados = document.querySelectorAll('tr input[type="checkbox"]:checked');
-  const filasSeleccionadas = Array.from(trSeleccinados).map((checkbox) => checkbox.closest('tr'));
+  const trSeleccinados = document.querySelectorAll('#listRem input[type="checkbox"]:checked');
+  const filasSeleccionadas = Array.from(trSeleccinados).map((checkbox) => checkbox.closest('input'));
   const idFilas = filasSeleccionadas.map((elem) => elem.id);
+
   location.href = `../venta/index.html?remito=true&remitos=${JSON.stringify(idFilas)}&vendedor=${vendedor}`;
 };
 

@@ -54,7 +54,9 @@ const putRemitoPasado = async (id) => {
 const putObservaciones = async (id, observaciones) => {
   try {
     const { data } = await axios.patch(`${URL}remitos/observaciones/${id}`, { observaciones });
-    console.log(data);
+    if (!data.ok) {
+      return await Swal.fire('Error al modificar el remito', data.msg, 'error');
+    }
     return data;
   } catch (error) {
     console.log(error);

@@ -255,5 +255,104 @@
     align-items: center;
     height: 100vh;
     width: 100%;
+
+    main{
+        background-color:  white;
+        padding: 10px;
+        width: 400px;
+        height: 350px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+
+        #modalTitle{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+
+            #close{
+                font-size: 20px;
+                font-weight: bold;
+                cursor: pointer;
+                color: gray;
+                border-radius: 5px;
+                padding: 5px;
+                background-color: rgb(238, 237, 237);
+            }
+
+            #close:hover{
+                color: black;
+                transform: scale(1.2);
+            }
+        }
+
+        h4{
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #observaciones{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label{
+            font-weight: bold;
+        }
+
+        textarea{
+            width: 380px;
+            height: 100%;
+            border: 1px solid gray;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+
+        #botones{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+
+            button{
+                padding: 5px;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 15px;
+                width: 45%;
+
+                
+            }
+
+            #aceptarCambioObservaciones{
+                background-color: green;
+                color: white;
+            }
+
+            #aceptarCambioObservaciones:hover{
+                background-color: rgb(0, 172, 43);
+            }
+
+            #cancelarCambioObservaciones{
+                background-color: white;
+                color: black;
+                border: 1px solid gray;
+            }
+
+            #cancelarCambioObservaciones:hover{
+                background-color: rgb(238, 237, 237);
+            }
+        }
+    }
 }
 

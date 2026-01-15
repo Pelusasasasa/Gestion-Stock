@@ -20,7 +20,6 @@ const getUltimoId = async () => {
 const getClienteById = async (id) => {
   try {
     const { data } = await axios.get(`${URL}clientes/id/${id}`);
-    console.log(data);
     if (!data.ok) return await Swal.fire('Error al obtener el cliente', data.msg, 'error');
     return data.cliente;
   } catch (error) {

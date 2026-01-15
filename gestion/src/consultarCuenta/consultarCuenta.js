@@ -1,7 +1,7 @@
 const sweet = require('sweetalert2');
 const { ipcRenderer } = require('electron/renderer');
 
-const { cerrarVentana, apretarEnter, redondear, getParameterByName } = require('../helpers');
+const { redondear, getParameterByName } = require('../helpers');
 const { default: Swal } = require('sweetalert2');
 const {
   getCompensadas,
@@ -19,9 +19,6 @@ const { getPrecio, getCostoImpuesto } = require('../services/productosService');
 const { putMovimientos, getMovimientoForNumberAndType } = require('../services/movProductosService');
 const { listarVentas, listarProductos } = require('../ui/consultar');
 const { getVentaForNumberAndType, putVentaForNumeroAndType } = require('../services/ventasService');
-
-require('dotenv').config();
-const URL = process.env.GESTIONURL;
 
 const vendedor = getParameterByName('vendedor');
 
@@ -60,7 +57,7 @@ ipcRenderer.on('recibir', async (e, args) => {
     listaHistorica = await getHistoricas(informacion);
     cliente = await getClienteById(informacion);
 
-    saldo.value = cliente.saldo;
+    saldo.value = cliente.saldo.toFixed(2);
     clienteInput.value = cliente.nombre.slice(0, 45);
     buscar.value = cliente._id;
     buscar.blur();
@@ -123,7 +120,7 @@ const borrarCuentaCompHist = async (e) => {
       await filtrarVentas(historica);
 
       trSeleccionado.remove();
-      saldo.value = clienteTraido.saldo;
+      saldo.value = clienteTraido.saldo.toFixed(2);
     }
   } else {
     await sweet.fire({
@@ -379,7 +376,7 @@ actualizar.addEventListener('click', async (e) => {
           listarProductos(movimientos);
           trSeleccionado.children[4].innerText = cuentaModificada.importe;
           trSeleccionado.children[6].innerText = cuentaModificada.saldo;
-          saldo.value = cliente.saldo;
+          saldo.value = cliente.saldo.toFixed(2);
         }
       });
   }
