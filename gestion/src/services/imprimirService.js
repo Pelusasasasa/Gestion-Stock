@@ -4,9 +4,10 @@ require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
 
-const getInfoImprimir = async (id) => {
+const getInfoImprimir = async (id, tipo_venta = 'CD') => {
   try {
-    const { data } = await axios.get(`${URL}imprimir/${id}`);
+    const { data } = await axios.get(`${URL}imprimir/${id}`, { params: { tipo_venta } });
+
     return data;
   } catch (error) {
     console.error(error);

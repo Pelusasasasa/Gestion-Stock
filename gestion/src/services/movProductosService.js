@@ -23,6 +23,17 @@ const getMovimientosRecibosForNumber = async (number) => {
   }
 };
 
+const patchMovNumeroSerie = async (id, series) => {
+  try {
+    const { data } = await axios.patch(`${URL}movimiento/serie/${id}`, { series });
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error(error);
+    return await Swal.fire('Error al modificar el movimiento', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
 const putMovimientos = async (movimiento) => {
   try {
     const { data } = await axios.put(`${URL}movimiento`, movimiento);
@@ -54,6 +65,7 @@ module.exports = {
   getMovimientoForNumberAndType,
   getMovimientosRecibosForNumber,
 
+  patchMovNumeroSerie,
   putMovimientos,
 
   deleteMovimientos,

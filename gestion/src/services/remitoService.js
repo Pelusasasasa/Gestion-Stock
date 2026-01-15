@@ -17,6 +17,20 @@ const getRemitoById = async (id) => {
   }
 };
 
+const getRemitos = async (pasados = false) => {
+  try {
+    const { data } = await axios.get(`${URL}remitos`, { params: { pasados } });
+    if (data.ok) {
+      return data.remitos;
+    }
+    return null;
+  } catch (error) {
+    console.log(error);
+    await Swal.fire('No se pudo traer los remitos', error?.response?.data?.msg, 'error');
+    return null;
+  }
+};
+
 const postRemito = async (remito) => {
   try {
     const { data } = await axios.post(`${URL}remitos`, remito);
@@ -37,10 +51,23 @@ const putRemitoPasado = async (id) => {
   }
 };
 
+const putObservaciones = async (id, observaciones) => {
+  try {
+    const { data } = await axios.patch(`${URL}remitos/observaciones/${id}`, { observaciones });
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return await Swal.fire('Error al modificar el remito', `${error?.response?.data?.msg}`, 'error');
+  }
+};
+
 module.exports = {
   getRemitoById,
+  getRemitos,
 
   postRemito,
 
   putRemitoPasado,
+  putObservaciones,
 };

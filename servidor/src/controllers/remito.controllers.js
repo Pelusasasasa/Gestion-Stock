@@ -1,135 +1,174 @@
-const remitoCTRL = {}
+const remitoCTRL = {};
 
-const { actualizarNumero } = require('../helpers/actualizarNumero');
-const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
-const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
-const { descontarStock } = require('../helpers/descontarStock');
-const Remito = require('../models/Remito');
+const { actualizarNumero } = require("../helpers/actualizarNumero");
+const { crearMovimientosStock } = require("../helpers/crearMovimientosStock");
+const {
+  crearMovimientoVendedores,
+} = require("../helpers/crearMovimientoVendedores");
+const { descontarStock } = require("../helpers/descontarStock");
+const Movimiento = require("../models/movProducto");
+const Remito = require("../models/Remito");
 
-remitoCTRL.getAll = async(req, res) => {
-    const remitos = await Remito.find();
+remitoCTRL.getAll = async (req, res) => {
+  const { pasados } = req.query;
+  try {
+    const remitos = await Remito.find({ pasado: pasados });
 
-    res.send(remitos);
+    await Promise.all(
+      remitos.map(async (remito, index) => {
+        const movimientos = await Movimiento.find({
+          tipo_venta: "RT",
+          nro_venta: remito.numero,
+        });
+
+        remitos[index] = { ...remito.toObject(), movimientos };
+      })
+    );
+
+    res.status(200).json({
+      ok: true,
+      remitos,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "No se pudo obtener los remitos, hable con el administrador",
+    });
+  }
 };
 
-remitoCTRL.getforid = async(req, res) => {
-    const { id } = req.params;
+remitoCTRL.getforid = async (req, res) => {
+  const { id } = req.params;
 
-    try {
-        const remito = await Remito.findById(id)
-            .populate('vendedor', 'nombre');
+  try {
+    const remito = await Remito.findById(id).populate("vendedor", "nombre");
 
-        res.status(200).json({
-            remito,
-            ok: true
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'No se pudo obtener el remito, hable con el administrador'
-        })
-    };
+    res.status(200).json({
+      remito,
+      ok: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "No se pudo obtener el remito, hable con el administrador",
+    });
+  }
 };
 
-remitoCTRL.postOne = async(req, res) => {
-    try {
-        const remito = new Remito(req.body);
+remitoCTRL.postOne = async (req, res) => {
+  try {
+    const remito = new Remito(req.body);
 
-        const numeroActualizado = await actualizarNumero(remito.tipo_venta);
-        if(numeroActualizado.ok){
-            remito.numero = numeroActualizado.numero;
-        };
-
-        const stockDescontado = await descontarStock(req.body.listaProductos);
-        if(!stockDescontado) return res.status(400).json({
-            ok: false,
-            msg: "Error al descontar el stock"
-        });
-
-        const movimientos = await crearMovimientosStock(req.body.listaProductos, remito);
-        if(!movimientos) return res.status(400).json({
-            ok: false,
-            msg: "Error al crear los movimientos"
-        });
-
-        await remito.save();
-
-        await crearMovimientoVendedores(`Se hizo un remito al cliente ${remito.cliente}`, remito.vendedor);
-
-        const nuevoRemito = await Remito.findOne({_id:remito._id})
-            .populate('vendedor', 'nombre');
-        
-        res.status(201).json({
-            ok: true,
-            venta: nuevoRemito,
-            movimientos,
-        })
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            ok: false,
-            msg: "Error al cargar el remito, hable con el administrador"
-        });
+    const numeroActualizado = await actualizarNumero(remito.tipo_venta);
+    if (numeroActualizado.ok) {
+      remito.numero = numeroActualizado.numero;
     }
+
+    const stockDescontado = await descontarStock(req.body.listaProductos);
+    if (!stockDescontado)
+      return res.status(400).json({
+        ok: false,
+        msg: "Error al descontar el stock",
+      });
+
+    const movimientos = await crearMovimientosStock(
+      req.body.listaProductos,
+      remito
+    );
+    if (!movimientos)
+      return res.status(400).json({
+        ok: false,
+        msg: "Error al crear los movimientos",
+      });
+
+    await remito.save();
+
+    await crearMovimientoVendedores(
+      `Se hizo un remito al cliente ${remito.cliente}`,
+      remito.vendedor
+    );
+
+    const nuevoRemito = await Remito.findOne({ _id: remito._id }).populate(
+      "vendedor",
+      "nombre"
+    );
+
+    res.status(201).json({
+      ok: true,
+      venta: nuevoRemito,
+      movimientos,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al cargar el remito, hable con el administrador",
+    });
+  }
 };
 
-remitoCTRL.putPasado = async(req, res) => {
-    const { id } = req.params;
-    console.log(id)
-    try {
-        const remito = await Remito.findOneAndUpdate({_id: id,},{
+remitoCTRL.putPasado = async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const remito = await Remito.findOneAndUpdate(
+      { _id: id },
+      {
         $set: {
-            pasado: true
-            }
-        });
+          pasado: true,
+        },
+      }
+    );
 
-        console.log(remito)
-        if(!remito) return res.status(400).json({
-            ok: false,
-            msg: "No se pudo actualizar el remito"
-        });
+    console.log(remito);
+    if (!remito)
+      return res.status(400).json({
+        ok: false,
+        msg: "No se pudo actualizar el remito",
+      });
 
-        res.status(200).json({
-            ok: true,
-            remito
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: "Error al actualizar el remito, hable con el administrador"
-        });
-    };
+    res.status(200).json({
+      ok: true,
+      remito,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al actualizar el remito, hable con el administrador",
+    });
+  }
 };
 
-remitoCTRL.patchObservaciones = async(req, res) => {
-    const { id } = req.params;
+remitoCTRL.patchObservaciones = async (req, res) => {
+  const { id } = req.params;
 
-    try {
-        const remito = await Remito.findByIdAndUpdate(
-            id, 
-            {observaciones: req.body.observaciones},
-            {new: true}
-        );
+  try {
+    const remito = await Remito.findByIdAndUpdate(
+      id,
+      { observaciones: req.body.observaciones },
+      { new: true }
+    );
 
-        if(!remito) return res.status(404).json({
-            ok: false,
-            msg: 'Remito no encontrado'
-        });
+    if (!remito)
+      return res.status(404).json({
+        ok: false,
+        msg: "Remito no encontrado",
+      });
 
-
-        res.status(200).json({
-            ok: true,
-            remito
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            msg: 'No se pudo modifcar las observaciones del remit, hable con el administrador'
-        });
-    };
-}
+    res.status(200).json({
+      ok: true,
+      remito,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      msg: "No se pudo modifcar las observaciones del remit, hable con el administrador",
+    });
+  }
+};
 
 module.exports = remitoCTRL;
