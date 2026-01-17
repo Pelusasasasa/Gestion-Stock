@@ -54,7 +54,7 @@ const traerProvedor = async () => {
   const { data } = await axios.get(`${URL}provedores`);
   for await (let { nombre } of data.provedores) {
     const option = document.createElement('option');
-    (option.text = nombre), (option.value = nombre);
+    ((option.text = nombre), (option.value = nombre));
     provedor.appendChild(option);
   }
 };
@@ -63,7 +63,7 @@ const traerMarcas = async () => {
   const marcas = (await axios.get(`${URL}marca`)).data;
   for await (let { nombre } of marcas) {
     const option = document.createElement('option');
-    (option.text = nombre), (option.value = nombre);
+    ((option.text = nombre), (option.value = nombre));
     marca.appendChild(option);
   }
 };

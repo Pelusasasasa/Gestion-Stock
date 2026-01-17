@@ -1,20 +1,21 @@
-const funciones = {};
 const Afip = require('@afipsdk/afip.js');
 const { clipboard } = require('electron');
-
-const archivo = require('./configuracion.json');
-
-const afip = new Afip({ CUIT: archivo.cuit });
-
+const fs = require('fs');
+const path = require('path');
 const sweet = require('sweetalert2');
 const axios = require('axios');
+const archivo = require('./configuracion.json');
+let internetAvalible = require('internet-available');
+const { getClienteById } = require('./services/clientesService');
+
 require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
-let puntoVenta = archivo.puntoVenta;
+const funciones = {};
 
-let internetAvalible = require('internet-available');
-const { getClienteById } = require('./services/clientesService');
+const afip = new Afip({ CUIT: archivo.cuit });
+
+let puntoVenta = archivo.puntoVenta;
 
 //Sirve para ver si hay internet o no
 funciones.verSiHayInternet = () => {
@@ -320,6 +321,21 @@ funciones.ultimaAB = async () => {
       notaB: 0,
     };
   }
+};
+
+funciones.obtenerElementoSeleccionado = (e) => {
+  let seleccionado = e.target.closest('.seleccionado');
+  if (e.target.nodeName === 'TD') {
+    seleccionado = e.target.parentNode;
+  } else if (e.target.nodeName === 'DIV') {
+    console.log(e.target);
+    seleccionado = e.target.parentNode.parentNode;
+  } else if (e.target.nodeName === 'SPAN') {
+    seleccionado = e.target.parentNode.parentNode.parentNode;
+  }
+
+  seleccionado.classList.add('seleccionado');
+  return seleccionado;
 };
 
 funciones.ponerNumero = async () => {
@@ -729,6 +745,31 @@ funciones.masVeinticuatroHoras = (fechaTraida) => {
   } else {
     return false;
   }
+};
+
+funciones.modulos = () => {
+  let modulos = '';
+  const filePath = path.join(__dirname, 'config.json');
+
+  const moduloCreate = {
+    ventas: true,
+    clientes: true,
+    productos: true,
+    caja: true,
+    recibos: true,
+    consultas: true,
+    remitos: true,
+    gastos: true,
+    servicioTecnico: true,
+  };
+
+  try {
+    modulos = require('./config.json');
+  } catch (error) {
+    fs.writeFileSync(filePath, JSON.stringify(moduloCreate), 'utf-8');
+    location.reload();
+  }
+  return modulos;
 };
 
 funciones.verPrecioConCantidad = ({ producto, cantidad }, tipoCliente = 'Normal', dolar) => {

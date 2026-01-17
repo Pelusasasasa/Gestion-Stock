@@ -1,36 +1,83 @@
 const vendedorCTRL = {};
 
-const Vendedor = require('../models/Vendedor');
+const Vendedor = require("../models/Vendedor");
 
-vendedorCTRL.post = async(req,res)=>{
+vendedorCTRL.post = async (req, res) => {
+  try {
     const vendedor = new Vendedor(req.body);
     await vendedor.save();
     console.log(`Vendedor ${req.body.nombre} Cargado`);
-    res.end();
-}
+    res.status(201).json({
+      ok: true,
+      vendedor,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al cargar el vendedor, hable con el administrador",
+    });
+  }
+};
 
-vendedorCTRL.getAll = async(req,res)=>{
+vendedorCTRL.getAll = async (req, res) => {
+  try {
     const vendedores = await Vendedor.find();
-    res.send(vendedores);
-}
+    res.status(200).json({
+      ok: true,
+      vendedores,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al obtener los vendedores, hable con el administrador",
+    });
+  }
+};
 
-vendedorCTRL.getForId = async(req,res)=>{
-    const {id} = req.params;
-    const vendedor = await Vendedor.findOne({codigo:id});
-    res.send(vendedor)
-}
+vendedorCTRL.getForId = async (req, res) => {
+  const { id } = req.params;
+  const vendedor = await Vendedor.findOne({ codigo: id });
+  res.send(vendedor);
+};
 
-vendedorCTRL.putForId = async(req,res)=>{
-    const {id} = req.params;
-    await Vendedor.findOneAndUpdate({_id:id},req.body);
-    console.log(`Vendedor ${req.body.nombre} Modificado`)
-    res.end();
-}
+vendedorCTRL.putForId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const vendedor = await Vendedor.findOneAndUpdate({ _id: id }, req.body, {
+      new: true,
+    });
+    console.log(`Vendedor ${vendedor.nombre} Modificado`);
+    res.status(200).json({
+      ok: true,
+      vendedor,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al modificar el vendedor, hable con el administrador",
+    });
+  }
+};
 
-vendedorCTRL.deleteForId = async(req,res)=>{
-    const {id} = req.params;
-    await Vendedor.findOneAndDelete({_id:id});
-    res.end();
-}
+vendedorCTRL.deleteForId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Vendedor.findOneAndDelete({ _id: id });
+    console.log(`Vendedor ${id} Eliminado`);
+    res.status(200).json({
+      ok: true,
+      msg: "Vendedor eliminado correctamente",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al eliminar el vendedor, hable con el administrador",
+    });
+  }
+};
 
 module.exports = vendedorCTRL;

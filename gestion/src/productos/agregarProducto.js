@@ -42,7 +42,7 @@ const traerRubros = async () => {
   const rubros = (await axios.get(`${URL}rubro`)).data;
   for await (let { numero, rubro } of rubros) {
     const option = document.createElement('option');
-    (option.text = numero + ' - ' + rubro), (option.value = rubro);
+    ((option.text = numero + ' - ' + rubro), (option.value = rubro));
     select.appendChild(option);
   }
 };
@@ -51,7 +51,7 @@ const traerProvedores = async () => {
   const { data } = await axios.get(`${URL}provedores`);
   for await (let { nombre } of data.provedores) {
     const option = document.createElement('option');
-    (option.text = nombre), (option.value = nombre);
+    ((option.text = nombre), (option.value = nombre));
     provedor.appendChild(option);
   }
 };
@@ -60,7 +60,7 @@ const traerMarcas = async () => {
   const marcas = (await axios.get(`${URL}marca`)).data;
   for await (let { nombre } of marcas) {
     const option = document.createElement('option');
-    (option.text = nombre), (option.value = nombre);
+    ((option.text = nombre), (option.value = nombre));
     marca.appendChild(option);
   }
 };

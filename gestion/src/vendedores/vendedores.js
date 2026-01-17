@@ -1,20 +1,16 @@
-const axios = require('axios');
-require('dotenv').config();
-const URL = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
+const { vendedores: verVendedores } = require('../configuracion.json');
+const { getVendedores, postVendedor, putVendedor, deleteVendedor } = require('../services/vendedorService');
 
 const { cerrarVentana, verificarUsuarios } = require('../helpers');
-
-const { vendedores: verVendedores } = require('../configuracion.json');
-const { ipcRenderer } = require('electron');
+const funciones = require('../helpers');
+const { listarVendedor, htmlFormulario } = require('../ui/vendedor');
 
 const tbody = document.querySelector('tbody');
 
 //botones
 const agregar = document.querySelector('.agregar');
 const eliminar = document.querySelector('.eliminar');
-
-let vendedores = [];
 
 let seleccionado;
 
@@ -35,42 +31,14 @@ window.addEventListener('load', async (e) => {
     }
   }
 
-  vendedores = (await axios.get(`${URL}vendedores`)).data;
+  const vendedores = await getVendedores();
   listarVendedores(vendedores);
 });
 
 const listarVendedores = (lista) => {
   tbody.innerHTML = '';
   for (let vendedor of lista) {
-    const tr = document.createElement('tr');
-    tr.id = vendedor._id;
-
-    const tdCodigo = document.createElement('td');
-    const tdNombre = document.createElement('td');
-    const tdPermiso = document.createElement('td');
-    const tdAcciones = document.createElement('td');
-
-    tdAcciones.classList.add('acciones');
-
-    tdCodigo.innerHTML = vendedor.codigo;
-    tdNombre.innerHTML = vendedor.nombre;
-    tdPermiso.innerHTML = vendedor.permiso;
-
-    tdAcciones.innerHTML = `
-            <div class=tool>
-                <span class=material-icons>edit</span>
-                <p class=tooltip>Modificar</p>
-            </div>
-            <div class=tool>
-                <span class=material-icons>delete</span>
-                <p class=tooltip>Eliminar</p>
-            </div>
-        `;
-
-    tr.appendChild(tdCodigo);
-    tr.appendChild(tdNombre);
-    tr.appendChild(tdPermiso);
-    tr.appendChild(tdAcciones);
+    const tr = listarVendedor(vendedor);
 
     tbody.appendChild(tr);
   }
@@ -79,20 +47,7 @@ const listarVendedores = (lista) => {
 agregar.addEventListener('click', (e) => {
   sweet
     .fire({
-      html: `<section>
-                <main>
-                    <label htmlFor="nombre">Nombre</label>
-                    <input type="text" name="nombre" id="nombre" />
-                </main>
-                <main>
-                    <label htmlFor="codigo">Codigo</label>
-                    <input type="text" name="codigo" id="codigo" />
-                </main>
-                <main>
-                    <label htmlFor="permisos">Permisos</label>
-                    <input type="number" name="permisos" id="permisos" />
-                </main>
-            </section>`,
+      html: htmlFormulario(),
       confirmButtonText: 'Aceptar',
       showCancelButton: true,
     })
@@ -102,9 +57,14 @@ agregar.addEventListener('click', (e) => {
         vendedorNuevo.nombre = document.getElementById('nombre').value.toUpperCase();
         vendedorNuevo.codigo = document.getElementById('codigo').value;
         vendedorNuevo.permiso = document.getElementById('permisos').value;
+
         try {
-          await axios.post(`${URL}vendedores`, vendedorNuevo);
-          location.reload();
+          const { ok, vendedor } = await postVendedor(vendedorNuevo);
+          if (ok) {
+            const tr = listarVendedor(vendedor);
+
+            tbody.appendChild(tr);
+          }
         } catch (error) {
           console.log(error);
           await sweet.fire({
@@ -116,39 +76,13 @@ agregar.addEventListener('click', (e) => {
 });
 
 tbody.addEventListener('click', async (e) => {
-  seleccionado && seleccionado.classList.remove('seleccionado');
+  seleccionado = funciones.obtenerElementoSeleccionado(e);
 
-  if (e.target.nodeName === 'TD') {
-    seleccionado = e.target.parentNode;
-  } else if (e.target.nodeName === 'DIV') {
-    console.log(e.target);
-    seleccionado = e.target.parentNode.parentNode;
-  } else if (e.target.nodeName === 'SPAN') {
-    seleccionado = e.target.parentNode.parentNode.parentNode;
-  }
-
-  seleccionado.classList.add('seleccionado');
-
-  if (e.target.innerHTML === 'edit') {
+  if (e.target.innerText === 'edit') {
     sweet
       .fire({
         title: 'Modificar Vendedor',
-        html: `
-                <section class=input>
-                    <main>
-                        <label htmlFor="nombre">Nombre</label>
-                        <input type="text" name="nombre" value=${seleccionado.children[1].innerHTML} id="nombre" />
-                    </main>
-                    <main>
-                        <label htmlFor="codigo">Codigo</label>
-                        <input type="text" name="codigo" value=${seleccionado.children[0].innerHTML} id="codigo" />
-                    </main>
-                    <main>
-                        <label htmlFor="permisos">Permisos</label>
-                        <input type="number" name="permisos" value=${seleccionado.children[2].innerHTML} id="permisos" />
-                    </main>
-                </section>
-            `,
+        html: htmlFormulario(seleccionado),
         showCancelButton: true,
         confirmButtonText: 'Modificar',
       })
@@ -159,40 +93,26 @@ tbody.addEventListener('click', async (e) => {
           vendedorNuevo.codigo = document.getElementById('codigo').value;
           vendedorNuevo.permiso = document.getElementById('permisos').value;
 
-          try {
-            await axios.put(`${URL}vendedores/id/${seleccionado.id}`, vendedorNuevo);
-            await sweet.fire({
-              title: `${vendedorNuevo.nombre} Modificado`,
-            });
+          const { ok, vendedor } = await putVendedor(vendedorNuevo, seleccionado.id);
+
+          if (ok) {
             location.reload();
-          } catch (error) {
-            console.log(error);
-            sweet.fire({
-              title: 'No se pudo modficar el vendedor',
-            });
           }
         }
       });
-  } else if (e.target.innerHTML === 'delete') {
-    await sweet
-      .fire({
-        title: 'Eliminar Vendedor?',
-        confirmButtonText: 'Aceptar',
-        showCancelButton: true,
-      })
-      .then(async ({ isConfirmed }) => {
-        if (isConfirmed) {
-          try {
-            await axios.delete(`${URL}vendedores/id/${seleccionado.id}`);
-            tbody.removeChild(seleccionado);
-          } catch (error) {
-            console.log(error);
-            sweet.fire({
-              title: 'No se pudo borrar vendedor',
-            });
-          }
-        }
-      });
+  } else if (e.target.innerText === 'delete') {
+    const { isConfirmed } = await sweet.fire({
+      title: 'Eliminar Vendedor?',
+      confirmButtonText: 'Aceptar',
+      showCancelButton: true,
+    });
+
+    if (isConfirmed) {
+      const { ok } = await deleteVendedor(seleccionado.id);
+      if (ok) {
+        tbody.removeChild(seleccionado);
+      }
+    }
   }
 });
 
