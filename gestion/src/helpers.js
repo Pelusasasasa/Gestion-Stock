@@ -448,7 +448,7 @@ funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, factura
   venta.cliente = nombre.value;
   venta.direccion = direccion.value;
   venta.localidad = localidad.value;
-  venta.condicion = condicion.value;
+  venta.condicion = lista.value;
   venta.vendedor = vendedor ?? '';
   venta.caja = require('./configuracion.json').caja;
 
@@ -464,6 +464,7 @@ funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, factura
   venta.cod_comp = situacion === 'blanco' ? await funciones.verCodigoComprobante(tipoFactura, cuit.value, condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value) : 0;
   venta.tipo_comp = situacion === 'blanco' ? await funciones.verTipoComprobante(venta.cod_comp) : await funciones.verTipoComprobanteNegro(venta.tipo_venta);
   venta.num_doc = cuit.value !== '' ? cuit.value : '00000000';
+  venta.cod_doc = await funciones.verCodDoc(cuit.value);
   venta.condicionIva = condicionIva.value === 'Responsable Inscripto' ? 'Inscripto' : condicionIva.value;
 
   const [iva21, iva0, gravado21, gravado0, iva105, gravado105, cantIva] = await funciones.sacarIva(listaProductos, venta.condicion);
@@ -551,6 +552,12 @@ funciones.verCodigoComprobante = async (notaCredito, cuit = '00000000', condIva)
   }
 };
 
+funciones.verCodDoc = async (cuit) => {
+  if (cuit === '00000000') return 99;
+  if (cuit.length > 8) return 80;
+  return 90;
+};
+
 funciones.verTipoComprobante = async (codigo) => {
   let retorno = 'Comprobante';
   if (codigo === 1) {
@@ -594,7 +601,6 @@ funciones.sacarIva = (lista, condicion) => {
   let gravado0 = 0;
   let totalIva105 = 0;
   let gravado105 = 0;
-
   if (condicion === 'NORMAL') {
     lista.forEach(({ producto, cantidad }) => {
       console.log(producto.impuesto);
