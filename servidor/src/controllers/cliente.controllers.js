@@ -37,7 +37,6 @@ clienteCTRL.getsClientes = async (req, res) => {
 };
 
 clienteCTRL.id = async (req, res) => {
-  clg;
   try {
     const ultimoCliente = await Clientes.find({}, { _id: 1 });
     let arreglo = ultimoCliente.map((e) => {
@@ -101,7 +100,7 @@ clienteCTRL.cargarCliente = async (req, res) => {
 
     const movCreado = await crearMovimientoVendedores(
       `Alta de Cliente ${cliente.nombre}`,
-      req.body.vendedor
+      req.body.vendedor,
     );
     if (!movCreado)
       return res.status(500).json({
@@ -137,7 +136,7 @@ clienteCTRL.modificarCliente = async (req, res) => {
 
     const movCreado = await crearMovimientoVendedores(
       `Modificacion del Cliente ${cliente.nombre}`,
-      req.body.vendedor
+      req.body.vendedor,
     );
     if (!movCreado)
       return res.status(500).json({
@@ -172,7 +171,7 @@ clienteCTRL.eliminarCliente = async (req, res) => {
 
     const movCreado = await crearMovimientoVendedores(
       `Eliminacion de Cliente ${cliente.nombre}`,
-      req.query.vendedor
+      req.query.vendedor,
     );
     if (!movCreado)
       return res.status(500).json({
