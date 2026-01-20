@@ -110,8 +110,8 @@ const llenarInputs = async (codigoProducto) => {
     costoIvaInstalador.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolarInstalador.value), 2);
   } else {
     costoUtilidad.value = redondear(producto.costo + (producto.costo * producto.utilidad) / 100, 2);
-    costoIva.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolar.value), 2);
-    costoIvaInstalador.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolarInstalador.value), 2);
+    costoIva.value = redondear(parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100, 2);
+    costoIvaInstalador.value = redondear(parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100, 2);
   }
   ganancia.value = producto.ganancia.toFixed(2);
   total.value = producto.precio.toFixed(2);

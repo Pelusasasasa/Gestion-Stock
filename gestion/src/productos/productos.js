@@ -26,6 +26,17 @@ const ingresarMov = document.querySelector('.ingresarMov');
 const salir = document.querySelector('.salir');
 const buscador = document.querySelector('#buscarProducto');
 
+const abrirVentanaModificar = () => {
+  const opciones = {
+    path: './productos/modificarProducto.html',
+    botones: true,
+    informacion: seleccionado.id,
+    altura: 800,
+    vendedor: vendedor,
+  };
+  ipcRenderer.send('abrir-ventana', opciones);
+};
+
 const filtrar = async () => {
   tbody.innerHTML = '';
   let condicion = seleccion.value;
@@ -68,6 +79,8 @@ const listar = (productos) => {
   for (let { _id, descripcion, marca, rubro, stock, precio } of productos) {
     const tr = document.createElement('tr');
     tr.id = _id;
+
+    tr.addEventListener('dblclick', abrirVentanaModificar);
 
     const tdId = document.createElement('td');
     const tdDescripcion = document.createElement('td');
@@ -227,14 +240,7 @@ tbody.addEventListener('click', async (e) => {
         }
       });
   } else if (e.target.innerHTML === 'edit') {
-    const opciones = {
-      path: './productos/modificarProducto.html',
-      botones: true,
-      informacion: seleccionado.id,
-      altura: 800,
-      vendedor: vendedor,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
+    abrirVentanaModificar();
   } else if (e.target.innerHTML === 'visibility') {
     historicaMovDiv.classList.remove('none');
     try {
