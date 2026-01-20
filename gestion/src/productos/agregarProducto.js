@@ -17,7 +17,6 @@ const utilidad = document.querySelector('#utilidad');
 const costoUtilidad = document.querySelector('#costoUtilidad');
 const impuesto = document.querySelector('#impuesto');
 
-const costoIva = document.querySelector('#costoIva');
 const costoIvaInstalador = document.querySelector('#costoIvaInstalador');
 //Total
 const ganancia = document.querySelector('#ganancia');
@@ -37,6 +36,15 @@ require('dotenv').config();
 const URL = process.env.GESTIONURL;
 
 let vendedor;
+
+const calcularCosto = (costo, impuesto, dolar) => {
+  if (parseFloat(costoDolar.value) !== 0) {
+    return (costo + (costo * impuesto) / 100) * dolar;
+  } else {
+    return costo + (costo * impuesto) / 100;
+  }
+};
+
 //Funciones
 const traerRubros = async () => {
   const rubros = (await axios.get(`${URL}rubro`)).data;
@@ -242,10 +250,6 @@ impuesto.addEventListener('focus', (e) => {
   impuesto.select();
 });
 
-costoIva.addEventListener('focus', (e) => {
-  costoIva.select();
-});
-
 ganancia.addEventListener('focus', (e) => {
   ganancia.select();
 });
@@ -257,14 +261,13 @@ total.addEventListener('focus', (e) => {
 impuesto.addEventListener('blur', (e) => {
   impuesto.value = impuesto.value === '' ? 0 : impuesto.value;
   if (parseFloat(costoDolar.value) !== 0) {
-    costoIva.value = redondear(((parseFloat(impuesto.value) * parseFloat(costoUtilidad.value)) / 100 + parseFloat(costoUtilidad.value)) * parseFloat(dolar.value), 2);
     costoIvaInstalador.value = ((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * parseFloat(impuesto.value)) / 100) * parseFloat(dolarInstalador.value)).toFixed(2);
   } else {
-    costoIva.value = ((parseFloat(impuesto.value) * parseFloat(costoUtilidad.value)) / 100 + parseFloat(costoUtilidad.value)).toFixed(2);
     costoIvaInstalador.value = (parseFloat(costoUtilidad.value) + parseFloat(costoUtilidad.value) * parseFloat(impuesto.value / 100)).toFixed(2);
   }
 });
 
 total.addEventListener('focus', (e) => {
-  total.value = (parseFloat(costoIva.value) + (parseFloat(costoIva.value) * parseFloat(ganancia.value)) / 100).toFixed(2);
+  const costoAux = calcularCosto(parseFloat(costoUtilidad.value), parseFloat(impuesto.value), parseFloat(dolar.value));
+  total.value = (parseFloat(costoAux) + (parseFloat(costoAux) * parseFloat(ganancia.value)) / 100).toFixed(2);
 });

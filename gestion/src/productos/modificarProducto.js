@@ -28,7 +28,6 @@ const utilidad = document.querySelector('#utilidad');
 const costoUtilidad = document.querySelector('#costoUtilidad');
 const impuesto = document.querySelector('#impuesto');
 
-const costoIva = document.querySelector('#costoIva');
 const costoIvaInstalador = document.querySelector('#costoIvaInstalador');
 //Total
 const ganancia = document.querySelector('#ganancia');
@@ -38,6 +37,14 @@ const modificar = document.querySelector('.modificar');
 const salir = document.querySelector('.salir');
 
 let vendedor;
+
+const calcularCosto = (costo, impuesto, dolar) => {
+  if (parseFloat(costoDolar.value) !== 0) {
+    return (costo + (costo * impuesto) / 100) * dolar;
+  } else {
+    return costo + (costo * impuesto) / 100;
+  }
+};
 
 const traerRubros = async () => {
   const rubros = (await axios.get(`${URL}rubro`)).data;
@@ -106,11 +113,9 @@ const llenarInputs = async (codigoProducto) => {
 
   if (producto.costoDolar !== 0) {
     costoUtilidad.value = redondear(producto.costoDolar + (producto.costoDolar * (producto.utilidad ?? 0)) / 100, 2);
-    costoIva.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolar.value), 2);
     costoIvaInstalador.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100) * parseFloat(dolarInstalador.value), 2);
   } else {
     costoUtilidad.value = redondear(producto.costo + (producto.costo * producto.utilidad) / 100, 2);
-    costoIva.value = redondear(parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100, 2);
     costoIvaInstalador.value = redondear(parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * producto.impuesto) / 100, 2);
   }
   ganancia.value = producto.ganancia.toFixed(2);
@@ -213,10 +218,6 @@ impuesto.addEventListener('keypress', (e) => {
   apretarEnter(e, ganancia);
 });
 
-costoIva.addEventListener('keypress', (e) => {
-  apretarEnter(e, costoIvaInstalador);
-});
-
 costoIvaInstalador.addEventListener('keypress', (e) => {
   apretarEnter(e, ganancia);
 });
@@ -256,10 +257,6 @@ impuesto.addEventListener('focus', (e) => {
   impuesto.select();
 });
 
-costoIva.addEventListener('focus', (e) => {
-  costoIva.select();
-});
-
 ganancia.addEventListener('focus', (e) => {
   ganancia.select();
 });
@@ -270,16 +267,15 @@ total.addEventListener('focus', (e) => {
 
 impuesto.addEventListener('blur', (e) => {
   if (parseFloat(costoDolar.value) !== 0) {
-    costoIva.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * parseFloat(impuesto.value)) / 100) * parseFloat(dolar.value), 2);
     costoIvaInstalador.value = redondear((parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * parseFloat(impuesto.value)) / 100) * parseFloat(dolarInstalador.value), 2);
   } else {
-    costoIva.value = (parseFloat(costoUtilidad.value) + (parseFloat(costoUtilidad.value) * parseFloat(impuesto.value)) / 100).toFixed(2);
     costoIvaInstalador.value = (parseFloat(costoUtilidad.value) + parseFloat(costoUtilidad.value) * (parseFloat(impuesto.value) / 100)).toFixed(2);
   }
 });
 
 ganancia.addEventListener('blur', (e) => {
-  total.value = Math.round((parseFloat(costoIva.value) * parseFloat(ganancia.value)) / 100 + parseFloat(costoIva.value)).toFixed(2);
+  const costoAux = calcularCosto(parseFloat(costoUtilidad.value), parseFloat(impuesto.value), parseFloat(dolar.value));
+  total.value = Math.round((parseFloat(costoAux) * parseFloat(ganancia.value)) / 100 + parseFloat(costoAux)).toFixed(2);
 });
 
 salir.addEventListener('click', (e) => {
