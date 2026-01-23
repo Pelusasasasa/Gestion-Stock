@@ -244,7 +244,7 @@ const listarServicio = (servicio, lista) => {
   numero.value = `ST-${servicio.numero.toString().padStart(4, '0')}`;
   fecha.value = parsearFecha(servicio.fecha).slice(0, 10).split('/', 3).reverse().join('-');
 
-  cliente.value = servicio?.datosClientes?.nombre ?? '';
+  nombre.value = servicio?.datosClientes?.nombre ?? '';
   direccion.value = servicio?.datosClientes?.direccion ?? '';
   telefono.value = servicio?.datosClientes?.telefono ?? '';
   historial = servicio.historial;
@@ -281,7 +281,7 @@ const modificarSerivicio = async () => {
   const servicio = {
     fecha: fechaConHora(fecha.value),
     datosClientes: {
-      nombre: cliente.value,
+      nombre: nombre.value,
       direccion: direccion.value,
       telefono: telefono.value,
     },
