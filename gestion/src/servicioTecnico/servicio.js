@@ -7,8 +7,6 @@ const { ipcRenderer } = require('electron');
 const vendedor = getParameterByName('vendedor');
 const permiso = getParameterByName('permiso');
 
-console.log(vendedor);
-
 const URL = process.env.GESTIONURL;
 
 const volver = document.getElementById('volver');
@@ -228,7 +226,7 @@ const listarServicios = async (lista, equipos) => {
 };
 
 agregar.addEventListener('click', () => {
-  location.href = `./agregarServicio.html?vendedor=${vendedor}`;
+  location.href = `./agregarServicio.html?vendedor=${vendedor}&permiso=${permiso}`;
 });
 
 buscador.addEventListener('keyup', buscar);

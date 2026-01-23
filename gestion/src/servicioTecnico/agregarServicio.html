@@ -10,10 +10,10 @@
 </head>
 <body class="m-0 p-0  h-screen bg-gray-50 bg-orange-700">
     
-    <header class="flex justify-between bg-white b px-2 pt-2 w-full border-b border-gray-200">
-        <div>
+    <header class="flex justify-between bg-white b px-2 pt-2 w-full border-b border-gray-300">
+        <div class="flex flex-col">
             <h1 class="m-0">Nuevo Servicio Tecnico</h1>
-            <p class="m-0">Ingreso de nuevo servicio tecnico</p>
+            <p class="m-0 mb-1">Ingreso de nuevo servicio tecnico</p>
         </div>
 
         <div>
@@ -39,7 +39,7 @@
     <section class=" w-full mt-2 ">
         <form action="" class="mx-auto flex flex-col gap-2 max-w-7xl" >
 
-            <div class="bg-gray-100 border rounded-sm border-gray-200 p-2">
+            <div class="bg-gray-100 border rounded-sm border-gray-300 p-2">
                 <h3>Datos del servicio</h3>
                 <div class="flex gap-2 justify-around">
                     <div class="flex flex-col">
@@ -53,50 +53,48 @@
                 </div>
             </div>
 
-            <div class="bg-gray-100 border rounded-sm border-gray-200 p-2">
+            <div class="bg-gray-100 border rounded-sm border-gray-300 p-2">
                 <h3 class="text-xl m-0 mb-2">Cliente</h3>
 
                 <div class="flex flex-col">
                     <label for="cliente" class="font-bold mb-2">Buscar Cliente *</label>
-                    <input type="text" name="cliente" id="cliente" class="border border-gray-200 rounded-sm" placeholder="Buscar por codigo o nombre">
+                    <input type="text" name="cliente" id="cliente" class="border border-gray-300 rounded-sm" placeholder="Buscar por codigo">
+                </div>
+
+                <div class="flex flex-col">
+                    <label for="nombre" class="font-bold mb-2">Nombre</label>
+                    <input type="text" name="nombre" placeholder="Nombre del cliente" id="nombre" class="border border-gray-300 rounded-sm" disabled>
                 </div>
 
                 <div class="flex justify-around mt-2">
+                    
+
                     <div class="flex flex-col">
                         <label for="direccion" class="font-bold mb-2">Direccion</label>
-                        <input type="text" name="direccion" id="direccion" class="border border-gray-200 rounded-sm" disabled>
+                        <input type="text" name="direccion" placeholder="Direccion del cliente" id="direccion" class="border border-gray-300 rounded-sm" disabled>
                     </div>
 
                     <div class="flex flex-col">
                         <label for="telefono" class="font-bold mb-2">Telefono</label>
-                        <input type="text" name="telefono" id="telefono" class="border border-gray-200 rounded-sm" disabled>
+                        <input type="text" name="telefono" placeholder="Telefono del cliente" id="telefono" class="border border-gray-300 rounded-sm" disabled>
                     </div>
                 </div>
 
-                <div class="none mt-2 border border-gray-200 h-20 rounded-sm overflow-scroll">
-                    <div class="flex justify-between border-b border-gray-200">
-                        <p class="text-gray-700 m-0">Nombre</p>
-                        <p class="text-gray-700 m-0">Direccion</p>
-                        <p class="text-gray-700 m-0">Telefono</p>
-                    </div>
-                    <div id="listaClientes" >
-                        
-                    </div>
-                </div>
+                
             </div>
 
-            <div class="bg-gray-100 border rounded-sm border-gray-200 p-2">
+            <div class="bg-gray-100 border rounded-sm border-gray-300 p-2">
                 <h3>Productos</h3>
 
                 <div class="flex flex-col">
                     <div class="flex justify-between mb-1">
                         <label for="producto" class="font-bold mb-2">Buscar Producto *</label>
-                        <button id="agregarManual" type="button" class="border border-gray-200 bg-green-600 text-white">Agregar Manual</button>
+                        <button id="agregarManual" type="button" class="border border-gray-300 bg-green-600 text-white">Agregar Manual</button>
                     </div>
-                    <input type="text" name="producto" id="producto" placeholder="Buscar por codigo o nombre" class="border border-gray-200 rounded-sm">
+                    <input type="text" name="producto" id="producto" placeholder="Buscar por codigo o nombre" class="border border-gray-300 rounded-sm">
                 </div>
-                <div class="mt-2 border none border-gray-200 h-20 rounded-sm overflow-scroll">
-                    <div class="columns-3-1fr-2fr-1fr grid border-b border-gray-200">
+                <div class="mt-2 border none border-gray-300 h-20 rounded-sm overflow-scroll">
+                    <div class="columns-3-1fr-2fr-1fr grid border-b border-gray-300">
                         <p class="text-gray-700 m-0">Codigo</p>
                         <p class="text-gray-700 m-0">Descripcion</p>
                         <p class="text-gray-700 m-0">Marca</p>
@@ -106,22 +104,22 @@
                     </div>
                 </div>
 
-                <div class="mt-2 px-1 border border-gray-200 h-20 rounded-sm overflow-auto">
+                <div class="mt-2 px-1 border border-gray-300 h-20 rounded-sm overflow-auto">
                     <h3>Productos Agregados</h3>
-                    <div class="flex flex-col gap-2 border-b border-gray-200" id="productosAgregados">
+                    <div class="flex flex-col gap-2 border-b border-gray-300" id="productosAgregados">
                         
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-100 border rounded-sm border-gray-200 p-2">
+            <div class="bg-gray-100 border rounded-sm border-gray-300 p-2">
                 <h3>Observaciones generales</h3>
                 <div class="flex">
-                    <textarea class="w-full border-gray-200 border rounded-sm p-1" rows="5" name="sugerencia" id="sugerencia"></textarea>
+                    <textarea class="w-full border-gray-300 border rounded-sm p-1" rows="5" name="sugerencia" id="sugerencia"></textarea>
                 </div>
             </div>
 
-            <div class="bg-gray-100 border rounded-sm border-gray-200 p-2 h-20 mb-2 overflow-scroll">
+            <div class="bg-gray-100 border rounded-sm border-gray-300 p-2 h-20 mb-2 overflow-scroll">
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
@@ -133,6 +131,20 @@
                     <tbody id="tbody"></tbody>
                 </table>
             </div>
+
+        <div class="bg-gray-100 border rounded-sm border-gray-300 p-2 h-20 mb-2 overflow-scroll">
+            <h4 class="text-center m-0 text-xl mb-1">Historial Observaciones</h4>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th class="border">Fecha</th>
+                        <th class="border">Observaciones</th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="tbodyObservaciones"></tbody>
+            </table>
+        </div>
         </form>
     </section>
     <script src="./agregarServicio.js"></script>

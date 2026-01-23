@@ -30,7 +30,7 @@ movCajaCTRL.deleteOne = async (req, res) => {
 };
 
 movCajaCTRL.getForDates = async (req, res) => {
-  const { desde, hasta, tipo } = req.params;
+  const { desde, tipo } = req.params;
   let movs = [];
   const { inicio, fin } = obtenerRangoMes(desde);
   try {

@@ -672,6 +672,9 @@ table tbody {
 .border-gray-200{
   border-color: #e4e4e7
 }
+.border-gray-300{
+  border-color: #a1a1aa
+}
 
 .border-gray-400{
   border-color: oklch(70.4% 0.04 256.788)

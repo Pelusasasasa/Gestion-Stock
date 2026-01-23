@@ -2,6 +2,8 @@ const { default: Swal } = require('sweetalert2');
 const { parsearFecha, getParameterByName, fechaConHora, masVeinticuatroHoras } = require('../helpers');
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
+const { getProductoByType } = require('../services/productoService');
+const { getClienteById } = require('../services/clientesService');
 require('dotenv').config();
 
 const URL = process.env.GESTIONURL;
@@ -17,17 +19,19 @@ const modificar = document.getElementById('modificar');
 const numero = document.getElementById('numero');
 const fecha = document.getElementById('fecha');
 const cliente = document.getElementById('cliente');
+const nombre = document.getElementById('nombre');
 const direccion = document.getElementById('direccion');
 const telefono = document.getElementById('telefono');
 const producto = document.getElementById('producto');
 const agregarManual = document.getElementById('agregarManual');
 const sugerencia = document.getElementById('sugerencia');
-const listaClientes = document.getElementById('listaClientes');
 const listaProductos = document.getElementById('listaProductos');
 const productosAgregados = document.getElementById('productosAgregados');
 const tbody = document.getElementById('tbody');
+const tbodyObservaciones = document.getElementById('tbodyObservaciones');
 
 let equipos = [];
+let historial = [];
 
 const agregarEquipoHTML = (equipo, marca, serie) => {
   productosAgregados.innerHTML += `
@@ -70,15 +74,21 @@ const agregarProductoManual = async () => {
 
 const buscarCliente = async (e) => {
   if (e.key === 'Enter') {
+    const options = {
+      path: './clientes/clientes.html',
+      botones: false,
+    };
+    if (e.target.value === '') return ipcRenderer.send('abrir-ventana', options);
+
     try {
-      const { data } = await axios.get(`${URL}clientes/buscar/${cliente.value}`);
-      if (data.ok) {
-        listarClientes(data.clientes);
+      let clienteTraido = await getClienteById(e.target.value);
+      if (clienteTraido) {
+        seleccionarCliente(clienteTraido);
       } else {
-        return await Swal.fire('Error al obtener los clientes', data.msg, 'error');
+        return await Swal.fire('Error al obtener los clientes', 'No se encontro el cliente', 'error');
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return await Swal.fire('Error al obtener los clientes', error?.response?.data?.msg, 'error');
     }
   }
@@ -87,14 +97,16 @@ const buscarCliente = async (e) => {
 const buscarProducto = async (e) => {
   if (e.key === 'Enter') {
     try {
-      const { data } = await axios.get(`${URL}productos/${producto.value}/descripcion`);
-      if (data) {
-        listarProductos(data);
+      const productosDescripcion = await getProductoByType(producto.value, 'descripcion');
+      const productosCodigo = await getProductoByType(producto.value, '_id');
+      const productos = [...productosDescripcion, ...productosCodigo];
+      if (productos) {
+        listarProductos(productos);
       } else {
-        return await Swal.fire('Error al obtener los productos', data.msg, 'error');
+        return await Swal.fire('Error al obtener los productos', productos.msg, 'error');
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return await Swal.fire('Error al obtener los productos', error?.response?.data?.msg, 'error');
     }
   }
@@ -111,12 +123,10 @@ const cargarPagina = async () => {
 };
 
 const crearServicio = async () => {
-  console.log(equipos);
-
   const servicio = {
     fecha: fechaConHora(fecha.value),
     datosClientes: {
-      nombre: cliente.value,
+      nombre: nombre.value,
       direccion: direccion.value,
       telefono: telefono.value,
     },
@@ -134,12 +144,12 @@ const crearServicio = async () => {
         servicio: data.servicio,
         equipos: data.equiposCargados,
       });
-      location.href = `./servicio.html?vendedor=${vendedor}`;
+      location.href = `./servicio.html?vendedor=${vendedor}&permiso=${permiso}`;
     } else {
       await Swal.fire('Error al crear el servicio', data.msg, 'error');
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return await Swal.fire('Error al crear el servicio', error?.response?.data?.msg, 'error');
   }
 };
@@ -153,33 +163,6 @@ const cambiarEquipo = async (e) => {
   if (e.target.nodeName === 'SELECT') {
     const equipoTraido = equipos.find((equipo) => equipo.equipo === e.target.parentNode.children[0].innerText);
     equipoTraido.estado = e.target.value;
-  }
-};
-
-const listarClientes = (lista) => {
-  listaClientes.innerHTML = '';
-  listaClientes.parentNode.classList.remove('none');
-
-  for (let cliente of lista) {
-    const div = document.createElement('div');
-
-    div.addEventListener('click', seleccionarCliente);
-
-    div.classList.add('flex');
-    div.classList.add('justify-between');
-    div.classList.add('cursor-pointer');
-    div.classList.add('hover-bg-gray');
-    div.classList.add('py-1');
-    div.classList.add('border-b');
-    div.classList.add('border-gray-400');
-
-    div.innerHTML = `
-            <p class='m-0'>${cliente.nombre}</p>
-            <p class='m-0'>${cliente.direccion}</p>
-            <p class='m-0'>${cliente.telefono}</p>
-        `;
-
-    listaClientes.appendChild(div);
   }
 };
 
@@ -206,8 +189,55 @@ const listarHistorial = (historial) => {
 
     fragment.appendChild(tr);
   }
-  console.log(tbody);
   tbody.appendChild(fragment);
+};
+
+const listarProductos = (lista) => {
+  listaProductos.innerHTML = '';
+  listaProductos.parentNode.classList.remove('none');
+
+  for (let producto of lista) {
+    const div = document.createElement('div');
+    div.addEventListener('click', seleccionarProducto);
+
+    div.classList.add('grid');
+    div.classList.add('columns-3-1fr-2fr-1fr');
+    div.classList.add('cursor-pointer');
+    div.classList.add('hover-bg-gray');
+    div.classList.add('border-b');
+    div.classList.add('border-gray-400');
+
+    div.innerHTML = `
+            <p class='m-0 px-1'>${producto._id}</p>
+            <p class='m-0 px-1'>${producto.descripcion}</p>
+            <p class='m-0 px-1'>${producto.marca}</p>
+        `;
+
+    listaProductos.appendChild(div);
+  }
+};
+
+const listarObservaciones = (lista) => {
+  tbodyObservaciones.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+  for (let elem of lista) {
+    const tr = document.createElement('tr');
+
+    const tdFecha = document.createElement('td');
+    const tdTexto = document.createElement('td');
+
+    tdFecha.classList.add('border', 'text-center');
+    tdTexto.classList.add('border', 'text-center');
+
+    tdFecha.innerText = parsearFecha(elem.fecha);
+    tdTexto.innerText = elem.texto;
+
+    tr.appendChild(tdFecha);
+    tr.appendChild(tdTexto);
+
+    fragment.appendChild(tr);
+  }
+  tbodyObservaciones.appendChild(fragment);
 };
 
 const listarServicio = (servicio, lista) => {
@@ -217,8 +247,8 @@ const listarServicio = (servicio, lista) => {
   cliente.value = servicio?.datosClientes?.nombre ?? '';
   direccion.value = servicio?.datosClientes?.direccion ?? '';
   telefono.value = servicio?.datosClientes?.telefono ?? '';
-
-  sugerencia.value = servicio.sugerencias;
+  historial = servicio.historial;
+  listarObservaciones(servicio.historial);
 
   for (let equipo of lista) {
     equipos.push({
@@ -247,31 +277,6 @@ const listarServicio = (servicio, lista) => {
   }
 };
 
-const listarProductos = (lista) => {
-  listaProductos.innerHTML = '';
-  listaProductos.parentNode.classList.remove('none');
-
-  for (let producto of lista) {
-    const div = document.createElement('div');
-    div.addEventListener('click', seleccionarProducto);
-
-    div.classList.add('grid');
-    div.classList.add('columns-3-1fr-2fr-1fr');
-    div.classList.add('cursor-pointer');
-    div.classList.add('hover-bg-gray');
-    div.classList.add('border-b');
-    div.classList.add('border-gray-400');
-
-    div.innerHTML = `
-            <p class='m-0 px-1'>${producto._id}</p>
-            <p class='m-0 px-1'>${producto.descripcion}</p>
-            <p class='m-0 px-1'>${producto.marca}</p>
-        `;
-
-    listaProductos.appendChild(div);
-  }
-};
-
 const modificarSerivicio = async () => {
   const servicio = {
     fecha: fechaConHora(fecha.value),
@@ -281,6 +286,7 @@ const modificarSerivicio = async () => {
       telefono: telefono.value,
     },
     sugerencias: sugerencia.value,
+    historial: historial,
     vendedor,
   };
   try {
@@ -302,9 +308,9 @@ const modificarSerivicio = async () => {
       });
     }
 
-    location.href = `./servicio.html?vendedor=${vendedor}`;
+    location.href = `./servicio.html?vendedor=${vendedor}&permiso=${permiso}`;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return await Swal.fire('Error al modifiar el servicio Tecnico', error.response.data.msg, 'error');
   }
 };
@@ -332,14 +338,10 @@ const seleccionarProducto = async (e) => {
   producto.value = '';
 };
 
-const seleccionarCliente = (e) => {
-  const clienteDiv = e.target.nodeName === 'DIV' ? e.target : e.target.parentNode;
-
-  cliente.value = clienteDiv.children[0].innerText;
-  direccion.value = clienteDiv.children[1].innerText;
-  telefono.value = clienteDiv.children[2].innerText;
-
-  listaClientes.parentNode.classList.add('none');
+const seleccionarCliente = (clienteTraido) => {
+  nombre.value = clienteTraido.nombre;
+  direccion.value = clienteTraido.direccion;
+  telefono.value = clienteTraido.telefono;
 };
 
 const traerParaModificar = async () => {
@@ -365,7 +367,7 @@ const traerParaModificar = async () => {
       return await Swal.fire('Error al obtener el servicio', data.msg, 'error');
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return await Swal.fire('Error al obtener el servicio', error?.response?.data?.msg, 'error');
   }
 };
@@ -382,10 +384,22 @@ const verDisponibilidadParaEliminar = (servicio) => {
 };
 
 agregarManual.addEventListener('click', agregarProductoManual);
-cancelar.addEventListener('click', () => (location.href = `./servicio.html?vendedor=${vendedor}`));
+cancelar.addEventListener('click', () => (location.href = `./servicio.html?vendedor=${vendedor}&permiso=${permiso}`));
 cliente.addEventListener('keypress', buscarCliente);
 guardar.addEventListener('click', crearServicio);
 modificar.addEventListener('click', modificarSerivicio);
 producto.addEventListener('keypress', buscarProducto);
 productosAgregados.addEventListener('click', cambiarEquipo);
 window.addEventListener('load', cargarPagina);
+
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'Escape') {
+    location.href = `./servicio.html?vendedor=${vendedor}&permiso=${permiso}`;
+  }
+});
+
+ipcRenderer.on('recibir', async (e, args) => {
+  const { tipo, informacion } = JSON.parse(args);
+  let clienteTraido = await getClienteById(informacion);
+  seleccionarCliente(clienteTraido);
+});

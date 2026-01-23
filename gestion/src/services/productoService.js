@@ -14,10 +14,20 @@ const getProductoById = async (id) => {
   }
 };
 
+const getProductoByType = async (value, type) => {
+  try {
+    const { data } = await axios.get(`${URL}productos/${value}/${type}`);
+    return data;
+  } catch (error) {
+    console.log(error);
+    await Swal.fire('No se pudo traer el producto', error?.response?.data?.msg, 'error');
+    return null;
+  }
+};
+
 const getProductoByNombre = async (nombre) => {
   try {
     const { data } = await axios.get(`${URL}productos/nombre/${nombre}`);
-    console.log('a');
     return data;
   } catch (error) {
     console.log(error);
@@ -28,5 +38,6 @@ const getProductoByNombre = async (nombre) => {
 
 module.exports = {
   getProductoById,
+  getProductoByType,
   getProductoByNombre,
 };
