@@ -603,16 +603,15 @@ funciones.sacarIva = (lista, condicion) => {
   let gravado105 = 0;
   if (condicion === 'NORMAL') {
     lista.forEach(({ producto, cantidad }) => {
-      console.log(producto.impuesto);
       if (producto.impuesto === 21) {
-        gravado21 += (cantidad * producto.precio) / 1.21;
-        totalIva21 += (((cantidad * producto.precio) / 1.21) * 21) / 100;
+        gravado21 += (cantidad * producto.precioAux) / 1.21;
+        totalIva21 += (((cantidad * producto.precioAux) / 1.21) * 21) / 100;
       } else if (producto.impuesto === 10.5) {
-        gravado105 += (cantidad * producto.precio) / 1.105;
-        totalIva105 += (((cantidad * producto.precio) / 1.105) * 10.5) / 100;
+        gravado105 += (cantidad * producto.precioAux) / 1.105;
+        totalIva105 += (((cantidad * producto.precioAux) / 1.105) * 10.5) / 100;
       } else {
-        gravado0 += (cantidad * producto.precio) / 1;
-        totalIva0 += cantidad * producto.precio - producto.precio / 1;
+        gravado0 += (cantidad * producto.precioAux) / 1;
+        totalIva0 += cantidad * producto.precioAux - producto.precioAux / 1;
       }
     });
   } else {

@@ -1,18 +1,18 @@
-const {Schema, model} = require('mongoose');
-
+const { Schema, model } = require("mongoose");
 
 const SaldoMensual = new Schema({
-
-    mes: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    saldo: {
-        type: String,
-        required: true
-    }
+  mes: {
+    type: Number,
+    required: true,
+  },
+  anio: {
+    type: Number,
+    required: true,
+  },
+  saldo: {
+    type: Number,
+    required: true,
+  },
 });
 
-
-module.exports = model('SaldoMensual', SaldoMensual);
+module.exports = model("SaldoMensual", SaldoMensual);

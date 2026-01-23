@@ -55,7 +55,6 @@ const crearHTML = async (elem) => {
       impuesto: elem.iva,
     };
   }
-  console.log(producto);
   listaProductos.push({
     cantidad: elem.cantidad,
     producto,
