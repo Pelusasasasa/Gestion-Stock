@@ -8,6 +8,8 @@ const {
 } = require("../schemas/cheque.schema");
 
 chequeCTRL.gestAll = async (req, res) => {
+  const { desde, hasta } = req.query;
+
   const cheques = await Cheque.find();
   try {
     res.status(200).json({

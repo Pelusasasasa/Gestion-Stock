@@ -28,7 +28,6 @@ codigo.addEventListener('change', async (e) => {
 
 nuevoCodigo.addEventListener('change', async (e) => {
   const producto = (await axios.get(`${URL}productos/${nuevoCodigo.value}`)).data;
-  console.log(producto);
   if (producto) {
     await sweet.fire({
       title: 'Codigo Ya utilizado',
@@ -43,6 +42,7 @@ modificar.addEventListener('click', async (e) => {
   try {
     await axios.delete(`${URL}productos/${producto._id}`);
     producto._id = nuevoCodigo.value;
+    producto.utilidad = producto.utilidad ? producto.utilidad : 0;
     await axios.post(`${URL}productos`, producto);
     location.reload();
   } catch (error) {
