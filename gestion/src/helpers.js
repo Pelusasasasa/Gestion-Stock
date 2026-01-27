@@ -41,7 +41,7 @@ funciones.calcularPrecio = (lista, producto, dolar) => {
     const precio = costoUtilidad + (costoUtilidad * producto.impuesto) / 100;
     return precio;
   } else {
-    const costoUtilidad = producto.costoDolar + (producto.costoDolar * (producto.utilidad ?? 0)) / 100;
+    const costoUtilidad = producto.costo + (producto.costo * (producto.utilidad ?? 0)) / 100;
     const precio = costoUtilidad + (costoUtilidad * producto.impuesto) / 100;
     return precio;
   }

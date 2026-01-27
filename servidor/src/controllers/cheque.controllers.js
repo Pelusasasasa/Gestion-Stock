@@ -9,8 +9,9 @@ const {
 
 chequeCTRL.gestAll = async (req, res) => {
   const { desde, hasta } = req.query;
-
-  const cheques = await Cheque.find();
+  const cheques = await Cheque.find({
+    $and: [{ f_cheque: { $gte: desde } }, { f_cheque: { $lte: hasta } }],
+  });
   try {
     res.status(200).json({
       cheques,
