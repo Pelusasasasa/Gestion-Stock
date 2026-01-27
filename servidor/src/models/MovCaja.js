@@ -34,8 +34,8 @@ const MovCaja = new Schema({
   },
   tipoPago: {
     type: String,
-    enum: ["EFEECTIVO", "TARJETA", "CHEQUE", "TRANSFERENCIA"],
-    default: "EFEECTIVO",
+    enum: ["EFECTIVO", "TARJETA", "CHEQUE", "TRANSFERENCIA"],
+    default: "EFECTIVO",
     required: true,
   },
   vendedor: {

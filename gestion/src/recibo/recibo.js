@@ -10,7 +10,7 @@ let vendedor = getParameterByName('vendedor');
 const archivo = require('../configuracion.json');
 
 const { ipcRenderer } = require('electron');
-const { apretarEnter, cargarFactura, redondear, cargarMovCaja, fechaActual } = require('../helpers');
+const { apretarEnter, cargarFactura, redondear, fechaActual } = require('../helpers');
 
 const { getClienteById } = require('../services/clientesService');
 const { getReciboById, postRecibo } = require('../services/reciboService');
@@ -18,6 +18,9 @@ const { getCompensadas, putCompensadaObservaciones } = require('../services/cuen
 const { postRetencion } = require('../services/retencionService');
 
 const { default: Swal } = require('sweetalert2');
+const { getTipoCuentas } = require('../services/tipoCuentaService');
+const { postMovCaja } = require('../services/movCajaService');
+const funciones = require('../helpers');
 
 const codigo = document.querySelector('#codigo');
 const borrarCliente = document.querySelector('#borrarCliente');
@@ -296,6 +299,20 @@ imprimir.addEventListener('click', async (e) => {
           informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false]),
         });
       } else {
+        const tipoCuenta = await getTipoCuentas();
+
+        await postMovCaja({
+          fecha: funciones.fechaActualConHoraArgentina(),
+          tipo: 'Recibo',
+          descripcion: recibo.cliente,
+          puntoVenta: '000R',
+          numero: data.recibo.numero.toString(),
+          tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
+          importe: recibo.precio,
+          tipoPago: 'EFECTIVO',
+          vendedor: vendedor,
+        });
+
         ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
         location.href = '../menu.html';
       }

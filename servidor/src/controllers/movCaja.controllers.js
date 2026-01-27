@@ -48,6 +48,7 @@ movCajaCTRL.getForDates = async (req, res) => {
     });
 
     const movs = await cargarSaldo(saldo, movimientos);
+    console.log(movs);
 
     res.status(200).json({
       movimientos: movs,
@@ -66,7 +67,6 @@ movCajaCTRL.getForDates = async (req, res) => {
 
 movCajaCTRL.patchOne = async (req, res) => {
   const { id } = req.params;
-
   const result = await validatePartialMovCajaSchema(req.body);
 
   if (!result.success)
@@ -103,18 +103,15 @@ movCajaCTRL.patchOne = async (req, res) => {
 };
 
 movCajaCTRL.postOne = async (req, res) => {
-  const result = await validateMovCajaSchema(req.body);
-
-  console.log(result.error);
-
-  if (!result.success)
-    return res.status(400).json({
-      ok: false,
-      msg: "No se pudo cargar el movimiento de caja",
-      error: result.error,
-    });
-
   try {
+    const result = await validateMovCajaSchema(req.body);
+
+    if (!result.success)
+      return res.status(400).json({
+        ok: false,
+        msg: "No se pudo cargar el movimiento de caja",
+        error: result.error,
+      });
     const newMov = new MovCaja(result.data);
     await newMov.save();
 
@@ -122,6 +119,7 @@ movCajaCTRL.postOne = async (req, res) => {
       "nombre",
       "tipo",
     ]);
+
     res.status(201).json({
       ok: true,
       mov,

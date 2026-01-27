@@ -708,24 +708,6 @@ funciones.diferenciaObjetoServicio = async (objeto1, objeto2) => {
   }
 };
 
-funciones.cargarMovCaja = async (descripcion, puntoVenta, numero, tipo, importe, vendedor) => {
-  const cuenta = {};
-
-  cuenta.fecha = new Date();
-  cuenta.descripcion = descripcion;
-  cuenta.puntoVenta = puntoVenta;
-  cuenta.numero = numero;
-  cuenta.tipo = tipo;
-  cuenta.importe = importe;
-  cuenta.vendedor = vendedor;
-
-  try {
-    await axios.post(`${URL}movCaja`, cuenta);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 funciones.parsearFecha = (date) => {
   const fecha = new Date(date);
   const fechaUTC3 = new Date(fecha.getTime() - 3 * 60 * 60 * 1000).toISOString();
@@ -806,6 +788,25 @@ funciones.fechaActual = () => {
   m = m === 13 ? 1 : m;
 
   return `${a}-${m}-${d}`;
+};
+
+funciones.fechaActualConHoraArgentina = () => {
+  const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+  let d = hoy.getDate();
+  let m = hoy.getMonth() + 1;
+  let a = hoy.getFullYear();
+  let h = hoy.getHours();
+  let min = hoy.getMinutes();
+  let s = hoy.getSeconds();
+
+  d = d < 10 ? `0${d}` : d;
+  m = m < 10 ? `0${m}` : m;
+  m = m === 13 ? 1 : m;
+  h = h < 10 ? `0${h}` : h;
+  min = min < 10 ? `0${min}` : min;
+  s = s < 10 ? `0${s}` : s;
+
+  return `${a}-${m}-${d} ${h}:${min}:${s}`;
 };
 
 funciones.saltarEnter = (origen, destino) => {

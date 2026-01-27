@@ -39,7 +39,7 @@ ventaCTRL.putForId = async (req, res) => {
     delete req.body._id;
     const venta = await Venta.findOneAndUpdate(
       { numero: id, tipo_venta: tipo },
-      req.body
+      req.body,
     );
     res.status(200).json({
       ok: true,
@@ -68,7 +68,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
         venta.idCliente,
         venta.precio,
         false,
-        venta.tipo_comp
+        venta.tipo_comp,
       );
 
       if (!saldoModficado.ok)
@@ -103,7 +103,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
     const movimientos = await crearMovimientosStock(
       req.body.listaProductos,
-      venta
+      venta,
     );
     if (!movimientos)
       return res.status(400).json({
@@ -118,12 +118,12 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
     await crearMovimientoVendedores(
       `Se hizo una venta al cliente ${venta.cliente}`,
-      venta.vendedor
+      venta.vendedor,
     );
 
     const nuevaVenta = await Venta.findOne({ _id: venta._id }).populate(
       "vendedor",
-      "nombre"
+      "nombre",
     );
 
     console.log(`Venta con el numero: ${venta.numero} Cargada`);
@@ -175,7 +175,7 @@ ventaCTRL.ventasMes = async (req, res) => {
     let fechaConMesSig = new Date(
       `${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${
         mes === 12 ? 1 : mes + 1
-      }-1`
+      }-1`,
     );
 
     const ventas = await Venta.find({
@@ -222,7 +222,7 @@ ventaCTRL.deleteForId = async (req, res) => {
 
     const movCreado = await crearMovimientoVendedores(
       `Elimino la venta con numero ${venta.numero}`,
-      req.query.vendedor
+      req.query.vendedor,
     );
     if (!movCreado)
       return res.status(500).json({
