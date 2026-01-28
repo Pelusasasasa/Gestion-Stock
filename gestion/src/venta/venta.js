@@ -418,7 +418,7 @@ facturar.addEventListener('click', async (e) => {
     cliente.direccion = direccion.value;
     cliente._id = codigo.value;
 
-    venta = await prepararObjetoVenta(dolar, dolarInstalador, vendedor, facturaAnterior);
+    venta = await prepararObjetoVenta(dolar, dolarInstalador, vendedor, facturaAnterior, esRemito);
 
     try {
       if (situacion === 'blanco') {

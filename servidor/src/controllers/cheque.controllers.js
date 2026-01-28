@@ -1,16 +1,14 @@
 const chequeCTRL = {};
 
-const cargarMovCaja = require("../helpers/movCaja/cargarMovCaja");
-const Cheque = require("../models/Cheque");
-const {
-  validateCheque,
-  validatePartialCheque,
-} = require("../schemas/cheque.schema");
+const fechaConHoraLocal = require('../helpers/fechaConHoraLocal');
+const cargarMovCaja = require('../helpers/movCaja/cargarMovCaja');
+const Cheque = require('../models/Cheque');
+const { validateCheque, validatePartialCheque } = require('../schemas/cheque.schema');
 
 chequeCTRL.gestAll = async (req, res) => {
   const { desde, hasta } = req.query;
   const cheques = await Cheque.find({
-    $and: [{ f_cheque: { $gte: desde } }, { f_cheque: { $lte: hasta } }],
+    $and: [{ f_recibido: { $gte: new Date(desde + 'T00:00:00.000Z') } }, { f_recibido: { $lte: new Date(hasta + 'T23:59:59.999Z') } }],
   });
   try {
     res.status(200).json({
@@ -20,17 +18,21 @@ chequeCTRL.gestAll = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      msg: "Hable Con el Administrador",
+      msg: 'Hable Con el Administrador',
     });
   }
 };
 
 chequeCTRL.postOne = async (req, res) => {
-  const result = await validateCheque(req.body);
+  const chequeData = {
+    ...req.body,
+    f_recibido: fechaConHoraLocal(req.body.f_recibido),
+  };
 
+  const result = await validateCheque(chequeData);
   if (!result.success)
     return res.status(400).json({
-      msg: "Error en el formato de los datos",
+      msg: 'Error en el formato de los datos',
       errors: result.error,
       ok: false,
     });
@@ -39,18 +41,21 @@ chequeCTRL.postOne = async (req, res) => {
     const cheque = new Cheque(result.data);
     await cheque.save();
 
-    const movCaja = await cargarMovCaja({
-      comprobante: cheque.comprobanteId,
-      tipoPago: "CHEQUE",
-      importe: cheque.importe,
-    });
-
-    if (!movCaja) {
-      return res.status(400).json({
-        msg: "Error al cargar el movimiento de caja",
-        ok: false,
+    if (cheque.comprobanteId) {
+      const movCaja = await cargarMovCaja({
+        comprobante: cheque.comprobanteId,
+        tipoPago: 'CHEQUE',
+        importe: cheque.importe,
       });
+
+      if (!movCaja) {
+        return res.status(400).json({
+          msg: 'Error al cargar el movimiento de caja',
+          ok: false,
+        });
+      }
     }
+
     res.status(201).json({
       cheque,
       ok: true,
@@ -59,7 +64,7 @@ chequeCTRL.postOne = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: false,
-      msg: "Hable Con el Administrador",
+      msg: 'Hable Con el Administrador',
     });
   }
 };
@@ -87,7 +92,7 @@ chequeCTRL.patchOne = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      msg: "Hable Con el Administrador",
+      msg: 'Hable Con el Administrador',
     });
   }
 };
@@ -105,7 +110,7 @@ chequeCTRL.deleteOne = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      msg: "Hable Con el Administrador",
+      msg: 'Hable Con el Administrador',
     });
   }
 };

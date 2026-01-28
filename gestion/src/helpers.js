@@ -439,7 +439,7 @@ funciones.ponerNumero = async () => {
     });
 };
 
-funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, facturaAnterior) => {
+funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, facturaAnterior, esRemito = false) => {
   const venta = {};
 
   venta.fecha = new Date();
@@ -451,6 +451,7 @@ funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, factura
   venta.condicion = lista.value;
   venta.vendedor = vendedor ?? '';
   venta.caja = require('./configuracion.json').caja;
+  venta.esRemito = esRemito === 'true' ? true : false;
 
   venta.precio = parseFloat(total.value);
   venta.descuento = parseFloat(descuento.value ?? 0);

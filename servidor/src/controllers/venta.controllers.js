@@ -92,7 +92,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
         });
     }
 
-    if (venta.tipo_venta !== "PP") {
+    if (venta.tipo_venta !== "PP" && req.body.esRemito !== true) {
       const stockDescontado = await descontarStock(req.body.listaProductos);
       if (!stockDescontado)
         return res.status(400).json({
