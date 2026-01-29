@@ -5,6 +5,7 @@ const Swal = require('sweetalert2');
 
 const getProductoById = async (id) => {
   try {
+    if (!id) return null;
     const { data } = await axios.get(`${URL}productos/${id}`);
     return data;
   } catch (error) {

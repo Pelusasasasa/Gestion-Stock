@@ -177,15 +177,19 @@ funciones.tablaCondicionIVAReceptorId = (condicion) => {
 };
 
 funciones.cargarFactura = async (venta, notaCredito) => {
+  console.log('La venta en cargargar factura es:');
   console.log(venta);
+
   const fecha = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
   const { AppServer, AuthServer, DbServer } = await afip.ElectronicBilling.getServerStatus();
   console.log('Estado del servidor');
   console.log({ AppServer, AuthServer, DbServer }); // mostramos el estado del servidor
 
   let ultimaElectronica = await afip.ElectronicBilling.getLastVoucher(puntoVenta, venta.cod_comp);
+  console.log('La ultima electronica es:');
   console.log(ultimaElectronica);
 
+  console.log('La factura anterior es:');
   console.log(parseFloat(venta.facturaAnterior));
   let aux = venta.condicionIva === 'Inscripto' ? 1 : 6;
   let ventaAnterior = venta.facturaAnterior && (await afip.ElectronicBilling.getVoucherInfo(parseFloat(venta.facturaAnterior), puntoVenta, aux));
@@ -477,7 +481,7 @@ funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, factura
   venta.iva105 = iva105;
   venta.gravado105 = gravado105;
   venta.cantIva = cantIva;
-  venta.facturaAnterior = facturaAnterior && '';
+  venta.facturaAnterior = facturaAnterior ?? '';
 
   return venta;
 };

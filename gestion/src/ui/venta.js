@@ -1,3 +1,5 @@
+const { getProductoById } = require('../services/productoService');
+
 const crearHTML = async (elem) => {
   const tr = document.createElement('tr');
 
@@ -44,7 +46,7 @@ const crearHTML = async (elem) => {
 
   tbody.appendChild(tr);
 
-  let producto = await obtenerProducto(elem.codProd);
+  let producto = await getProductoById(elem.codProd);
 
   if (!producto) {
     producto = {
@@ -52,8 +54,11 @@ const crearHTML = async (elem) => {
       descripcion: elem.producto,
       precio: elem.precio,
       marca: elem.marca,
+      precioAux: elem.precio,
       impuesto: elem.iva,
     };
+  } else {
+    producto.precioAux = elem.precio;
   }
   listaProductos.push({
     cantidad: elem.cantidad,

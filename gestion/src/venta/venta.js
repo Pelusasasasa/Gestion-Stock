@@ -340,7 +340,8 @@ const listarVenta = async (venta) => {
   listarCliente(venta.idCliente);
 
   try {
-    const { data } = await getMovimientoForNumberAndType(venta.numero, venta.tipo_venta);
+    const data = await getMovimientoForNumberAndType(venta.numero, venta.tipo_venta);
+
     listarMovimientos(data);
   } catch (error) {
     console.log(error);
@@ -398,6 +399,7 @@ const vefiricarVenta = async () => {
 facturar.addEventListener('click', async (e) => {
   let verificado = await vefiricarVenta();
   let bandera = listaProductos.find(({ producto }) => producto.impuesto === 0);
+
   if (bandera) {
     return await sweet.fire({
       title: 'No se puede hacer una venta con un producto que no tiene iva',
@@ -864,7 +866,7 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
   listarCliente(compensada.idCliente);
 
   for (let elem of cuentas) {
-    const { data: movs } = await getMovimientoForNumberAndType(elem, 'CC');
+    const movs = await getMovimientoForNumberAndType(elem, 'CC');
 
     for await (let mov of movs) {
       producto = {
