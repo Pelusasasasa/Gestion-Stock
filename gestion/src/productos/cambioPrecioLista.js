@@ -51,19 +51,17 @@ const cambiarPrecioshikvision = (datos, productos) => {
     let productoAux = datos.find((elem) => producto._id == elem.SAP);
     if (!productoAux) {
       productoAux = datos.find((elem) => elem.SAP == producto.codigoSecundario);
-      console.log(productoAux);
     }
     if (!productoAux) continue;
-
-    productoAux.GREMIO = parseFloat(productoAux.GREMIO.replace('US$', ''));
+    productoAux.GREMIO = productoAux.GREMIO.replace(',', '.');
+    productoAux.GREMIO = parseFloat(productoAux.GREMIO.replace('USD', ''));
+    if (productoAux.SAP == '300512639') console.log(productoAux.GREMIO);
 
     if (producto.costoDolar !== 0) {
       producto.costoDolar = productoAux ? productoAux.GREMIO : producto.costoDolar;
     } else {
       producto.costo = productoAux ? productoAux.GREMIO : producto.costoDolar;
     }
-
-    console.log(producto);
 
     productosModificados.push(producto);
 
