@@ -1,14 +1,16 @@
 const tarjetaCTRL = {};
 
-const cargarMovCaja = require("../helpers/movCaja/cargarMovCaja");
-const Tarjeta = require("../models/Tarjeta");
-const {
-  validateTarjeta,
-  validatePartialTarjeta,
-} = require("../schemas/tarjeta.schema");
+const fechaConHoraLocal = require('../helpers/fechaConHoraLocal');
+const cargarMovCaja = require('../helpers/movCaja/cargarMovCaja');
+const Tarjeta = require('../models/Tarjeta');
+const { validateTarjeta, validatePartialTarjeta } = require('../schemas/tarjeta.schema');
 
 tarjetaCTRL.postOne = async (req, res) => {
   try {
+    const tarjetaData = {
+      ...req.body,
+      fecha: fechaConHoraLocal(req.body.fecha),
+    };
     const result = await validateTarjeta(req.body);
     if (!result.success)
       return res.status(400).json({
@@ -19,22 +21,22 @@ tarjetaCTRL.postOne = async (req, res) => {
     const tarjeta = new Tarjeta(result.data);
     await tarjeta.save();
 
-    const movCaja = await cargarMovCaja({
-      comprobante: tarjeta.comprobanteId,
-      tipoPago: "TARJETA",
-      importe: tarjeta.importe,
-    });
-
-    if (!movCaja) {
-      return res.status(400).json({
-        msg: "Error al cargar el movimiento de caja",
-        ok: false,
+    if (tarjeta.comprobanteId) {
+      const movCaja = await cargarMovCaja({
+        comprobante: tarjeta.comprobanteId,
+        tipoPago: 'TARJETA',
+        importe: tarjeta.importe,
       });
+
+      if (!movCaja) {
+        return res.status(400).json({
+          msg: 'Error al cargar el movimiento de caja',
+          ok: false,
+        });
+      }
     }
 
-    const tarjetaConDatos = await Tarjeta.findById(tarjeta._id).populate(
-      "tarjeta",
-    );
+    const tarjetaConDatos = await Tarjeta.findById(tarjeta._id).populate('tarjeta');
 
     res.status(201).json({
       ok: true,
@@ -44,14 +46,18 @@ tarjetaCTRL.postOne = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: false,
-      msg: "Hable con el administrador",
+      msg: 'Hable con el administrador',
     });
   }
 };
 
 tarjetaCTRL.getAll = async (req, res) => {
+  const { desde, hasta } = req.query;
+  console.log(desde, hasta);
   try {
-    const tarjetas = await Tarjeta.find().populate("tarjeta");
+    const tarjetas = await Tarjeta.find({
+      $and: [{ fecha: { $gte: new Date(desde + 'T00:00:00.000Z') } }, { fecha: { $lte: new Date(hasta + 'T23:59:59.999Z') } }],
+    }).populate('tarjeta');
 
     res.status(200).json({
       ok: true,
@@ -60,7 +66,7 @@ tarjetaCTRL.getAll = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      msg: "Hable con el administrador",
+      msg: 'Hable con el administrador',
     });
   }
 };
@@ -81,9 +87,7 @@ tarjetaCTRL.patchOne = async (req, res) => {
       new: true,
     });
 
-    const tarjetaConDatos = await Tarjeta.findById(tarjetaUpdate._id).populate(
-      "tarjeta",
-    );
+    const tarjetaConDatos = await Tarjeta.findById(tarjetaUpdate._id).populate('tarjeta');
 
     res.status(200).json({
       ok: true,
@@ -93,7 +97,7 @@ tarjetaCTRL.patchOne = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: false,
-      msg: "Hable con el administrador",
+      msg: 'Hable con el administrador',
     });
   }
 };
@@ -111,7 +115,7 @@ tarjetaCTRL.deleteOne = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      msg: "Hable con el administrador",
+      msg: 'Hable con el administrador',
     });
   }
 };
