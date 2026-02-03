@@ -6,10 +6,24 @@ const Cheque = require('../models/Cheque');
 const { validateCheque, validatePartialCheque } = require('../schemas/cheque.schema');
 
 chequeCTRL.gestAll = async (req, res) => {
-  const { desde, hasta } = req.query;
-  const cheques = await Cheque.find({
-    $and: [{ f_recibido: { $gte: new Date(desde + 'T00:00:00.000Z') } }, { f_recibido: { $lte: new Date(hasta + 'T23:59:59.999Z') } }],
-  });
+  const { desde, hasta, text } = req.query;
+
+  const query = {
+    f_recibido: {
+      $gte: new Date(desde + 'T00:00:00.000Z'),
+      $lte: new Date(hasta + 'T23:59:59.999Z'),
+    },
+  };
+
+  if (text) {
+    const regex = new RegExp(text, 'i');
+    const or = [{ numero: regex }, { ent_por: regex }, { banco: regex }];
+
+    query.$or = or;
+  }
+
+  const cheques = await Cheque.find(query);
+
   try {
     res.status(200).json({
       cheques,

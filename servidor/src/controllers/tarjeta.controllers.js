@@ -52,18 +52,34 @@ tarjetaCTRL.postOne = async (req, res) => {
 };
 
 tarjetaCTRL.getAll = async (req, res) => {
-  const { desde, hasta } = req.query;
-  console.log(desde, hasta);
+  const { desde, hasta, text } = req.query;
+
+  const query = {
+    fecha: {
+      $gte: new Date(desde + 'T00:00:00.000Z'),
+      $lte: new Date(hasta + 'T23:59:59.999Z'),
+    },
+  };
+
+  if (text) {
+    const regex = new RegExp(text, 'i');
+    const or = [{ nombre: regex }, { tipo: regex }];
+
+    query.$or = or;
+  }
+
+  console.log(query);
+
   try {
-    const tarjetas = await Tarjeta.find({
-      $and: [{ fecha: { $gte: new Date(desde + 'T00:00:00.000Z') } }, { fecha: { $lte: new Date(hasta + 'T23:59:59.999Z') } }],
-    }).populate('tarjeta');
+    const tarjetas = await Tarjeta.find(query).populate('tarjeta');
+    console.log(tarjetas);
 
     res.status(200).json({
       ok: true,
       tarjetas,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: 'Hable con el administrador',
