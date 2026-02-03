@@ -79,20 +79,14 @@
                 <input type="text" value="0.00" name="entregado" id="entregado">
             </main>
 
-            <main class="cheque">
-                <label for="cheque">Cheque</label>
-                <input type="radio" name="cheque" id="cheque">
-            </main>
+            
 
             <main class="retencion">
                 <label for="retencion">Retencion</label>
                 <input type="checkbox" name="retencion" id="retencion">
             </main>
 
-            <main>
-                <label for="tarjeta">Tarjeta</label>
-                <input type="radio" name="tarjeta" id="tarjeta">
-            </main>
+            
             <main class="total">
                 <label for="total">Total</label>
                 <input type="text" disabled name="total" value="0.00" id="total">
@@ -103,6 +97,34 @@
             <button class="imprimir">Imprimir</button>
         </div>
     </footer>
+
+    <div id="modal" class="none">
+        <main>
+            <div id="modalTitle">
+                <h4>Elegir Opcion </h4>
+                <p id="close">X</p>
+            </div>
+
+            <section id="modalTbody">
+
+                <div id="cheque">
+                    <h5>Cheques</h5>
+                </div>
+                <div id="tarjeta">
+                    <h5>Tarjetas</h5>
+                </div>
+                <div class="activo" id="efectivo">
+                    <h5>Efectivos</h5>
+                </div>
+                
+            </section>
+
+            <section id="botonesModal">
+                <button id="aceptarModal">Continuar</button>
+                <button id="cancelarModal">Cancelar</button>
+            </section>
+        </main>
+    </div>
 </body>
 <script src="./recibo.js"></script>
 

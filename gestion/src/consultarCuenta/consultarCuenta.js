@@ -16,7 +16,7 @@ const {
 } = require('../services/cuentasService');
 const { getClienteById, putCliente } = require('../services/clientesService');
 const { getPrecio, getCostoImpuesto } = require('../services/productosService');
-const { putMovimientos, getMovimientoForNumberAndType } = require('../services/movProductosService');
+const { putMovimientos, getMovimientoForNumberAndType, getMovimientosRecibosForNumber } = require('../services/movProductosService');
 const { listarVentas, listarProductos } = require('../ui/consultar');
 const { getVentaForNumberAndType, putVentaForNumeroAndType } = require('../services/ventasService');
 

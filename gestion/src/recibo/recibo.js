@@ -34,18 +34,23 @@ const observaciones = document.getElementById('observaciones');
 
 const tbody = document.querySelector('tbody');
 const total = document.querySelector('#total');
-const imprimir = document.querySelector('.imprimir');
 const entregado = document.querySelector('#entregado');
-const cheque = document.querySelector('#cheque');
+
 const retencion = document.querySelector('#retencion');
+
+const imprimir = document.querySelector('.imprimir');
 const cancelar = document.querySelector('.cancelar');
 
-const tarjeta = document.querySelector('#tarjeta');
+const modal = document.querySelector('#modal');
+const modalTbody = document.querySelector('#modalTbody');
+const aceptarModal = document.querySelector('#aceptarModal');
+const cancelarModal = document.querySelector('#cancelarModal');
 
 let cuentaAFavor;
 let nroCheque = '';
 let retencionValor;
 let retencionBrutos;
+let recibo = {};
 
 fecha.value = fechaActual();
 
@@ -158,16 +163,6 @@ const ponerVenta = async (cuenta) => {
   tbody.appendChild(tr);
 };
 
-const verValorRecibo = () => {
-  if (cheque.checked) {
-    return `CHEQUE`;
-  } else if (tarjeta.checked) {
-    return `TARJETA`;
-  } else {
-    return 'EFECTIVO';
-  }
-};
-
 //Cuando hago un click que seleccione el input
 let inputSeleccionado = tbody;
 let trSeleccionado = '';
@@ -244,81 +239,58 @@ entregado.addEventListener('change', async (e) => {
 
 imprimir.addEventListener('click', async (e) => {
   //ponemos los valores en el recibo
-  const recibo = {};
   recibo.cliente = nombre.value;
   recibo.idCliente = codigo.value;
   recibo.tipo_comp = 'Recibo';
   recibo.tipo_venta = 'RB';
   recibo.descuento = 0;
-  recibo.valorRecibido = nroCheque ? `CHEQUE ${nroCheque.toUpperCase()}` : 'EFECTIVO';
+  recibo.valorRecibido = 'EFECTIVO';
   recibo.precio = parseFloat(total.value);
   recibo.vendedor = vendedor ? vendedor : '';
   recibo.caja = archivo.caja;
   recibo.compensadas = await modificarCuentaCompensadas();
-  recibo.valorRecibido = verValorRecibo();
+
+  const { isConfirmed } = await Swal.fire({
+    title: '¿Estas seguro de generar el recibo?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, generar recibo',
+    cancelButtonText: 'Cancelar',
+  });
+
+  if (!isConfirmed) {
+    return;
+  }
 
   try {
-    const data = await postRecibo(recibo);
-
-    if (data.ok) {
-      data.recibo.retencion = [];
-      if (retencionValor) {
-        const retencion = await postRetencion({
-          importe: retencionValor,
-          reciboId: data.recibo._id,
-          nro_comp: data.recibo.numero,
-          descripcion: 'Retenciones Imp a las Ganancias',
-        });
-        data.recibo.retencion.push(retencion.retencion);
-      }
-
-      if (retencionBrutos) {
-        const retencion = await postRetencion({
-          importe: retencionBrutos,
-          reciboId: data.recibo._id,
-          nro_comp: data.recibo.numero,
-          descripcion: 'Retencones IIBB - ATER Contribuyente',
-        });
-        data.recibo.retencion.push(retencion.retencion);
-      }
-
-      if (cheque.checked) {
-        await ipcRenderer.send('abrir-ventana', {
-          path: './cheque/agregarCheque.html',
-          altura: 800,
-          ancho: 600,
-          reinicio: false,
-          informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false]),
-        });
-      } else if (tarjeta.checked) {
-        await ipcRenderer.send('abrir-ventana', {
-          path: './tarjeta/agregarTarjeta.html',
-          altura: 800,
-          ancho: 600,
-          reinicio: false,
-          informacion: JSON.stringify([data.recibo, data.cliente, data.movsRecibos, false]),
-        });
-      } else {
-        const tipoCuenta = await getTipoCuentas();
-
-        await postMovCaja({
-          fecha: funciones.fechaActualConHoraArgentina(),
-          tipo: 'Recibo',
-          descripcion: recibo.cliente,
-          puntoVenta: '000R',
-          numero: data.recibo.numero.toString(),
-          tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
-          importe: recibo.precio,
-          tipoPago: 'EFECTIVO',
-          vendedor: vendedor,
-        });
-
-        ipcRenderer.send('imprimir-recibo', [data.recibo, data.cliente, data.movsRecibos, false]);
-        location.href = '../menu.html';
-      }
-    } else {
-      await Swal.fire('Error al generar el recibo', data?.msg, 'error');
+    recibo = await postRecibo(recibo);
+    recibo.recibo.retencion = [];
+    if (retencionValor) {
+      const retencion = await postRetencion({
+        importe: retencionValor,
+        reciboId: recibo.recibo._id,
+        nro_comp: recibo.recibo.numero,
+        descripcion: 'Retenciones Imp a las Ganancias',
+      });
+      recibo.recibo.retencion.push(retencion.retencion);
     }
+
+    if (retencionBrutos) {
+      const retencion = await postRetencion({
+        importe: retencionBrutos,
+        reciboId: recibo.recibo._id,
+        nro_comp: recibo.recibo.numero,
+        descripcion: 'Retencones IIBB - ATER Contribuyente',
+      });
+      recibo.recibo.retencion.push(retencion.retencion);
+    }
+
+    if (!recibo.ok) {
+      await Swal.fire('Error al generar el recibo', data?.msg, 'error');
+      return;
+    }
+
+    modal.classList.remove('none');
   } catch (error) {
     console.log(error);
   }
@@ -467,4 +439,57 @@ borrarCliente.addEventListener('click', () => {
   codigo.removeAttribute('disabled');
 
   tbody.innerHTML = '';
+});
+
+modalTbody.addEventListener('click', (e) => {
+  document.querySelector('.activo').classList.remove('activo');
+  if (e.target.tagName === 'DIV') {
+    e.target.classList.add('activo');
+  } else if (e.target.tagName === 'H5') {
+    e.target.parentElement.classList.add('activo');
+  }
+});
+
+aceptarModal.addEventListener('click', async () => {
+  const activo = document.querySelector('.activo');
+  console.log(activo);
+  console.log(recibo);
+  if (activo.id === 'cheque') {
+    await ipcRenderer.send('abrir-ventana', {
+      path: './cheque/agregarCheque.html',
+      altura: 800,
+      ancho: 600,
+      reinicio: false,
+      informacion: JSON.stringify([recibo.recibo, recibo.cliente, recibo.movsRecibos, false]),
+    });
+  } else if (activo.id === 'tarjeta') {
+    await ipcRenderer.send('abrir-ventana', {
+      path: './tarjeta/agregarTarjeta.html',
+      altura: 800,
+      ancho: 600,
+      reinicio: false,
+      informacion: JSON.stringify([recibo.recibo, recibo.cliente, recibo.movsRecibos, false]),
+    });
+  } else if (activo.id === 'efectivo') {
+    const tipoCuenta = await getTipoCuentas();
+
+    await postMovCaja({
+      fecha: funciones.fechaActualConHoraArgentina(),
+      tipo: 'Recibo',
+      descripcion: recibo?.cliente?.nombre ?? 'SIN NOMBRE',
+      puntoVenta: '000R',
+      numero: recibo.recibo.numero.toString(),
+      tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
+      importe: recibo.recibo.precio,
+      tipoPago: 'EFECTIVO',
+      vendedor: vendedor,
+    });
+
+    ipcRenderer.send('imprimir-recibo', [recibo.recibo, recibo.cliente, recibo.movsRecibos, false]);
+    location.href = '../menu.html';
+  }
+});
+
+cancelarModal.addEventListener('click', () => {
+  modal.classList.add('none');
 });

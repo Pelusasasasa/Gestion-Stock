@@ -1,10 +1,10 @@
 const historicaCTRL = {};
 
-const Historica = require("../models/cuentaCorrHisto");
+const Historica = require('../models/cuentaCorrHisto');
 
 historicaCTRL.porNumberAndType = async (req, res) => {
   const { number, type } = req.params;
-  console.log(number, type);
+
   const historica = await Historica.findOne({
     nro_venta: number,
     tipo_comp: type,
@@ -16,9 +16,7 @@ historicaCTRL.porNumberAndType = async (req, res) => {
 historicaCTRL.cargarHistorica = async (req, res) => {
   const historica = new Historica(req.body);
   await historica.save();
-  console.log(
-    `Historica ${req.body.nro_venta} Guardada al cliente ${req.body.cliente}`,
-  );
+  console.log(`Historica ${req.body.nro_venta} Guardada al cliente ${req.body.cliente}`);
   res.send(`Historica ${req.body._id} Guardada`);
 };
 
@@ -27,17 +25,15 @@ historicaCTRL.modificarHistorica = async (req, res) => {
   try {
     delete req.body._id;
     await Historica.findOneAndUpdate({ nro_venta: id }, req.body);
-    console.log(
-      `Cuenta Historica numero: ${id} Modificado al cliente ${req.body.cliente}`,
-    );
+    console.log(`Cuenta Historica numero: ${id} Modificado al cliente ${req.body.cliente}`);
     res.status(200).json({
       ok: true,
-      msg: "Historica modificada",
+      msg: 'Historica modificada',
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      msg: " No se pudo modificar la historica hable con el administrador",
+      msg: ' No se pudo modificar la historica hable con el administrador',
       ok: false,
       error: error,
     });
@@ -55,7 +51,7 @@ historicaCTRL.eliminarHistorica = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      msg: " No se pudo eliminar la historica hable con el administrador",
+      msg: ' No se pudo eliminar la historica hable con el administrador',
       ok: false,
       error: error,
     });
@@ -79,7 +75,7 @@ historicaCTRL.traerHistorica = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      msg: " No se pudo obtener la historica hable con el administrador",
+      msg: ' No se pudo obtener la historica hable con el administrador',
       ok: false,
       error: error,
     });
@@ -89,7 +85,7 @@ historicaCTRL.traerHistorica = async (req, res) => {
 historicaCTRL.traerHistoricaDesdeYCliente = async (req, res) => {
   const { desde, codigo } = req.params;
   const historicas = await Historica.find({
-    fecha: { $gte: desde + "T00:00:00.000Z" },
+    fecha: { $gte: desde + 'T00:00:00.000Z' },
     idCliente: codigo,
   });
   res.send(historicas);
@@ -100,18 +96,15 @@ historicaCTRL.putForNumberAndType = async (req, res) => {
 
   try {
     delete req.body._id;
-    await Historica.findOneAndUpdate(
-      { nro_venta: number, tipo_comp: type },
-      req.body,
-    );
+    await Historica.findOneAndUpdate({ nro_venta: number, tipo_comp: type }, req.body);
     res.status(200).json({
       ok: true,
-      msg: "Historica modificada",
+      msg: 'Historica modificada',
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      msg: " No se pudo modificar la historica hable con el administrador",
+      msg: ' No se pudo modificar la historica hable con el administrador',
       ok: false,
       error: error,
     });
