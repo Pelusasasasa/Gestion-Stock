@@ -452,8 +452,7 @@ modalTbody.addEventListener('click', (e) => {
 
 aceptarModal.addEventListener('click', async () => {
   const activo = document.querySelector('.activo');
-  console.log(activo);
-  console.log(recibo);
+
   if (activo.id === 'cheque') {
     await ipcRenderer.send('abrir-ventana', {
       path: './cheque/agregarCheque.html',
@@ -470,6 +469,46 @@ aceptarModal.addEventListener('click', async () => {
       reinicio: false,
       informacion: JSON.stringify([recibo.recibo, recibo.cliente, recibo.movsRecibos, false]),
     });
+  } else if (activo.id === 'transferencia') {
+    const tipoCuenta = await getTipoCuentas();
+    const { isConfirmed, value } = await Swal.fire({
+      title: 'Transferencia',
+      text: 'Colocar importe de trasferencia',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+    });
+    if (isConfirmed) {
+      console.log('a');
+      await postMovCaja({
+        fecha: funciones.fechaActualConHoraArgentina(),
+        tipo: 'Recibo',
+        descripcion: recibo?.cliente?.nombre ?? 'SIN NOMBRE',
+        puntoVenta: '000R',
+        numero: recibo.recibo.numero.toString(),
+        tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
+        importe: parseFloat(value),
+        tipoPago: 'TRANSFERENCIA',
+        vendedor: vendedor,
+      });
+    }
+
+    if (recibo.recibo.precio > parseFloat(value)) {
+      await postMovCaja({
+        fecha: funciones.fechaActualConHoraArgentina(),
+        tipo: 'Recibo',
+        descripcion: recibo?.cliente?.nombre ?? 'SIN NOMBRE',
+        puntoVenta: '000R',
+        numero: recibo.recibo.numero.toString(),
+        tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
+        importe: recibo.recibo.precio - parseFloat(value),
+        tipoPago: 'EFECTIVO',
+        vendedor: vendedor,
+      });
+    }
+    ipcRenderer.send('imprimir-recibo', [recibo.recibo, recibo.cliente, recibo.movsRecibos, false]);
+    location.href = '../menu.html';
   } else if (activo.id === 'efectivo') {
     const tipoCuenta = await getTipoCuentas();
 

@@ -1,13 +1,10 @@
 const movCajaCTRL = {};
 
-const cargarSaldo = require("../helpers/cargarSaldo");
-const obtenerRangoMes = require("../helpers/obtenerRangoMes");
-const MovCaja = require("../models/MovCaja");
-const SaldoMensual = require("../models/SaldoMensual");
-const {
-  validateMovCajaSchema,
-  validatePartialMovCajaSchema,
-} = require("../schemas/movCaja.schema");
+const cargarSaldo = require('../helpers/cargarSaldo');
+const obtenerRangoMes = require('../helpers/obtenerRangoMes');
+const MovCaja = require('../models/MovCaja');
+const SaldoMensual = require('../models/SaldoMensual');
+const { validateMovCajaSchema, validatePartialMovCajaSchema } = require('../schemas/movCaja.schema');
 
 movCajaCTRL.deleteOne = async (req, res) => {
   const { id } = req.params;
@@ -23,7 +20,7 @@ movCajaCTRL.deleteOne = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: true,
-      msg: "No se pueod eliminar el movimiento",
+      msg: 'No se pueod eliminar el movimiento',
       error: error,
     });
   }
@@ -35,12 +32,8 @@ movCajaCTRL.getForDates = async (req, res) => {
   const { inicio, fin } = obtenerRangoMes(desde);
   try {
     const movimientos = await MovCaja.find({
-      $and: [
-        { fecha: { $gte: inicio } },
-        { fecha: { $lt: fin } },
-        { tipoPago: tipo },
-      ],
-    }).populate("tipo", ["nombre", "tipo"]);
+      $and: [{ fecha: { $gte: inicio } }, { fecha: { $lt: fin } }, { tipoPago: tipo }],
+    }).populate('tipo', ['nombre', 'tipo']);
 
     const saldo = await SaldoMensual.findOne({
       mes: inicio.getMonth() + 1,
@@ -59,7 +52,7 @@ movCajaCTRL.getForDates = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: false,
-      msg: "No se puede obtener los movimientos, hable con el administrador",
+      msg: 'No se puede obtener los movimientos, hable con el administrador',
       error,
     });
   }
@@ -72,21 +65,14 @@ movCajaCTRL.patchOne = async (req, res) => {
   if (!result.success)
     return res.status(400).json({
       ok: false,
-      msg: "No se pudo modifciar el movimiento de caja",
+      msg: 'No se pudo modifciar el movimiento de caja',
       error: result.error,
     });
 
   try {
-    const updateMovCajaAux = await MovCaja.findOneAndUpdate(
-      { _id: id },
-      result.data,
-      { new: true },
-    );
+    const updateMovCajaAux = await MovCaja.findOneAndUpdate({ _id: id }, result.data, { new: true });
 
-    const updateMovCaja = await MovCaja.findById(updateMovCajaAux._id).populate(
-      "tipo",
-      ["nombre", "tipo"],
-    );
+    const updateMovCaja = await MovCaja.findById(updateMovCajaAux._id).populate('tipo', ['nombre', 'tipo']);
 
     res.status(200).json({
       ok: true,
@@ -96,7 +82,7 @@ movCajaCTRL.patchOne = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: false,
-      msg: "No se puedo modificar el movimiento de caja, hable con el administador",
+      msg: 'No se puedo modificar el movimiento de caja, hable con el administador',
       error: error,
     });
   }
@@ -104,21 +90,19 @@ movCajaCTRL.patchOne = async (req, res) => {
 
 movCajaCTRL.postOne = async (req, res) => {
   try {
+    console.log(req.body);
     const result = await validateMovCajaSchema(req.body);
-
     if (!result.success)
       return res.status(400).json({
         ok: false,
-        msg: "No se pudo cargar el movimiento de caja",
+        msg: 'No se pudo cargar el movimiento de caja',
         error: result.error,
       });
     const newMov = new MovCaja(result.data);
+    console.log(newMov);
     await newMov.save();
 
-    const mov = await MovCaja.findOne({ _id: newMov._id }).populate("tipo", [
-      "nombre",
-      "tipo",
-    ]);
+    const mov = await MovCaja.findOne({ _id: newMov._id }).populate('tipo', ['nombre', 'tipo']);
 
     res.status(201).json({
       ok: true,
@@ -128,7 +112,7 @@ movCajaCTRL.postOne = async (req, res) => {
     console.error(error);
     res.status(500).json({
       ok: false,
-      msg: "No se pudo cargar el mov, Hable con el administrador",
+      msg: 'No se pudo cargar el mov, Hable con el administrador',
       error: error,
     });
   }
