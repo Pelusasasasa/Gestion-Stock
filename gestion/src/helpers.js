@@ -564,19 +564,19 @@ funciones.verCodDoc = async (cuit) => {
 };
 
 funciones.verTipoComprobante = async (codigo) => {
-  let retorno = 'Comprobante';
+  let retorno = 'PRESUPUESTO';
   if (codigo === 1) {
-    retorno = 'Factura A';
+    retorno = 'FACTURA A';
   } else if (codigo === 3) {
-    retorno = 'Nota Credito A';
+    retorno = 'NOTA CREDITO A';
   } else if (codigo === 6) {
-    retorno = 'Factura B';
+    retorno = 'FACTURA B';
   } else if (codigo === 8) {
-    retorno = 'Nota Credito B';
+    retorno = 'NOTA CREDITO B';
   } else if (codigo === 11) {
-    retorno = 'Factura C';
+    retorno = 'FACTURA C';
   } else if (codigo === 13) {
-    retorno = 'Nota Credito C';
+    retorno = 'NOTA CREDITO C';
   }
   return retorno;
 };
@@ -585,7 +585,7 @@ funciones.verTipoComprobanteNegro = async (tipo) => {
   if (tipo === 'RT') {
     return 'REMITO';
   } else {
-    return 'COMPROBANTE';
+    return 'PRESUPUESTO';
   }
 };
 

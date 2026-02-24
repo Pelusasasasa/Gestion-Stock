@@ -1,4 +1,7 @@
 const axios = require('axios');
+require('dotenv').config();
+
+const URL = process.env.GESTIONURL;
 const getPrecio = async (codProd) => {
   try {
     const { data } = await axios.get(`${URL}productos/traerPrecio/${codProd}`);

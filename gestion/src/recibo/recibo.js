@@ -480,7 +480,6 @@ aceptarModal.addEventListener('click', async () => {
       cancelButtonText: 'Cancelar',
     });
     if (isConfirmed) {
-      console.log('a');
       await postMovCaja({
         fecha: funciones.fechaActualConHoraArgentina(),
         tipo: 'Recibo',

@@ -1,5 +1,4 @@
 const Recibo = require('../../models/Recibo');
-const CuentaCompensada = require('../../models/cuentaCorrComp');
 const Historica = require('../../models/cuentaCorrHisto');
 
 const modificarValorRecibido = async (comprobanteNumero, tipoPago) => {

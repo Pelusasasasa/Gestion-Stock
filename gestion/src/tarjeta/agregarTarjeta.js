@@ -80,6 +80,7 @@ const validarDatos = async () => {
 ipcRenderer.on('informacion', (e, args) => {
   informacion = args;
   const [venta, cliente] = JSON.parse(informacion.informacion);
+
   fecha.value = venta.fecha.slice(0, 10);
   nombre.value = cliente.nombre.slice(0, 40);
   importe.value = venta.precio.toFixed(2);

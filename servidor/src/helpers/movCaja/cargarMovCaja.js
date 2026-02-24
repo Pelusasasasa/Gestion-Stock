@@ -1,12 +1,18 @@
 const MovCaja = require('../../models/MovCaja');
 const Recibo = require('../../models/Recibo');
 const TipoCuenta = require('../../models/TipoCuenta');
+const Venta = require('../../models/Venta');
 const modificarValorRecibido = require('../recibo/modificarValorRecibido');
 
 const cargarMovCaja = async (data) => {
   try {
-    const comprobante = await Recibo.findById(data.comprobante);
-    modificarValorRecibido(data.comprobante, data.tipoPago);
+    let comprobante = await Recibo.findById(data.comprobante);
+
+    if (!comprobante) {
+      comprobante = await Venta.findById(data.comprobante);
+    } else {
+      modificarValorRecibido(data.comprobante, data.tipoPago);
+    }
 
     const tipoCuenta = await TipoCuenta.findOne({
       nombre: comprobante.tipo_comp.toUpperCase(),
@@ -21,7 +27,6 @@ const cargarMovCaja = async (data) => {
       tipo: tipoCuenta._id ?? '',
       vendedor: comprobante.vendedor,
     };
-
     const movCaja = new MovCaja(mov);
     await movCaja.save();
 

@@ -288,6 +288,7 @@ body.addEventListener('keypress', async (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
+  console.log(ventanaSecundaria);
   if (e.key === 'Escape' && ventanaSecundaria) {
     window.close();
   } else if (e.key === 'Escape' && !ventanaSecundaria) {

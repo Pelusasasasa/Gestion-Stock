@@ -12,6 +12,9 @@ const { getProductoById } = require('../services/productoService');
 const { postVenta, getVentaPorFactura, getVentaForIdAndType } = require('../services/ventasService');
 const { getNumero } = require('../services/numeroService');
 const { crearHTML, crearProducto } = require('../ui/venta');
+const { getTipoCuentas } = require('../services/tipoCuentaService');
+const { postMovCaja } = require('../services/movCajaService');
+const funciones = require('../helpers');
 
 let vendedor = getParameterByName('vendedor');
 let esRemito = getParameterByName('remito');
@@ -50,6 +53,12 @@ const volver = document.querySelector('.volver');
 const impresion = document.querySelector('#impresion');
 const checkboxDolar = document.querySelector('#dolar');
 
+//Modal
+const aceptarModal = document.getElementById('aceptarModal');
+const cancelarModal = document.querySelector('#cancelarModal');
+const modal = document.getElementById('modal');
+const modalTbody = document.getElementById('modalTbody');
+
 //alerta
 const alerta = document.querySelector('.alerta');
 
@@ -60,6 +69,10 @@ let tipoFactura = getParameterByName('tipoFactura');
 let facturaAnterior;
 
 let situacion = 'blanco';
+let venta;
+let ventaTraida;
+let cliente;
+let movimientos;
 
 let totalGlobal = 0;
 let idProducto = 0;
@@ -182,10 +195,6 @@ const eliminarCuentas = async () => {
     const { ok } = await deleteCompensada(elem);
     const { ok: historica } = await deleteHistorica(elem);
     const { ok: movs } = await deleteMovimientos(elem, 'CC');
-
-    console.log(ok);
-    console.log(historica);
-    console.log(movs);
   }
 };
 
@@ -396,6 +405,87 @@ const vefiricarVenta = async () => {
   return bandera;
 };
 
+aceptarModal.addEventListener('click', async () => {
+  const activo = document.querySelector('.activo');
+
+  if (activo.id === 'cheque') {
+    await ipcRenderer.send('abrir-ventana', {
+      path: './cheque/agregarCheque.html',
+      altura: 800,
+      ancho: 600,
+      reinicio: false,
+      informacion: JSON.stringify([ventaTraida, cliente, movimientos, false]),
+    });
+  } else if (activo.id === 'tarjeta') {
+    await ipcRenderer.send('abrir-ventana', {
+      path: './tarjeta/agregarTarjeta.html',
+      altura: 800,
+      ancho: 600,
+      reinicio: false,
+      informacion: JSON.stringify([ventaTraida, cliente, movimientos, false]),
+    });
+  } else if (activo.id === 'transferencia') {
+    const tipoCuenta = await getTipoCuentas();
+    const { isConfirmed, value } = await Swal.fire({
+      title: 'Transferencia',
+      text: 'Colocar importe de trasferencia',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+    });
+    if (isConfirmed) {
+      await postMovCaja({
+        fecha: funciones.fechaActualConHoraArgentina(),
+        tipo: 'Recibo',
+        descripcion: ventaTraida.cliente ?? 'SIN NOMBRE',
+        puntoVenta: ventaTraida.afip ? ventaTraida.afip.numero : '000C',
+        numero: ventaTraida.afip ? ventaTraida.afip.numero : ventaTraida.numero,
+        tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
+        importe: parseFloat(value),
+        tipoPago: 'TRANSFERENCIA',
+        vendedor: vendedor,
+      });
+    }
+
+    if (ventaTraida.precio > parseFloat(value)) {
+      await postMovCaja({
+        fecha: funciones.fechaActualConHoraArgentina(),
+        tipo: 'Recibo',
+        descripcion: ventaTraida.cliente ?? 'SIN NOMBRE',
+        puntoVenta: ventaTraida.afip?.puntoVenta ?? '000C',
+        numero: ventaTraida.afip?.numero ?? ventaTraida.numero,
+        tipo: tipoCuenta.find((t) => t.nombre === 'RECIBO')._id,
+        importe: ventaTraida.precio - parseFloat(value),
+        tipoPago: 'EFECTIVO',
+        vendedor: vendedor,
+      });
+    }
+    await ipcRenderer.send('imprimir', [situacion, ventaTraida, cliente, movimientos, checkboxDolar.checked]);
+    location.href = '../menu.html';
+  } else if (activo.id === 'efectivo') {
+    const tipoCuenta = await getTipoCuentas();
+
+    await postMovCaja({
+      fecha: funciones.fechaActualConHoraArgentina(),
+      tipo: ventaTraida.tipo_comp,
+      descripcion: ventaTraida.cliente ?? 'Consumidor Final',
+      puntoVenta: ventaTraida?.afip?.puntoVenta ?? '0',
+      numero: ventaTraida?.afip?.numero ?? ventaTraida.numero,
+      tipo: tipoCuenta.find(({ nombre }) => nombre === ventaTraida.tipo_comp)?._id ?? tipoCuenta.find(({ nombre }) => nombre === 'PRESUPUESTO')?._id,
+      importe: ventaTraida.precio,
+      tipoPago: 'EFECTIVO',
+      vendedor: vendedor._id,
+    });
+    await ipcRenderer.send('imprimir', [situacion, ventaTraida, cliente, movimientos, checkboxDolar.checked]);
+    location.href = '../menu.html';
+  }
+});
+
+cancelarModal.addEventListener('click', async () => {
+  modal.classList.add('none');
+});
+
 facturar.addEventListener('click', async (e) => {
   let verificado = await vefiricarVenta();
   let bandera = listaProductos.find(({ producto }) => producto.impuesto === 0);
@@ -409,10 +499,9 @@ facturar.addEventListener('click', async (e) => {
 
   if (verificado) {
     alerta.classList.remove('none');
-    const movimientos = [];
-    let venta = {};
-    let ventaTraida = {};
-    const cliente = {};
+    ventaTraida = {};
+    movimientos = [];
+    cliente = {};
     cliente.nombre = nombre.value;
     cliente.localidad = localidad.value;
     cliente.cuit = cuit.value;
@@ -441,17 +530,21 @@ facturar.addEventListener('click', async (e) => {
         await Promise.all(promesas);
       }
 
-      if (impresion.checked) {
-        ipcRenderer.send('imprimir', [situacion, ventaTraida, cliente, movimientos, checkboxDolar.checked]);
-      }
-
       if (facturaVarios) {
         await arreglarSaldo(codigo.value);
         await eliminarCuentas();
       }
 
-      facturaVarios && window.close();
-      esRemito ? (location.href = '../menu.html') : location.reload();
+      if (venta.tipo_venta === 'CD') {
+        modal.classList.remove('none');
+      } else {
+        if (impresion.checked) {
+          ipcRenderer.send('imprimir', [situacion, ventaTraida, cliente, movimientos, checkboxDolar.checked]);
+        }
+
+        facturaVarios && window.close();
+        esRemito ? (location.href = '../menu.html') : location.reload();
+      }
     } catch (error) {
       await sweet.fire({
         title: 'No se pudo generar la venta',
@@ -460,6 +553,51 @@ facturar.addEventListener('click', async (e) => {
     } finally {
       alerta.classList.add('none');
     }
+  }
+});
+
+//Buscamos un cliente, si sabemos el codigo directamente apretamos enter
+codigo.addEventListener('keypress', async (e) => {
+  if (e.key === 'Enter') {
+    if (codigo.value === '') {
+      const opciones = {
+        path: './clientes/clientes.html',
+        botones: false,
+      };
+      ipcRenderer.send('abrir-ventana', opciones);
+    } else {
+      listarCliente(codigo.value);
+    }
+  }
+});
+
+codBarra.addEventListener('keypress', async (e) => {
+  if (e.key === 'Enter' && codBarra.value !== '' && codBarra.value !== '999-999') {
+    cantidad.focus();
+  } else if (e.key === 'Enter' && codBarra.value === '') {
+    //Esto abre una ventana donde lista todos los productos
+    const opciones = {
+      path: './productos/productos.html',
+      botones: false,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
+  } else if (codBarra.value === '999-999') {
+    cantidad.focus();
+  }
+
+  if (e.keyCode === 37) {
+    cantidad.focus();
+  }
+});
+
+lista.addEventListener('change', togglePrecios);
+
+modalTbody.addEventListener('click', (e) => {
+  document.querySelector('.activo').classList.remove('activo');
+  if (e.target.tagName === 'DIV') {
+    e.target.classList.add('activo');
+  } else if (e.target.tagName === 'H5') {
+    e.target.parentElement.classList.add('activo');
   }
 });
 
@@ -566,42 +704,6 @@ tbody.addEventListener('dblclick', async (se) => {
       }
     });
 });
-
-//Buscamos un cliente, si sabemos el codigo directamente apretamos enter
-codigo.addEventListener('keypress', async (e) => {
-  if (e.key === 'Enter') {
-    if (codigo.value === '') {
-      const opciones = {
-        path: './clientes/clientes.html',
-        botones: false,
-      };
-      ipcRenderer.send('abrir-ventana', opciones);
-    } else {
-      listarCliente(codigo.value);
-    }
-  }
-});
-
-codBarra.addEventListener('keypress', async (e) => {
-  if (e.key === 'Enter' && codBarra.value !== '' && codBarra.value !== '999-999') {
-    cantidad.focus();
-  } else if (e.key === 'Enter' && codBarra.value === '') {
-    //Esto abre una ventana donde lista todos los productos
-    const opciones = {
-      path: './productos/productos.html',
-      botones: false,
-    };
-    ipcRenderer.send('abrir-ventana', opciones);
-  } else if (codBarra.value === '999-999') {
-    cantidad.focus();
-  }
-
-  if (e.keyCode === 37) {
-    cantidad.focus();
-  }
-});
-
-lista.addEventListener('change', togglePrecios);
 
 //Por defecto ponemos el A Consumidor Final y tambien el select
 window.addEventListener('load', async (e) => {
@@ -893,6 +995,14 @@ ipcRenderer.on('recibir', async (e, args) => {
     producto.precioAux = calcularPrecio(lista.value, producto, dolarInstalador);
     listarProducto(producto, cantidad);
   }
+});
+
+ipcRenderer.on('recibir-ventana-secundaria', async (e, args) => {
+  const [res, cliente, lista] = JSON.parse(JSON.parse(args).informacion);
+  if (impresion.checked) {
+    await ipcRenderer.send('imprimir', [situacion, res, cliente, lista, checkboxDolar.checked]);
+  }
+  location.href = '../menu.html';
 });
 
 //ponemos un numero para la venta y luego mandamos a imprimirla
