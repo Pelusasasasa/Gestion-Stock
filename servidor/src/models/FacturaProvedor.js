@@ -9,15 +9,20 @@ const FacturaProvedor = new Schema({
     type: Date,
     default: Date.now,
   },
+  puntoVenta: {
+    type: String,
+    required: true,
+    set: (value) => value.padStart(4, '0'),
+  },
   numero: {
     type: String,
     required: true,
+    set: (value) => value.padStart(8, '0'),
   },
   tipo: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
-    trim: true,
-    set: (value) => value.toUpperCase(),
+    ref: 'TipoCuenta',
   },
   provedorId: {
     type: Schema.Types.ObjectId,
