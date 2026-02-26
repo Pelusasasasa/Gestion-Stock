@@ -1,7 +1,7 @@
 const { Router } = require('express');
-const { crearFacturaProvedor } = require('../controllers/facturaProvedor.controller');
+const { crearFacturaProvedor, obtenerFacturasProvedores } = require('../controllers/facturaProvedor.controller');
 const router = Router();
 
-router.route('/').post(crearFacturaProvedor);
+router.route('/').get(obtenerFacturasProvedores).post(crearFacturaProvedor);
 
 module.exports = router;

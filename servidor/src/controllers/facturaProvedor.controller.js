@@ -3,6 +3,7 @@ const cargarCuentaCorriente = require('../helpers/cuentaCorrienteProvedor/cargar
 const cargarMovCajaProvedor = require('../helpers/movCaja/cargarMovCajaProvedor');
 const FacturaProvedor = require('../models/FacturaProvedor');
 const Provedor = require('../models/Provedor');
+
 const crearFacturaProvedor = async (req, res) => {
   try {
     const facturaAux = new FacturaProvedor(req.body);
@@ -43,6 +44,34 @@ const crearFacturaProvedor = async (req, res) => {
   }
 };
 
+const obtenerFacturasProvedores = async (req, res) => {
+  try {
+    const { page, limit } = req.query;
+
+    const facturas = await FacturaProvedor.find()
+      .populate('tipo')
+      .populate('provedorId')
+      .sort({ fecha_comp: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await FacturaProvedor.countDocuments();
+
+    res.status(200).json({
+      ok: true,
+      facturas,
+      total,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      message: 'Error al obtener las facturas',
+    });
+  }
+};
+
 module.exports = {
   crearFacturaProvedor,
+  obtenerFacturasProvedores,
 };
