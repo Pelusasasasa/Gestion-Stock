@@ -7,10 +7,13 @@ const getCuentaCorrienteProvedores = async (req, res) => {
     const cuentas = await CuentaCorrienteProvedores.find({
       provedorId: id,
       fecha: {
-        $gte: desde,
-        $lte: hasta,
+        $gte: new Date(desde),
+        $lte: new Date(hasta),
       },
-    });
+    })
+      .populate('tipo')
+      .populate('facturaAsoc')
+      .populate('provedorId');
 
     res.status(200).json({
       ok: true,

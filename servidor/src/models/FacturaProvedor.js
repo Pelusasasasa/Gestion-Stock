@@ -90,6 +90,10 @@ const FacturaProvedor = new Schema({
     type: String,
     default: '',
   },
+  detallesPago: {
+    type: [],
+    default: [],
+  },
 });
 
 module.exports = model('FacturaProvedor', FacturaProvedor);

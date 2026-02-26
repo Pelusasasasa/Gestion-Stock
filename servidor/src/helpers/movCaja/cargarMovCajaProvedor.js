@@ -4,7 +4,7 @@ const cargarMovCajaProvedor = async (factura) => {
   try {
     const movCaja = new MovCaja({
       fecha: factura.fecha_comp,
-      descripcion: factura.provedorId,
+      descripcion: factura.provedorId.nombre,
       puntoVenta: factura.puntoVenta,
       numero: factura.numero,
       tipo: factura.tipo,
@@ -12,7 +12,6 @@ const cargarMovCajaProvedor = async (factura) => {
       tipoPago: 'EFECTIVO',
       vendedor: factura.vendedor,
     });
-    console.log(movCaja);
     await movCaja.save();
   } catch (error) {
     console.error(error);
