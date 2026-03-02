@@ -455,6 +455,7 @@ funciones.prepararObjetoVenta = async (dolar, dolarInstalador, vendedor, factura
   venta.condicion = lista.value;
   venta.vendedor = vendedor ?? '';
   venta.caja = require('./configuracion.json').caja;
+  venta.observaciones = observaciones.value;
   venta.esRemito = esRemito === 'true' ? true : false;
 
   venta.precio = parseFloat(total.value);

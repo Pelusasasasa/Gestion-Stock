@@ -30,7 +30,6 @@ const postVenta = async (venta) => {
       if (!data.ok) return await Swal.fire('Error al crear el presupuesto', data.msg, 'error');
       return data;
     } else if (venta.tipo_venta === 'RT') {
-      console.log(venta);
       const { data } = await axios.post(`${URL}remitos`, venta);
       if (!data.ok) return await Swal.fire('Error al crear el remito', data.msg, 'error');
       return data;
