@@ -73,6 +73,7 @@ app.use('/gestion/movCaja', require('./routes/movCaja.routes'));
 app.use('/gestion/provedores', require('./routes/provedor.routes'));
 app.use('/gestion/facturaProvedores', require('./routes/facturaProvedores.route'));
 app.use('/gestion/cuentaCorrienteProvedor', require('./routes/cuentaCorrienteProvedores.routes'));
+app.use('/gestion/pagoProvedor', require('./routes/pagoProvedor.routes'));
 
 app.use('/gestion/saldoMensual', require('./routes/saldoMensual.routes'));
 app.use('/gestion/tarjetas', require('./routes/tarjeta.routes'));
