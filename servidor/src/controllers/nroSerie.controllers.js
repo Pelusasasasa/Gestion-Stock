@@ -41,7 +41,7 @@ nroSerieCTRL.getForSearch = async (req, res) => {
         { provedor: { $regex: re, $options: 'i' } },
         { factura: { $regex: re, $options: 'i' } },
       ],
-    });
+    }).sort({ _id: -1 });
 
     const movs = await buscarMovimientosPorNROSeries(numeros);
 
