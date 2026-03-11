@@ -15,4 +15,16 @@ const modificarCheques = async (cheques, nombre) => {
   }
 };
 
-module.exports = modificarCheques;
+const entregarCheque = async (numero, nombre) => {
+  try {
+    const cheque = await Cheque.findOne({ numero });
+    cheque.ent_a = nombre;
+    await cheque.save();
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+module.exports = { modificarCheques, entregarCheque };

@@ -1,7 +1,7 @@
-const modificarCheques = require('../helpers/cheque/modificarCheques');
-const cargarCuentaCorriente = require('../helpers/cuentaCorrienteProvedor/cargarCuentaCorriente');
+const { modificarCheques } = require('../helpers/cheque/modificarCheques');
+const { cargarCuentaCorriente } = require('../helpers/cuentaCorrienteProvedor/cargarCuentaCorriente');
 const eliminarCuentacorriente = require('../helpers/cuentaCorrienteProvedor/eliminarCuentacorriente');
-const cargarMovCajaProvedor = require('../helpers/movCaja/cargarMovCajaProvedor');
+const { cargarMovCajaProvedor } = require('../helpers/movCaja/cargarMovCajaProvedor');
 const { descontarSaldo } = require('../helpers/provedor/descontarSaldo');
 const FacturaProvedor = require('../models/FacturaProvedor');
 const Provedor = require('../models/Provedor');

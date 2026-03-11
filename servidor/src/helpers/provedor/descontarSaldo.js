@@ -17,6 +17,23 @@ const descontarSaldo = async (factura) => {
   }
 };
 
+const descontarSaldoDesdePago = async (id, importe) => {
+  try {
+    const provedor = await Provedor.findById(id);
+
+    if (!provedor) {
+      return false;
+    }
+
+    provedor.saldo -= importe;
+    await provedor.save();
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 module.exports = {
   descontarSaldo,
+  descontarSaldoDesdePago,
 };

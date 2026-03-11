@@ -1,16 +1,16 @@
 const MovCaja = require('../../models/MovCaja');
 
-const cargarMovCajaPagoProvedor = async (pago) => {
+const cargarMovCajaPagoProvedor = async (pago, factura) => {
   try {
     const movCaja = new MovCaja({
-      fecha: pago.fecha,
+      fecha: factura.fecha,
       importe: pago.importe,
-      tipo: pago.tipo,
+      tipo: pago?.tipo,
       puntoVenta: '000E',
-      numero: pago.numero,
-      descripcion: `Pago a ${pago.provedorId.nombre}`,
-      tipoPago: 'EFECTIVO',
-      vendedor: pago.vendedor,
+      numero: factura.numero.toString().padStart(8, '0'),
+      descripcion: `Pago a ${factura.provedorId.nombre}`,
+      tipoPago: pago?.tipoPago,
+      vendedor: pago?.vendedor,
     });
 
     await movCaja.save();
@@ -27,4 +27,4 @@ const cargarMovCajaPagoProvedor = async (pago) => {
   }
 };
 
-module.exports = cargarMovCajaPagoProvedor;
+module.exports = { cargarMovCajaPagoProvedor };

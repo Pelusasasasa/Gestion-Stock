@@ -13,9 +13,11 @@ const cargarMovCajaProvedor = async (factura) => {
       vendedor: factura.vendedor,
     });
     await movCaja.save();
+    return movCaja;
   } catch (error) {
     console.error(error);
+    return false;
   }
 };
 
-module.exports = cargarMovCajaProvedor;
+module.exports = { cargarMovCajaProvedor };

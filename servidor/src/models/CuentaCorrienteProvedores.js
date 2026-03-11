@@ -29,7 +29,6 @@ const cuentaCorrienteProvedoresSchema = new Schema({
   tipo: {
     type: Types.ObjectId,
     ref: 'TipoCuenta',
-    require: true,
   },
   observaciones: {
     type: String,

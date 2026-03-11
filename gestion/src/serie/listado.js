@@ -105,11 +105,15 @@ const eliminarNro = async () => {
 };
 
 const filtrar = async () => {
-  const { data } = await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`);
+  try {
+    const { data } = await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`);
 
-  if (!data.ok) return await sweet.fire('Error al obtener los numeros de series', 'No se pudo obtener los numeros de series', 'error');
+    if (!data.ok) return await sweet.fire('Error al obtener los numeros de series', 'No se pudo obtener los numeros de series', 'error');
 
-  listarSeries(data.movs);
+    listarSeries(data.movs);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const listarSeries = (series) => {
@@ -147,7 +151,7 @@ const listarSeries = (series) => {
     tdVendedor.classList.add('border-black');
 
     tdFecha.innerText = serie.fecha.slice(0, 10).split('-', 3).reverse().join('/');
-    tdCliente.innerText = `${serie?.idCliente ?? ''} - ${serie.cliente ?? ''}`;
+    tdCliente.innerText = `${serie?.idCliente?.slice(0, 25) ?? ''} - ${serie.cliente?.slice(0, 25) ?? ''}`;
     tdCodigo.innerText = serie.codigo;
     tdProducto.innerText = serie.producto;
     tdNroSerie.innerText = serie.nro_serie;

@@ -25,4 +25,31 @@ const cargarCuentaCorriente = async (factura) => {
   }
 };
 
-module.exports = cargarCuentaCorriente;
+const cargarCuentaCorrienteProvedor = async (pago) => {
+  try {
+    const ultimaCuentaCorriente = await CuentaCorrienteProvedores.findOne({
+      provedorId: pago.provedorId,
+    }).sort({ fecha: -1 });
+
+    const cuentaCorriente = new CuentaCorrienteProvedores({
+      fecha: pago.fecha,
+      facturaAsoc: pago._id,
+      provedorId: pago.provedorId,
+      debe: 0,
+      haber: pago.importe,
+      saldo: (ultimaCuentaCorriente?.saldo ?? 0) - pago.importe,
+      tipo: pago?.tipo?._id,
+      observaciones: pago.observaciones,
+    });
+    await cuentaCorriente.save();
+    return cuentaCorriente;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+module.exports = {
+  cargarCuentaCorriente,
+  cargarCuentaCorrienteProvedor,
+};

@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
 
 const MovCaja = new Schema({
   fecha: {
@@ -8,25 +8,24 @@ const MovCaja = new Schema({
   descripcion: {
     type: String,
     trim: true,
-    default: "",
+    default: '',
     set: (value) => value.toUpperCase(),
   },
   puntoVenta: {
     type: String,
-    default: "0000",
+    default: '0000',
     trim: true,
-    set: (value) => value.padStart(4, "0"),
+    set: (value) => value.padStart(4, '0'),
   },
   numero: {
     type: String,
-    default: "00000000",
+    default: '00000000',
     trim: true,
-    set: (value) => value.padStart(8, "0"),
+    set: (value) => value.padStart(8, '0'),
   },
   tipo: {
     type: Schema.Types.ObjectId,
-    required: true,
-    ref: "TipoCuenta",
+    ref: 'TipoCuenta',
   },
   importe: {
     type: Number,
@@ -34,15 +33,16 @@ const MovCaja = new Schema({
   },
   tipoPago: {
     type: String,
-    enum: ["EFECTIVO", "TARJETA", "CHEQUE", "TRANSFERENCIA"],
-    default: "EFECTIVO",
+    enum: ['EFECTIVO', 'TARJETA', 'CHEQUE', 'TRANSFERENCIA'],
+    default: 'EFECTIVO',
+    set: (value) => value.toUpperCase(),
     required: true,
   },
   vendedor: {
     type: Schema.Types.ObjectId,
     // required: true,
-    ref: "Vendedor",
+    ref: 'Vendedor',
   },
 });
 
-module.exports = model("MovCaja", MovCaja);
+module.exports = model('MovCaja', MovCaja);
