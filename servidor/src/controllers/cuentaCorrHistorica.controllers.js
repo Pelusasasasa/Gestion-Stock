@@ -9,7 +9,6 @@ historicaCTRL.porNumberAndType = async (req, res) => {
     nro_venta: number,
     tipo_comp: type,
   });
-  console.log(historica);
   res.send(historica);
 };
 

@@ -41,7 +41,6 @@ movCajaCTRL.getForDates = async (req, res) => {
     });
 
     const movs = await cargarSaldo(saldo, movimientos);
-    console.log(movs);
 
     res.status(200).json({
       movimientos: movs,
@@ -90,7 +89,6 @@ movCajaCTRL.patchOne = async (req, res) => {
 
 movCajaCTRL.postOne = async (req, res) => {
   try {
-    console.log(req.body);
     const result = await validateMovCajaSchema(req.body);
     if (!result.success)
       return res.status(400).json({
@@ -99,7 +97,7 @@ movCajaCTRL.postOne = async (req, res) => {
         error: result.error,
       });
     const newMov = new MovCaja(result.data);
-    console.log(newMov);
+
     await newMov.save();
 
     const mov = await MovCaja.findOne({ _id: newMov._id }).populate('tipo', ['nombre', 'tipo']);

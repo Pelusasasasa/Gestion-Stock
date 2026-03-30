@@ -479,6 +479,8 @@ aceptarModal.addEventListener('click', async () => {
       confirmButtonText: 'Aceptar',
       cancelButtonText: 'Cancelar',
     });
+    recibo.recibo.transferencia = parseFloat(value);
+
     if (isConfirmed) {
       await postMovCaja({
         fecha: funciones.fechaActualConHoraArgentina(),
