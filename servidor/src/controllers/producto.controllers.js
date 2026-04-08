@@ -8,7 +8,6 @@ const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
 
 productoCTRL.descontarStock = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const { stock, tipo, descripcion, vendedor, series } = req.body;
   try {
     const producto = await Producto.findByIdAndUpdate(id, { stock }, { new: true });

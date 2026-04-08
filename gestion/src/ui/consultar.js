@@ -27,7 +27,8 @@ const listarVentas = async (lista) => {
     tdFecha.innerHTML = `${day}/${month}/${year}`;
     tdNumero.innerHTML = venta.nro_venta;
     tdCliente.innerHTML = venta.cliente.slice(0, 45);
-    tdTipo.innerHTML = venta.tipo_comp ? venta.tipo_comp : '';
+
+    tdTipo.innerHTML = venta.tipo_comp ? (venta.tipo_comp === 'PRESUPUESTO' ? 'COMPROBANTE' : venta.tipo_comp) : '';
     if (venta.tipo_comp === 'Nota Credito C') {
       tdImporte.innerHTML = venta.importe ? redondear(venta.importe * -1, 2) : redondear(venta.debe * -1, 2);
     } else {
