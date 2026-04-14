@@ -44,7 +44,7 @@ window.addEventListener('load', async (e) => {
 
   fecha.value = `${year}-${month}-${day}`;
 
-  vendedores = (await axios.get(`${URL}vendedores`)).data;
+  const { vendedores } = (await axios.get(`${URL}vendedores`)).data;
   await listarVendedores(vendedores);
 
   movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
