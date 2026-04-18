@@ -10,133 +10,134 @@ const Recibo = require('../models/Recibo');
 const Retencion = require('../models/Retencion');
 const Tarjeta = require('../models/Tarjeta');
 
-
 reciboCTRL.cargarRecibo = async (req, res) => {
-    try {
+  try {
+    const nuevoRecibo = new Recibo(req.body);
 
-        const nuevoRecibo = new Recibo(req.body);
-
-        const numeroActualizado = await actualizarNumero(nuevoRecibo.tipo_venta)
-        if (numeroActualizado.ok) {
-            nuevoRecibo.numero = numeroActualizado.numero;
-        } else {
-            return res.status(400).json({
-                ok: false,
-                msg: "Error al actualizar el numero del recibo"
-            });
-        };
-
-        const saldoModificado = await cambiarSaldoCliente(nuevoRecibo.idCliente, nuevoRecibo.precio, true);
-        if (!saldoModificado.ok) {
-            return res.status(400).json({
-                ok: false,
-                msg: "Error al modificar el saldo del cliente"
-            });
-        };
-        const historica = await crearHistorica(nuevoRecibo);
-        if (!historica) {
-            return res.status(400).json({
-                ok: false,
-                msg: "Error al crear la historica"
-            });
-        };
-
-        const compensadasModificadas = await actualizarCompensadas(req.body.compensadas, nuevoRecibo);
-
-        if (!compensadasModificadas.ok) return res.status(400).json({
-            ok: false,
-            msg: 'Error al modificar las compensadas'
-        });
-
-        const movsRecibos = await cargarMovsRecibos(compensadasModificadas.compensadas, numeroActualizado.numero);
-        if (!movsRecibos.ok) return res.status(400).json({
-            ok: false,
-            msg: 'Error al cargar los movimientos de los recibos'
-        });
-        await nuevoRecibo.save();
-        res.status(201).json({
-            ok: true,
-            recibo: nuevoRecibo,
-            movsRecibos: movsRecibos.movs,
-            cliente: saldoModificado.cliente
-        })
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'No se pudo realizar el recibo, hable con el administrador'
-        })
+    const numeroActualizado = await actualizarNumero(nuevoRecibo.tipo_venta);
+    if (numeroActualizado.ok) {
+      nuevoRecibo.numero = numeroActualizado.numero;
+    } else {
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al actualizar el numero del recibo',
+      });
     }
-}
+
+    const saldoModificado = await cambiarSaldoCliente(nuevoRecibo.idCliente, nuevoRecibo.precio, true);
+    if (!saldoModificado.ok) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al modificar el saldo del cliente',
+      });
+    }
+    const historica = await crearHistorica(nuevoRecibo);
+    if (!historica) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al crear la historica',
+      });
+    }
+
+    const compensadasModificadas = await actualizarCompensadas(req.body.compensadas, nuevoRecibo);
+
+    if (!compensadasModificadas.ok)
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al modificar las compensadas',
+      });
+
+    const movsRecibos = await cargarMovsRecibos(compensadasModificadas.compensadas, numeroActualizado.numero);
+    if (!movsRecibos.ok)
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al cargar los movimientos de los recibos',
+      });
+    await nuevoRecibo.save();
+    res.status(201).json({
+      ok: true,
+      recibo: nuevoRecibo,
+      movsRecibos: movsRecibos.movs,
+      cliente: saldoModificado.cliente,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'No se pudo realizar el recibo, hable con el administrador',
+    });
+  }
+};
 
 reciboCTRL.recibosDia = async (req, res) => {
-    const { fecha } = req.params;
-    const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
-    const inicioDia = new Date(fechaBase);
-    const finDia = new Date(fechaBase);
-    finDia.setHours(23, 59, 59, 999);
+  const { fecha } = req.params;
+  const fechaBase = new Date(`${fecha}T00:00:00-03:00`);
+  const inicioDia = new Date(fechaBase);
+  const finDia = new Date(fechaBase);
+  finDia.setHours(23, 59, 59, 999);
 
-    const recibos = await Recibo.find({
-        $and: [
-            { fecha: { $gte: inicioDia } },
-            { fecha: { $lte: finDia } }
-        ]
-    })
-    res.send(recibos);
+  const recibos = await Recibo.find({
+    $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
+  });
+  res.send(recibos);
 };
 
 reciboCTRL.recibosMes = async (req, res) => {
-    const { fecha } = req.params;
-    let mes = parseFloat(fecha);
-    let hoy = new Date();
-    mes = mes > 12 ? 1 : mes;
+  const { fecha } = req.params;
+  let mes = parseFloat(fecha);
+  let hoy = new Date();
+  mes = mes > 12 ? 1 : mes;
 
-    let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`)
-    let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
-    const recibos = await Recibo.find({
-        $and: [
-            { fecha: { $gte: fechaConMes } },
-            { fecha: { $lte: fechaConMesSig } }
-        ]
-    });
-    res.send(recibos);
+  let fechaConMes = new Date(`${hoy.getFullYear()}-${mes}-1`);
+  let fechaConMesSig = new Date(`${mes === 12 ? hoy.getFullYear() + 1 : hoy.getFullYear()}-${mes === 12 ? 1 : mes + 1}-1`);
+  const recibos = await Recibo.find({
+    $and: [{ fecha: { $gte: fechaConMes } }, { fecha: { $lte: fechaConMesSig } }],
+  });
+  res.send(recibos);
 };
 
 reciboCTRL.recibosAnio = async (req, res) => {
-    const { fecha } = req.params;
-    const hoy = new Date();
-    const esteAnio = new Date(`${fecha}-1-1`);
-    const anioSig = new Date(`${parseFloat(fecha) + 1}-1-1`);
-    const recibos = await Recibo.find({
-        $and: [
-            { fecha: { $gte: esteAnio } },
-            { fecha: { $lte: anioSig } }
-        ]
-    });
-    res.send(recibos);
+  const { fecha } = req.params;
+  const hoy = new Date();
+  const esteAnio = new Date(`${fecha}-1-1`);
+  const anioSig = new Date(`${parseFloat(fecha) + 1}-1-1`);
+  const recibos = await Recibo.find({
+    $and: [{ fecha: { $gte: esteAnio } }, { fecha: { $lte: anioSig } }],
+  });
+  res.send(recibos);
 };
 
 reciboCTRL.getForNumber = async (req, res) => {
-    const { number } = req.params;
-    let retorno = {};
+  const { number } = req.params;
+  let retorno = {};
 
-    const recibo = await Recibo.findOne({ numero: number });
+  const recibo = await Recibo.findOne({ numero: number });
 
-    // Buscar retención asociada, si existe
-    let retencion = await Retencion.find({ reciboId: recibo?._id });
+  // Buscar retención asociada, si existe
+  let retencion = await Retencion.find({ reciboId: recibo?._id });
 
-    let cheques = await Cheque.find({ comprobanteId: recibo?.id });
-    let tarjetas = await Tarjeta.find({ comprobanteId: recibo?.id }).populate('tarjeta', {nombre: 1});
+  let cheques = await Cheque.find({ comprobanteId: recibo?.id });
+  let tarjetas = await Tarjeta.find({ comprobanteId: recibo?.id }).populate('tarjeta', { nombre: 1 });
 
-    // Armar respuesta combinada con la info del recibo y la retención (si hay)
-    retorno = {
-        ...recibo?._doc,
-        ...(cheques && cheques.length > 0 ? { cheques } : {}),
-        ...(tarjetas && tarjetas.length > 0 ? { tarjetas } : {}),
-        ...(retencion ? { retencion } : {})
-    };
+  // Armar respuesta combinada con la info del recibo y la retención (si hay)
+  retorno = {
+    ...recibo?._doc,
+    ...(cheques && cheques.length > 0 ? { cheques } : {}),
+    ...(tarjetas && tarjetas.length > 0 ? { tarjetas } : {}),
+    ...(retencion ? { retencion } : {}),
+  };
 
-    res.send(retorno)
+  res.send(retorno);
+};
+
+reciboCTRL.putRecibo = async (req, res) => {
+  const { number } = req.params;
+  const recibo = req.body;
+  const reciboActualizado = await Recibo.findByIdAndUpdate(number, recibo, { new: true });
+  res.status(200).json({
+    ok: true,
+    recibo: reciboActualizado,
+  });
 };
 
 module.exports = reciboCTRL;

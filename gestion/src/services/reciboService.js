@@ -24,8 +24,20 @@ const postRecibo = async (recibo) => {
   }
 };
 
+const putRecibo = async (recibo) => {
+  try {
+    const { data } = await axios.put(`${URL}recibo/id/${recibo._id}`, recibo);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
 module.exports = {
   getReciboById,
 
   postRecibo,
+
+  putRecibo,
 };

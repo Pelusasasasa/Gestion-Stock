@@ -13,7 +13,7 @@ const { ipcRenderer } = require('electron');
 const { apretarEnter, cargarFactura, redondear, fechaActual } = require('../helpers');
 
 const { getClienteById } = require('../services/clientesService');
-const { getReciboById, postRecibo } = require('../services/reciboService');
+const { getReciboById, postRecibo, putRecibo } = require('../services/reciboService');
 const { getCompensadas, putCompensadaObservaciones } = require('../services/cuentasService');
 const { postRetencion } = require('../services/retencionService');
 
@@ -480,6 +480,8 @@ aceptarModal.addEventListener('click', async () => {
       cancelButtonText: 'Cancelar',
     });
     recibo.recibo.transferencia = parseFloat(value);
+
+    await putRecibo(recibo.recibo);
 
     if (isConfirmed) {
       await postMovCaja({

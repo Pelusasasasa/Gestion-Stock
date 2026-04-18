@@ -237,7 +237,7 @@ const listarProducto = async (producto, cant = 1, series = []) => {
   cantidad.value = cant;
 
   if (!Number.isInteger(parseFloat(cantidad.value)) && producto.unidad === 'unidad') {
-    descripcion.value = producto.descripcion;
+    descripcion.value = producto.descripcion?.slice(0, 20);
 
     await sweet.fire({
       title: 'No se puede poner una cantidad con decimal a un producto que se venda por unidad',
@@ -288,7 +288,7 @@ const listarProducto = async (producto, cant = 1, series = []) => {
                 <tr id=${producto.idTabla}>
                     <td>${codBarra.value}</td>
                     <td>${cantidad.value}</td>
-                    <td>${producto.descripcion.toUpperCase()}</td>
+                    <td>${producto.descripcion?.slice(0, 50).toUpperCase()}</td>
                     <td>${producto.marca}</td>
                     <td>${producto.impuesto.toFixed(2)}</td>
                     <td>${parseFloat(precioU.value).toFixed(2)}</td>
@@ -961,9 +961,9 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
 
   facturaVarios = true;
 
-  const compensada = await getCompensadaById(cuentas[0]);
+  const compensada = await getCompensada(cuentas[0]);
 
-  const { data: venta } = await getVentaForIdAndType(compensada.id, 'CC');
+  //const { data: venta } = await getVentaForIdAndType(compensada._id, 'CC');
 
   listarCliente(compensada.idCliente);
 
@@ -973,7 +973,7 @@ ipcRenderer.on('facturarVarios', async (e, args) => {
     for await (let mov of movs) {
       producto = {
         descripcion: mov.producto,
-        precio: mov.precio,
+        precioAux: mov.precio,
         impuesto: mov.iva,
         _id: '',
         marca: '',
