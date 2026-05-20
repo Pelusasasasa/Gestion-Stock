@@ -2,7 +2,7 @@ const { default: Swal } = require('sweetalert2');
 const { parsearFecha, getParameterByName, fechaConHora, masVeinticuatroHoras } = require('../helpers');
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
-const { getProductoByType } = require('../services/productoService');
+const { getProductoById } = require('../services/productoService');
 const { getClienteById } = require('../services/clientesService');
 require('dotenv').config();
 
@@ -68,7 +68,6 @@ const agregarProductoManual = async () => {
 
   agregarEquipoHTML(producto.value.toUpperCase(), '', value);
 
-  listaProductos.parentNode.classList.add('none');
   producto.value = '';
 };
 
@@ -96,19 +95,11 @@ const buscarCliente = async (e) => {
 
 const buscarProducto = async (e) => {
   if (e.key === 'Enter') {
-    try {
-      const productosDescripcion = await getProductoByType(producto.value, 'descripcion');
-      const productosCodigo = await getProductoByType(producto.value, '_id');
-      const productos = [...productosDescripcion, ...productosCodigo];
-      if (productos) {
-        listarProductos(productos);
-      } else {
-        return await Swal.fire('Error al obtener los productos', productos.msg, 'error');
-      }
-    } catch (error) {
-      console.error(error);
-      return await Swal.fire('Error al obtener los productos', error?.response?.data?.msg, 'error');
-    }
+    const opciones = {
+      path: './productos/productos.html',
+      botones: false,
+    };
+    ipcRenderer.send('abrir-ventana', opciones);
   }
 };
 
@@ -190,31 +181,6 @@ const listarHistorial = (historial) => {
     fragment.appendChild(tr);
   }
   tbody.appendChild(fragment);
-};
-
-const listarProductos = (lista) => {
-  listaProductos.innerHTML = '';
-  listaProductos.parentNode.classList.remove('none');
-
-  for (let producto of lista) {
-    const div = document.createElement('div');
-    div.addEventListener('click', seleccionarProducto);
-
-    div.classList.add('grid');
-    div.classList.add('columns-3-1fr-2fr-1fr');
-    div.classList.add('cursor-pointer');
-    div.classList.add('hover-bg-gray');
-    div.classList.add('border-b');
-    div.classList.add('border-gray-400');
-
-    div.innerHTML = `
-            <p class='m-0 px-1'>${producto._id}</p>
-            <p class='m-0 px-1'>${producto.descripcion}</p>
-            <p class='m-0 px-1'>${producto.marca}</p>
-        `;
-
-    listaProductos.appendChild(div);
-  }
 };
 
 const listarObservaciones = (lista) => {
@@ -315,8 +281,7 @@ const modificarSerivicio = async () => {
   }
 };
 
-const seleccionarProducto = async (e) => {
-  const productoDiv = e.target.nodeName === 'DIV' ? e.target : e.target.parentNode;
+const seleccionarProducto = async (productoParam) => {
   const { isConfirmed, value } = await Swal.fire({
     title: 'Numero Serie',
     confirmButtonText: 'Agregar',
@@ -327,14 +292,13 @@ const seleccionarProducto = async (e) => {
   if (!isConfirmed) return;
 
   equipos.push({
-    equipo: productoDiv.children[1].innerText,
-    marca: productoDiv.children[2].innerText,
+    equipo: productoParam.descripcion,
+    marca: productoParam.marca,
     serie: value,
   });
 
-  agregarEquipoHTML(productoDiv.children[1].innerText, productoDiv.children[2].innerText, value);
+  agregarEquipoHTML(productoParam.descripcion, productoParam.marca, value);
 
-  listaProductos.parentNode.classList.add('none');
   producto.value = '';
 };
 
@@ -400,6 +364,19 @@ document.addEventListener('keyup', (e) => {
 
 ipcRenderer.on('recibir', async (e, args) => {
   const { tipo, informacion } = JSON.parse(args);
-  let clienteTraido = await getClienteById(informacion);
-  seleccionarCliente(clienteTraido);
+
+  if (tipo === 'producto') {
+    try {
+      let productoTraido = await getProductoById(informacion);
+      if (productoTraido) {
+        seleccionarProducto(productoTraido);
+      }
+    } catch (error) {
+      console.error(error);
+      return await Swal.fire('Error al obtener los productos', error?.response?.data?.msg, 'error');
+    }
+  } else {
+    let clienteTraido = await getClienteById(informacion);
+    seleccionarCliente(clienteTraido);
+  }
 });
