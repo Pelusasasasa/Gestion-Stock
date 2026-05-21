@@ -1,11 +1,11 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const Swal = require('sweetalert2');
 
 const getMovimientoForNumberAndType = async (number, type) => {
   try {
-    const { data } = await axios.get(`${URL}movimiento/${number}/${type}`);
+    const { data } = await axios.get(`${url}movimiento/${number}/${type}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -15,7 +15,7 @@ const getMovimientoForNumberAndType = async (number, type) => {
 
 const getMovimientosRecibosForNumber = async (number) => {
   try {
-    const { data } = await axios.get(`${URL}movRecibo/forNumber/${number}`);
+    const { data } = await axios.get(`${url}movRecibo/forNumber/${number}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -25,7 +25,7 @@ const getMovimientosRecibosForNumber = async (number) => {
 
 const patchMovNumeroSerie = async (id, series) => {
   try {
-    const { data } = await axios.patch(`${URL}movimiento/serie/${id}`, { series });
+    const { data } = await axios.patch(`${url}movimiento/serie/${id}`, { series });
     console.log(data);
     return data;
   } catch (error) {
@@ -36,7 +36,7 @@ const patchMovNumeroSerie = async (id, series) => {
 
 const putMovimientos = async (movimiento) => {
   try {
-    const { data } = await axios.put(`${URL}movimiento`, movimiento);
+    const { data } = await axios.put(`${url}movimiento`, movimiento);
     if (!data.ok) return await sweet.fire('Error al modificar el movimiento', data.msg, 'error');
     return data.movimiento;
   } catch (error) {
@@ -47,7 +47,7 @@ const putMovimientos = async (movimiento) => {
 
 const deleteMovimientos = async (number, type) => {
   try {
-    await axios.delete(`${URL}movimiento/${number}/${type}`);
+    await axios.delete(`${url}movimiento/${number}/${type}`);
     return {
       ok: true,
       msg: 'Movimiento Eliminado',

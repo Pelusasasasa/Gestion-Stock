@@ -3,7 +3,7 @@ const { cerrarVentana } = require('../helpers');
 require('dotenv').config();
 const axios = require('axios');
 const sweet = require('sweetalert2');
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 let marcas = [];
 let seleccionado = null;
@@ -18,7 +18,7 @@ const tbody = document.getElementById('tbody');
 
 const cargarPagina = async () => {
   try {
-    const id = (await axios.get(`${URL}marca/last`)).data;
+    const id = (await axios.get(`${url}marca/last`)).data;
     numero.value = id + 1;
   } catch (error) {
     console.log(error);
@@ -26,7 +26,7 @@ const cargarPagina = async () => {
   }
 
   try {
-    marcas = (await axios.get(`${URL}marca`)).data;
+    marcas = (await axios.get(`${url}marca`)).data;
     listarMarcas(marcas);
   } catch (error) {
     console.log(error);
@@ -41,7 +41,7 @@ const agregarMarca = async () => {
   };
 
   try {
-    const res = (await axios.post(`${URL}marca`, marca)).data;
+    const res = (await axios.post(`${url}marca`, marca)).data;
     marcas.push(res);
     listarMarcas(marcas);
   } catch (error) {
@@ -83,7 +83,7 @@ const clickTr = async (e) => {
 
     if (isConfirmed) {
       try {
-        await axios.delete(`${URL}marca/forId/${seleccionado.id}`);
+        await axios.delete(`${url}marca/forId/${seleccionado.id}`);
         marcas = marcas.filter((marca) => marca._id !== seleccionado.id);
         tbody.removeChild(seleccionado);
         seleccionado = null;
@@ -107,7 +107,7 @@ const clickTr = async (e) => {
       aux.nombre = value.toUpperCase().trim();
 
       try {
-        await axios.put(`${URL}marca/forId/${seleccionado.id}`, aux);
+        await axios.put(`${url}marca/forId/${seleccionado.id}`, aux);
       } catch (error) {
         console.log(error);
         return await sweet.fire('No se pudo modificar la marca', error.response?.data?.msg, 'error');

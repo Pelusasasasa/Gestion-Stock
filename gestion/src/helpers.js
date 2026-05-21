@@ -9,7 +9,7 @@ let internetAvalible = require('internet-available');
 const { getClienteById } = require('./services/clientesService');
 
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const funciones = {};
 
@@ -350,10 +350,10 @@ funciones.ponerNumero = async () => {
                 <main>
                     <label htmlFor="tipo">Tipo</label>
                     <select name="tipo" id="tipo">
-                        <option value="CD">Contado - ${(await axios.get(`${URL}numero`)).data.Contado}</option>
-                        <option value="CC">Cuenta Corriente - ${(await axios.get(`${URL}numero`)).data['Cuenta Corriente']}</option>
-                        <option value="PP">Presupuesto - ${(await axios.get(`${URL}numero`)).data.Presupuesto}</option>
-                        <option value="RC">Recibo - ${(await axios.get(`${URL}numero/Recibo`)).data}</option>
+                        <option value="CD">Contado - ${(await axios.get(`${url}numero`)).data.Contado}</option>
+                        <option value="CC">Cuenta Corriente - ${(await axios.get(`${url}numero`)).data['Cuenta Corriente']}</option>
+                        <option value="PP">Presupuesto - ${(await axios.get(`${url}numero`)).data.Presupuesto}</option>
+                        <option value="RC">Recibo - ${(await axios.get(`${url}numero/Recibo`)).data}</option>
                     </select>
                 </main>
                 <main>
@@ -375,7 +375,7 @@ funciones.ponerNumero = async () => {
       const numero = document.getElementById('numero');
       const checkboxDolar = document.getElementById('dolar');
 
-      const { data } = await axios.get(`${URL}numero`);
+      const { data } = await axios.get(`${url}numero`);
       let dolar = data.Dolar;
       let dolarInstalador = data.dolarInstalador;
 
@@ -386,13 +386,13 @@ funciones.ponerNumero = async () => {
 
       if (isConfirmed) {
         if (tipo.value === 'PP') {
-          venta = (await axios.get(`${URL}presupuesto/forNumber/${numero.value}`)).data;
+          venta = (await axios.get(`${url}presupuesto/forNumber/${numero.value}`)).data;
         } else if (tipo.value === 'RC') {
-          recibo = (await axios.get(`${URL}recibo/id/${numero.value}`)).data;
+          recibo = (await axios.get(`${url}recibo/id/${numero.value}`)).data;
         } else {
-          venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/${tipo.value}`)).data;
+          venta = (await axios.get(`${url}ventas/numeroYtipo/${numero.value}/${tipo.value}`)).data;
           if (!venta) {
-            venta = (await axios.get(`${URL}ventas/numeroYtipo/${numero.value}/T`)).data;
+            venta = (await axios.get(`${url}ventas/numeroYtipo/${numero.value}/T`)).data;
           }
         }
 
@@ -403,10 +403,10 @@ funciones.ponerNumero = async () => {
           return;
         }
 
-        movimientos = (await axios.get(`${URL}movimiento/${numero.value}/${tipo.value}`)).data;
+        movimientos = (await axios.get(`${url}movimiento/${numero.value}/${tipo.value}`)).data;
 
         if (movimientos.length === 0) {
-          movimientos = (await axios.get(`${URL}movimiento/${numero.value}/T`)).data;
+          movimientos = (await axios.get(`${url}movimiento/${numero.value}/T`)).data;
         }
 
         if (checkboxDolar.checked) {
@@ -417,7 +417,7 @@ funciones.ponerNumero = async () => {
           venta.precio = venta.condicion === 'INSTALADOR' ? venta.precio / dolarInstalador : venta.precio / dolar;
         }
 
-        movimientos = tipo.value === 'RC' ? (await axios.get(`${URL}movRecibo/forNumber/${numero.value}`)).data : movimientos;
+        movimientos = tipo.value === 'RC' ? (await axios.get(`${url}movRecibo/forNumber/${numero.value}`)).data : movimientos;
 
         let situacion;
         if (venta) {
@@ -498,7 +498,7 @@ funciones.verificarUsuarios = async () => {
     })
     .then(async ({ isConfirmed, value }) => {
       if (isConfirmed) {
-        retorno = (await axios.get(`${URL}vendedores/id/${value}`)).data;
+        retorno = (await axios.get(`${url}vendedores/id/${value}`)).data;
       }
     });
   return retorno;
@@ -516,7 +516,7 @@ funciones.agregarMovimientoVendedores = async (descripcion, vendedor = '') => {
   movimiento.fecha = new Date();
   movimiento.vendedor = vendedor;
 
-  await axios.post(`${URL}movVendedores`, movimiento);
+  await axios.post(`${url}movVendedores`, movimiento);
 };
 
 //Vemos el codigo de comprobante para las faturas

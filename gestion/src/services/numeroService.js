@@ -1,11 +1,11 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const Swal = require('sweetalert2');
 
 const getNumero = async () => {
   try {
-    const { data } = await axios.get(`${URL}numero`);
+    const { data } = await axios.get(`${url}numero`);
     return data;
   } catch (error) {
     console.log(error);

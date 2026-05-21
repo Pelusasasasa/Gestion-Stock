@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -12,7 +12,7 @@ const salir = document.querySelector('.salir');
 
 //Cuando carga la pagina trae las marcas
 window.addEventListener('load', async (e) => {
-  const marcas = (await axios.get(`${URL}productos/marcas`)).data;
+  const marcas = (await axios.get(`${url}productos/marcas`)).data;
   for await (let marca of marcas) {
     const option = document.createElement('option');
     option.value = marca;
@@ -24,7 +24,7 @@ window.addEventListener('load', async (e) => {
 aceptar.addEventListener('click', async (e) => {
   if (porcentaje.value !== '') {
     const mensaje = (
-      await axios.put(`${URL}productos/marcas`, {
+      await axios.put(`${url}productos/marcas`, {
         porcentaje: parseFloat(porcentaje.value),
         marca: marcas.value,
       })

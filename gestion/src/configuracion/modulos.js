@@ -3,7 +3,7 @@ const sweet = require('sweetalert2');
 const path = require('path');
 require('dotenv').config();
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const modulos = require('../config.json');
 
 const configPath = path.join(__dirname, '../config.json');

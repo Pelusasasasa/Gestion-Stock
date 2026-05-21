@@ -2,7 +2,7 @@ const axios = require('axios');
 const Swal = require('sweetalert2');
 const { ipcRenderer } = require('electron');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const fecha = document.getElementById('fecha');
 const nombre = document.getElementById('nombre');
@@ -17,7 +17,7 @@ let informacion = '';
 let id;
 
 const cargarPagina = async () => {
-  const { data } = await axios.get(`${URL}tipoTarjeta`);
+  const { data } = await axios.get(`${url}tipoTarjeta`);
 
   data.tipos.map((elem) => {
     const option = document.createElement('option');
@@ -41,7 +41,7 @@ const guardar = async () => {
   tarj.comprobanteId = id;
 
   try {
-    const { data } = await axios.post(`${URL}tarjetas`, tarj);
+    const { data } = await axios.post(`${url}tarjetas`, tarj);
     if (data.ok) {
       ipcRenderer.send('enviar-ventana-principal', informacion);
       window.close();

@@ -1,11 +1,11 @@
 const axios = require('axios');
 const { default: Swal } = require('sweetalert2');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const postMovCaja = async (movCaja) => {
   try {
-    const { data } = await axios.post(`${URL}movCaja`, movCaja);
+    const { data } = await axios.post(`${url}movCaja`, movCaja);
     if (data.ok) {
       return data.movCaja;
     }

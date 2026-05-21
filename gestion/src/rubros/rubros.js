@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const tbody = document.querySelector('tbody');
@@ -12,8 +12,8 @@ const modificar = document.querySelector('.modificar');
 let seleccionado = '';
 
 window.addEventListener('load', async (e) => {
-  numero.value = (await axios.get(`${URL}rubro/id`)).data;
-  const rubros = (await axios.get(`${URL}rubro`)).data;
+  numero.value = (await axios.get(`${url}rubro/id`)).data;
+  const rubros = (await axios.get(`${url}rubro`)).data;
   listar(rubros);
 });
 
@@ -56,7 +56,7 @@ agregar.addEventListener('click', async (e) => {
       rubro: nombre.value,
       numero: numero.value,
     };
-    await axios.post(`${URL}rubro`, nuevoRubro);
+    await axios.post(`${url}rubro`, nuevoRubro);
     tbody.innerHTML = '';
     location.reload();
   } else {
@@ -97,7 +97,7 @@ tbody.addEventListener('click', async (e) => {
       .then(async ({ isConfirmed }) => {
         if (isConfirmed) {
           try {
-            await axios.delete(`${URL}rubro/codigo/${seleccionado.id}`);
+            await axios.delete(`${url}rubro/codigo/${seleccionado.id}`);
             tbody.removeChild(seleccionado);
             nombre.value = '';
             modificar.classList.add('none');
@@ -119,7 +119,7 @@ modificar.addEventListener('click', (e) => {
       rubro: nombre.value,
       numero: numero.value,
     };
-    axios.put(`${URL}rubro/${numero.value}`, rubroModificado);
+    axios.put(`${url}rubro/${numero.value}`, rubroModificado);
     tbody.innerHTML = '';
     location.reload();
   }

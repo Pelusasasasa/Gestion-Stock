@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require('dotenv').config();
-const URL = process.env.URL;
+const url = process.env.URL;
 
 const thead = document.querySelector('thead');
 const tbody = document.querySelector('tbody');
@@ -16,7 +16,7 @@ let prestamos = [];
 
 const cambiarObservaciones = async() => {
     const sweet = require('sweetalert2');
-    const prestamo = (await axios.get(`${URL}prestamos/forNumber/${seleccionado.id}`)).data;
+    const prestamo = (await axios.get(`${url}prestamos/forNumber/${seleccionado.id}`)).data;
     
     const {isConfirmed, value} = await sweet.fire({
         title: "Cambiar Observacion",
@@ -27,7 +27,7 @@ const cambiarObservaciones = async() => {
 
     if (isConfirmed){
         prestamo.observaciones = value.toUpperCase();
-        await axios.put(`${URL}prestamos/forNumber/${prestamo.nro_comp}`,prestamo);
+        await axios.put(`${url}prestamos/forNumber/${prestamo.nro_comp}`,prestamo);
         seleccionado.children[4].innerText = value.toUpperCase();
     }
 
@@ -60,12 +60,12 @@ const exportarExcel = async() => {
     let totalAux = 0;
 
     for(let elem of prestamosAux){
-        const mov = (await axios.get(`${URL}movProductos/${elem.nro_comp}/Prestamo`)).data;
+        const mov = (await axios.get(`${url}movProductos/${elem.nro_comp}/Prestamo`)).data;
         movimientosAux.push(...mov);
     };
 
     for(let elem of movimientosAux){
-        const pro = (await axios.get(`${URL}productos/${elem.codProd}`)).data;
+        const pro = (await axios.get(`${url}productos/${elem.codProd}`)).data;
         elem.precio_unitario = pro.oferta ? pro.precioOferta : pro.precio_venta;
         elem.total = (elem.egreso * elem.precio_unitario);
         totalAux += parseFloat(elem.total);
@@ -162,7 +162,7 @@ const listarPrestamos = async(lista) => {
 };
 
 const listarMovimientos = async( num ) => {
-    const movimientos = (await axios.get(`${URL}movProductos/${num}/Prestamo`)).data;
+    const movimientos = (await axios.get(`${url}movProductos/${num}/Prestamo`)).data;
     tbodyMovimientos.innerHTML = '';
     tbody.parentElement.parentElement.style.height = '40vh';
 
@@ -181,7 +181,7 @@ const listarMovimientos = async( num ) => {
         const tdCantidad = document.createElement('td');
         const tdStock = document.createElement('td');
         const tdPrecio = document.createElement('td');
-        const pro = (await axios.get(`${URL}productos/${mov.codProd}`)).data;
+        const pro = (await axios.get(`${url}productos/${mov.codProd}`)).data;
         
 
         tdCodigo.innerText = mov.codProd;
@@ -300,7 +300,7 @@ tbody.addEventListener('dblclick', e => {
 
 //Eventos
 window.addEventListener('load', async () => {
-    prestamos = (await axios.get(`${URL}prestamos/noAnulados`)).data.filter(prestamo => prestamo.codigo === "L083");
+    prestamos = (await axios.get(`${url}prestamos/noAnulados`)).data.filter(prestamo => prestamo.codigo === "L083");
     listarPrestamos(prestamos);
 });
 

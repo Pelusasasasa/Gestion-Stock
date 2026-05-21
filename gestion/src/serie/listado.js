@@ -3,7 +3,7 @@ const axios = require('axios');
 const sweet = require('sweetalert2');
 const { agregarMovimientoVendedores, verificarUsuarios } = require('../helpers');
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const buscador = document.querySelector('#buscador');
 const tbody = document.querySelector('tbody');
@@ -66,7 +66,7 @@ const modificarNro = async () => {
     const serie = document.getElementById('serie').value;
     const provedor = document.getElementById('provedor').value;
 
-    const res = (await axios.put(`${URL}nroSerie/id/${seleccionado.id}`, { nro_serie: serie, provedor })).data;
+    const res = (await axios.put(`${url}nroSerie/id/${seleccionado.id}`, { nro_serie: serie, provedor })).data;
     seleccionado.children[3].innerText = serie;
     seleccionado.children[4].innerText = provedor.toUpperCase();
 
@@ -96,7 +96,7 @@ const eliminarNro = async () => {
 
     if (!nombre) return;
 
-    await axios.delete(`${URL}nroSerie/id/${seleccionado.id}`);
+    await axios.delete(`${url}nroSerie/id/${seleccionado.id}`);
 
     await agregarMovimientoVendedores(`Elimino el numero de serie ${seleccionado.children[3].innerText} que pertenece al producto ${seleccionado.children[2].innerText}`, nombre);
     tbody.removeChild(seleccionado);
@@ -106,7 +106,7 @@ const eliminarNro = async () => {
 
 const filtrar = async () => {
   try {
-    const { data } = await axios.get(`${URL}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`);
+    const { data } = await axios.get(`${url}nroSerie/search/${buscador.value === '' ? 'all' : buscador.value}`);
 
     if (!data.ok) return await sweet.fire('Error al obtener los numeros de series', 'No se pudo obtener los numeros de series', 'error');
 

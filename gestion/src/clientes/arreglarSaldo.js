@@ -5,7 +5,7 @@ const axios = require('axios');
 const { ipcRenderer } = require('electron');
 const { getClienteById } = require('../services/clientesService');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const codigo = document.getElementById('id');
 const nombre = document.getElementById('nombre');

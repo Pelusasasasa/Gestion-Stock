@@ -1,11 +1,11 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const { Swal } = require('sweetalert2');
 
 const getVentaForNumberAndType = async (number, type) => {
   try {
-    const { data } = await axios.get(`${URL}ventas/numeroYtipo/${number}/${type}`);
+    const { data } = await axios.get(`${url}ventas/numeroYtipo/${number}/${type}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -15,7 +15,7 @@ const getVentaForNumberAndType = async (number, type) => {
 
 const getVentaForIdAndType = async (id, type) => {
   try {
-    const { data } = await axios.get(`${URL}ventas/id/${id}/${type}`);
+    const { data } = await axios.get(`${url}ventas/id/${id}/${type}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -26,15 +26,15 @@ const getVentaForIdAndType = async (id, type) => {
 const postVenta = async (venta) => {
   try {
     if (venta.tipo_venta === 'PP') {
-      const { data } = await axios.post(`${URL}presupuesto`, venta);
+      const { data } = await axios.post(`${url}presupuesto`, venta);
       if (!data.ok) return await Swal.fire('Error al crear el presupuesto', data.msg, 'error');
       return data;
     } else if (venta.tipo_venta === 'RT') {
-      const { data } = await axios.post(`${URL}remitos`, venta);
+      const { data } = await axios.post(`${url}remitos`, venta);
       if (!data.ok) return await Swal.fire('Error al crear el remito', data.msg, 'error');
       return data;
     } else {
-      const { data } = await axios.post(`${URL}ventas`, venta);
+      const { data } = await axios.post(`${url}ventas`, venta);
       if (!data.ok) return await Swal.fire('Error al crear la venta', data.msg, 'error');
       return data;
     }
@@ -46,7 +46,7 @@ const postVenta = async (venta) => {
 
 const putVentaForNumeroAndType = async (venta) => {
   try {
-    const { data } = await axios.put(`${URL}ventas/id/${venta.numero}/${venta.tipo_venta}`, venta);
+    const { data } = await axios.put(`${url}ventas/id/${venta.numero}/${venta.tipo_venta}`, venta);
     console.log(data);
 
     if (!data.ok) return await Swal.fire('Error al modificar la venta', data.msg, 'error');
@@ -59,7 +59,7 @@ const putVentaForNumeroAndType = async (venta) => {
 
 const deleteVentaForNumeroAndType = async (number, type, vendedor) => {
   try {
-    const { data } = await axios.delete(`${URL}ventas/id/${number}/${type}`, {
+    const { data } = await axios.delete(`${url}ventas/id/${number}/${type}`, {
       params: {
         vendedor,
       },
@@ -76,7 +76,7 @@ const deleteVentaForNumeroAndType = async (number, type, vendedor) => {
 
 const getVentaPorFactura = async (numero, tipo) => {
   try {
-    const { data } = await axios.get(`${URL}ventas/porFactura/${numero}/${tipo}`);
+    const { data } = await axios.get(`${url}ventas/porFactura/${numero}/${tipo}`);
     return data;
   } catch (error) {
     console.log(error);

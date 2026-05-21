@@ -5,7 +5,7 @@ const axios = require('axios');
 const { ipcRenderer } = require('electron');
 const { recorrerFlechas, copiar, redondear, agregarMovimientoVendedores, verificarUsuarios, getParameterByName, parsearFecha } = require('../helpers');
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 let vendedor = getParameterByName('vendedor');
 let permiso = getParameterByName('permiso');
@@ -44,7 +44,7 @@ const filtrar = async () => {
     condicion = '_id';
   }
   const descripcion = buscador.value !== '' ? buscador.value : 'textoVacio';
-  const producto = (await axios.get(`${URL}productos/${descripcion}/${condicion}`)).data;
+  const producto = (await axios.get(`${url}productos/${descripcion}/${condicion}`)).data;
   producto.length !== 0 && listar(producto);
 };
 
@@ -227,7 +227,7 @@ tbody.addEventListener('click', async (e) => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const mensaje = (await axios.delete(`${URL}productos/${seleccionado.id}`)).data;
+            const mensaje = (await axios.delete(`${url}productos/${seleccionado.id}`)).data;
             await sweet.fire({ title: mensaje });
             tbody.removeChild(seleccionado);
             vendedor && (await agregarMovimientoVendedores(`Elimino el producto ${seleccionado.children[1].innerHTML} con el precio ${seleccionado.children[2].innerHTML}`, vendedor));
@@ -244,7 +244,7 @@ tbody.addEventListener('click', async (e) => {
   } else if (e.target.innerHTML === 'visibility') {
     historicaMovDiv.classList.remove('none');
     try {
-      const { data } = await axios.get(`${URL}movimiento/porProducto/${seleccionado.id}`);
+      const { data } = await axios.get(`${url}movimiento/porProducto/${seleccionado.id}`);
       if (data.ok) {
         listarMovimientos(data.movimientos);
       }

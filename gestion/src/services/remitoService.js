@@ -1,11 +1,11 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const Swal = require('sweetalert2');
 
 const getRemitoById = async (id) => {
   try {
-    const { data } = await axios.get(`${URL}remitos/forId/${id}`);
+    const { data } = await axios.get(`${url}remitos/forId/${id}`);
     if (data.ok) {
       return data.remito;
     }
@@ -19,7 +19,7 @@ const getRemitoById = async (id) => {
 
 const getRemitos = async (pasados = false) => {
   try {
-    const { data } = await axios.get(`${URL}remitos`, { params: { pasados } });
+    const { data } = await axios.get(`${url}remitos`, { params: { pasados } });
     if (data.ok) {
       return data.remitos;
     }
@@ -33,7 +33,7 @@ const getRemitos = async (pasados = false) => {
 
 const postRemito = async (remito) => {
   try {
-    const { data } = await axios.post(`${URL}remitos`, remito);
+    const { data } = await axios.post(`${url}remitos`, remito);
     return data;
   } catch (error) {
     console.log(error);
@@ -43,7 +43,7 @@ const postRemito = async (remito) => {
 
 const putRemitoPasado = async (id) => {
   try {
-    const { data } = await axios.put(`${URL}remitos/pasado/${id}`);
+    const { data } = await axios.put(`${url}remitos/pasado/${id}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -53,7 +53,7 @@ const putRemitoPasado = async (id) => {
 
 const putObservaciones = async (id, observaciones) => {
   try {
-    const { data } = await axios.patch(`${URL}remitos/observaciones/${id}`, { observaciones });
+    const { data } = await axios.patch(`${url}remitos/observaciones/${id}`, { observaciones });
     if (!data.ok) {
       return await Swal.fire('Error al modificar el remito', data.msg, 'error');
     }

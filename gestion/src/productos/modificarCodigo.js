@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -14,7 +14,7 @@ const salir = document.getElementById('salir');
 let producto;
 
 codigo.addEventListener('change', async (e) => {
-  producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+  producto = (await axios.get(`${url}productos/${codigo.value}`)).data;
   if (producto) {
     descripcion.value = producto.descripcion;
     nuevoCodigo.focus();
@@ -27,7 +27,7 @@ codigo.addEventListener('change', async (e) => {
 });
 
 nuevoCodigo.addEventListener('change', async (e) => {
-  const producto = (await axios.get(`${URL}productos/${nuevoCodigo.value}`)).data;
+  const producto = (await axios.get(`${url}productos/${nuevoCodigo.value}`)).data;
   if (producto) {
     await sweet.fire({
       title: 'Codigo Ya utilizado',
@@ -40,10 +40,10 @@ nuevoCodigo.addEventListener('change', async (e) => {
 
 modificar.addEventListener('click', async (e) => {
   try {
-    await axios.delete(`${URL}productos/${producto._id}`);
+    await axios.delete(`${url}productos/${producto._id}`);
     producto._id = nuevoCodigo.value;
     producto.utilidad = producto.utilidad ? producto.utilidad : 0;
-    await axios.post(`${URL}productos`, producto);
+    await axios.post(`${url}productos`, producto);
     location.reload();
   } catch (error) {
     console.log(error);

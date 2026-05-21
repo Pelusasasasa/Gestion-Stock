@@ -1,10 +1,10 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const getPrecio = async (codProd) => {
   try {
-    const { data } = await axios.get(`${URL}productos/traerPrecio/${codProd}`);
+    const { data } = await axios.get(`${url}productos/traerPrecio/${codProd}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -14,7 +14,7 @@ const getPrecio = async (codProd) => {
 
 const getCostoImpuesto = async (codProd) => {
   try {
-    const { data } = await axios.get(`${URL}productos/traerCostoImpuesto/${codProd}`);
+    const { data } = await axios.get(`${url}productos/traerCostoImpuesto/${codProd}`);
     return data;
   } catch (error) {
     console.log(error);

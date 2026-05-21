@@ -1,11 +1,11 @@
 const axios = require('axios');
 const { default: Swal } = require('sweetalert2');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const getTipoCuentas = async () => {
   try {
-    const { data } = await axios.get(`${URL}tipocuenta`);
+    const { data } = await axios.get(`${url}tipocuenta`);
 
     if (data.ok) {
       return data.tipoCuentas;

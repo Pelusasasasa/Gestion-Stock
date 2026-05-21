@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -58,7 +58,7 @@ window.addEventListener('load', async (e) => {
   }
 
   try {
-    const { data } = await axios.get(`${URL}numero`);
+    const { data } = await axios.get(`${url}numero`);
     numeros = data;
   } catch (error) {
     console.log(error);
@@ -117,7 +117,7 @@ guardar.addEventListener('click', async (e) => {
   numero.dolarInstalador = dolarInstalador.value;
 
   if (dolarTraido !== parseFloat(dolar.value)) {
-    await axios.put(`${URL}productos/CambioDolar/${dolar.value}`);
+    await axios.put(`${url}productos/CambioDolar/${dolar.value}`);
     const pc = await verNombrePc();
     agregarMovimientoVendedores(`Cambio el Dolar de ${dolarTraido} a ${dolar.value} en la Computadora ${pc}`, usuario);
   }
@@ -128,7 +128,7 @@ guardar.addEventListener('click', async (e) => {
   }
 
   try {
-    await axios.put(`${URL}numero`, numero);
+    await axios.put(`${url}numero`, numero);
     ipcRenderer.send('send-ventanaPrincipal', parseFloat(dolar.value));
     window.close();
   } catch (error) {

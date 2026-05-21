@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const { redondear } = require('../helpers');
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const numero = document.getElementById('numero');
 const date = document.getElementById('fecha');

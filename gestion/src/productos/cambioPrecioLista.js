@@ -4,7 +4,7 @@ const swet = require('sweetalert2');
 const axios = require('axios');
 const xlsx = require('xlsx');
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const tipo = document.getElementById('tipo');
 const archivo = document.getElementById('archivo');
@@ -27,7 +27,7 @@ archivo.addEventListener('change', (e) => {
     let data = e.target.result;
     let woorbook = xlsx.read(data, { type: 'binary' });
 
-    let { data: res } = await axios.get(`${URL}productos/porMarca/${tipo.value}`);
+    let { data: res } = await axios.get(`${url}productos/porMarca/${tipo.value}`);
 
     await llenarLista(res.productos);
 
@@ -91,14 +91,14 @@ const cambiarPrecioshikvision = (datos, productos) => {
 };
 
 const cargarArchvio = async () => {
-  const { data } = await axios.get(`${URL}numero`);
+  const { data } = await axios.get(`${url}numero`);
   dolar = data.Dolar;
 };
 
 const guardarCambios = async () => {
   if (productosModificados.length === 0) return swet.fire('No hay productos a modificar');
 
-  const { data } = await axios.put(`${URL}productos`, productosModificados);
+  const { data } = await axios.put(`${url}productos`, productosModificados);
 
   if (data.ok) {
     await swet.fire('Modificar Varios Productos', `${data.msg}`, 'success');

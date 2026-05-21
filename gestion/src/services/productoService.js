@@ -1,12 +1,12 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const Swal = require('sweetalert2');
 
 const getProductoById = async (id) => {
   try {
     if (!id) return null;
-    const { data } = await axios.get(`${URL}productos/${id}`);
+    const { data } = await axios.get(`${url}productos/${id}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -17,7 +17,7 @@ const getProductoById = async (id) => {
 
 const getProductoByType = async (value, type) => {
   try {
-    const { data } = await axios.get(`${URL}productos/${value}/${type}`);
+    const { data } = await axios.get(`${url}productos/${value}/${type}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -28,7 +28,7 @@ const getProductoByType = async (value, type) => {
 
 const getProductoByNombre = async (nombre) => {
   try {
-    const { data } = await axios.get(`${URL}productos/nombre/${nombre}`);
+    const { data } = await axios.get(`${url}productos/nombre/${nombre}`);
     return data;
   } catch (error) {
     console.log(error);

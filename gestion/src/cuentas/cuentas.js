@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const cuentas = document.getElementById('cuentas');
 const agregar = document.getElementById('agregar');
@@ -12,7 +12,7 @@ const next = document.getElementById('next');
 let arreglo = [];
 
 window.addEventListener('load', async () => {
-  arreglo = (await axios.get(`${URL}cuenta`)).data;
+  arreglo = (await axios.get(`${url}cuenta`)).data;
   ponerPrimerCuenta(arreglo);
 });
 
@@ -59,7 +59,7 @@ agregar.addEventListener('click', async () => {
     cuenta.idCuenta = document.getElementById('codigo').value.toUpperCase().trim();
     cuenta.tipo = document.getElementById('tipo').value.toUpperCase();
 
-    await axios.post(`${URL}cuenta`, cuenta);
+    await axios.post(`${url}cuenta`, cuenta);
 
     arreglo.push(cuenta);
   }
@@ -75,7 +75,7 @@ borrar.addEventListener('click', async () => {
   });
 
   if (isConfirmed) {
-    await axios.delete(`${URL}cuenta/idCuenta/${cuentas.id}`);
+    await axios.delete(`${url}cuenta/idCuenta/${cuentas.id}`);
     const aux = arreglo.findIndex((elem) => elem.idCuenta === cuentas.id);
     arreglo = arreglo.filter((elem) => elem.idCuenta !== cuentas.id);
     if (arreglo[aux + 1]) {

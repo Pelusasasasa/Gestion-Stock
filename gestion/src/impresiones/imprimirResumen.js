@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const { ipcRenderer } = require('electron');
 const { default: Swal } = require('sweetalert2');

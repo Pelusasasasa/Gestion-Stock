@@ -1,10 +1,10 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const postRetencion = async (retencion) => {
   try {
-    const { data } = await axios.post(`${URL}retencion`, retencion);
+    const { data } = await axios.post(`${url}retencion`, retencion);
     console.log(data);
     return data;
   } catch (error) {

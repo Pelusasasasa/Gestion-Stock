@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const URL = process.env.URL;
+const url = process.env.URL;
 
 const tipo = document.getElementById('tipo');
 const buscador = document.getElementById('buscador');
@@ -17,9 +17,9 @@ const apretartecla = async(e) => {
 const cargarPagina = async() => {
     
     if (buscador.value === ''){
-        productos = (await axios.get(`${URL}productos/buscarProducto/textoVacio/descripcion`)).data;
+        productos = (await axios.get(`${url}productos/buscarProducto/textoVacio/descripcion`)).data;
     }else{
-        productos = (await axios.get(`${URL}productos/buscarProducto/${buscador.value}/${tipo.value}`)).data;
+        productos = (await axios.get(`${url}productos/buscarProducto/${buscador.value}/${tipo.value}`)).data;
     }
 
     listarProductos(productos);
@@ -31,7 +31,7 @@ const filtrar = async() => {
     const nuevoTexto = texto === '' ? 'textoVacio' : texto.replace('/', 'ALT47');
     const condicion = tipo.value === 'codigo' ? '_id' : tipo.value;
 
-    productos = (await axios.get(`${URL}productos/buscarProducto/${nuevoTexto}/${condicion}`)).data;
+    productos = (await axios.get(`${url}productos/buscarProducto/${nuevoTexto}/${condicion}`)).data;
     listarProductos(productos);
 };
 

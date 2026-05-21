@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -35,7 +35,7 @@ window.addEventListener('load', async (e) => {
     }
   }
   try {
-    const { data } = await axios.get(`${URL}pedidos`);
+    const { data } = await axios.get(`${url}pedidos`);
     pedidos = data;
   } catch (error) {
     console.log(error);
@@ -132,7 +132,7 @@ tbody.addEventListener('click', async (e) => {
     const pedido = pedidos.find((pedido) => pedido._id === seleccionado.id);
     pedido.estadoPedido = inputSeleccionado.value.toUpperCase();
     try {
-      await axios.put(`${URL}pedidos/id/${seleccionado.id}`, pedido);
+      await axios.put(`${url}pedidos/id/${seleccionado.id}`, pedido);
       location.reload();
     } catch (error) {
       console.log(error);
@@ -152,7 +152,7 @@ tbody.addEventListener('click', async (e) => {
       .then(async ({ isConfirmed }) => {
         if (isConfirmed) {
           try {
-            await axios.delete(`${URL}pedidos/id/${seleccionado.id}`);
+            await axios.delete(`${url}pedidos/id/${seleccionado.id}`);
             tbody.removeChild(seleccionado);
           } catch (error) {
             sweet.fire({

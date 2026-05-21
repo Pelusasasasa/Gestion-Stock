@@ -4,7 +4,7 @@ const axios = require('axios');
 
 require('dotenv').config();
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const fecha = document.querySelector('.fecha');
 const tbody = document.querySelector('.tbody');
@@ -51,7 +51,7 @@ const exportarExcel = async () => {
 };
 
 const listar = async () => {
-  clientes = (await axios.get(`${URL}clientes/clientesConSaldo`)).data;
+  clientes = (await axios.get(`${url}clientes/clientesConSaldo`)).data;
 
   for await (let cliente of clientes) {
     const { nombre, _id, direccion, saldo, cuit, condicionIva } = cliente;

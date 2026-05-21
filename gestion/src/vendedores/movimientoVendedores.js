@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { verificarUsuarios, parsearFecha } = require('../helpers');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const sweet = require('sweetalert2');
 
@@ -44,10 +44,10 @@ window.addEventListener('load', async (e) => {
 
   fecha.value = `${year}-${month}-${day}`;
 
-  const { vendedores } = (await axios.get(`${URL}vendedores`)).data;
+  const { vendedores } = (await axios.get(`${url}vendedores`)).data;
   await listarVendedores(vendedores);
 
-  movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+  movimientos = (await axios.get(`${url}movVendedores/${fecha.value}/${select.value}`)).data;
   listarMovimientos(movimientos);
 });
 
@@ -92,12 +92,12 @@ const listarConTipo = (lista, tipo) => {
 };
 
 select.addEventListener('change', async () => {
-  movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+  movimientos = (await axios.get(`${url}movVendedores/${fecha.value}/${select.value}`)).data;
   listarMovimientos(movimientos);
 });
 
 fecha.addEventListener('change', async () => {
-  const movimientos = (await axios.get(`${URL}movVendedores/${fecha.value}/${select.value}`)).data;
+  const movimientos = (await axios.get(`${url}movVendedores/${fecha.value}/${select.value}`)).data;
   listarMovimientos(movimientos);
 });
 

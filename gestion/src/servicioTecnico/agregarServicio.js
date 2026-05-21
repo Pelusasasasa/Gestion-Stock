@@ -6,7 +6,7 @@ const { getProductoById } = require('../services/productoService');
 const { getClienteById } = require('../services/clientesService');
 require('dotenv').config();
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 let vendedor = getParameterByName('vendedor');
 let permiso = getParameterByName('permiso');
@@ -107,7 +107,7 @@ const cargarPagina = async () => {
   const fechaActual = new Date();
   fecha.value = parsearFecha(fechaActual).slice(0, 10).split('/', 3).reverse().join('-');
 
-  const { data } = await axios.get(`${URL}numero`);
+  const { data } = await axios.get(`${url}numero`);
   numero.value = `ST-${data.Servicio.toString().padStart(4, '0')}`;
 
   traerParaModificar();
@@ -127,7 +127,7 @@ const crearServicio = async () => {
   };
 
   try {
-    const { data } = await axios.post(`${URL}servicios`, servicio);
+    const { data } = await axios.post(`${url}servicios`, servicio);
 
     if (data.ok) {
       await Swal.fire('Servicio creado con exito', '', 'success');
@@ -256,7 +256,7 @@ const modificarSerivicio = async () => {
     vendedor,
   };
   try {
-    const { data } = await axios.put(`${URL}servicios/${modificar.id}`, {
+    const { data } = await axios.put(`${url}servicios/${modificar.id}`, {
       servicio,
       equipos,
       vendedor,
@@ -312,7 +312,7 @@ const traerParaModificar = async () => {
   if (!numeroTraido) return;
 
   try {
-    const { data } = await axios.get(`${URL}servicios/numero/${numeroTraido}`);
+    const { data } = await axios.get(`${url}servicios/numero/${numeroTraido}`);
 
     if (data.ok) {
       listarServicio(data.servicio, data.equipos);

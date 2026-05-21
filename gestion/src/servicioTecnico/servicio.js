@@ -7,7 +7,7 @@ const { ipcRenderer } = require('electron');
 const vendedor = getParameterByName('vendedor');
 const permiso = getParameterByName('permiso');
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const volver = document.getElementById('volver');
 const buscador = document.getElementById('buscador');
@@ -109,7 +109,7 @@ const cargarPagina = async () => {
 const reImprimirservicio = async (e) => {
   const id = e.target.parentNode.parentNode.parentNode.id;
   try {
-    const { data } = await axios.get(`${URL}servicios/${id}`);
+    const { data } = await axios.get(`${url}servicios/${id}`);
     if (data.ok) {
       ipcRenderer.send('imprimir-servicio', {
         servicio: data.servicio,
@@ -137,7 +137,7 @@ const eliminarServicio = async (e) => {
   if (!isConfirmed) return;
 
   try {
-    const { data } = await axios.delete(`${URL}servicios/${id}`, {
+    const { data } = await axios.delete(`${url}servicios/${id}`, {
       params: { vendedor },
     });
     if (data.ok) {
@@ -172,7 +172,7 @@ const imprimirNuevoServicio = async (e) => {
 
     if (!isConfirmed) return;
 
-    const { data } = await axios.post(`${URL}servicios`, servicio);
+    const { data } = await axios.post(`${url}servicios`, servicio);
     if (data.ok) {
       agregarHTMLServicio(data.servicio, {});
       ipcRenderer.send('imprimir-servicio', {
@@ -190,7 +190,7 @@ const imprimirNuevoServicio = async (e) => {
 
 const traerServicios = async () => {
   try {
-    const { data } = await axios.get(`${URL}servicios`);
+    const { data } = await axios.get(`${url}servicios`);
     if (data.ok) {
       servicios = data.servicios;
       equipos = data.equipos;

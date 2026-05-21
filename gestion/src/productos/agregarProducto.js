@@ -33,7 +33,7 @@ const archivo = require('../configuracion.json');
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 let vendedor;
 
@@ -47,7 +47,7 @@ const calcularCosto = (costo, impuesto, dolar) => {
 
 //Funciones
 const traerRubros = async () => {
-  const rubros = (await axios.get(`${URL}rubro`)).data;
+  const rubros = (await axios.get(`${url}rubro`)).data;
   for await (let { numero, rubro } of rubros) {
     const option = document.createElement('option');
     ((option.text = numero + ' - ' + rubro), (option.value = rubro));
@@ -56,7 +56,7 @@ const traerRubros = async () => {
 };
 
 const traerProvedores = async () => {
-  const { data } = await axios.get(`${URL}provedores`);
+  const { data } = await axios.get(`${url}provedores`);
   for await (let { nombre } of data.provedores) {
     const option = document.createElement('option');
     ((option.text = nombre), (option.value = nombre));
@@ -65,7 +65,7 @@ const traerProvedores = async () => {
 };
 
 const traerMarcas = async () => {
-  const marcas = (await axios.get(`${URL}marca`)).data;
+  const marcas = (await axios.get(`${url}marca`)).data;
   for await (let { nombre } of marcas) {
     const option = document.createElement('option');
     ((option.text = nombre), (option.value = nombre));
@@ -81,8 +81,8 @@ window.addEventListener('load', async (e) => {
   if (!archivo.dolar) {
     costoDolar.setAttribute('disabled', '');
   }
-  dolar.value = (await axios.get(`${URL}numero`)).data.Dolar.toFixed(2);
-  dolarInstalador.value = (await axios.get(`${URL}numero`)).data.dolarInstalador.toFixed(2);
+  dolar.value = (await axios.get(`${url}numero`)).data.Dolar.toFixed(2);
+  dolarInstalador.value = (await axios.get(`${url}numero`)).data.dolarInstalador.toFixed(2);
 
   traerRubros();
   traerProvedores();
@@ -110,7 +110,7 @@ guardar.addEventListener('click', async (e) => {
     producto.precio = total.value;
     producto.unidad = unidad.value;
 
-    const { estado, mensaje } = (await axios.post(`${URL}productos`, producto)).data;
+    const { estado, mensaje } = (await axios.post(`${url}productos`, producto)).data;
 
     await sweet.fire({
       title: mensaje,
@@ -130,7 +130,7 @@ guardar.addEventListener('click', async (e) => {
 codigo.addEventListener('keypress', async (e) => {
   if (e.keyCode === 13) {
     if (codigo.value !== '') {
-      const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+      const producto = (await axios.get(`${url}productos/${codigo.value}`)).data;
       if (producto) {
         await sweet.fire({
           title: 'Codigo Ya utilizado por ' + producto.descripcion,

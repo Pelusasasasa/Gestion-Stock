@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const desde = document.getElementById('desde');
 const hasta = document.getElementById('hasta');
@@ -21,16 +21,16 @@ window.addEventListener('load', (e) => {
 desde.addEventListener('keypress', async (e) => {
   if (e.keyCode === 13) {
     hasta.focus();
-    ventas = (await axios.get(`${URL}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
-    presupuestos = (await axios.get(`${URL}presupuesto/betweenDate/${desde.value}/${hasta.value}`)).data;
+    ventas = (await axios.get(`${url}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
+    presupuestos = (await axios.get(`${url}presupuesto/betweenDate/${desde.value}/${hasta.value}`)).data;
     listar([...ventas, ...presupuestos]);
   }
 });
 
 hasta.addEventListener('keypress', async (e) => {
   if (e.keyCode === 13) {
-    ventas = (await axios.get(`${URL}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
-    presupuestos = (await axios.get(`${URL}presupuesto/betweenDate/${desde.value}/${hasta.value}`)).data;
+    ventas = (await axios.get(`${url}ventas/porFecha/${desde.value}/${hasta.value}`)).data;
+    presupuestos = (await axios.get(`${url}presupuesto/betweenDate/${desde.value}/${hasta.value}`)).data;
     listar([...ventas, ...presupuestos]);
   }
 });

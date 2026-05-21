@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { ipcRenderer } = require('electron');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -33,7 +33,7 @@ const salir = document.getElementById('salir');
 codigo.addEventListener('keypress', async (e) => {
   if (e.keyCode === 13 && codigo.value !== '') {
     try {
-      const producto = (await axios.get(`${URL}productos/${codigo.value}`)).data;
+      const producto = (await axios.get(`${url}productos/${codigo.value}`)).data;
       if (producto) {
         listarProducto(producto);
       } else {
@@ -133,7 +133,7 @@ agregar.addEventListener('click', async (e) => {
   pedido.vendedor = vendedor.value;
 
   try {
-    await axios.post(`${URL}pedidos`, pedido);
+    await axios.post(`${url}pedidos`, pedido);
     vendedor.value && (await agregarMovimientoVendedores(`Agrego el pedido ${pedido.producto} al cliente ${pedido.cliente}`, pedido.vendedor));
     window.close();
   } catch (error) {
@@ -153,7 +153,7 @@ modificar.addEventListener('click', async (e) => {
   pedido.vendedor = vendedor.value;
 
   try {
-    await axios.put(`${URL}pedidos/id/${modificar.id}`, pedido);
+    await axios.put(`${url}pedidos/id/${modificar.id}`, pedido);
     vendedor.value && (await agregarMovimientoVendedores(`Modifico el pedido ${pedido.producto} al cliente ${pedido.cliente}`, pedido.vendedor));
     window.close();
   } catch (error) {
@@ -168,7 +168,7 @@ salir.addEventListener('click', (e) => {
 ipcRenderer.on('informacion', async (e, args) => {
   if (args.informacion) {
     try {
-      const { data } = await axios.get(`${URL}pedidos/id/${args.informacion}`);
+      const { data } = await axios.get(`${url}pedidos/id/${args.informacion}`);
       const pedido = data;
       title.innerHTML = 'Modificar Pedido';
       agregar.classList.add('none');

@@ -1,12 +1,12 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const { Swal } = require('sweetalert2');
 
 const getUltimoId = async () => {
   try {
-    const { data } = await axios.get(`${URL}clientes`);
+    const { data } = await axios.get(`${url}clientes`);
     console.log(data);
 
     if (!data.ok) return await Swal.fire('Error al obtener el ultimo id', data.msg, 'error');
@@ -19,7 +19,7 @@ const getUltimoId = async () => {
 
 const getClienteById = async (id) => {
   try {
-    const { data } = await axios.get(`${URL}clientes/id/${id}`);
+    const { data } = await axios.get(`${url}clientes/id/${id}`);
     if (!data.ok) return await Swal.fire('Error al obtener el cliente', data.msg, 'error');
     return data.cliente;
   } catch (error) {
@@ -30,7 +30,7 @@ const getClienteById = async (id) => {
 
 const searchClientes = async (nombre) => {
   try {
-    const { data } = await axios.get(`${URL}clientes/buscar/${nombre === '' ? 'NADA' : nombre}`);
+    const { data } = await axios.get(`${url}clientes/buscar/${nombre === '' ? 'NADA' : nombre}`);
     if (data.ok) {
       return data.clientes;
     } else {
@@ -44,7 +44,7 @@ const searchClientes = async (nombre) => {
 
 const putCliente = async (id, cliente, vendedor) => {
   try {
-    const { data } = await axios.put(`${URL}clientes/id/${id}`, { ...cliente, vendedor });
+    const { data } = await axios.put(`${url}clientes/id/${id}`, { ...cliente, vendedor });
     console.log(data);
     if (!data.ok) return await Swal.fire('Error al modificar el cliente', data.msg, 'error');
     return { cliente: data.cliente };
@@ -56,7 +56,7 @@ const putCliente = async (id, cliente, vendedor) => {
 
 const deleteCliente = async (id, vendedor) => {
   try {
-    const { data } = await axios.delete(`${URL}clientes/id/${id}`, {
+    const { data } = await axios.delete(`${url}clientes/id/${id}`, {
       params: { vendedor },
     });
     if (!data.ok) return await Swal.fire('Error al eliminar el cliente', data.msg, 'error');
@@ -69,7 +69,7 @@ const deleteCliente = async (id, vendedor) => {
 
 const postCliente = async (cliente) => {
   try {
-    const { data } = await axios.post(`${URL}clientes`, cliente);
+    const { data } = await axios.post(`${url}clientes`, cliente);
     console.log(data);
     if (!data.ok) return await Swal.fire('Error al agregar el cliente', data.msg, 'error');
     return { cliente: data.cliente, ok: true };

@@ -3,7 +3,7 @@ const axios = require('axios');
 const { ipcRenderer } = require('electron');
 const sweet = require('sweetalert2');
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const codigo = document.querySelector('#codigo');
 const descripcion = document.querySelector('#descripcion');
@@ -112,7 +112,7 @@ const guardarMovimiento = async () => {
   }
 
   try {
-    const { data } = await axios.put(`${URL}productos/descontarStock/${codigo.value}`, {
+    const { data } = await axios.put(`${url}productos/descontarStock/${codigo.value}`, {
       stock: nuevoStock.value,
       descripcion: descripcion.value,
       vendedor: vendedor,
@@ -186,7 +186,7 @@ salir.addEventListener('click', (e) => {
 });
 
 ipcRenderer.on('informacion', async (e, { informacion, vendedor: vend }) => {
-  const { data } = await axios.get(`${URL}provedores`);
+  const { data } = await axios.get(`${url}provedores`);
   provedores = data.provedores;
 
   listarProvedores(provedores);
@@ -194,7 +194,7 @@ ipcRenderer.on('informacion', async (e, { informacion, vendedor: vend }) => {
   vendedor = vend.nombre;
   acceso = vend.permiso;
 
-  producto = (await axios.get(`${URL}productos/${informacion}`)).data;
+  producto = (await axios.get(`${url}productos/${informacion}`)).data;
   listarProducto(producto);
   verPermiso(acceso);
 });

@@ -4,7 +4,7 @@ const sweet = require('sweetalert2');
 
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const archivo = require('../configuracion.json');
 
@@ -47,7 +47,7 @@ const calcularCosto = (costo, impuesto, dolar) => {
 };
 
 const traerRubros = async () => {
-  const rubros = (await axios.get(`${URL}rubro`)).data;
+  const rubros = (await axios.get(`${url}rubro`)).data;
   for await (let { rubro, numero } of rubros) {
     const option = document.createElement('option');
     option.text = numero + '-' + rubro;
@@ -58,7 +58,7 @@ const traerRubros = async () => {
 };
 
 const traerProvedor = async () => {
-  const { data } = await axios.get(`${URL}provedores`);
+  const { data } = await axios.get(`${url}provedores`);
   for await (let { nombre } of data.provedores) {
     const option = document.createElement('option');
     ((option.text = nombre), (option.value = nombre));
@@ -67,7 +67,7 @@ const traerProvedor = async () => {
 };
 
 const traerMarcas = async () => {
-  const marcas = (await axios.get(`${URL}marca`)).data;
+  const marcas = (await axios.get(`${url}marca`)).data;
   for await (let { nombre } of marcas) {
     const option = document.createElement('option');
     ((option.text = nombre), (option.value = nombre));
@@ -80,8 +80,8 @@ ipcRenderer.on('informacion', async (e, args) => {
   if (!archivo.dolar) {
     costoDolar.setAttribute('disabled', '');
   }
-  dolar.value = (await axios.get(`${URL}numero/Dolar`)).data.toFixed(2);
-  dolarInstalador.value = (await axios.get(`${URL}numero/dolarInstalador`)).data.toFixed(2);
+  dolar.value = (await axios.get(`${url}numero/Dolar`)).data.toFixed(2);
+  dolarInstalador.value = (await axios.get(`${url}numero/dolarInstalador`)).data.toFixed(2);
 
   const { informacion } = args;
   vendedor = args.vendedor;
@@ -97,7 +97,7 @@ const llenarInputs = async (codigoProducto) => {
   codigo.value = codigoProducto;
 
   const id = codigo.value.replace(/\//g, '%2F');
-  const producto = (await axios.get(`${URL}productos/${id}`)).data;
+  const producto = (await axios.get(`${url}productos/${id}`)).data;
 
   descripcion.value = producto.descripcion;
   codigoSecundario.value = producto.codigoSecundario;
@@ -143,7 +143,7 @@ modificar.addEventListener('click', async (e) => {
     producto.ganancia = parseFloat(ganancia.value).toFixed(2);
     producto.precio = parseFloat(total.value).toFixed(2);
 
-    const { mensaje, estado } = (await axios.put(`${URL}productos/${producto._id.replace(/\//g, '%2F')}`, producto)).data;
+    const { mensaje, estado } = (await axios.put(`${url}productos/${producto._id.replace(/\//g, '%2F')}`, producto)).data;
 
     await ipcRenderer.send('informacion-a-ventana', producto);
 

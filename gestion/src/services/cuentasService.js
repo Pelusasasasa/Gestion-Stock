@@ -1,12 +1,12 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const { Swal } = require('sweetalert2');
 
 const getCompensadas = async (idCliente) => {
   try {
-    const { data } = await axios.get(`${URL}compensada/traerCompensadas/${idCliente}`);
+    const { data } = await axios.get(`${url}compensada/traerCompensadas/${idCliente}`);
 
     if (data.ok) {
       return data.compensadas;
@@ -21,7 +21,7 @@ const getCompensadas = async (idCliente) => {
 
 const getCompensada = async (id) => {
   try {
-    const { data } = await axios.get(`${URL}compensada/traerCompensada/id/${id}`);
+    const { data } = await axios.get(`${url}compensada/traerCompensada/id/${id}`);
     if (data.ok) {
       return data.compensada;
     } else {
@@ -37,7 +37,7 @@ const getCompensada = async (id) => {
 
 const putCompensadaForId = async (id, compensada) => {
   try {
-    const { data } = await axios.put(`${URL}compensada/traerCompensada/id/${id}`, compensada);
+    const { data } = await axios.put(`${url}compensada/traerCompensada/id/${id}`, compensada);
     return data;
   } catch (error) {
     console.log(error);
@@ -48,7 +48,7 @@ const putCompensadaForId = async (id, compensada) => {
 
 const putCompensadaObservaciones = async (aux, observaciones) => {
   try {
-    const { data } = await axios.put(`${URL}compensada/observaciones/${aux}`, { observaciones });
+    const { data } = await axios.put(`${url}compensada/observaciones/${aux}`, { observaciones });
     console.log(aux);
     return data;
   } catch (error) {
@@ -60,7 +60,7 @@ const putCompensadaObservaciones = async (aux, observaciones) => {
 
 const deleteCompensada = async (id) => {
   try {
-    await axios.delete(`${URL}compensada/traerCompensada/id/${id}`);
+    await axios.delete(`${url}compensada/traerCompensada/id/${id}`);
     return {
       ok: true,
       msg: 'Venta Eliminada',
@@ -76,7 +76,7 @@ const deleteCompensada = async (id) => {
 
 const getHistoricas = async (idCliente) => {
   try {
-    const { data } = await axios.get(`${URL}historica/traerPorCliente/${idCliente}`);
+    const { data } = await axios.get(`${url}historica/traerPorCliente/${idCliente}`);
 
     if (data) {
       return data;
@@ -91,7 +91,7 @@ const getHistoricas = async (idCliente) => {
 
 const getHistoricaForDateAndClient = async (fecha, idCliente) => {
   try {
-    const { data } = await axios.get(`${URL}historica/forDesdeAndCliente/${fecha}/${idCliente}`);
+    const { data } = await axios.get(`${url}historica/forDesdeAndCliente/${fecha}/${idCliente}`);
     return data;
   } catch (error) {
     console.log(error);
@@ -101,7 +101,7 @@ const getHistoricaForDateAndClient = async (fecha, idCliente) => {
 
 const getHistoricaForNumberAndType = async (number, type) => {
   try {
-    const { data } = await axios.get(`${URL}historica/porId/id/${number}`);
+    const { data } = await axios.get(`${url}historica/porId/id/${number}`);
     if (data.ok) {
       return data.historica;
     } else {
@@ -117,7 +117,7 @@ const getHistoricaForNumberAndType = async (number, type) => {
 
 const putHistoricaForId = async (id, historica) => {
   try {
-    const { data } = await axios.put(`${URL}historica/PorId/id/${id}`, historica);
+    const { data } = await axios.put(`${url}historica/PorId/id/${id}`, historica);
     return data;
   } catch (error) {
     console.log(error);
@@ -129,7 +129,7 @@ const putHistoricaForId = async (id, historica) => {
 const deleteHistorica = async (id) => {
   try {
     console.log(id);
-    await axios.delete(`${URL}historica/porNumero/${id}`);
+    await axios.delete(`${url}historica/porNumero/${id}`);
     return {
       ok: true,
       msg: 'Historica Eliminada',

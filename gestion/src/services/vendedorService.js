@@ -2,11 +2,11 @@ const axios = require('axios');
 const { default: Swal } = require('sweetalert2');
 require('dotenv').config();
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const getVendedores = async () => {
   try {
-    const { data } = await axios.get(`${URL}vendedores`);
+    const { data } = await axios.get(`${url}vendedores`);
     if (!data.ok) return await Swal.fire('Error al cargar los vendedores', '', 'error');
     return data.vendedores;
   } catch (error) {
@@ -17,7 +17,7 @@ const getVendedores = async () => {
 
 const postVendedor = async (vendedor) => {
   try {
-    const { data } = await axios.post(`${URL}vendedores`, vendedor);
+    const { data } = await axios.post(`${url}vendedores`, vendedor);
 
     if (!data.ok) {
       await Swal.fire('Error al cargar el vendedor', '', 'error');
@@ -35,7 +35,7 @@ const postVendedor = async (vendedor) => {
 const putVendedor = async (vendedor, id) => {
   console.log(vendedor);
   try {
-    const { data } = await axios.put(`${URL}vendedores/id/${id}`, vendedor);
+    const { data } = await axios.put(`${url}vendedores/id/${id}`, vendedor);
 
     if (!data.ok) {
       await Swal.fire('Error al cargar el vendedor', '', 'error');
@@ -51,7 +51,7 @@ const putVendedor = async (vendedor, id) => {
 
 const deleteVendedor = async (id) => {
   try {
-    const { data } = await axios.delete(`${URL}vendedores/id/${id}`);
+    const { data } = await axios.delete(`${url}vendedores/id/${id}`);
 
     if (!data.ok) {
       await Swal.fire('Error al cargar el vendedor', '', 'error');

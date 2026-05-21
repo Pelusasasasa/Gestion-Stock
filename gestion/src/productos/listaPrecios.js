@@ -1,8 +1,8 @@
 let XLSX = require('xlsx');
 const axios = require('axios');
 require('dotenv').process;
-const URL = process.env.GESTIONURL;
-console.log(URL);
+const url = process.env.GESTIONURL;
+console.log(url);
 
 const { dialog } = require('electron');
 
@@ -14,7 +14,7 @@ const descargar = document.getElementById('descargar');
 const listar = document.querySelector('.listar');
 
 window.addEventListener('load', async (e) => {
-  const marcas = (await axios.get(`${URL}productos/marcas`)).data;
+  const marcas = (await axios.get(`${url}productos/marcas`)).data;
   listarMarcas(marcas);
 });
 
@@ -42,7 +42,7 @@ descargar.addEventListener('click', async (e) => {
         marcasCheckeadas.push(marca.id);
       }
     }
-    const productos = (await axios.get(`${URL}productos/productosPorMarcas/${JSON.stringify(marcasCheckeadas)}`)).data;
+    const productos = (await axios.get(`${url}productos/productosPorMarcas/${JSON.stringify(marcasCheckeadas)}`)).data;
     productos.forEach((producto) => {
       delete producto.rubro;
       delete producto._id;

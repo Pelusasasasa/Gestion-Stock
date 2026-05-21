@@ -5,7 +5,7 @@ const { cerrarVentana, apretarEnter, saltarEnter } = require('../helpers');
 const axios = require('axios');
 const { getClienteById, putCliente } = require('../services/clientesService');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 let vendedor;
 

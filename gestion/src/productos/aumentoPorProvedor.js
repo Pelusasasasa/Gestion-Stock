@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 const sweet = require('sweetalert2');
 
 const select = document.getElementById('provedores');
@@ -9,7 +9,7 @@ const aceptar = document.getElementById('aceptar');
 const salir = document.getElementById('salir');
 
 window.addEventListener('load', async (e) => {
-  const { data } = await axios.get(`${URL}provedores`);
+  const { data } = await axios.get(`${url}provedores`);
   if (data.ok) {
     listarProvedores(data.provedores);
   } else {
@@ -19,7 +19,7 @@ window.addEventListener('load', async (e) => {
 
 aceptar.addEventListener('click', async (e) => {
   const mensaje = (
-    await axios.put(`${URL}productos/provedores`, {
+    await axios.put(`${url}productos/provedores`, {
       provedor: select.value,
       porcentaje: parseFloat(porcentaje.value),
     })

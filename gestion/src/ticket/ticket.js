@@ -4,7 +4,7 @@ const { cuit: cuitPro } = require('../configuracion.json');
 const axios = require('axios');
 require('dotenv').config();
 
-const URL = process.env.GESTIONURL;
+const url = process.env.GESTIONURL;
 
 const tipoComp = document.querySelector('.tipoComp');
 const numeroComp = document.querySelector('.numeroComp');
@@ -56,7 +56,7 @@ window.addEventListener('load', (e) => {
 
 ipcRenderer.on('imprimir', async (e, args) => {
   const [situacion, venta, cliente, listado, checkDolar] = JSON.parse(args);
-  dolar = (await axios.get(`${URL}numero/Dolar`)).data;
+  dolar = (await axios.get(`${url}numero/Dolar`)).data;
   listar(situacion, venta, cliente, listado, checkDolar);
 });
 
