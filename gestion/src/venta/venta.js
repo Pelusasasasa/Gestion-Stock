@@ -511,6 +511,16 @@ facturar.addEventListener('click', async (e) => {
 
     venta = await prepararObjetoVenta(dolar, dolarInstalador, vendedor, facturaAnterior, esRemito);
 
+    console.log(venta.vendedor)
+    if(!venta.vendedor){
+      Swal.fire({
+        title: 'No se pudo generar la venta',
+        text: 'El vendedor no se encuentra',
+        icon: 'error'
+      });
+      return;
+    }
+
     try {
       if (situacion === 'blanco') {
         alerta.classList.remove('none');
@@ -957,7 +967,9 @@ ipcRenderer.on('informacion', (e, args) => {
 });
 
 ipcRenderer.on('facturarVarios', async (e, args) => {
-  cuentas = JSON.parse(args);
+  const { values, vendedor: vendedorTraido } = JSON.parse(args);
+  cuentas = values;
+  vendedor = vendedorTraido
 
   facturaVarios = true;
 

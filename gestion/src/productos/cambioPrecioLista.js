@@ -51,10 +51,8 @@ const cambiarPrecioshikvision = (datos, productos) => {
     let productoAux = datos.find((elem) => producto._id == elem.SAP);
     if (!productoAux) {
       productoAux = datos.find((elem) => elem.SAP == producto.codigoSecundario);
-      console.log(productoAux)
     }
     if (!productoAux) continue;
-
 
     //productoAux.GREMIO = productoAux?.GREMIO?.replace(',', '.');
     //productoAux.GREMIO = parseFloat(productoAux.GREMIO.replace('USD', ''));

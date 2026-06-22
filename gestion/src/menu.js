@@ -238,7 +238,7 @@ caja.addEventListener('click', async (e) => {
 
 consulta.addEventListener('click', async (e) => {
   navegarConAutenticacion('./consultarCuenta/consultarCuenta.html', {
-    usarNombre: true,
+    usarNombre: false,
     incluirPermiso: false,
     sacarCierre: true,
   });

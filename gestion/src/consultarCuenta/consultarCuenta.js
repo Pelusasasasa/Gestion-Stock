@@ -220,12 +220,16 @@ const facturarVarios = async () => {
   });
 
   let values = [];
+  let argumento = {
+    values,
+    vendedor
+  }
 
   if (isConfirmed) {
     const chequeados = document.querySelectorAll('input[type=checkbox]');
     chequeados.forEach((elem) => elem.checked && values.push(elem.id));
 
-    ipcRenderer.send('facturarVarios', JSON.stringify(values));
+    ipcRenderer.send('facturarVarios', JSON.stringify(argumento));
   }
 };
 
@@ -376,7 +380,7 @@ actualizar.addEventListener('click', async (e) => {
           listarProductos(movimientos);
           trSeleccionado.children[4].innerText = cuentaModificada.importe;
           trSeleccionado.children[6].innerText = cuentaModificada.saldo;
-          saldo.value = cliente.saldo.toFixed(2);
+          saldo.value = cliente.saldo;
         }
       });
   }
