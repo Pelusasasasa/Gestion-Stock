@@ -48,19 +48,36 @@ const agregarSerieTabla = async () => {
   const tdSerie = document.createElement('td');
   const tdFactura = document.createElement('td');
   const tdProvedor = document.createElement('td');
+  const tdAcciones = document.createElement('td');
+
+  tdAcciones.classList.add('acciones');
 
   tdSerie.innerText = serie.value;
   tdFactura.innerText = factura.value;
   tdProvedor.innerText = provedor.value.toUpperCase();
+  tdAcciones.innerHTML = `
+            <div class="tool">
+                <span class='material-icons-outlined' title='Eliminar' id='delete'>delete</span>
+            </div>
+  `;
 
   tr.appendChild(tdSerie);
   tr.appendChild(tdProvedor);
   tr.appendChild(tdFactura);
+  tr.appendChild(tdAcciones);
 
   tbody.appendChild(tr);
 
   serie.value = '';
+  factura.value = '';
   serie.focus();
+
+  tdAcciones.addEventListener('click', eliminarSerie);
+};
+
+const eliminarSerie = (e) => {
+  const tr = e.target.parentElement.parentElement.parentElement;
+  tr.remove();
 };
 
 const listarProducto = ({ _id, descripcion: desc, stock: sto, provedor: pro }) => {
