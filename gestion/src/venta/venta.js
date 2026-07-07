@@ -810,9 +810,12 @@ iva.addEventListener('keypress', (e) => {
 
 porcentaje.addEventListener('change', async (e) => {
   porcentaje.value = porcentaje.value === '' ? '0.00' : porcentaje.value;
+
+
   descuento = redondear((parseFloat(total.value) * parseFloat(porcentaje.value)) / 100, 2);
   for await (let { cantidad, producto } of listaProductos) {
     const tr = document.getElementById(producto.idTabla);
+    producto.precioAux = Number(redondear(parseFloat(producto.precio) + (parseFloat(producto.precio) * parseFloat(porcentaje.value)) / 100, 2));
 
     totalGlobal -= verPrecioConCantidad({ producto, cantidad }, lista.value, dolarInstalador);
 
