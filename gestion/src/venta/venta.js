@@ -815,9 +815,13 @@ porcentaje.addEventListener('change', async (e) => {
   descuento = redondear((parseFloat(total.value) * parseFloat(porcentaje.value)) / 100, 2);
   for await (let { cantidad, producto } of listaProductos) {
     const tr = document.getElementById(producto.idTabla);
-    producto.precioAux = Number(redondear(parseFloat(producto.precio) + (parseFloat(producto.precio) * parseFloat(porcentaje.value)) / 100, 2));
+    
+    // Guardamos el precioAux actual antes de modificarlo para poder restarlo correctamente
+    const precioAuxViejo = producto.precioAux !== undefined ? producto.precioAux : producto.precio;
 
-    totalGlobal -= verPrecioConCantidad({ producto, cantidad }, lista.value, dolarInstalador);
+    totalGlobal -= redondear(precioAuxViejo * cantidad, 2);
+
+    producto.precioAux = Number(redondear(parseFloat(producto.precio) + (parseFloat(producto.precio) * parseFloat(porcentaje.value)) / 100, 2));
 
     tr.children[5].innerHTML = producto.precioAux.toFixed(2);
     tr.children[6].innerHTML = redondear(producto.precioAux * cantidad, 2);
