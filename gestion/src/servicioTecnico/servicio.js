@@ -28,8 +28,9 @@ const agregarHTMLServicio = (servicio = {}, equipo = {}) => {
   if (equipo.estado === 'Entregado') colorEstado = 'bg-blue-50 text-blue-800';
   if (equipo.estado === 'Sin Solucion') colorEstado = 'bg-black text-white';
 
-  const parrafoEstado = `<div class='flex justify-center items-center'><p class='m-0 ${colorEstado} justify-center px-1 text-sm rounded text-semibold rounded-full inline-flex'>${equipo?.estado ?? ''
-    }</p></div>`;
+  const parrafoEstado = `<div class='flex justify-center items-center'><p class='m-0 ${colorEstado} justify-center px-1 text-sm rounded text-semibold rounded-full inline-flex'>${
+    equipo?.estado ?? ''
+  }</p></div>`;
 
   const tr = document.createElement('tr');
   tr.id = servicio._id;
@@ -63,12 +64,13 @@ const agregarHTMLServicio = (servicio = {}, equipo = {}) => {
             <div class=tool>
                 <span class=material-icons-outlined title='Modificar' id='edit'>edit</span>
             </div>
-            ${permiso === '0'
-      ? `<div class=tool>
+            ${
+              permiso === '0'
+                ? `<div class=tool>
                     <span class=material-icons-outlined title='Eliminar' id='delete'>delete</span>
                 </div>`
-      : ``
-    }   
+                : ``
+            }   
             
         `;
 

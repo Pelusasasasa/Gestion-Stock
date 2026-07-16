@@ -694,8 +694,6 @@ tbody.addEventListener('dblclick', async (se) => {
     .then(async ({ isConfirmed }) => {
       if (isConfirmed) {
         const producto = listaProductos.find(({ producto }) => producto.idTabla === seleccionado.id);
-        //Borramos el total anterior
-        totalGlobal -= producto.producto.precioAux * producto.cantidad;
 
         producto.cantidad = parseFloat(document.getElementById('cantidadCambio').value);
         producto.producto.impuesto = parseFloat(document.getElementById('ivaCambio').value);
@@ -708,9 +706,8 @@ tbody.addEventListener('dblclick', async (se) => {
         seleccionado.children[5].innerHTML = precioAux.toFixed(2);
         seleccionado.children[6].innerHTML = redondear(precioAux * producto.cantidad, 2);
 
-        totalGlobal += parseFloat(redondear(precioAux * producto.cantidad, 2));
-
-        total.value = totalGlobal.toFixed(2);
+        await calcularTotal();
+        totalGlobal = parseFloat(total.value);
       }
     });
 });
