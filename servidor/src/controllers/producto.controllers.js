@@ -98,6 +98,7 @@ productoCTRL.traerProducto = async (req, res) => {
 
 productoCTRL.traerProductoPorNombre = async (req, res) => {
   const { nombre } = req.params;
+  console.log(nombre)
   const producto = await Producto.findOne({ descripcion: nombre });
   res.send(producto);
 };

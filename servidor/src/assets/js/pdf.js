@@ -90,7 +90,7 @@ funcion.crearPDF = async (venta) => {
   };
   pdf.create(html, config).toFile(`pdfs/${venta.cliente}--${puntoVenta}-${numero}.pdf`, (err, res) => {
     if (err) {
-      console.log(err);
+      console.error(err);
     } else {
       console.log(res);
     }

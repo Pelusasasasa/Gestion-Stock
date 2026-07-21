@@ -28,7 +28,7 @@ servicioCTRL.eliminarPorID = async (req, res) => {
       msg: `Servicio con el numero ${servicio.numero} Eliminado correctamente`,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "No se pudo eliminar el servicio",
@@ -111,7 +111,7 @@ servicioCTRL.traerPorId = async (req, res) => {
       historial,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "No se pud obtener los servicios",
@@ -158,7 +158,7 @@ servicioCTRL.modificarPorId = async (req, res) => {
       equiposModificados,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "No se pudo modificar el servicio tecnico",
@@ -213,7 +213,7 @@ servicioCTRL.traerPorNumero = async (req, res) => {
       historial,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(200).json({
       ok: false,
       msg: "No se pudo obtener el servicio, hable con el administrador",
@@ -241,7 +241,7 @@ servicioCTRL.modificarEstado = async (req, res) => {
       servicioModificado,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "No se pudo modificar el estado, hable con el administrador",

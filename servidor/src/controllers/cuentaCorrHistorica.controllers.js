@@ -30,7 +30,7 @@ historicaCTRL.modificarHistorica = async (req, res) => {
       msg: 'Historica modificada',
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       msg: ' No se pudo modificar la historica hable con el administrador',
       ok: false,

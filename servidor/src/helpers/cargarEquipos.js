@@ -19,7 +19,7 @@ exports.cargarEquipos = async(equipos = [], numero) => {
 
         return nuevosEquipos;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return false;
     }
 };
@@ -68,7 +68,7 @@ exports.modificarEquipos = async(equipos, numero) => {
         return equiposModificados;
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return false;
     }
 

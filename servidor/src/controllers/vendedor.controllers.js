@@ -54,7 +54,7 @@ vendedorCTRL.putForId = async (req, res) => {
       vendedor,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "Error al modificar el vendedor, hable con el administrador",
@@ -72,7 +72,7 @@ vendedorCTRL.deleteForId = async (req, res) => {
       msg: "Vendedor eliminado correctamente",
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "Error al eliminar el vendedor, hable con el administrador",

@@ -10,7 +10,7 @@ const cargarRetencion = async (req, res) => {
             retencion: newRetencion
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({
             ok: false,
             msg: 'Error del servidor al cargar retencion, hable con el administrador'

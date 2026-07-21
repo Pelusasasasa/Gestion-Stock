@@ -28,7 +28,7 @@ const informacionVenta = async (req, res) => {
       cliente,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: "Error al obtener la venta",

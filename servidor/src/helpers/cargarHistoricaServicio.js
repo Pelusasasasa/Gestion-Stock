@@ -23,7 +23,7 @@ exports.cargarHistoricaServicio = async(equipos, numero) => {
 
         return historial;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return false;
     };
 };

@@ -248,7 +248,7 @@ ventaCTRL.getPorFactura = async (req, res) => {
       venta,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: 'error al obtener la factura hable con el administrador',

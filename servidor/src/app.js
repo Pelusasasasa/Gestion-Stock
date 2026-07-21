@@ -32,6 +32,8 @@ app.use('/gestion/imprimir', require('./routes/imprimir.routes'));
 
 app.use('/gestion/historica', require('./routes/historica.route'));
 
+app.use('/gestion/manoObra', require('./routes/manoObra.routes'));
+
 app.use('/gestion/marca', require('./routes/marca.route'));
 
 app.use('/gestion/movimiento', require('./routes/movProducto.route'));

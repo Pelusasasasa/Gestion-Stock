@@ -20,7 +20,7 @@ const getCuentaCorrienteProvedores = async (req, res) => {
       cuentas,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error al obtener la cuenta corriente de los provedores' });
   }
 };
@@ -55,7 +55,7 @@ const putCuentaCorrienteProvedores = async (req, res) => {
       cuenta,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error al actualizar la cuenta corriente de los provedores' });
   }
 };
@@ -82,7 +82,7 @@ const deleteCuentaCorrienteProvedores = async (req, res) => {
       cuenta,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error al eliminar la cuenta corriente de los provedores' });
   }
 };

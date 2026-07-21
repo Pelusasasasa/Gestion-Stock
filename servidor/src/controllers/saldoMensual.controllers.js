@@ -34,7 +34,7 @@ saldoMensualCTRL.getAll = async (req, res) => {
     const saldos = await SaldoMensual.find();
     res.json(saldos);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error al obtener los saldos' });
   }
 };
@@ -59,7 +59,7 @@ saldoMensualCTRL.postNew = async (req, res) => {
       msg: 'Saldo creado exitosamente',
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: 'Error al crear el saldo',
@@ -88,7 +88,7 @@ saldoMensualCTRL.patchOne = async (req, res) => {
       msg: 'Saldo actualizado exitosamente',
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: 'Error al actualizar el saldo',

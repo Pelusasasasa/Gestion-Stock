@@ -123,7 +123,7 @@ remitoCTRL.putPasado = async (req, res) => {
       remito,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       ok: false,
       msg: 'Error al actualizar el remito, hable con el administrador',
@@ -148,7 +148,7 @@ remitoCTRL.patchObservaciones = async (req, res) => {
       remito,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({
       ok: false,
       msg: 'No se pudo modifcar las observaciones del remit, hable con el administrador',
