@@ -175,10 +175,17 @@ remitoCTRL.cargarRemitoManoObra = async(req, res) => {
     await nuevoRemito.save();
 
 
-    movimientos.forEach(async (mov) => {
+    for (const mov of movimientos) {
       const producto = await Producto.findOne({ _id: mov.codProd.toString() });
 
-      const manoObra = await ManoObra.findOneAndUpdate({ _id: mov.manoObra }, {activo: false, estado: 'Remitado'})
+      if (!producto) {
+        return res.status(404).json({
+          ok: false,
+          msg: `No se encontró el producto con ID ${mov.codProd}`
+        });
+      }
+
+      await ManoObra.findByIdAndUpdate(mov.manoObra, { activo: false, estado: 'Remitado' });
 
       const nuevoMovimiento = new Movimiento({
           fecha: nuevoRemito.fecha,
@@ -197,7 +204,7 @@ remitoCTRL.cargarRemitoManoObra = async(req, res) => {
       });
 
       await nuevoMovimiento.save();
-    })
+    }
 
 
     res.status(200).json({
