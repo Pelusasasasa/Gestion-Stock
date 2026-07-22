@@ -1,11 +1,13 @@
 const { Router } = require('express');
-const { postOne, getAll, getforid, putPasado, patchObservaciones } = require('../controllers/remito.controllers');
+const { postOne, getAll, getforid, putPasado, patchObservaciones, cargarRemitoManoObra } = require('../controllers/remito.controllers');
 
 const router = Router();
 
 router.route('/')
     .get(getAll)
     .post(postOne)
+router.route('/mano-obra')
+    .post(cargarRemitoManoObra)
 router.route('/forId/:id')
     .get(getforid)
 router.route('/pasado/:id')

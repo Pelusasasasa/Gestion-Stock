@@ -1,13 +1,15 @@
 const { Router } = require('express');
 const router = Router();
 
-const { id, cargar, modificarVarios, porId, porRubro, post, deleteForIdAndTipo, traerPorProducto, modificar } = require('../controllers/movProducto.controllers');
+const { id, cargar, modificarVarios, porId, porRubro, post, deleteForIdAndTipo, traerPorProducto, modificar, postManoObra } = require('../controllers/movProducto.controllers');
 
 router.route('/')
     .put(modificarVarios)
     .post(cargar)
 router.route('/post')
     .post(post)
+router.route('/movimientoManoObra')
+    .post(postManoObra)
 router.route('/porProducto/:codigo')
     .get(traerPorProducto)
     .patch(modificar)

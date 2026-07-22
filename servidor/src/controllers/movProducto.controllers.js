@@ -1,6 +1,8 @@
 const movimientoCTRL = {}
 
+const ManoObra = require('../models/ManoObra');
 const movProducto = require('../models/movProducto');
+const Producto = require('../models/producto');
 
 movimientoCTRL.deleteForIdAndTipo = async (req, res) => {
 
@@ -116,6 +118,55 @@ movimientoCTRL.post = async (req, res) => {
 
 };
 
+movimientoCTRL.postManoObra = async (req, res) => {
+    
+    const movimientos = req.body;
+
+    try {
+        for (const elem of movimientos) {
+            const { fecha, tipo_venta, cliente, nombreCliente, marca, codProd, producto, rubro, cantidad, iva, precio, nro_venta, tipo_comp, manoObra } = elem;
+            
+            const productoTraido = await Producto.findOne({ _id: codProd.toString() });
+
+            if (!productoTraido) return res.status(404).json({
+                ok: false,
+                msg: 'No se encontro el producto'
+            })
+
+            await ManoObra.findByIdAndUpdate({_id: manoObra}, {activo: false, estado: 'Remitado'}, {new: true});
+
+            const movimiento = movProducto({
+                fecha,
+                tipo_venta, 
+                cliente, 
+                nombreCliente,
+                marca,
+                codProd,
+                producto: productoTraido.descripcion,
+                rubro: productoTraido.rubro,
+                cantidad,
+                iva: productoTraido.impuesto, 
+                precio: productoTraido.precio,
+                nro_venta,
+                tipo_comp
+            });
+
+            await movimiento.save();
+        }
+
+        res.status(200).json({
+            ok: true,
+            msg: 'Movimientos cargados correctamente'
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo cargar el movimiento, hable con el administrador'
+        })
+    }
+}
+
 movimientoCTRL.modificar = async(req, res) => {
     const { id , tipoVenta } = req.params;
     try {
@@ -143,6 +194,6 @@ movimientoCTRL.modificar = async(req, res) => {
             msg: 'No se pudo modificar el movimiento, hable con el administrador'
         })
     }
-}
+};
 
 module.exports = movimientoCTRL;

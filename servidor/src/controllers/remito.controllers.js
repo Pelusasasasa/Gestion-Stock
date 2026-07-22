@@ -4,13 +4,17 @@ const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const { descontarStock } = require('../helpers/descontarStock');
+
 const Movimiento = require('../models/movProducto');
+const Producto = require('../models/producto');
 const Remito = require('../models/Remito');
+const ManoObra = require('../models/ManoObra');
 
 remitoCTRL.getAll = async (req, res) => {
   const { pasados } = req.query;
   try {
-    const remitos = await Remito.find({ pasado: pasados });
+    const remitos = await Remito.find({ pasado: pasados }).populate('vendedor', 'nombre');
+
 
     await Promise.all(
       remitos.map(async (remito, index) => {
@@ -155,5 +159,60 @@ remitoCTRL.patchObservaciones = async (req, res) => {
     });
   }
 };
+
+remitoCTRL.cargarRemitoManoObra = async(req, res) => {
+  try {
+    const {remito, movimientos} = req.body;
+    
+
+    const nuevoRemito = new Remito(remito);
+
+    const numeroActualizado = await actualizarNumero(remito.tipo_venta);
+    if (numeroActualizado.ok) {
+      nuevoRemito.numero = numeroActualizado.numero;
+    }
+
+    await nuevoRemito.save();
+
+
+    movimientos.forEach(async (mov) => {
+      const producto = await Producto.findOne({ _id: mov.codProd.toString() });
+
+      const manoObra = await ManoObra.findOneAndUpdate({ _id: mov.manoObra }, {activo: false, estado: 'Remitado'})
+
+      const nuevoMovimiento = new Movimiento({
+          fecha: nuevoRemito.fecha,
+          tipo_venta: 'RT',
+          cliente: nuevoRemito.idCliente,
+          nombreCliente: nuevoRemito.cliente,
+          marca: producto.marca,
+          codProd: mov.codProd,
+          producto: producto.descripcion,
+          rubro: producto.rubro,
+          cantidad: mov.cantidad,
+          iva: producto.impuesto,
+          precio: producto.precio,
+          nro_venta: nuevoRemito.numero,
+          tipo_comp: 'REMITO'
+      });
+
+      await nuevoMovimiento.save();
+    })
+
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Remito Cargado Correctamente'
+    })
+
+    
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error en el servidor'
+    })
+  }
+}
 
 module.exports = remitoCTRL;
