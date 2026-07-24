@@ -6,20 +6,27 @@ const Clientes = require("../models/Cliente");
 
 clienteCTRL.getsClientes = async (req, res) => {
   const { nombre } = req.params;
+  const { desactivado } = req.query;
+
+  
   let clientes;
   let texto = "";
+
+  const estaActvo = desactivado === 'false' ? false : true;
+
 
   texto = nombre.includes("*") ? nombre.substr(1) : nombre;
 
   try {
     if (nombre === "NADA") {
-      clientes = await Clientes.find().sort({ nombre: 1 }).limit(50);
+      clientes = await Clientes.find({activo: !estaActvo}).sort({ nombre: 1 }).limit(70);
     } else {
       const re = nombre.includes("*")
         ? new RegExp(`${texto}`)
         : new RegExp(`^${texto}`);
       clientes = await Clientes.find({
         nombre: { $regex: re, $options: "i" },
+        activo: !estaActvo
       }).sort({ nombre: 1 });
     }
 
@@ -189,6 +196,62 @@ clienteCTRL.eliminarCliente = async (req, res) => {
       ok: false,
       msg: "No se pudo eliminar el cliente, Hable con el administrador",
     });
+  }
+};
+
+clienteCTRL.desactivarCliente = async(req, res) => {
+  try {
+      const { id } = req.params;
+
+      const clienteDesactivado = await Clientes.findByIdAndUpdate(id, {activo: false}, {new: true});
+
+      if(!clienteDesactivado){
+        return res.status(400).json({
+          ok: false,
+          msg: 'Cliente no encontrado'
+        })
+      }
+
+      console.log('Cliente desactivado correctamente')
+      return res.status(200).json({
+        ok: true,
+        clienteDesactivado,
+        msg: 'Cliente desactivado correctamente'
+      })
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error al desactivar el cliente, hable con el administrador'
+      })
+  }
+};
+
+clienteCTRL.activarCliente = async(req, res) => {
+  try {
+      const { id } = req.params;
+
+      const clienteActivado = await Clientes.findByIdAndUpdate(id, {activo: true}, {new: true});
+
+      if(!clienteActivado){
+        return res.status(400).json({
+          ok: false,
+          msg: 'Cliente no encontrado'
+        })
+      }
+
+      console.log('Cliente activado correctamente')
+      return res.status(200).json({
+        ok: true,
+        clienteActivado,
+        msg: 'Cliente activado correctamente'
+      })
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        ok: false,
+        msg: 'Error al activar el cliente, hable con el administrador'
+      })
   }
 };
 
