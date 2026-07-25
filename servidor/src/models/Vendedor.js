@@ -12,6 +12,10 @@ const Vendedor = new Schema({
     permiso:{
         type:Number,
         default:2
+    },
+    activo: {
+        type: Boolean,
+        default: true
     }
 });
 

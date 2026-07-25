@@ -64,7 +64,7 @@ app.use('/gestion/pedidos', require('./routes/pedido'));
 
 app.use('/gestion/servicios', require('./routes/servicioTecnico.route'));
 
-app.use('/gestion/vendedores', require('./routes/vendedor'));
+app.use('/gestion/vendedores', require('./routes/vendedor.route'));
 
 //Caja
 app.use('/gestion/categoriaEvento', require('./routes/categoryEvento.routes'));

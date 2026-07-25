@@ -21,8 +21,13 @@ vendedorCTRL.post = async (req, res) => {
 };
 
 vendedorCTRL.getAll = async (req, res) => {
+
+  const { desactivados } = req.query;
+
+  const estaActivo = desactivados === 'false' ? true : false;
+
   try {
-    const vendedores = await Vendedor.find();
+    const vendedores = await Vendedor.find({activo: estaActivo});
     res.status(200).json({
       ok: true,
       vendedores,
@@ -76,6 +81,48 @@ vendedorCTRL.deleteForId = async (req, res) => {
     res.status(500).json({
       ok: false,
       msg: "Error al eliminar el vendedor, hable con el administrador",
+    });
+  }
+};
+
+vendedorCTRL.activar = async(req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const vendedor = await Vendedor.findByIdAndUpdate(id, { activo: true }, {
+      new: true,
+    });
+    console.log(`Vendedor ${vendedor.nombre} Desactivado`);
+    res.status(200).json({
+      ok: true,
+      msg: "Vendedor desactivado correctamente",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al desactivar el vendedor, hable con el administrador",
+    });
+  }
+};
+
+vendedorCTRL.desactivar = async(req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const vendedor = await Vendedor.findByIdAndUpdate(id, { activo: false }, {
+      new: true,
+    });
+    console.log(`Vendedor ${vendedor.nombre} Desactivado`);
+    res.status(200).json({
+      ok: true,
+      msg: "Vendedor desactivado correctamente",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al desactivar el vendedor, hable con el administrador",
     });
   }
 };

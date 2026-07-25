@@ -96,7 +96,19 @@ clienteCTRL.getClienteId = async (req, res) => {
 
 clienteCTRL.cargarCliente = async (req, res) => {
   try {
-    const cliente = new Clientes(req.body);
+
+    const { _id, nombre, cuit, telefono, direccion, localidad, email,condicionFacturacion, condicionIva, tipoCuenta, observaciones} = req.body;
+
+    if(!nombre)return res.status(400).json({
+      ok: false,
+      msg: 'El nombre del cliente es obligatorio'
+    })
+
+    const cliente = new Clientes({
+      _id: Number(_id),
+      nombre, cuit, telefono, direccion, localidad, email,
+      condicionFacturacion, condicionIva, tipoCuenta, observaciones
+    });
     await cliente.save();
 
     if (!cliente)
