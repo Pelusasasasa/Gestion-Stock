@@ -6,7 +6,7 @@ const Clientes = require("../models/Cliente");
 
 clienteCTRL.getsClientes = async (req, res) => {
   const { nombre } = req.params;
-  const { desactivado } = req.query;
+  const { desactivado = 'false' } = req.query;
 
   
   let clientes;

@@ -4,10 +4,12 @@ const Rubro = new mongoose.Schema({
     rubro:{
         type:String,
         required:true,
+        unique: true
     },
     numero:{
         type:Number,
-        require:true
+        require:true,
+        unique: true
     }
 });
 

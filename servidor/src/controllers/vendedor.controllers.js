@@ -22,7 +22,7 @@ vendedorCTRL.post = async (req, res) => {
 
 vendedorCTRL.getAll = async (req, res) => {
 
-  const { desactivados } = req.query;
+  const { desactivados = 'false' } = req.query;
 
   const estaActivo = desactivados === 'false' ? true : false;
 

@@ -3,17 +3,47 @@ const marcaCTRL = {};
 const Marca = require('../models/Marca');
 
 marcaCTRL.post = async(req, res) => {
-    const marca = new Marca(req.body);
+    try {
+        const marca = new Marca(req.body);
     
-    await marca.save();
+        await marca.save();
 
-    res.send(marca);
+        res.status(200).json({
+            ok: true,
+            msg: 'Marca cargada correctamente'
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error al cargar la marca'
+        })
+    }
 };
 
 marcaCTRL.getAll = async(req, res) => {
-    const marcas = await Marca.find();
+    try {
+        const { texto } = req.query;
+        let marcas;
+        if(texto){
+            const regex = new RegExp(texto, 'i');
+            marcas = await Marca.find({ nombre: regex });
+            console.log(marcas)
+        }else{
+            marcas = await Marca.find();
+        }
 
-    res.send(marcas);
+        res.status(200).json({
+            ok: true,
+            marcas
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error al obtener las marcas'
+        })
+    }
 };
 
 marcaCTRL.deleteForId = async(req, res) => {
