@@ -26,6 +26,8 @@ app.use('/gestion/caja', require('./routes/caja.routes'));
 
 app.use('/gestion/cuenta', require('./routes/cuenta'));
 
+app.use('/gestion/datos', require('./routes/datos.route'));
+
 app.use('/gestion/gastos', require('./routes/gasto'));
 
 app.use('/gestion/imprimir', require('./routes/imprimir.routes'));

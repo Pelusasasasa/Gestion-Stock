@@ -66,6 +66,10 @@ const Producto = new mongoose.Schema(
       type: String,
       default: "",
     },
+    activo: {
+      type: Boolean,
+      default: true
+    }
   },
   {
     timestamps: true,

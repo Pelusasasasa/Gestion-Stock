@@ -48,14 +48,21 @@ productoCTRL.descontarStock = async (req, res) => {
 productoCTRL.getsProductos = async (req, res) => {
   const { descripcion, condicion } = req.params;
 
+  const { desactivados = 'false' } = req.query;
+
+  const estaActivo = desactivados === 'false' ? true : false;
+
+  console.log(estaActivo)
+
   try{
     let productos;
   if (descripcion === 'textoVacio') {
-    productos = await Producto.find({}).limit(50);
+    productos = await Producto.find({activo: estaActivo}).limit(50);
   } else if (condicion === '_id') {
     const re = new RegExp(`^${descripcion}`);
     productos = await Producto.find({
       $or: [{ _id: { $regex: re, $options: 'i' } }, { codigoSecundario: { $regex: re, $options: 'i' } }],
+      activo: estaActivo,
     });
   } else {
     let re;
@@ -67,10 +74,11 @@ productoCTRL.getsProductos = async (req, res) => {
       }
       productos = await Producto.find({
         [condicion]: { $regex: re, $options: 'i' },
+        activo: estaActivo,
       }).limit(50);
     } catch (error) {
       re = descripcion;
-      productos = await Producto.find().limit(50);
+      productos = await Producto.find({activo: estaActivo}).limit(50);
     }
   }
 
@@ -362,6 +370,58 @@ productoCTRL.modificarVarios = async (req, res) => {
     res.status(500).json({
       ok: false,
       msg: 'Hable con el administrador',
+    });
+  }
+};
+
+
+productoCTRL.activar = async (req, res) => {
+  try{
+    const { codigo } = req.query;
+
+    const producto = await Producto.findByIdAndUpdate(String(codigo), {activo: true}, {new: true});
+
+    if(!producto) return res.status(404).json({
+      ok: false,
+      msg: 'Producto no encontrado',
+    });
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Producto activado correctamente',
+    });
+
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al desactivar el producto',
+    });
+  }
+};
+
+productoCTRL.desactivar = async (req, res) => {
+  try{
+    const { codigo } = req.query;
+
+
+    const producto = await Producto.findByIdAndUpdate(String(codigo), {activo: false}, {new: true});
+
+    if(!producto) return res.status(404).json({
+      ok: false,
+      msg: 'Producto no encontrado',
+    });
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Producto desactivado correctamente',
+    });
+
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al desactivar el producto',
     });
   }
 };

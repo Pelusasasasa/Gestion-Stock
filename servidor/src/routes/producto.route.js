@@ -22,9 +22,15 @@ const {
   modificarVarios,
   updateProducto,
   traerCostoImpuesto,
+  activar,
+  desactivar,
 } = require("../controllers/producto.controllers");
 
 router.route("/").post(cargarProducto).put(modificarVarios);
+
+router.route('/activar').patch(activar);
+router.route('/desactivar').patch(desactivar);
+
 router.route("/marcas").get(traerMarcas).put(putMarcas);
 router.route("/descontarStock/:id").put(descontarStock);
 router.route("/CambioDolar/:dolar").put(cambioPreciosPorDolar);
@@ -43,5 +49,6 @@ router
 router.route("/ultimosModificados/:fecha").get(traerModificados);
 router.route("/:descripcion/:condicion").get(getsProductos);
 router.route("/buscar/porNombre/:nombre").get(traerProductoPorNombre);
+
 
 module.exports = router;
