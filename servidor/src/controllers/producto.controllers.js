@@ -48,7 +48,8 @@ productoCTRL.descontarStock = async (req, res) => {
 productoCTRL.getsProductos = async (req, res) => {
   const { descripcion, condicion } = req.params;
 
-  let productos;
+  try{
+    let productos;
   if (descripcion === 'textoVacio') {
     productos = await Producto.find({}).limit(50);
   } else if (condicion === '_id') {
@@ -72,7 +73,25 @@ productoCTRL.getsProductos = async (req, res) => {
       productos = await Producto.find().limit(50);
     }
   }
-  res.send(productos);
+
+  if(!productos){
+    return res.status(404).json({
+      ok: false,
+      msg: 'No se encontraron productos',
+    })
+  }
+
+  res.status(200).json({
+    ok: true,
+    productos,
+  });
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al obtener los productos',
+    });
+  }
 };
 
 productoCTRL.traerPrecio = async (req, res) => {

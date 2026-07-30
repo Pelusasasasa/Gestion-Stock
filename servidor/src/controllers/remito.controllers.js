@@ -9,22 +9,46 @@ const Movimiento = require('../models/movProducto');
 const Producto = require('../models/producto');
 const Remito = require('../models/Remito');
 const ManoObra = require('../models/ManoObra');
+const Cliente = require('../models/Cliente');
+
+
 
 remitoCTRL.getAll = async (req, res) => {
-  const { pasados } = req.query;
+  const { texto = '', pasado = 'false' } = req.query;
+
   try {
-    const remitos = await Remito.find({ pasado: pasados }).populate('vendedor', 'nombre');
 
+    let remitos = [];
+    const estaPasado = pasado === 'false' ? false : true;
 
-    await Promise.all(
-      remitos.map(async (remito, index) => {
+    console.log({texto, pasado, estaPasado})
+
+    if(texto === ''){
+      remitos = await Remito.find({pasado: estaPasado}).populate('vendedor', 'nombre').limit(70)
+      
+    }else{
+
+      remitos = await Remito.find({
+        pasado: pasado,
+        $or: [
+          { cliente: { $regex: texto, $options: 'i' } },
+        ]
+      }).populate('vendedor', 'nombre')
+      .limit(70)
+    }
+
+    const datosClientes = await Cliente.find({ _id: { $in: remitos.map((remito) => remito.idCliente) } });
+
+    remitos = await Promise.all(
+      remitos.map(async (remito) => {
+        const cliente = datosClientes.find((cliente) => cliente._id.toString() === remito.idCliente?.toString());
         const movimientos = await Movimiento.find({
           tipo_venta: 'RT',
           nro_venta: remito.numero,
         });
 
-        remitos[index] = { ...remito.toObject(), movimientos };
-      }),
+        return { ...remito.toObject(), datosClientes: cliente, movimientos };
+      })
     );
 
     res.status(200).json({
@@ -38,7 +62,7 @@ remitoCTRL.getAll = async (req, res) => {
       msg: 'No se pudo obtener los remitos, hable con el administrador',
     });
   }
-};
+}
 
 remitoCTRL.getforid = async (req, res) => {
   const { id } = req.params;
