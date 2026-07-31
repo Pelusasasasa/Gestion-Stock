@@ -44,8 +44,12 @@ const filtrar = async () => {
     condicion = '_id';
   }
   const descripcion = buscador.value !== '' ? buscador.value : 'textoVacio';
-  const producto = (await axios.get(`${url}productos/${descripcion}/${condicion}`)).data;
-  producto.length !== 0 && listar(producto);
+  const { data } = await axios.get(`${url}productos/${descripcion}/${condicion}`);
+  if (!data.ok) {
+    console.log('error al obtener los productos')
+    return;
+  }
+  data.productos.length !== 0 && listar(data.productos);
 };
 
 const ingresarMovimiento = async (e) => {

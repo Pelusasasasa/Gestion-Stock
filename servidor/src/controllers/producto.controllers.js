@@ -52,8 +52,6 @@ productoCTRL.getsProductos = async (req, res) => {
 
   const estaActivo = desactivados === 'false' ? true : false;
 
-  console.log(estaActivo)
-
   try{
     let productos;
   if (descripcion === 'textoVacio') {
@@ -183,26 +181,25 @@ productoCTRL.updateProducto = async (req, res) => {
 
 productoCTRL.cargarProducto = async (req, res) => {
   let producto;
-  let mensaje;
-  let estado;
+  
 
   try {
     producto = new Producto(req.body);
     await producto.save();
-    mensaje = `Producto ${producto.descripcion} cargado`;
-    estado = true;
+
+    return res.status(200).json({
+      ok: true,
+      producto
+    })
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al cargar el producto'
+    })
   }
 
-  console.log(mensaje);
-
-  res.send(
-    JSON.stringify({
-      mensaje,
-      estado,
-    }),
-  );
+  
 };
 
 productoCTRL.eliminarProducto = async (req, res) => {
