@@ -47,7 +47,8 @@ const calcularCosto = (costo, impuesto, dolar) => {
 };
 
 const traerRubros = async () => {
-  const rubros = (await axios.get(`${url}rubro`)).data;
+  const { data } = (await axios.get(`${url}rubro`));
+  const rubros = data.rubros || [];
   for await (let { rubro, numero } of rubros) {
     const option = document.createElement('option');
     option.text = numero + '-' + rubro;
@@ -67,7 +68,8 @@ const traerProvedor = async () => {
 };
 
 const traerMarcas = async () => {
-  const marcas = (await axios.get(`${url}marca`)).data;
+  const { data } = (await axios.get(`${url}marca`));
+  const marcas = data.marcas || [];
   for await (let { nombre } of marcas) {
     const option = document.createElement('option');
     ((option.text = nombre), (option.value = nombre));
