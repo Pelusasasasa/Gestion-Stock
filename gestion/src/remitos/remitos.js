@@ -87,7 +87,7 @@ const dobleclickTbody = (e) => {
 };
 
 const filtrarRemitos = async (e) => {
-  const filtro = remitos.filter((elem) => elem.cliente.startsWith(buscador.value.toUpperCase()));
+  const filtro = await getRemitos(bandera, buscador.value.toUpperCase());
   listRem.innerHTML = '';
   listRem.appendChild(crearEncabezadoRem());
   for (let elem of filtro) {

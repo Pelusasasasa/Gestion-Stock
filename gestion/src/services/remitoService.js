@@ -17,9 +17,9 @@ const getRemitoById = async (id) => {
   }
 };
 
-const getRemitos = async (pasados = false) => {
+const getRemitos = async (pasado = false, texto = '') => {
   try {
-    const { data } = await axios.get(`${url}remitos`, { params: { pasados } });
+    const { data } = await axios.get(`${url}remitos`, { params: { pasado, texto } });
     if (data.ok) {
       return data.remitos;
     }
