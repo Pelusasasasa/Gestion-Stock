@@ -20,9 +20,8 @@ const Producto = new mongoose.Schema(
       trim: true,
     },
     marca: {
-      type: String,
-      default: "",
-      trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Marca"
     },
     rubro: {
       type: String,

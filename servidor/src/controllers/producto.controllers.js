@@ -2,7 +2,7 @@ const productoCTRL = {};
 
 const Producto = require('../models/producto');
 const Numero = require('../models/Numero');
-const { default: mongoose } = require('mongoose');
+const movProducto = require('../models/movProducto');
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
 
@@ -11,6 +11,26 @@ productoCTRL.descontarStock = async (req, res) => {
   const { stock, tipo, descripcion, vendedor, series } = req.body;
   try {
     const producto = await Producto.findByIdAndUpdate(id, { stock }, { new: true });
+
+    const nuevoMovimiento = {
+      fecha: new Date(),
+      tipo_venta: tipo,
+      cliente: '',
+      nombreCliente: '',
+      marca: producto.marca,
+      codProd: producto._id,
+      producto: producto.descripcion,
+      rubro: producto.rubro,
+      cantidad: stock,
+      iva: producto.impuesto,
+      precio: producto.precio,
+      nro_venta: 0,
+      tipo_comp: tipo
+    }
+
+    const nuevoMovimientoProducto = new movProducto(nuevoMovimiento);
+
+    await nuevoMovimientoProducto.save();
 
     const movimientoVendedor = await crearMovimientoVendedores(
       tipo === 'resta' ? `Resto el stock a ${stock} del producto ${descripcion}}` : `Sumo el stock a ${stock} del producto ${descripcion}`,
@@ -24,7 +44,6 @@ productoCTRL.descontarStock = async (req, res) => {
       });
 
     const movimientoSeries = await crearNumeroSeries(series);
-    console.log(movimientoSeries);
 
     if (!movimientoSeries)
       return res.status(404).json({
@@ -55,13 +74,13 @@ productoCTRL.getsProductos = async (req, res) => {
   try{
     let productos;
   if (descripcion === 'textoVacio') {
-    productos = await Producto.find({activo: estaActivo}).limit(50);
+    productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(50);
   } else if (condicion === '_id') {
     const re = new RegExp(`^${descripcion}`);
     productos = await Producto.find({
       $or: [{ _id: { $regex: re, $options: 'i' } }, { codigoSecundario: { $regex: re, $options: 'i' } }],
       activo: estaActivo,
-    });
+    }).populate('marca', ['nombre']);
   } else {
     let re;
     try {
@@ -73,10 +92,10 @@ productoCTRL.getsProductos = async (req, res) => {
       productos = await Producto.find({
         [condicion]: { $regex: re, $options: 'i' },
         activo: estaActivo,
-      }).limit(50);
+      }).populate('marca', ['nombre']).limit(50);
     } catch (error) {
       re = descripcion;
-      productos = await Producto.find({activo: estaActivo}).limit(50);
+      productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(50);
     }
   }
 

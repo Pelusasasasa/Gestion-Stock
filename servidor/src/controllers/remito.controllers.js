@@ -21,7 +21,6 @@ remitoCTRL.getAll = async (req, res) => {
     let remitos = [];
     const estaPasado = pasado === 'false' ? false : true;
 
-    console.log({texto, pasado, estaPasado})
 
     if(texto === ''){
       remitos = await Remito.find({pasado: estaPasado}).populate('vendedor', 'nombre').limit(70)
