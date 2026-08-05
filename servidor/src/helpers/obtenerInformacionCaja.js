@@ -48,7 +48,7 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
       );
     });
 
-    console.log(recibos);
+    
     res.status(200).json({
       ok: true,
       ventas: ventas,
@@ -117,7 +117,7 @@ exports.traerInformacionCajaDelMes = async (req, res) => {
       );
     });
 
-    console.log(recibos);
+    
 
     res.status(200).json({
       ok: true,
