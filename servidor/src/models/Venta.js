@@ -96,7 +96,11 @@ const Venta = new Schema({
     cantIva:{
         type:Number,
         default:0
-    }
+    },
+    activo: {
+        type: Boolean,
+        default: true,
+    },
 
 });
 

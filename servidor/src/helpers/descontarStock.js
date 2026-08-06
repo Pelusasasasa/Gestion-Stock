@@ -25,7 +25,7 @@ exports.descontarStock = async (lista, vendedorId = '', numero = '') => {
           const serie = new NroSerie({
             codigo: producto._id,
             producto: producto.descripcion,
-            marca: producto.marca._id || undefined,
+            marca: producto?.marca?._id || undefined,
             nro_serie: elem || ' ',
             provedor: 'Venta',
             factura: numero.toString(),

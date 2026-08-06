@@ -47,6 +47,10 @@ const Recibo = new Schema({
     type: Number,
     default: 0,
   },
+  activo: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 module.exports = model('Recibo', Recibo);

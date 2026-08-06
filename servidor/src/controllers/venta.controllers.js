@@ -134,7 +134,6 @@ ventaCTRL.VentasDia = async (req, res) => {
       $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
     }).populate('vendedor', 'nombre');
 
-    
 
     res.send(ventas);
   } catch (error) {

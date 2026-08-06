@@ -1,4 +1,4 @@
-const Gasto = require("../models/Gasto");
+const Presupuesto = require("../models/Presupuesto");
 const Recibo = require("../models/Recibo");
 const Venta = require("../models/Venta");
 const Movimiento = require("../models/movProducto");
@@ -6,25 +6,32 @@ const MovRecibo = require("../models/MovRecibos");
 
 exports.traerInformacionCajaDelDia = async (req, res) => {
   const { desde, hasta } = req.params;
+
+  const { desactivados = 'false'} = req.query;
+
+  const estaActivo = desactivados === 'false' ? true : false;
+
   try {
     const fechaBase = new Date(`${desde}T00:00:00-03:00`);
     const fechaFin = new Date(`${hasta}T23:59:59-03:00`);
 
     const ventas = await Venta.find({
-      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }, { activo: estaActivo }],
     })
       .populate("vendedor", "nombre")
       .lean();
 
     const recibos = await Recibo.find({
-      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }, { activo: estaActivo }],
     })
       .populate("vendedor", "nombre")
       .lean();
 
-    const gastos = await Gasto.find({
-      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
-    });
+    const presupuestos = await Presupuesto.find({
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }, { activo: estaActivo }],
+    }).populate("vendedor", "nombre").lean();
+
+    
 
     // Buscar movimientos del día una sola vez
     const movimientos = await Movimiento.find({
@@ -32,6 +39,10 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
     }).lean();
 
     const movRecibos = await MovRecibo.find({
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
+    }).lean();
+
+    const movPresupuestos = await Movimiento.find({
       $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     }).lean();
 
@@ -48,12 +59,18 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
       );
     });
 
+    presupuestos.forEach((presupuesto) => {
+      presupuesto.movimientos = movPresupuestos.filter(
+        (mov) => mov.numeroPresupuesto == presupuesto.numero
+      );
+    });
+
     
     res.status(200).json({
       ok: true,
       ventas: ventas,
       recibos: recibos,
-      gastos: gastos,
+      presupuestos: presupuestos
     });
   } catch (error) {
     console.error("Error al traer la información de la caja del día:", error);
