@@ -8,10 +8,14 @@ exports.descontarStock = async (lista, vendedorId = '', numero = '') => {
     try {
       if (!producto?._id) continue;
 
-      const productoActualizado = await Producto.findById(producto._id);
-      productoActualizado.stock -= cantidad;
-      productoActualizado.utilidad = producto.utilidad ?? 0;
-      await productoActualizado.save();
+      await Producto.findByIdAndUpdate(
+        producto._id,
+        {
+          $inc: { stock: -cantidad },
+          $set: { utilidad: producto.utilidad ?? 0 },
+        },
+        { runValidators: true }
+      );
 
       const vendedor = await Vendedor.findById(vendedorId);
 
@@ -21,7 +25,7 @@ exports.descontarStock = async (lista, vendedorId = '', numero = '') => {
           const serie = new NroSerie({
             codigo: producto._id,
             producto: producto.descripcion,
-            marca: producto.marca,
+            marca: producto.marca._id || undefined,
             nro_serie: elem || ' ',
             provedor: 'Venta',
             factura: numero.toString(),

@@ -16,8 +16,8 @@ const NroSerie = new Schema({
         set: value => value.toUpperCase() // Convertir a mayúsculas
     },
     marca:{
-        type:String,
-        set: value => value.toUpperCase() // Convertir a mayúsculas
+        type: Schema.Types.ObjectId,
+        ref: 'Marca',
     },
     nro_serie:{
         type: String,
