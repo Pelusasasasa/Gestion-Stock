@@ -130,12 +130,12 @@ productoCTRL.traerProducto = async (req, res) => {
   const { id } = req.params;
   let producto = [];
   if (id === 'rubro') {
-    rubros = await Producto.find({}, { rubro: 1, _id: 0 });
+    rubros = await Producto.find({}, { rubro: 1, _id: 0 }).populate('marca', {nombre: 1});
     rubros.forEach((rubro) => {
       producto.push(rubro.rubro);
     });
   } else {
-    producto = await Producto.findOne({ _id: id });
+    producto = await Producto.findOne({ _id: id }).populate('marca', {nombre: 1});
   }
   res.send(producto);
 };

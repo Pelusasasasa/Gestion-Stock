@@ -158,7 +158,7 @@ const cargarRemito = async () => {
             descripcion: elem.producto,
             precio: elem.precio,
             precioAux: elem.precio,
-            marca: elem.marca,
+            marca: elem?.marca ? elem.marca : '',
             impuesto: elem.iva,
           };
         }
@@ -283,13 +283,13 @@ const listarProducto = async (producto, cant = 1, series = []) => {
 
       idProducto++;
       producto.idTabla = `${idProducto}`;
-
+      
       tbody.innerHTML += `
                 <tr id=${producto.idTabla}>
                     <td>${codBarra.value}</td>
                     <td>${cantidad.value}</td>
                     <td>${producto.descripcion?.slice(0, 50).toUpperCase()}</td>
-                    <td>${producto.marca}</td>
+                    <td>${producto?.marca?.nombre ?? ''}</td>
                     <td>${producto.impuesto.toFixed(2)}</td>
                     <td>${parseFloat(precioU.value).toFixed(2)}</td>
                     <td>${redondear(parseFloat(precioU.value) * parseFloat(cantidad.value), 2)}</td>

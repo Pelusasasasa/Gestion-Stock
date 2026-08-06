@@ -17,7 +17,7 @@ const crearHTML = async (elem) => {
   tdCodigo.innerText = elem.codProd;
   tdCantidad.innerText = elem.cantidad;
   tdDescripcion.innerText = elem.producto;
-  tdMarca.innerText = elem.marca;
+  tdMarca.innerText = elem?.marca ? elem.marca : '';
   tdIva.innerText = elem.iva;
   tdPrecio.innerText = elem.precio;
   tdTotal.innerText = redondear(elem.precio * elem.cantidad, 2);

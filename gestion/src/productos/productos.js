@@ -92,29 +92,18 @@ const listar = (productos) => {
     const tdStock = document.createElement('td');
     const tdRubro = document.createElement('td');
     const tdMarca = document.createElement('td');
-    const tdAcciones = document.createElement('td');
 
     tdPrecio.classList.add('text-rigth');
     tdStock.classList.add('text-rigth');
-    tdAcciones.classList.add('acciones');
+
 
     tdId.innerHTML = _id;
     tdDescripcion.innerHTML = descripcion.slice(0, 80);
     tdPrecio.innerHTML = redondear(precio, 2);
     tdStock.innerHTML = redondear(stock, 2);
-    tdMarca.innerHTML = marca;
+    tdMarca.innerHTML = marca?.nombre ?? '';
     tdRubro.innerText = rubro;
-    tdAcciones.innerHTML = `
-            <div id=edit class=tool>
-                <span id=visibility class=material-icons-outlined title='Historial Mov'>visibility</span>
-            </div>
-            <div id=edit class=tool>
-                <span id=edit title='Modificar' class=material-icons-outlined>edit</span>
-            </div>
-            <div id=delete class="tool ${permiso !== 0 && 'none'}">
-                <span id=delete title='Eliminar' class=material-icons-outlined>delete</span>
-            </div>
-        `;
+    
 
     tr.appendChild(tdId);
     tr.appendChild(tdDescripcion);
@@ -122,7 +111,6 @@ const listar = (productos) => {
     tr.appendChild(tdStock);
     tr.appendChild(tdMarca);
     tr.appendChild(tdRubro);
-    tr.appendChild(tdAcciones);
 
     tbody.appendChild(tr);
   }
