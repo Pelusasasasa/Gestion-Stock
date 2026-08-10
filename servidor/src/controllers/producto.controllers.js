@@ -157,10 +157,10 @@ productoCTRL.modificarProducto = async (req, res) => {
   req.body.ultimaModificacion = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
   try {
     producto = await Producto.findOneAndUpdate({ _id: id }, req.body);
-    mensaje = `Producto ${producto.descripcion} Modificado`;
+    mensaje = `Producto ${producto?.descripcion} Modificado`;
     estado = true;
   } catch (error) {
-    mensaje = `Producto ${producto.descripcion} No se modifico`;
+    mensaje = `Producto ${producto?.descripcion} No se modifico`;
     estado = false;
   }
   res.send(

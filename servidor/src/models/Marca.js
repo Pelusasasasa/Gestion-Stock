@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 
 const Marca = new Schema({
     codigo: {
@@ -15,4 +15,4 @@ const Marca = new Schema({
 });
 
 
-module.exports = model('Marca',Marca);
+module.exports = mongoose.models.Marca || model('Marca', Marca);

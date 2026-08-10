@@ -14,26 +14,28 @@ const Cliente = require('../models/Cliente');
 
 
 remitoCTRL.getAll = async (req, res) => {
-  const { texto = '', pasado = 'false' } = req.query;
+  const { texto = '', pasado = 'false', activo = 'true' } = req.query;
 
   try {
 
     let remitos = [];
     const estaPasado = pasado === 'false' ? false : true;
+    const estaActivo = activo === 'false' ? false : true;
 
 
     if(texto === ''){
-      remitos = await Remito.find({pasado: estaPasado}).populate('vendedor', 'nombre').limit(70)
+      remitos = await Remito.find({pasado: estaPasado, activo: estaActivo}).populate('vendedor', 'nombre')
       
     }else{
 
       remitos = await Remito.find({
-        pasado: pasado,
+        pasado: estaPasado,
+        activo: estaActivo,
         $or: [
           { cliente: { $regex: texto, $options: 'i' } },
         ]
       }).populate('vendedor', 'nombre')
-      .limit(70)
+      
     }
 
     const datosClientes = await Cliente.find({ _id: { $in: remitos.map((remito) => remito.idCliente) } });
