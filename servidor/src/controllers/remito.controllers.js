@@ -24,12 +24,12 @@ remitoCTRL.getAll = async (req, res) => {
 
 
     if(texto === ''){
-      remitos = await Remito.find({pasado: estaPasado, activo: estaActivo}).populate('vendedor', 'nombre')
+      remitos = await Remito.find({pasado: false, activo: estaActivo}).populate('vendedor', 'nombre')
       
     }else{
 
       remitos = await Remito.find({
-        pasado: estaPasado,
+        pasado: flase,
         activo: estaActivo,
         $or: [
           { cliente: { $regex: texto, $options: 'i' } },
