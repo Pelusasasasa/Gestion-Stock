@@ -20,7 +20,7 @@ app.use('/gestion/updates', express.static(path.join(__dirname, 'caja-updates'))
 //routes
 app.use('/gestion/clientes', require('./routes/cliente.route'));
 
-app.use('/gestion/compensada', require('./routes/compensada'));
+app.use('/gestion/compensada', require('./routes/compensada.route'));
 
 app.use('/gestion/caja', require('./routes/caja.routes'));
 

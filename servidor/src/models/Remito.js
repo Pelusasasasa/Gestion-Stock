@@ -49,6 +49,10 @@ const Remito = new Schema({
     pasado: {
         type: Boolean,
         default: false
+    },
+    activo: {
+        type: Boolean,
+        default: true
     }
 
 });
