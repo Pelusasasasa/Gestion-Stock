@@ -2,8 +2,10 @@ const compensadaCTRL = {};
 
 const {
   agregarIngormacionCompensadas,
+  agregarInformacionHistoricas,
 } = require("../helpers/agregarIngormacionCompensadas");
 const CuentaCompensada = require("../models/cuentaCorrComp");
+const CuentaHistorica = require('../models/cuentaCorrHisto');
 
 compensadaCTRL.crearCompensda = async (req, res) => {
   const ultimaCompensada = await CuentaCompensada.find({}, { _id: 1 });
@@ -32,12 +34,20 @@ compensadaCTRL.traerPorCliente = async (req, res) => {
       $and: [{ idCliente: id }, { saldo: { $not: { $eq: 0 } } }],
     });
 
+    const historicas = await CuentaHistorica.find({
+      $and: [{idCliente: id}]
+    });
+    
+
     const compensadasConInformacion = await agregarIngormacionCompensadas(
       compensadas
     );
 
+    const historicasConInformacion = await agregarInformacionHistoricas(historicas);
+
     res.status(200).json({
       ok: true,
+      historicas: historicasConInformacion,
       compensadas: compensadasConInformacion,
     });
   } catch (error) {

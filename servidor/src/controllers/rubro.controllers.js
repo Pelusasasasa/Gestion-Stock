@@ -48,7 +48,7 @@ rubroCTRL.postRubro = async(req,res)=>{
 
 
       if(rubroRepetido){
-        console.log("a")
+        
         return res.status(400).json({
           ok: false,
           msg: 'El rubro ya existe'

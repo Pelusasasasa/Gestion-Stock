@@ -130,7 +130,7 @@ remitoCTRL.postOne = async (req, res) => {
 
 remitoCTRL.putPasado = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  
   try {
     const remito = await Remito.findOneAndUpdate(
       { _id: id },
@@ -141,7 +141,6 @@ remitoCTRL.putPasado = async (req, res) => {
       },
     );
 
-    console.log(remito);
     if (!remito)
       return res.status(400).json({
         ok: false,

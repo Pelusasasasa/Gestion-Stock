@@ -2,7 +2,10 @@ const productoCTRL = {};
 
 const Producto = require('../models/producto');
 const Numero = require('../models/Numero');
+const Marca = require('../models/Marca');
 const movProducto = require('../models/movProducto');
+
+
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
 
@@ -70,6 +73,8 @@ productoCTRL.getsProductos = async (req, res) => {
   const { desactivados = 'false' } = req.query;
 
   const estaActivo = desactivados === 'false' ? true : false;
+  
+  
 
   try{
     let productos;
@@ -81,6 +86,17 @@ productoCTRL.getsProductos = async (req, res) => {
       $or: [{ _id: { $regex: re, $options: 'i' } }, { codigoSecundario: { $regex: re, $options: 'i' } }],
       activo: estaActivo,
     }).populate('marca', ['nombre']);
+  } else if(condicion === 'marca'){
+    const marcasCoincidentes = await Marca.find({
+      nombre: {$regex: descripcion, $options: 'i'}
+    });
+
+    const marcaIds = marcasCoincidentes.map(m => m._id);
+
+    productos = await Producto.find({
+      marca: { $in: marcaIds},
+      activo: estaActivo
+    }).populate('marca', ['nombre']).limit(50);
   } else {
     let re;
     try {
@@ -122,7 +138,7 @@ productoCTRL.getsProductos = async (req, res) => {
 productoCTRL.traerPrecio = async (req, res) => {
   const { id } = req.params;
   const producto = (await Producto.find({ _id: id }, { precio: 1, _id: 0 }))[0];
-  console.log(producto);
+  
   res.send(`${producto.precio}`);
 };
 
@@ -142,7 +158,7 @@ productoCTRL.traerProducto = async (req, res) => {
 
 productoCTRL.traerProductoPorNombre = async (req, res) => {
   const { nombre } = req.params;
-  console.log(nombre)
+  
   const producto = await Producto.findOne({ descripcion: nombre });
   res.send(producto);
 };

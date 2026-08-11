@@ -13,7 +13,7 @@ const Retencion = new Schema({
         type: String,
         required: true,
         trim: true,
-        enum: ['Retenciones Imp a las Ganancias', 'Retencones IIBB - ATER Contribuyente']
+        
     },
     nro_comp: {
         type: String,

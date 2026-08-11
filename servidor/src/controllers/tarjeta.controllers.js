@@ -68,11 +68,11 @@ tarjetaCTRL.getAll = async (req, res) => {
     query.$or = or;
   }
 
-  console.log(query);
+  
 
   try {
     const tarjetas = await Tarjeta.find(query).populate('tarjeta');
-    console.log(tarjetas);
+    
 
     res.status(200).json({
       ok: true,

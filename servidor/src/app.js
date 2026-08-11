@@ -52,7 +52,7 @@ app.use('/gestion/presupuesto', require('./routes/presupuesto.route'));
 
 app.use('/gestion/productos', require('./routes/producto.route'));
 
-app.use('/gestion/recibo', require('./routes/recibo'));
+app.use('/gestion/recibo', require('./routes/recibo.route'));
 
 app.use('/gestion/remitos', require('./routes/remito.route'));
 

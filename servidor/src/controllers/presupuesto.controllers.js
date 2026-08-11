@@ -74,15 +74,13 @@ presupuestoCTRL.getForNumber = async (req, res) => {
 
 presupuestoCTRL.getForDay = async (req, res) => {
   const { day } = req.params;
-  console.log(day);
+  
   let inicioDia = new Date(day + "T00:00:00.000Z");
   let finDia = new Date(day + "T23:59:59.000Z");
 
   const presupuestos = await Presupuesto.find({
     $and: [{ fecha: { $gte: inicioDia } }, { fecha: { $lte: finDia } }],
   }).populate("vendedor", "nombre");
-
-  console.log(presupuestos);
 
   res.send(presupuestos);
 };

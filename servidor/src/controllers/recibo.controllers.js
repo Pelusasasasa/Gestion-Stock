@@ -9,6 +9,9 @@ const Cheque = require('../models/Cheque');
 const Recibo = require('../models/Recibo');
 const Retencion = require('../models/Retencion');
 const Tarjeta = require('../models/Tarjeta');
+const MetodoPago = require('../models/MetodoPago');
+const Compensada = require('../models/cuentaCorrComp')
+const Historica = require("../models/cuentaCorrHisto");
 
 reciboCTRL.cargarRecibo = async (req, res) => {
   try {
@@ -68,6 +71,114 @@ reciboCTRL.cargarRecibo = async (req, res) => {
     });
   }
 };
+
+reciboCTRL.realizarRecibo = async (req, res) => {
+  try {
+    const { fecha, cliente, idCliente, precio, tipo_comp, tipo_venta, valorRecibido = 'EFECTIVO', vendedor  } = req.body;
+    const { retenciones, metodoPagos, compensadas} = req.query;
+
+    // 1. Actualizamos el numero
+    const numero = await actualizarNumero(tipo_venta);
+    if (!numero.ok) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al actualizar el numero del recibo',
+      });
+    }    
+    req.body.numero = numero.numero;
+
+    // 2. Cargamos el Recibo
+    const recibo = new Recibo({
+      fecha, cliente, idCliente, precio, tipo_comp, tipo_venta, 
+      valorRecibido, numero: req.body.numero, vendedor
+    });
+
+    await recibo.save();
+
+    //3. Cargamos la retencion si existe
+    if(retenciones){
+      for(let i = 0; i < retenciones.length; i++){
+        const retencionAux = retenciones[i];
+        retencionAux.fecha = recibo.fecha;
+        retencionAux.reciboId = recibo._id;
+        retencionAux.nro_comp = recibo.numero;
+        const retencion = new Retencion(retencionAux);
+        await retencion.save();
+      }
+    }
+
+    // 4. Cargamos los metodos de pago
+    if(metodoPagos){
+      for(let i = 0; i < metodoPagos.length; i++){
+        const metodoPagoAux = metodoPagos[i];
+        metodoPagoAux.fecha = recibo.fecha;
+        metodoPagoAux.comprobanteId = recibo._id;
+        metodoPagoAux.tipoComprobante = recibo.tipo_comp;
+        metodoPagoAux.nro_comp = recibo.numero;
+        
+        const metodoPago = new MetodoPago(metodoPagoAux);
+        await metodoPago.save();
+      }
+    }
+
+    // 5. Modificamos las compensadas
+    for(let i = 0; i < compensadas.length; i++){
+      const item = compensadas[i];
+      await Compensada.findByIdAndUpdate(item._id, {
+        pagado: item.pagado,
+        saldo: item.saldo,
+      });
+    }
+
+    // 6. Actualizamos el saldo del cliente
+    const saldoModificado = await cambiarSaldoCliente(recibo.idCliente, recibo.precio, true);
+    if (!saldoModificado.ok) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al modificar el saldo del cliente',
+      });
+    }
+
+    // 7. Creamos la historica
+      const historica = new Historica({
+        fecha: recibo.fecha,
+        cliente: recibo.cliente,
+        idCliente: recibo.idCliente,
+        nro_venta: recibo.numero,
+        tipo_comp: recibo.tipo_comp,
+        debe: 0,
+        haber: recibo.precio,
+        saldo: saldoModificado.cliente.saldo,
+        condicion: recibo.valorRecibido,
+        observaciones: '',
+      });
+      await historica.save();
+
+      // 8.Cargamos mov Recibos
+      const movsRecibos = await cargarMovsRecibos(compensadas, numero.numero);
+      if (!movsRecibos.ok) {
+        return res.status(400).json({
+          ok: false,
+          msg: 'Error al cargar los movimientos de los recibos',
+        });
+      }
+      
+      ;
+      return res.status(201).json({
+        ok: true,
+        recibo,
+        saldoModificado: saldoModificado.cliente,
+        historica,
+        movsRecibos
+      })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'No se pudo realizar el recibo, hable con el administrador',
+    });
+  }
+}
 
 reciboCTRL.recibosDia = async (req, res) => {
   const { fecha } = req.params;

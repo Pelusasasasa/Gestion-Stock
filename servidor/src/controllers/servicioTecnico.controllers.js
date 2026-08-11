@@ -122,7 +122,7 @@ servicioCTRL.traerPorId = async (req, res) => {
 servicioCTRL.modificarPorId = async (req, res) => {
   const { id } = req.params;
   const { servicio, equipos, vendedor } = req.body;
-  console.log(servicio.historial);
+  
   servicio.historial = cargarHstorial(servicio);
   try {
     const servicioTraido = await Servicio.findByIdAndUpdate(id, servicio, {
