@@ -161,10 +161,27 @@ reciboCTRL.realizarRecibo = async (req, res) => {
     // 5. Modificamos las compensadas
     for(let i = 0; i < compensadas.length; i++){
       const item = compensadas[i];
-      await Compensada.findByIdAndUpdate(item._id, {
-        pagado: item.pagado,
-        saldo: item.saldo,
-      });
+      if (item.importe < 0 || item.tipo_comp === 'NC' || typeof item._id === 'string' && item._id.startsWith('saldo_favor_')) {
+        const nuevaCompensadaAkit = new Compensada({
+          fecha: recibo.fecha,
+          idCliente: recibo.idCliente,
+          cliente: recibo.cliente,
+          tipo_comp: item.tipo_comp || 'NC',
+          nro_venta: recibo.numero,
+          importe: item.importe,
+          pagado: 0,
+          saldo: item.saldo,
+          comprobanteId: recibo._id
+        });
+        console.log('NUEVA COMPENSADA AGREGADA A LA BASE DE DATOS', nuevaCompensadaAkit)
+        await nuevaCompensadaAkit.save();
+        compensadas[i] = nuevaCompensadaAkit;
+      } else {
+        await Compensada.findByIdAndUpdate(item._id, {
+          pagado: item.pagado,
+          saldo: item.saldo,
+        });
+      }
     }
 
     // 6. Actualizamos el saldo del cliente
