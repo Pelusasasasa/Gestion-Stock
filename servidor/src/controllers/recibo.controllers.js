@@ -108,6 +108,7 @@ reciboCTRL.realizarRecibo = async (req, res) => {
     }
 
     // 4. Cargamos los metodos de pago
+    console.log(metodoPagos)
     if(metodoPagos){
       for(let i = 0; i < metodoPagos.length; i++){
         const metodoPagoAux = metodoPagos[i];
@@ -118,6 +119,21 @@ reciboCTRL.realizarRecibo = async (req, res) => {
         
         const metodoPago = new MetodoPago(metodoPagoAux);
         await metodoPago.save();
+
+        if(metodoPago.tipo === 'tarjeta'){
+          console.log(metodoPago)
+          const tarjeta = new Tarjeta({
+            fecha: recibo.fecha,
+            nombre: metodoPagoAux.cliente,
+            importe: metodoPago.monto,
+            tarjeta: metodoPagoAux.tarjeta,
+            tipo: metodoPago.tipoComprobante,
+            vendedor: vendedor,
+            comprobanteId: recibo._id,
+            tipoComprobante: recibo.tipo_comp
+          })
+          await tarjeta.save();
+        }
       }
     }
 

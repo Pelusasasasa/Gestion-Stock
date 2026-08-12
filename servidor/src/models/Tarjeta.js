@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 
 const Tarjeta = new Schema({
@@ -27,18 +27,20 @@ const Tarjeta = new Schema({
         set: value => value.toUpperCase()
     },
     vendedor: {
-        type: String,
-        // required: true,
-        set: value => value.toUpperCase()
-    },
-    pc: {
-        type: String,
-        default: ''
+        type: Schema.Types.ObjectId,
+        ref: 'Vendedor'
     },
     comprobanteId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Recibo'
-    }
+            type: Types.ObjectId,
+            required: true,
+            refPath: 'tipoComprobante'
+        },
+        tipoComprobante: {
+            type: String,
+            required: true,
+            enum: ['Recibo', 'Presupuesto', 'Venta'],
+            default: 'Recibo'
+        }
 });
 
 module.exports = model('Tarjeta', Tarjeta);
