@@ -35,12 +35,12 @@ const Tarjeta = new Schema({
             required: true,
             refPath: 'tipoComprobante'
         },
-        tipoComprobante: {
+    tipoComprobante: {
             type: String,
             required: true,
             enum: ['Recibo', 'Presupuesto', 'Venta'],
             default: 'Recibo'
-        }
+    }
 });
 
 module.exports = model('Tarjeta', Tarjeta);

@@ -3,6 +3,7 @@ const Recibo = require("../models/Recibo");
 const Venta = require("../models/Venta");
 const Movimiento = require("../models/movProducto");
 const MovRecibo = require("../models/MovRecibos");
+const MetodoPago = require('../models/MetodoPago');
 
 exports.traerInformacionCajaDelDia = async (req, res) => {
   const { desde, hasta } = req.params;
@@ -26,11 +27,15 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
     })
       .populate("vendedor", "nombre")
       .lean();
-
-    const presupuestos = await Presupuesto.find({
-      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }, { activo: estaActivo }],
-    }).populate("vendedor", "nombre").lean();
-
+      
+      const presupuestos = await Presupuesto.find({
+        $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }, { activo: estaActivo }],
+      }).populate("vendedor", "nombre").lean();
+      
+      // Traer MetodoPagos de recibos
+      const metodoPagos = await MetodoPago.find({
+        $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
+      }).lean()
     
 
     // Buscar movimientos del día una sola vez
@@ -56,6 +61,10 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
     recibos.forEach((recibo) => {
       recibo.movimientos = movRecibos.filter(
         (mov) => mov.numeroRecibo == recibo.numero
+      );
+
+      recibo.metodoPago = metodoPagos.filter(
+        (metodo) => metodo.nro_comp == recibo.numero
       );
     });
 

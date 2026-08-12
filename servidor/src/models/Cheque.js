@@ -54,14 +54,8 @@ const Cheque = new Schema({
         type: String,
     },
     vendedor: {
-        type: String,
-        trim: true,
-        default: ""
-    },
-    pc: {
-        type: String,
-        trim: true,
-        default: ""
+        type: Schema.Types.ObjectId,
+        ref: 'Usuario'
     },
     observacion: {
         type: String,
@@ -69,7 +63,15 @@ const Cheque = new Schema({
         default: ''
     },
     comprobanteId: {
-        type: Types.ObjectId
+            type: Types.ObjectId,
+            required: true,
+            refPath: 'tipoComprobante'
+        },
+    tipoComprobante: {
+        type: String,
+        required: true,
+        enum: ['Recibo', 'Presupuesto', 'Venta'],
+        default: 'Recibo'
     }
 });
 
