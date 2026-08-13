@@ -1,6 +1,11 @@
 const ventaCTRL = {};
 
 const Venta = require('../models/Venta');
+const Producto = require('../models/producto');
+const Movimiento = require('../models/movProducto');
+const CuentaCorriente = require('../models/cuentaCorrComp');
+const CuentaHistorica = require('../models/cuentaCorrHisto');
+
 const funcion = require('../assets/js/pdf');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
 const { actualizarNumero } = require('../helpers/actualizarNumero');
@@ -9,6 +14,8 @@ const { crearMovimientosStock } = require('../helpers/crearMovimientosStock');
 const { crearCompensada } = require('../helpers/crearCompensada');
 const { crearHistorica } = require('../helpers/crearHistorica');
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
+const { cargarMetodosPago } = require('../helpers/MetodoPago/cargarMetodosPagos');
+
 
 ventaCTRL.getForId = async (req, res) => {
   const { id, tipoVenta } = req.params;
@@ -121,6 +128,135 @@ ventaCTRL.cargarVenta = async (req, res) => {
     });
   }
 };
+
+ventaCTRL.realizarVenta = async(req, res) => {
+  try {
+    const { venta } = req.body;
+    const { metodosPagos, productos, facturado} = req.query
+
+    console.log("a")
+
+    //1. Facturar si factura = true
+
+    //2. Actualizar Numero
+    const numero = await actualizarNumero(venta.tipo_venta);
+    if(!numero.ok)
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al actualizar el numero, pero si se facturo',
+      });
+
+    venta.numero = numero.numero;
+
+
+    //3. Cargar Venta
+    const ventaCargada = new Venta(venta);
+    await ventaCargada.save();
+
+    if(!ventaCargada)
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al cargar la venta, pero si se facturo y se actualizo el numero',
+      });
+
+
+      
+      
+    for(let i = 0; i < productos.length; i++){
+          if (!productos[i]._id) continue;
+          
+          //4. Descontar Stock Si no es presupuesto
+          if(venta.tipo_venta !== 'PP'){    
+            const producto = await Producto.findByIdAndUpdate(
+              productos[i]._id,
+              {
+                $inc: { stock: -productos[i].cantidad }
+              },
+              { runValidators: true }
+            );
+
+            if(!producto)
+              return res.status(400).json({
+                ok: false,
+                msg: 'Error al descontar el stock, pero si se facturo y se actualizo el numero',
+              });
+          }
+        
+          //5. Cargar Movimiento de producto
+        const movimiento = new Movimiento({
+          fecha: ventaCargada.fecha,
+          tipo_venta: ventaCargada.tipo_venta,
+          cliente: ventaCargada.idCliente,
+          nombreCliente: ventaCargada.cliente,
+          marca: productos[i].marca,
+          codProd: productos[i].codigo,
+          producto: productos[i].nombre,
+          rubro: productos[i].rubro,
+          cantidad: productos[i].cantidad,
+          iva: productos[i].impuesto,
+          precio: productos[i].precio,
+          nro_venta: ventaCargada.numero,
+          tipo_comp: ventaCargada.tipo_comp,
+          series: productos[i].series
+            
+        })
+
+        await movimiento.save();
+      };
+
+
+      //6. Cargar Cuenta Corriente e Historica
+
+      if(ventaCargada.tipo_venta === 'CC'){
+        const cuentaCorr = new  CuentaCorriente({
+          fecha: ventaCargada.fecha,
+          idCliente: ventaCargada.idCliente,
+          cliente: ventaCargada.cliente,
+          nro_venta: ventaCargada.numero,
+          tipo_comp: ventaCargada.tipo_comp,
+          importe: ventaCargada.precio,
+          pagado: 0,
+          saldo: ventaCargada.precio,
+          condicion: 'Normal',
+          observaciones: '',
+          nro_factura: ''
+        });
+
+        await  cuentaCorr.save();
+        
+        const cuentaHistorica = new  CuentaHistorica({
+          fecha: ventaCargada.fecha,
+          idCliente: ventaCargada.idCliente,
+          cliente: ventaCargada.cliente,
+          nro_venta: ventaCargada.numero,
+          tipo_comp: ventaCargada.tipo_comp,
+          debe: ventaCargada.precio,
+          haber: 0,
+          saldo: ventaCargada.precio,
+          condicion: 'Normal',
+          observaciones: '',
+        });
+
+        await  cuentaHistorica.save();
+      };
+
+      if(metodosPagos){
+        await cargarMetodosPago(ventaCargada, metodosPagos);
+      }
+
+    res.send({
+      ok: true,
+      venta: ventaCargada,
+      msg: 'Cargado completo'
+    })
+  }catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al realizar la venta, hable con el administrador',
+    });
+  }
+}
 
 ventaCTRL.VentasDia = async (req, res) => {
   const { fecha } = req.params;

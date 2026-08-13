@@ -1,5 +1,6 @@
 const Venta = require("../models/Venta");
 const Movimientos = require("../models/movProducto");
+const MetodoPago = require('../models/MetodoPago');
 const MovRecibo = require('../models/MovRecibos');
 
 exports.agregarIngormacionCompensadas = async(lista) => {
@@ -35,7 +36,14 @@ exports.agregarInformacionHistoricas = async(lista) => {
             const movimientos = await MovRecibo.find({
                 numeroRecibo: elem.nro_venta
             });
+
+            const metodosPago = await MetodoPago.find({
+                nro_comp: elem.nro_venta,
+                tipoComprobante: elem.tipo_comp
+            });
+
             historica.movimientos = movimientos;
+            historica.metodosPago = metodosPago;
         }else{
 
             const movimientos = await Movimientos.find({

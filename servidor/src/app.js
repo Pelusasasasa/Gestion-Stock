@@ -60,7 +60,7 @@ app.use('/gestion/retencion', require('./routes/retencion.routes'));
 
 app.use('/gestion/rubro', require('./routes/rubro'));
 
-app.use('/gestion/ventas', require('./routes/venta.router'));
+app.use('/gestion/ventas', require('./routes/venta.route'));
 
 app.use('/gestion/pedidos', require('./routes/pedido'));
 

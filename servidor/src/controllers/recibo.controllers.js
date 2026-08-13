@@ -5,13 +5,14 @@ const { actualizarNumero } = require('../helpers/actualizarNumero');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
 const { cargarMovsRecibos } = require('../helpers/cargarMovsRecibos');
 const { crearHistorica } = require('../helpers/crearHistorica');
-const Cheque = require('../models/Cheque');
 const Recibo = require('../models/Recibo');
 const Retencion = require('../models/Retencion');
+const Cheque = require('../models/Cheque');
 const Tarjeta = require('../models/Tarjeta');
 const MetodoPago = require('../models/MetodoPago');
 const Compensada = require('../models/cuentaCorrComp')
 const Historica = require("../models/cuentaCorrHisto");
+const { cargarMetodosPago } = require('../helpers/MetodoPago/cargarMetodosPagos');
 
 reciboCTRL.cargarRecibo = async (req, res) => {
   try {
@@ -110,52 +111,7 @@ reciboCTRL.realizarRecibo = async (req, res) => {
     // 4. Cargamos los metodos de pago
     
     if(metodoPagos){
-      for(let i = 0; i < metodoPagos.length; i++){
-        const metodoPagoAux = metodoPagos[i];
-        metodoPagoAux.fecha = recibo.fecha;
-        metodoPagoAux.comprobanteId = recibo._id;
-        metodoPagoAux.tipoComprobante = recibo.tipo_comp;
-        metodoPagoAux.nro_comp = recibo.numero;
-        
-        const metodoPago = new MetodoPago(metodoPagoAux);
-        await metodoPago.save();
-
-        if(metodoPago.tipo === 'tarjeta'){
-          
-          const tarjeta = new Tarjeta({
-            fecha: recibo.fecha,
-            nombre: metodoPagoAux.cliente,
-            importe: metodoPago.monto,
-            tarjeta: metodoPagoAux.tarjeta,
-            tipo: metodoPago.tipoComprobante,
-            vendedor: vendedor,
-            comprobanteId: recibo._id,
-            tipoComprobante: recibo.tipo_comp
-          })
-          await tarjeta.save();
-        }
-
-        if(metodoPago.tipo === 'cheque'){
-          const cheque = new Cheque({
-            f_recibido: recibo.fecha,
-            numero: metodoPagoAux.numero,
-            banco: metodoPagoAux.banco,
-            f_cheque: metodoPagoAux.fechaVencimiento,
-            importe: metodoPagoAux.monto,
-            ent_por: recibo.cliente,
-            ent_a: '',
-            domicilio: metodoPagoAux.domicilio,
-            telefono: metodoPagoAux.telefono,
-            vendedor: vendedor,
-            tipo: metodoPagoAux.tipoComprobante,
-            comprobanteId: recibo._id,
-            tipoComprobante: recibo.tipo_comp,
-            observacion: ''
-          })
-
-          await cheque.save();
-        }
-      }
+      const metodosPagos = await cargarMetodosPago(recibo, metodoPagos);
     }
 
     // 5. Modificamos las compensadas
@@ -215,15 +171,21 @@ reciboCTRL.realizarRecibo = async (req, res) => {
           ok: false,
           msg: 'Error al cargar los movimientos de los recibos',
         });
-      }
+      };
+
       
-      ;
+
+      
+      const reciboObj = recibo.toObject();
+      reciboObj.movimientos = movsRecibos.movs;
+      reciboObj.metodoPago = metodoPagos;
+
       return res.status(201).json({
         ok: true,
-        recibo,
+        recibo: reciboObj,
         saldoModificado: saldoModificado.cliente,
         historica,
-        movsRecibos
+        retenciones,
       })
   } catch (error) {
     console.error(error);

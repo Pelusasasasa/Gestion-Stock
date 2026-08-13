@@ -26,7 +26,7 @@ const MetodoPago = new Schema({
     tipoComprobante: {
         type: String,
         required: true,
-        enum: ['Recibo', 'Presupuesto', 'Venta'],
+        enum: ['Recibo', 'Presupuesto', 'CuentaCorriente', 'Contado'],
         default: 'Recibo'
     }
 });
