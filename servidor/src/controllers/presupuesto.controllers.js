@@ -1,18 +1,22 @@
 const presupuestoCTRL = {};
 
+const Movimiento = require('../models/movProducto');
+const Presupuesto = require("../models/Presupuesto");
+
 const funcion = require("../assets/js/pdf");
 const { actualizarNumero } = require("../helpers/actualizarNumero");
 const { crearMovimientosStock } = require("../helpers/crearMovimientosStock");
 const {
   crearMovimientoVendedores,
 } = require("../helpers/crearMovimientoVendedores");
-const Presupuesto = require("../models/Presupuesto");
+const Cliente = require('../models/Cliente');
 
 presupuestoCTRL.post = async (req, res) => {
   try {
     const presupuesto = new Presupuesto(req.body);
 
     const numeroActualizado = await actualizarNumero(presupuesto.tipo_venta);
+    
     if (numeroActualizado.ok) {
       presupuesto.numero = numeroActualizado.numero;
     }
@@ -58,6 +62,92 @@ presupuestoCTRL.post = async (req, res) => {
       ok: false,
       msg: "Error en el servidor al cargar el presupuesto, hable con el administrador",
     });
+  }
+};
+
+presupuestoCTRL.realizarPresupuesto = async(req, res) => {
+  try {
+    const { presupuesto } = req.body;
+    const { productos, facturado } = req.query;
+
+    // 1. Facturar
+
+    // 2. Actualizar numero
+    const numeroActualizado = await actualizarNumero(presupuesto.tipo_venta);
+
+    if(!numeroActualizado.ok)
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al actualizar el numero'
+      });
+
+    presupuesto.numero = numeroActualizado.numero;
+    console.log(numeroActualizado.numero)
+    
+    // 3. Cargar Presupuesto
+    const presupuestoCargado = new Presupuesto(presupuesto)
+    await presupuestoCargado.save()
+
+    if(!presupuestoCargado)
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al cargar el presupuesto, pero se actualizao en numero'
+      })
+
+    let movimientos = [];
+    // 4. Cargar Movimientos stock
+    for(let i = 0; i < productos.length; i++){
+      if(!productos[i]._id) continue;
+      
+      const movimiento = new Movimiento({
+        fecha: presupuestoCargado.fecha,
+        tipo_venta: presupuestoCargado.tipo_venta,
+        cliente: presupuestoCargado.idCliente,
+        nombreCliente: presupuestoCargado.cliente,
+        marca: productos[i].marca,
+        codProd: productos[i]._id,
+        producto: productos[i].descripcion,
+        cantidad: productos[i].cantidad,
+        iva: productos[i].impuesto,
+        precio: productos[i].precio,
+        nro_venta: presupuestoCargado.numero,
+        vendedor: presupuestoCargado.vendedor
+      });
+
+      await movimiento.save()
+      movimientos.push(movimiento);
+
+      if(!movimiento)
+        return res.status(400).json({
+          ok: false,
+          msg: 'Error al cargar el movimiento, pero si se actualizao el numero y se cargo el presupuesto'
+        });
+    };
+
+    const cliente = await Cliente.findById(presupuesto.idCliente);
+
+    const presupuestoObj = presupuestoCargado.toObject();
+    presupuestoObj.movimientos = movimientos;
+    presupuestoObj.datosClientes = {
+      direccion: cliente?.direccion,
+      localidad: cliente?.localidad,
+      telefono: cliente?.telefono,
+      cuit: cliente?.cuit,
+      condicionIva: cliente?.condicionIva,
+    };
+
+    res.status(201).json({
+      ok: true,
+      msg: 'Remito cargado correctamente',
+      presupuesto: presupuestoObj
+    })
+    
+  } catch (error) {
+   console.error(error);
+   return res.status(500).json({
+    ok: false,
+    msg: 'Error al realizar el presupuesto'
+   })
   }
 };
 

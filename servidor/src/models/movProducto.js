@@ -27,10 +27,6 @@ const movProducto = new mongoose.Schema({
     producto:{
         type:String
     },
-    rubro:{
-        type:String,
-        default:""
-    },
     cantidad:{
         type:Number,
         required:true

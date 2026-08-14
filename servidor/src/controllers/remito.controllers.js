@@ -128,6 +128,96 @@ remitoCTRL.postOne = async (req, res) => {
   }
 };
 
+remitoCTRL.realizarRemito = async(req, res) => {
+  try{
+    const { remito } = req.body;
+    const {productos} = req.query;
+
+    // 1. Actualizar numero
+    const numero = await actualizarNumero(remito.tipo_venta);
+    if(!numero.ok)
+      return res.status(400).json({
+        ok:false,
+        msg: 'Error al actualizar el numero'
+      })
+    
+    remito.numero = numero.numero;
+
+    // 2. Cargar Remito
+
+    const remitoCargado = new Remito(remito);
+    await remitoCargado.save();
+
+    if(!remitoCargado)
+      return res.status(400).json({
+        ok:false,
+        msg: 'Error al cargar el remito, pero si se actualizo el numero'
+      })
+
+      let movimientos = [];
+      for(let i = 0; i < productos.length; i++){
+        if(!productos[i]._id) continue;
+        // 3.Descontar Stock
+        const producto = await Producto.findByIdAndUpdate(
+          productos[i]._id,
+          {
+            $inc: {stock: -productos[i].cantidad}
+          },
+          {runValidators: true}
+        )
+
+      if(!producto)
+        return res.status(400).json({
+          ok:false,
+          msg: 'Error al descontar el stock, pero si se actualizo el numero y se cargo el remito'
+        })
+        
+        // 4.Cargar Mov Producto
+        const movimiento = new Movimiento({
+          fecha: remitoCargado.fecha,
+          tipo_venta: remitoCargado.tipo_venta,
+          cliente: remitoCargado.idCliente,
+          nombreCliente: remitoCargado.cliente,
+          marca: productos[i].marca,
+          codProd: productos[i]._id,
+          producto: productos[i].descripcion,
+          cantidad: productos[i].cantidad,
+          iva: productos[i].impuesto,
+          precio: productos[i].precio,
+          nro_venta: remitoCargado.numero,
+          tipo_comp: remitoCargado.tipo_comp,
+        });
+
+        await movimiento.save();
+        movimientos.push(movimiento);
+
+        if(!movimiento)
+          return res.status(400).json({
+            ok:false,
+            msg: 'Error al cargar el movimiento, pero si se actualizo el numero y se cargo el remito y se descontó el stock'
+          });
+
+    };  
+
+
+    const remitoObj = remitoCargado.toObject();
+    remitoObj.movimientos = movimientos;
+      
+
+    res.status(200).json({
+      ok: true,
+      remito: remitoObj,
+      msg: 'Remito cargado correctamente'
+    });
+  }catch(error){
+    console.error();
+    return res.status(500).json({
+      ok:false,
+      msg: 'No se pudo cargar el remito'
+    })
+  }
+};
+
 remitoCTRL.putPasado = async (req, res) => {
   const { id } = req.params;
   

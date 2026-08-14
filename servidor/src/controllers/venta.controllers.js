@@ -238,13 +238,25 @@ ventaCTRL.realizarVenta = async(req, res) => {
         });
 
         await  cuentaHistorica.save();
+
+
+        const cliente = await Cliente.findByIdAndUpdate(ventaCargada.idCliente, {
+          $inc: { saldo: ventaCargada.precio }
+        });
+
+        if(!cliente){
+          return res.status(400).json({
+            ok: false,
+            msg: 'Error al actualizar el saldo del cliente, pero si se facturo, actualizo numero, cargo en cuenta corriente y se cargo la venta',
+          });
+        }
       };
 
       if(metodosPagos){
         await cargarMetodosPago(ventaCargada, metodosPagos);
       }
 
-    res.send({
+    res.status(200).json({
       ok: true,
       venta: ventaCargada,
       msg: 'Cargado completo'
