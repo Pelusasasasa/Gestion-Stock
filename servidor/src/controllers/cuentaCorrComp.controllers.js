@@ -1,11 +1,16 @@
 const compensadaCTRL = {};
 
+const Venta = require('../models/Venta');
+const MovProducto = require('../models/movProducto');
+const Producto = require('../models/producto');
+const CuentaCompensada = require("../models/cuentaCorrComp");
+const Cliente = require("../models/Cliente");
+const CuentaHistorica = require('../models/cuentaCorrHisto');
+
 const {
   agregarIngormacionCompensadas,
   agregarInformacionHistoricas,
 } = require("../helpers/agregarIngormacionCompensadas");
-const CuentaCompensada = require("../models/cuentaCorrComp");
-const CuentaHistorica = require('../models/cuentaCorrHisto');
 
 compensadaCTRL.crearCompensda = async (req, res) => {
   const ultimaCompensada = await CuentaCompensada.find({}, { _id: 1 });
@@ -103,5 +108,121 @@ compensadaCTRL.cambiarObservaciones = async (req, res) => {
   }
   res.send("OK");
 };
+
+compensadaCTRL.actualizarCompensada = async (req, res) => {
+  const {numero} = req.params;
+  
+  try {
+   
+    // 1.Traer Venta 
+    const venta = await Venta.findOne({numero, tipo_venta: 'CC'});
+    if(!venta){
+      return res.status(404).json({
+        ok: false,
+        msg: "No se encontro la venta",
+      });
+    }
+
+    // 2. Traer Cliente
+    const cliente = await Cliente.findOne({_id: venta.idCliente});
+    if(!cliente){
+      return res.status(404).json({
+        ok: false,
+        msg: "No se encontro el cliente",
+      });
+    }
+
+    // 3. Traer Compensadas
+    const compensada = await CuentaCompensada.findOne({nro_venta: numero});
+    if(!compensada){
+      return res.status(404).json({
+        ok: false,
+        msg: "No se encontraron las compensadas",
+      });
+    }
+
+
+    // 4. Traer Historica
+    const historica = await CuentaHistorica.findOne({nro_venta: numero});
+    if(!historica){
+      return res.status(404).json({
+        ok: false,
+        msg: "No se encontraron las historicas",
+      });
+    }
+
+    // 5. Traer Movimientos
+    const movimientos = await MovProducto.find({nro_venta: numero, tipo_venta: 'CC'});
+    if(!movimientos){
+      return res.status(404).json({
+        ok: false,
+        msg: "No se encontraron los movimientos",
+      });
+    }
+
+    // 6. Traer Productos y actaulizar movimientos
+    for(const movimiento of movimientos){
+      const producto = await Producto.findOne({_id: movimiento.codProd});
+      if(!producto){
+        return res.status(404).json({
+          ok: false,
+          msg: "No se encontro el producto",
+        });
+      }
+
+      movimiento.precio = producto.precio;
+      await movimiento.save()
+    }
+
+    // 7. Actualizar Venta
+    venta.precio = movimientos.reduce((acc, mov) => acc + mov.precio, 0);
+    await venta.save();
+
+    // 8. Actualizar Compensada
+    compensada.importe = venta.precio;
+    compensada.saldo = venta.precio - compensada.pagado;
+    await compensada.save();
+
+    // 9. Actualizar Historica
+    const debeAnterior = historica.debe;
+    const saldoAnterior = historica.saldo;
+
+    historica.debe = venta.precio;
+    historica.saldo = saldoAnterior - debeAnterior + venta.precio;
+    await historica.save();
+
+    // 10. Actualizar Cliente
+    cliente.saldo = venta.precio - compensada.pagado;
+    await cliente.save();
+
+    // 11. Traer historicas con fecha superior a la actual
+    const historicasPosteriores = await CuentaHistorica.find({
+      idCliente: cliente._id,
+      fecha: { $gt: historica.fecha }
+    }).sort({fecha: 1});
+
+    let saldoInicial = historica.saldo;
+
+    for(const item of historicasPosteriores){
+      item.saldo = saldoInicial - item.haber + item.debe;
+      saldoInicial = item.saldo;
+      await item.save();
+    }
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Actualizado correctamente',
+      historicasPosteriores
+    });
+    
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error al actualizar la cuenta Compensada",
+    });
+  }
+}
 
 module.exports = compensadaCTRL;

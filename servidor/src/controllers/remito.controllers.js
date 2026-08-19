@@ -186,6 +186,7 @@ remitoCTRL.realizarRemito = async(req, res) => {
           precio: productos[i].precio,
           nro_venta: remitoCargado.numero,
           tipo_comp: remitoCargado.tipo_comp,
+          series: productos[i].series
         });
 
         await movimiento.save();
@@ -199,10 +200,8 @@ remitoCTRL.realizarRemito = async(req, res) => {
 
     };  
 
-
     const remitoObj = remitoCargado.toObject();
-    remitoObj.movimientos = movimientos;
-      
+    remitoObj.movimientos = movimientos;      
 
     res.status(200).json({
       ok: true,

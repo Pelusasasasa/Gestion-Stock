@@ -161,7 +161,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
 
 
       
-      
+      let movimientos = [];
     for(let i = 0; i < productos.length; i++){
           if (!productos[i]._id) continue;
           
@@ -189,9 +189,8 @@ ventaCTRL.realizarVenta = async(req, res) => {
           cliente: ventaCargada.idCliente,
           nombreCliente: ventaCargada.cliente,
           marca: productos[i].marca,
-          codProd: productos[i].codigo,
-          producto: productos[i].nombre,
-          rubro: productos[i].rubro,
+          codProd: productos[i]._id,
+          producto: productos[i].descripcion,
           cantidad: productos[i].cantidad,
           iva: productos[i].impuesto,
           precio: productos[i].precio,
@@ -202,8 +201,8 @@ ventaCTRL.realizarVenta = async(req, res) => {
         })
 
         await movimiento.save();
+        movimientos.push(movimiento);
       };
-
 
       //6. Cargar Cuenta Corriente e Historica
 
@@ -256,9 +255,14 @@ ventaCTRL.realizarVenta = async(req, res) => {
         await cargarMetodosPago(ventaCargada, metodosPagos);
       }
 
+      
+    const ventaObj = ventaCargada.toObject();
+    ventaObj.movimientos = movimientos;
+
+      
     res.status(200).json({
       ok: true,
-      venta: ventaCargada,
+      venta: ventaObj,
       msg: 'Cargado completo'
     })
   }catch (error) {
