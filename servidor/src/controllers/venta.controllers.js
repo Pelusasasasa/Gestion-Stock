@@ -6,6 +6,7 @@ const Movimiento = require('../models/movProducto');
 const CuentaCorriente = require('../models/cuentaCorrComp');
 const CuentaHistorica = require('../models/cuentaCorrHisto');
 const NroSerie = require('../models/NroSerie');
+const Cliente = require('../models/Cliente');
 
 const funcion = require('../assets/js/pdf');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');

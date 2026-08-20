@@ -16,8 +16,7 @@ const NroSerie = new Schema({
         set: value => value.toUpperCase() // Convertir a mayúsculas
     },
     nro_serie:{
-        type: String,
-        required: true
+        type: String
     },
     factura: {
         type: String,
