@@ -334,6 +334,43 @@ remitoCTRL.cargarRemitoManoObra = async(req, res) => {
       msg: 'Error en el servidor'
     })
   }
+};
+
+remitoCTRL.getItemsRemitos = async(req, res) => {
+  const { listaRemitos } = req.query;
+
+  try {
+    const todosLosMovimientos = listaRemitos.flatMap(remito => remito.movimientos);
+
+  let productos = [];
+  for(const item of todosLosMovimientos){
+    const producto = await Producto.findById(item.codProd);
+    if(producto){
+      productos.push({
+        _id: producto._id,
+        descripcion: producto.descripcion,
+        precio: producto.precio,
+        cantidad: 1,
+        impuesto: producto.impuesto,
+        marca: producto.marca,
+        productoOriginal: producto,
+        
+      });
+    }
+  }
+
+    return res.status(200).json({
+      ok: true,
+      productos,
+      msg: 'Productos cargados correctamente'
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error en el servidor'
+    })
+  }
 }
 
 module.exports = remitoCTRL;
