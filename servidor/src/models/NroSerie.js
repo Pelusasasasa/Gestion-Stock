@@ -15,18 +15,9 @@ const NroSerie = new Schema({
         required: true,
         set: value => value.toUpperCase() // Convertir a mayúsculas
     },
-    marca:{
-        type: Schema.Types.ObjectId,
-        ref: 'Marca',
-    },
     nro_serie:{
         type: String,
         required: true
-    },
-    provedor:{
-        type: String,
-        required: true,
-        set: value => value.toUpperCase() // Convertir a mayúsculas
     },
     factura: {
         type: String,

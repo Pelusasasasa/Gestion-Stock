@@ -5,6 +5,7 @@ const Producto = require('../models/producto');
 const Movimiento = require('../models/movProducto');
 const CuentaCorriente = require('../models/cuentaCorrComp');
 const CuentaHistorica = require('../models/cuentaCorrHisto');
+const NroSerie = require('../models/NroSerie');
 
 const funcion = require('../assets/js/pdf');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
@@ -202,9 +203,30 @@ ventaCTRL.realizarVenta = async(req, res) => {
 
         await movimiento.save();
         movimientos.push(movimiento);
+
+        // 6. Cargar series
+                if(productos[i].series){
+                  const serie = new NroSerie({
+                    fecha: remito.fecha,
+                    codigo: productos[i]._id,
+                    producto: productos[i].descripcion,
+                    nro_serie: productos[i].series,
+                    factura: remito.tipo_comp,
+                    vendedor: remito.vendedor
+                  });
+        
+                  await serie.save();
+                  if(!serie){
+                    console.error('Error al guardar la serie');
+                    return res.status(400).json({
+                      ok:false,
+                      msg: 'Error al guardar la serie, pero si se actualizo el numero y se cargo el remito y se descontó el stock y se cargó el movimiento'
+                    })
+                  }
+                }
       };
 
-      //6. Cargar Cuenta Corriente e Historica
+      //7. Cargar Cuenta Corriente e Historica
 
       if(ventaCargada.tipo_venta === 'CC'){
         const cuentaCorr = new  CuentaCorriente({

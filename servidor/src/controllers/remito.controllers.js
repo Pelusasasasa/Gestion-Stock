@@ -10,6 +10,7 @@ const Producto = require('../models/producto');
 const Remito = require('../models/Remito');
 const ManoObra = require('../models/ManoObra');
 const Cliente = require('../models/Cliente');
+const NroSerie = require('../models/NroSerie')
 
 
 
@@ -156,6 +157,7 @@ remitoCTRL.realizarRemito = async(req, res) => {
 
       let movimientos = [];
       for(let i = 0; i < productos.length; i++){
+        
         if(!productos[i]._id) continue;
         // 3.Descontar Stock
         const producto = await Producto.findByIdAndUpdate(
@@ -197,6 +199,28 @@ remitoCTRL.realizarRemito = async(req, res) => {
             ok:false,
             msg: 'Error al cargar el movimiento, pero si se actualizo el numero y se cargo el remito y se descontó el stock'
           });
+          console.log(productos[i].series)
+
+        // 5. Cargar series
+        if(productos[i].series){
+          const serie = new NroSerie({
+            fecha: remito.fecha,
+            codigo: productos[i]._id,
+            producto: productos[i].descripcion,
+            nro_serie: productos[i].series,
+            factura: remito.tipo_comp,
+            vendedor: remito.vendedor
+          });
+
+          await serie.save();
+          if(!serie){
+            console.error('Error al guardar la serie');
+            return res.status(400).json({
+              ok:false,
+              msg: 'Error al guardar la serie, pero si se actualizo el numero y se cargo el remito y se descontó el stock y se cargó el movimiento'
+            })
+          }
+        }
 
     };  
 
@@ -209,7 +233,7 @@ remitoCTRL.realizarRemito = async(req, res) => {
       msg: 'Remito cargado correctamente'
     });
   }catch(error){
-    console.error();
+    console.error(error);
     return res.status(500).json({
       ok:false,
       msg: 'No se pudo cargar el remito'
