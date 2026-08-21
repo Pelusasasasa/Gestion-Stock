@@ -17,6 +17,7 @@ const { crearCompensada } = require('../helpers/crearCompensada');
 const { crearHistorica } = require('../helpers/crearHistorica');
 const { crearMovimientoVendedores } = require('../helpers/crearMovimientoVendedores');
 const { cargarMetodosPago } = require('../helpers/MetodoPago/cargarMetodosPagos');
+const { cargarFactura } = require('../helpers/afip/facturar');
 
 
 ventaCTRL.getForId = async (req, res) => {
@@ -136,9 +137,23 @@ ventaCTRL.realizarVenta = async(req, res) => {
     const { venta } = req.body;
     const { metodosPagos, productos, facturado} = req.query
 
-    console.log("a")
 
     //1. Facturar si factura = true
+    if(facturado === "true"){
+      const afip = await cargarFactura(venta);
+      if(afip.ok){
+        venta.afip = afip;
+
+        // Generar PDF
+        funcion.crearPDF(venta, productos);
+      }else{
+        return res.status(400).json({
+          ok: false,
+          msg: 'No se pudo cargar la factura'
+        })
+      }
+    }
+
 
     //2. Actualizar Numero
     const numero = await actualizarNumero(venta.tipo_venta);
