@@ -23,10 +23,14 @@ const NroSerie = new Schema({
         default: "",
         set: value => value.toUpperCase() // Convertir a mayúsculas
     },
+    provedor: {
+        type: Schema.Types.ObjectId,
+        ref: 'Provedor'
+    },
     vendedor:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'Vendedor',
         required: true,
-        set: value => value.toUpperCase() // Convertir a mayúsculas
     }
 });
 

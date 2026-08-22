@@ -1,3 +1,6 @@
+const tls = require('tls');
+tls.DEFAULT_CIPHERS = 'DEFAULT@SECLEVEL=1';
+
 const Afip = require('@afipsdk/afip.js');
 const afip = new Afip({ CUIT: '27340150231' });
 
@@ -57,7 +60,7 @@ const cargarFactura = async (venta, notaCredito) => {
     ImpOpEx: 0,
     ImpIVA: parseFloat((venta.totalIva21 + venta.totalIva105).toFixed(2)),
     ImpTrib: 0,
-    'CondicionIVAReceptorId': tablaCondicionIVAReceptorId(venta.condicionIva),
+    //'CondicionIVAReceptorId': tablaCondicionIVAReceptorId(venta.condicionIva),
     MonId: 'PES',
     PtoVta: puntoVenta,
     MonCotiz: 1,
