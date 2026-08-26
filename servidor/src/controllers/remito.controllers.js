@@ -132,7 +132,7 @@ remitoCTRL.postOne = async (req, res) => {
 remitoCTRL.realizarRemito = async(req, res) => {
   try{
     const { remito } = req.body;
-    const {productos} = req.query;
+    const {productos, descontarStock = 'true'} = req.query;
 
     // 1. Actualizar numero
     const numero = await actualizarNumero(remito.tipo_venta);
@@ -160,19 +160,21 @@ remitoCTRL.realizarRemito = async(req, res) => {
         
         if(!productos[i]._id) continue;
         // 3.Descontar Stock
-        const producto = await Producto.findByIdAndUpdate(
-          productos[i]._id,
-          {
-            $inc: {stock: -productos[i].cantidad}
-          },
-          {runValidators: true}
+        if(descontarStock === 'true'){
+          const producto = await Producto.findByIdAndUpdate(
+            productos[i]._id,
+            {
+              $inc: {stock: -productos[i].cantidad}
+            },
+            {runValidators: true}
         )
 
-      if(!producto)
-        return res.status(400).json({
-          ok:false,
-          msg: 'Error al descontar el stock, pero si se actualizo el numero y se cargo el remito'
-        })
+          if(!producto)
+            return res.status(400).json({
+              ok:false,
+              msg: 'Error al descontar el stock, pero si se actualizo el numero y se cargo el remito'
+            })
+        }
         
         // 4.Cargar Mov Producto
         const movimiento = new Movimiento({

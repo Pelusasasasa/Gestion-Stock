@@ -7,6 +7,7 @@ const CuentaCorriente = require('../models/cuentaCorrComp');
 const CuentaHistorica = require('../models/cuentaCorrHisto');
 const NroSerie = require('../models/NroSerie');
 const Cliente = require('../models/Cliente');
+const Remito = require('../models/Remito');
 
 const funcion = require('../assets/js/pdf');
 const { cambiarSaldoCliente } = require('../helpers/cambiarSaldoCliente');
@@ -135,8 +136,9 @@ ventaCTRL.cargarVenta = async (req, res) => {
 ventaCTRL.realizarVenta = async(req, res) => {
   try {
     const { venta } = req.body;
-    const { metodosPagos, productos, facturado} = req.query
+    const { metodosPagos, productos, facturado, descontarStock = 'true', remitos} = req.query
 
+  
 
     //1. Facturar si factura = true
     if(facturado === "true"){
@@ -183,7 +185,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
           if (!productos[i]._id) continue;
           
           //4. Descontar Stock Si no es presupuesto
-          if(venta.tipo_venta !== 'PP'){    
+          if(venta.tipo_venta !== 'PP' && descontarStock === 'true'){    
             const producto = await Producto.findByIdAndUpdate(
               productos[i]._id,
               {
@@ -292,6 +294,13 @@ ventaCTRL.realizarVenta = async(req, res) => {
       if(metodosPagos){
         await cargarMetodosPago(ventaCargada, metodosPagos);
       }
+
+    // 8. Si viene remitos lo pasamos como pasado
+    for(const remito of remitos){
+      await Remito.findByIdAndUpdate(remito, {
+        pasado: true
+      });
+    }
 
       
     const ventaObj = ventaCargada.toObject();

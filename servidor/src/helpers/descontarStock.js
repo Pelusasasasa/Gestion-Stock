@@ -27,9 +27,9 @@ exports.descontarStock = async (lista, vendedorId = '', numero = '') => {
             producto: producto.descripcion,
             marca: producto?.marca?._id || undefined,
             nro_serie: elem || ' ',
-            provedor: 'Venta',
+            provedor: elem?.provedor ? elem.provedor : undefined,
             factura: numero.toString(),
-            vendedor: vendedor.nombre,
+            vendedor: vendedor._id,
           });
           await serie.save();
         }

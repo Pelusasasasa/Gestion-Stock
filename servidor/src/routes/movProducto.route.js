@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-const { id, cargar, modificarVarios, porId, porRubro, post, deleteForIdAndTipo, traerPorProducto, modificar, postManoObra } = require('../controllers/movProducto.controllers');
+const { id, cargar, modificarVarios, porId, porRubro, post, deleteForIdAndTipo, traerPorProducto, modificar, postManoObra, actualizarPrecios } = require('../controllers/movProducto.controllers');
 
 router.route('/')
     .put(modificarVarios)
@@ -10,6 +10,8 @@ router.route('/post')
     .post(post)
 router.route('/movimientoManoObra')
     .post(postManoObra)
+router.route('/actualizarPrecios')
+    .post(actualizarPrecios)
 router.route('/porProducto/:codigo')
     .get(traerPorProducto)
     .patch(modificar)

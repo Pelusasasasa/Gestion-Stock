@@ -196,4 +196,33 @@ movimientoCTRL.modificar = async(req, res) => {
     }
 };
 
+movimientoCTRL.actualizarPrecios = async(req, res) => {
+    try {
+        const { lista } = req.body;
+
+
+        for(const item of lista){ 
+            const producto = await Producto.findById(item._id)
+            if(!producto) return res.status(404).json({
+                ok: false,
+                msg: 'No se encontro el producto',
+            })
+
+            item.precio = producto.precio;
+        }
+
+        res.status(200).json({
+            ok: true,
+            lista
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo actualizar los precios, hable con el administrador',
+            error
+        })
+    }
+}
+
 module.exports = movimientoCTRL;
