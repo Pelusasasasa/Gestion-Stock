@@ -141,9 +141,9 @@ remitoCTRL.realizarRemito = async(req, res) => {
         ok:false,
         msg: 'Error al actualizar el numero'
       })
-    
-    remito.numero = numero.numero;
 
+    remito.numero = numero.numero;
+    remito.idCliente = typeof remito.idCliente === 'number' ? remito?.idCliente?.toString() : remito.idCliente;
     // 2. Cargar Remito
 
     const remitoCargado = new Remito(remito);

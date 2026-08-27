@@ -9,6 +9,7 @@ manoObraCtrl.getManoDeObras = async(req, res) => {
         const manoObras = await ManoObra.find({activo})
         .populate('cliente_id', 'nombre')
         .populate('vendedor_id', 'nombre')
+        .populate('operarios', 'nombre codigo')
 
         res.status(200).json({
             ok: true,
@@ -23,7 +24,7 @@ manoObraCtrl.getManoDeObras = async(req, res) => {
 
 manoObraCtrl.postManoObra = async(req, res ) => {
     try {
-        const { cliente_id, vendedor_id, tipo, segmento_id, fecha, horas, descripcion, estado} = req.body;
+        const { cliente_id, vendedor_id, tipo, segmento_id, fecha, horas, descripcion, estado, operarios} = req.body;
 
         const lastMano = await ManoObra.findOne().sort({ numero: -1 });
         const nextNumero = lastMano ? lastMano.numero + 1 : 1;
@@ -40,8 +41,8 @@ manoObraCtrl.postManoObra = async(req, res ) => {
             descripcion,
             estado,
             created: new Date(),
-            activo: true
-            
+            activo: true,
+            operarios,
         })
 
         await manoObra.save();

@@ -21,7 +21,7 @@ exports.cargarMetodosPago = async (comprobante, metodoPagos) => {
             importe: metodoPago.monto,
             tarjeta: metodoPagoAux.tarjeta,
             tipo: metodoPago.tipoComprobante,
-            vendedor: vendedor,
+            vendedor: comprobante.vendedor,
             comprobanteId: comprobante._id,
             tipoComprobante: comprobante.tipo_comp
           })
@@ -39,7 +39,7 @@ exports.cargarMetodosPago = async (comprobante, metodoPagos) => {
             ent_a: '',
             domicilio: metodoPagoAux.domicilio,
             telefono: metodoPagoAux.telefono,
-            vendedor: vendedor,
+            vendedor: comprobante.vendedor,
             tipo: metodoPagoAux.tipoComprobante,
             comprobanteId: comprobante._id,
             tipoComprobante: comprobante.tipo_comp,

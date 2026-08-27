@@ -50,7 +50,11 @@ const ManoObra = new Schema({
     numero: {
         type: Number,
         required: true
-    }
+    },
+    operarios: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Vendedor'
+    }]
 })
 
 module.exports = model('ManoObra', ManoObra)
