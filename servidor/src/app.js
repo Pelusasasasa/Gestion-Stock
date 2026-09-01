@@ -30,6 +30,8 @@ app.use('/gestion/datos', require('./routes/datos.route'));
 
 app.use('/gestion/gastos', require('./routes/gasto'));
 
+app.use('/gestion/gerencia', require('./routes/gerencia.routes'));
+
 app.use('/gestion/imprimir', require('./routes/imprimir.routes'));
 
 app.use('/gestion/historica', require('./routes/historica.route'));

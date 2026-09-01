@@ -5,7 +5,7 @@ const pdf = require('html-pdf');
 const fs = require('fs');
 const path = require('path');
 
-funcion.crearPDF = async (venta, productos) => {
+funcion.crearPDF = async (venta, productos = {}) => {
   const { dolar, checkboxDolar } = venta;
 
   let html = fs.readFileSync(path.join(__dirname, '../html/pdf.html'), 'utf8');

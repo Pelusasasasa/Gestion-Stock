@@ -296,10 +296,13 @@ ventaCTRL.realizarVenta = async(req, res) => {
       }
 
     // 8. Si viene remitos lo pasamos como pasado
-    for(const remito of remitos){
-      await Remito.findByIdAndUpdate(remito, {
-        pasado: true
-      });
+    if(remitos){
+
+      for(const remito of remitos){
+        await Remito.findByIdAndUpdate(remito, {
+          pasado: true
+        });
+      }
     }
 
       
