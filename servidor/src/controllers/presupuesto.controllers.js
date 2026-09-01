@@ -97,7 +97,7 @@ presupuestoCTRL.realizarPresupuesto = async(req, res) => {
     let movimientos = [];
     // 4. Cargar Movimientos stock
     for(let i = 0; i < productos.length; i++){
-      if(!productos[i]._id) continue;
+      if(!productos[i]._id && !productos[i].codigoAux) continue;
       
       const movimiento = new Movimiento({
         fecha: presupuestoCargado.fecha,
@@ -105,7 +105,7 @@ presupuestoCTRL.realizarPresupuesto = async(req, res) => {
         cliente: presupuestoCargado.idCliente,
         nombreCliente: presupuestoCargado.cliente,
         marca: productos[i].marca,
-        codProd: productos[i]._id,
+        codProd: productos[i]._id ?? productos[i].codigoAux,
         producto: productos[i].descripcion,
         cantidad: productos[i].cantidad,
         iva: productos[i].impuesto,
