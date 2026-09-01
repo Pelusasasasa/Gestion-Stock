@@ -12,7 +12,8 @@ const {
   getForNumberAndType,
   getbetweenDate,
   getPorFactura,
-  realizarVenta
+  realizarVenta,
+  ventasFacturadas
 } = require("../controllers/venta.controllers");
 
 router.route("/").post(cargarVenta);
@@ -24,4 +25,5 @@ router.route("/mes/:fecha").get(ventasMes);
 router.route("/anio/:fecha").get(ventaAnio);
 router.route("/porFecha/:desde/:hasta").get(getbetweenDate);
 router.route("/porFactura/:factura/:tipo").get(getPorFactura);
+router.route('/ventasFacturadas').get(ventasFacturadas)
 module.exports = router;

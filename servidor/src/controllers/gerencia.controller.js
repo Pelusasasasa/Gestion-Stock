@@ -93,15 +93,25 @@ gerenciaCTRL.realizarGerencia = async(req, res) => {
 
 gerenciaCTRL.obtenerGerencias = async(req, res) => {
   const { desde, hasta }= req.query;
-  const desdeDate = new Date(desde);
-  const hastaDate = new Date(hasta);
-  console.log(desdeDate, hastaDate)
+  const desdeDate = new Date(`${desde}T00:00:00.000-03:00`);
+  const hastaDate = new Date(`${hasta}T23:59:59.999-03:00`);
     try {
-        const gerencias = await Gerencia.find({fecha: {$gte: desdeDate, $lte: hastaDate}});
+        const gerencias = await Gerencia.find({fecha: {$gte: desdeDate, $lte: hastaDate}}).sort({$natural: -1}).populate('vendedor', 'nombre').lean();
+
+        const filtros = gerencias.map(g => ({ nro_venta: g.numero.toString(), tipo_venta: g.tipo_venta }));
+        const movimientos = await Movimiento.find({ $or: filtros }).lean();
+
+        const gerenciasConMovimientos = gerencias.map(gerencia => ({
+            ...gerencia,
+            movimientos: movimientos.filter(m =>
+                m.nro_venta === gerencia.numero.toString() && m.tipo_venta === gerencia.tipo_venta
+            )
+        }));
         return res.status(200).json({
             ok: true,
-            gerencias,
+            gerencias: gerenciasConMovimientos,
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({

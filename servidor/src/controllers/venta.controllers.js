@@ -457,4 +457,42 @@ ventaCTRL.getPorFactura = async (req, res) => {
   }
 };
 
+ventaCTRL.ventasFacturadas = async(req, res) => {
+  const { desde, hasta }= req.query;
+  const desdeDate = new Date(`${desde}T00:00:00.000-03:00`);
+  const hastaDate = new Date(`${hasta}T23:59:59.999-03:00`);
+  try {
+    const ventas = await Venta.find({
+      $and: [{ fecha: { $gte: desdeDate } }, { fecha: { $lte: hastaDate } }, { F: true }],
+    }).populate('vendedor', 'nombre').sort({$natural: -1}).lean();
+    if(!ventas){
+      return res.status(404).json({
+        ok: false,
+        msg: 'No hsay ventas facturadas',
+      });
+    }
+
+    const filtros = ventas.map(g => ({ nro_venta: g.numero.toString(), tipo_venta: g.tipo_venta }));
+    const movimientos = await Movimiento.find({ $or: filtros }).lean();
+    
+    const ventasConMovimientos = ventas.map(venta => ({
+        ...venta,
+        movimientos: movimientos.filter(m =>
+            m.nro_venta === venta.numero.toString() && m.tipo_venta === venta.tipo_venta
+        )
+    }));
+
+    res.status(200).json({
+      ok: true,
+      ventas: ventasConMovimientos,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'No se pudo obtener las ventas facturadas, hable con el administrador',
+    });
+  }
+}
+
 module.exports = ventaCTRL;
