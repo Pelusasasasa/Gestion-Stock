@@ -74,13 +74,11 @@ productoCTRL.getsProductos = async (req, res) => {
 
   const estaActivo = desactivados === 'false' ? true : false;
   
-  
-
   try{
     let productos;
   if (descripcion === 'textoVacio') {
     productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(50);
-  } else if (condicion === '_id') {
+  } else if (condicion === 'codigo') {
     const re = new RegExp(`^${descripcion}`);
     productos = await Producto.find({
       $or: [{ _id: { $regex: re, $options: 'i' } }, { codigoSecundario: { $regex: re, $options: 'i' } }],
@@ -97,6 +95,7 @@ productoCTRL.getsProductos = async (req, res) => {
       marca: { $in: marcaIds},
       activo: estaActivo
     }).populate('marca', ['nombre']).limit(50);
+
   } else {
     let re;
     try {
