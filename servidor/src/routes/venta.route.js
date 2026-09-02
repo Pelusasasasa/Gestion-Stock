@@ -13,17 +13,22 @@ const {
   getbetweenDate,
   getPorFactura,
   realizarVenta,
-  ventasFacturadas
+  ventasFacturadas,
+  realizarNotaCredito
 } = require("../controllers/venta.controllers");
 
 router.route("/").post(cargarVenta);
 router.route('/realizarVenta').post(realizarVenta)
+router.route('/realizarNotaCredito').post(realizarNotaCredito)
+
 router.route("/id/:id/:tipo").get(getForId).put(putForId).delete(deleteForId);
+
 router.route("/numeroYtipo/:numero/:tipo").get(getForNumberAndType);
 router.route("/dia/:fecha").get(VentasDia);
 router.route("/mes/:fecha").get(ventasMes);
 router.route("/anio/:fecha").get(ventaAnio);
 router.route("/porFecha/:desde/:hasta").get(getbetweenDate);
 router.route("/porFactura/:factura/:tipo").get(getPorFactura);
-router.route('/ventasFacturadas').get(ventasFacturadas)
+router.route('/ventasFacturadas').get(ventasFacturadas);
+
 module.exports = router;

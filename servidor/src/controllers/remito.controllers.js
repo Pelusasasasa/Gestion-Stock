@@ -158,7 +158,7 @@ remitoCTRL.realizarRemito = async(req, res) => {
       let movimientos = [];
       for(let i = 0; i < productos.length; i++){
         
-        if(!productos[i]._id) continue;
+        if(!productos[i]._id && !productos[i].codigoAux) continue;
         // 3.Descontar Stock
         if(descontarStock === 'true'){
           const producto = await Producto.findByIdAndUpdate(
@@ -204,23 +204,29 @@ remitoCTRL.realizarRemito = async(req, res) => {
           console.log(productos[i].series)
 
         // 5. Cargar series
-        if(productos[i].series){
-          const serie = new NroSerie({
-            fecha: remito.fecha,
-            codigo: productos[i]._id,
-            producto: productos[i].descripcion,
-            nro_serie: productos[i].series,
-            factura: remito.tipo_comp,
-            vendedor: remito.vendedor
-          });
-
-          await serie.save();
-          if(!serie){
-            console.error('Error al guardar la serie');
-            return res.status(400).json({
-              ok:false,
-              msg: 'Error al guardar la serie, pero si se actualizo el numero y se cargo el remito y se descontó el stock y se cargó el movimiento'
-            })
+        if(productos[i].series && productos[i].series.length > 0){
+          if(Array.isArray(productos[i].series)){
+            for(let s of productos[i].series){
+              const serie = new NroSerie({
+                fecha: remito.fecha,
+                codigo: productos[i]._id,
+                producto: productos[i].descripcion,
+                nro_serie: s,
+                factura: remito.tipo_comp,
+                vendedor: remito.vendedor
+              });
+              await serie.save();
+            }
+          } else {
+            const serie = new NroSerie({
+              fecha: remito.fecha,
+              codigo: productos[i]._id,
+              producto: productos[i].descripcion,
+              nro_serie: productos[i].series,
+              factura: remito.tipo_comp,
+              vendedor: remito.vendedor
+            });
+            await serie.save();
           }
         }
 

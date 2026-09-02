@@ -55,25 +55,31 @@ gerenciaCTRL.realizarGerencia = async(req, res) => {
                  movimientos.push(movimiento);
 
                 //5. Cargar Series
-                if(productos[i].series){
-                                  const serie = new NroSerie({
-                                    fecha: gerenciaCargada.fecha,
-                                    codigo: productos[i]._id,
-                                    producto: productos[i].descripcion,
-                                    nro_serie: productos[i].series,
-                                    factura: gerenciaCargada.tipo_comp,
-                                    vendedor: gerenciaCargada.vendedor
-                                  });
-                        
-                                  await serie.save();
-                                  if(!serie){
-                                    console.error('Error al guardar la serie');
-                                    return res.status(400).json({
-                                      ok:false,
-                                      msg: 'Error al guardar la serie, pero si se actualizo el numero y se cargo la gerencia y se descontó el stock y se cargó el movimiento'
-                                    })
-                                  }
-                                }
+                if(productos[i].series && productos[i].series.length > 0){
+                  if(Array.isArray(productos[i].series)){
+                    for(let s of productos[i].series){
+                      const serie = new NroSerie({
+                        fecha: gerenciaCargada.fecha,
+                        codigo: productos[i]._id,
+                        producto: productos[i].descripcion,
+                        nro_serie: s,
+                        factura: gerenciaCargada.tipo_comp,
+                        vendedor: gerenciaCargada.vendedor
+                      });
+                      await serie.save();
+                    }
+                  } else {
+                    const serie = new NroSerie({
+                      fecha: gerenciaCargada.fecha,
+                      codigo: productos[i]._id,
+                      producto: productos[i].descripcion,
+                      nro_serie: productos[i].series,
+                      factura: gerenciaCargada.tipo_comp,
+                      vendedor: gerenciaCargada.vendedor
+                    });
+                    await serie.save();
+                  }
+                }
         }
         
         return res.status(201).json({

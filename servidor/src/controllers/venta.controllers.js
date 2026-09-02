@@ -135,10 +135,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
 ventaCTRL.realizarVenta = async(req, res) => {
   try {
-    const { venta } = req.body;
-    const { metodosPagos, productos, facturado, descontarStock = 'true', remitos} = req.query
-
-  
+    const { venta, metodosPagos, productos, facturado, descontarStock = 'true', remitos } = req.body;
 
     //1. Facturar si factura = true
     if(facturado === "true"){
@@ -155,7 +152,6 @@ ventaCTRL.realizarVenta = async(req, res) => {
         })
       }
     }
-
 
     //2. Actualizar Numero
     const numero = await actualizarNumero(venta.tipo_venta);
@@ -182,7 +178,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
       
       let movimientos = [];
     for(let i = 0; i < productos.length; i++){
-          if (!productos[i]._id) continue;
+          if (!productos[i]._id && !productos[i].codigoAux) continue;
           
           //4. Descontar Stock Si no es presupuesto
           if(venta.tipo_venta !== 'PP' && descontarStock === 'true'){    
@@ -223,25 +219,31 @@ ventaCTRL.realizarVenta = async(req, res) => {
         movimientos.push(movimiento);
 
         // 6. Cargar series
-                if(productos[i].series){
-                  const serie = new NroSerie({
-                    fecha: remito.fecha,
-                    codigo: productos[i]._id,
-                    producto: productos[i].descripcion,
-                    nro_serie: productos[i].series,
-                    factura: remito.tipo_comp,
-                    vendedor: remito.vendedor
-                  });
-        
-                  await serie.save();
-                  if(!serie){
-                    console.error('Error al guardar la serie');
-                    return res.status(400).json({
-                      ok:false,
-                      msg: 'Error al guardar la serie, pero si se actualizo el numero y se cargo el remito y se descontó el stock y se cargó el movimiento'
-                    })
-                  }
-                }
+        if(productos[i].series && productos[i].series.length > 0){
+          if(Array.isArray(productos[i].series)){
+            for(let s of productos[i].series){
+              const serie = new NroSerie({
+                fecha: ventaCargada.fecha,
+                codigo: productos[i]._id,
+                producto: productos[i].descripcion,
+                nro_serie: s,
+                factura: ventaCargada.tipo_comp,
+                vendedor: ventaCargada.vendedor
+              });
+              await serie.save();
+            }
+          } else {
+            const serie = new NroSerie({
+              fecha: ventaCargada.fecha,
+              codigo: productos[i]._id,
+              producto: productos[i].descripcion,
+              nro_serie: productos[i].series,
+              factura: ventaCargada.tipo_comp,
+              vendedor: ventaCargada.vendedor
+            });
+            await serie.save();
+          }
+        }
       };
 
       //7. Cargar Cuenta Corriente e Historica
@@ -322,7 +324,191 @@ ventaCTRL.realizarVenta = async(req, res) => {
       msg: 'Error al realizar la venta, hable con el administrador',
     });
   }
-}
+};
+
+ventaCTRL.realizarNotaCredito = async(req, res) => {
+  try {
+    const { venta, productos, metodosPagos, descontarStock = 'true' } = req.body;
+
+
+    //1. Facturar
+      const afip = await cargarFactura(venta, true);
+      if(afip.ok){
+        venta.afip = afip;
+
+        //Generar PDF
+        funcion.crearPDF(venta, productos)
+      }else{
+        return res.status(400).json({
+          ok: false,
+          msg: 'No se pudo cargar la factura'
+        })
+      }
+    
+
+    //2. Actualizar Numero
+    const numero = await actualizarNumero(venta.tipo_venta);
+    if(!numero.ok){
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al actualizar el numero, pero si se facturo'
+      })
+    };
+
+    venta.numero = numero.numero;
+    venta.precio = venta.precio * -1;
+
+    //3. Cargar Venta
+    const ventaCargada = new Venta(venta);
+    await ventaCargada.save();
+
+    if(!ventaCargada){
+      return res.status(400).json({
+        ok: false,
+        msg: 'Error al cargar la venta, pero si se facturo y se actualizo el numero'
+      });
+    };
+
+    let movimientos = [];
+    for(let i = 0; i < productos.length; i++){
+
+
+      if(!productos[i]._id && !productos[i].codigoAux) continue;
+
+      //4. Descontar stock
+      if(venta.tipo_venta !== 'PP' && descontarStock === 'true' && productos[i]._id){
+        console.log("se desceunta Stock")
+        const producto = await Producto.findByIdAndUpdate(
+          productos[i]._id,
+          {
+            $inc: {stock: productos[i].cantidad}
+          },
+          { runValidators: true}
+        )
+        if(!producto){
+          return res.status(400).json({
+            ok: false,
+            msg: 'Error al descontar el stock, pero si se facturo y se actualizo el numero'
+          })
+        };
+        };
+
+        // 5. Cargar Movimiento Producto
+        const movimiento = new Movimiento({
+          fecha: ventaCargada.fecha,
+          tipo_venta: ventaCargada.tipo_venta,
+          cliente: ventaCargada.idCliente,
+          nombrecliente: ventaCargada.cliente,
+          marca: productos[i].marca,
+          codProd: productos[i]._id,
+          producto: productos[i].descripcion,
+          cantidad: productos[i].cantidad,
+          iva: productos[i].impuesto,
+          precio: productos[i].precio * -1,
+          nro_venta: ventaCargada.numero,
+          tipo_comp: ventaCargada.tipo_comp,
+          series: productos[i].series
+        });
+
+        await movimiento.save();
+        movimientos.push(movimiento);
+
+        // 6. Cargar Series
+        if(productos[i].series && productos[i].series.length > 0){
+          if(Array.isArray(productos[i].series)){
+            for(let s of productos[i].series){
+              const serie = new NroSerie({
+                fecha: ventaCargada.fecha,
+                codigo: productos[i]._id,
+                producto: productos[i].descripcion,
+                nro_serie: s,
+                factura: ventaCargada.tipo_comp,
+                vendedor: ventaCargada.vendedor
+              });
+              await serie.save();
+            }
+          } else {
+            const serie = new NroSerie({
+              fecha: ventaCargada.fecha,
+              codigo: productos[i]._id,
+              producto: productos[i].descripcion,
+              nro_serie: productos[i].series,
+              factura: ventaCargada.tipo_comp,
+              vendedor: ventaCargada.vendedor
+            });
+            await serie.save();
+          }
+        };
+      
+    };
+
+
+    // 7. Cargar Cuenta Corriente e Historica
+    if(ventaCargada.tipo_venta === 'CC'){
+      const cuentaCorr = new CuentaCorriente({
+        fecha: ventaCargada.fecha,
+        idCliente: ventaCargada.idCliente,
+        cliente: ventaCargada.cliente,
+        nro_venta: ventaCargada.numero,
+        tipo_comp: ventaCargada.tipo_comp,
+        importe: ventaCargada.precio * -1,
+        pagado: 0,
+        saldo: ventaCargada.precio * -1,
+        codicion: 'Normal',
+        observaciones: '',
+        nro_factura: ''
+      });
+
+      await cuentaCorr.save();
+
+      const cuentaHistorica = new CuentaHistorica({
+        fecha: ventaCargada.fecha,
+        idCliente: ventaCargada.idCliente,
+        cliente: ventaCargada.cliente,
+        nro_venta: ventaCargada.numero,
+        tipo_comp: ventaCargada.tipo_comp,
+        debe: ventaCargada.precio * -1,
+        haber: 0,
+        saldo: ventaCargada.precio * -1,
+        condicion: 'Normal',
+        observaciones: ventaCargada.observaciones
+      });
+
+      await cuentaHistorica.save();
+
+      const cliente = await Cliente.findByIdAndUpdate(ventaCargada.idCliente, {
+        $inc: {saldo: -ventaCargada.precio}
+      });
+
+      if(!cliente){
+        return res.status(400).json({
+          ok: false,
+          msg: 'Error al actualizar el saldo del cleinte, pero si se facuro, actulizo numero, cargo en cuenta corriente'
+        });
+      }
+    };
+
+    if(metodosPagos){
+      await cargarMetodosPago(ventaCargada, metodosPagos);
+    };
+
+    const ventaObj = ventaCargada.toObject();
+    ventaObj.movimientos = movimientos;
+
+      
+    res.status(200).json({
+      ok: true,
+      venta: ventaObj,
+      msg: 'Cargado completo'
+    })
+  }catch(error){
+    console.error(error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al realizar la venta, hable con el administrador',
+    });
+  }
+};
 
 ventaCTRL.VentasDia = async (req, res) => {
   const { fecha } = req.params;

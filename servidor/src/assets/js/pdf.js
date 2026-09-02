@@ -49,8 +49,8 @@ funcion.crearPDF = async (venta, productos = {}) => {
             <tr>
                 <td>${_id ? _id : ''}</td>
                 <td class="text-left">${descripcion}</td>
-                <td class="text-end">${productoOriginal.unidad === 'horas' ? '' : cantidad.toFixed(2)}</td>
-                <td class="text-end">${productoOriginal.unidad === 'horas' ? '' : venta.condicionIva === 'Inscripto' ? (precio / (impuesto / 100 + 1)).toFixed(2) : precio.toFixed(2)}</td>
+                <td class="text-end">${productoOriginal?.unidad === 'horas' ? '' : cantidad.toFixed(2)}</td>
+                <td class="text-end">${productoOriginal?.unidad === 'horas' ? '' : venta.condicionIva === 'Inscripto' ? (precio / (impuesto / 100 + 1)).toFixed(2) : precio.toFixed(2)}</td>
                 <td class="text-end">${impuesto ? impuesto.toFixed(2) : ''}</td>
                 <td class="text-end">${venta.condicionIva === 'Inscripto' ? ((precio / (impuesto / 100 + 1)) * cantidad).toFixed(2) : (precio * cantidad).toFixed(2)}</td>
             </tr>
