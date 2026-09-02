@@ -649,7 +649,7 @@ ventaCTRL.ventasFacturadas = async(req, res) => {
   const hastaDate = new Date(`${hasta}T23:59:59.999-03:00`);
   try {
     const ventas = await Venta.find({
-      $and: [{ fecha: { $gte: desdeDate } }, { fecha: { $lte: hastaDate } }, { F: true }],
+      $and: [{ fecha: { $gte: desdeDate } }, { fecha: { $lte: hastaDate } }, { F: true }, {tipo_comp: {$ne: "Contado"}}],
     }).populate('vendedor', 'nombre').sort({$natural: -1}).lean();
     if(!ventas){
       return res.status(404).json({
