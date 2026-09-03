@@ -136,9 +136,8 @@ ventaCTRL.cargarVenta = async (req, res) => {
 ventaCTRL.realizarVenta = async(req, res) => {
   try {
     const { venta, metodosPagos, productos, facturado, descontarStock = 'true', remitos } = req.body;
-
     //1. Facturar si factura = true
-    if(facturado === "true"){
+    if(facturado === "true" || facturado === true){
       const afip = await cargarFactura(venta);
       if(afip.ok){
         venta.afip = afip;
@@ -679,6 +678,51 @@ ventaCTRL.ventasFacturadas = async(req, res) => {
       msg: 'No se pudo obtener las ventas facturadas, hable con el administrador',
     });
   }
+}
+
+ventaCTRL.recrearPdf = async (req, res) => {
+  const { id } = req.params;
+  
+  try{
+    const venta = await Venta.findById(id).populate('vendedor', 'nombre');
+    if(!venta || !venta.afip.puntoVenta){
+      return res.status(404).json({
+        ok: false,
+        msg: 'Venta no encontrada',
+      });
+    }
+
+    const movs = await Movimiento.find({ $and: [{ nro_venta: venta.numero.toString() }, { tipo_venta: venta.tipo_venta }] }).lean();
+
+    const productos = []
+
+    for(const mov of movs){
+      const prod = {};
+      prod._id = mov.codProd;
+      prod.descripcion = mov.producto;
+      prod.cantidad = mov.cantidad;
+      prod.precio = mov.precio;
+      prod.impuesto = mov.iva;
+      prod.productoOriginal = await Producto.findById(mov.codProd);
+      productos.push(prod);
+    } 
+    
+    
+
+    await funcion.crearPDF(venta, productos);
+    
+    res.status(200).json({
+      ok: true,
+      msg: 'PDF recreado correctamente',
+    });
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'No se pudo recrear el PDF, hable con el administrador',
+    });
+  }
+  
 }
 
 module.exports = ventaCTRL;

@@ -13,7 +13,7 @@ funcion.crearPDF = async (venta, productos = {}) => {
   const puntoVenta = venta.afip.puntoVenta.toString().padStart(4, '0');
   const numero = venta.afip.numero.toString().padStart(8, '0');
   const letra = await verTipoFactura(venta.cod_comp);
-  const fecha = venta.fecha.slice(0, 10).split('-', 3);
+  const fecha = new Date(venta.fecha).toISOString().slice(0, 10).split('-', 3);
 
   //parte arriba
   html = html.replace('{{letra}}', letra);

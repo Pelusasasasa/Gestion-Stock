@@ -14,12 +14,14 @@ const {
   getPorFactura,
   realizarVenta,
   ventasFacturadas,
-  realizarNotaCredito
+  realizarNotaCredito,
+  recrearPdf
 } = require("../controllers/venta.controllers");
 
 router.route("/").post(cargarVenta);
 router.route('/realizarVenta').post(realizarVenta)
 router.route('/realizarNotaCredito').post(realizarNotaCredito)
+router.route('/recrearPdf/:id').post(recrearPdf)
 
 router.route("/id/:id/:tipo").get(getForId).put(putForId).delete(deleteForId);
 
