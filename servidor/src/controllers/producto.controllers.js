@@ -11,7 +11,7 @@ const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
 
 productoCTRL.descontarStock = async (req, res) => {
   const { id } = req.params;
-  const { stock, tipo, descripcion, vendedor, series } = req.body;
+  const { stock, tipo, descripcion, vendedor, series, cant } = req.body;
   try {
     const producto = await Producto.findByIdAndUpdate(id, { stock }, { new: true });
 
@@ -24,7 +24,7 @@ productoCTRL.descontarStock = async (req, res) => {
       codProd: producto._id,
       producto: producto.descripcion,
       rubro: producto.rubro,
-      cantidad: stock,
+      cantidad: cant ? cant : stock,
       iva: producto.impuesto,
       precio: producto.precio,
       nro_venta: 0,
@@ -145,12 +145,14 @@ productoCTRL.traerProducto = async (req, res) => {
   const { id } = req.params;
   let producto = [];
   if (id === 'rubro') {
-    rubros = await Producto.find({}, { rubro: 1, _id: 0 }).populate('marca', {nombre: 1});
+    const rubros = await Producto.find({}, { rubro: 1, _id: 0 }).populate('marca', {nombre: 1});
     rubros.forEach((rubro) => {
       producto.push(rubro.rubro);
     });
   } else {
-    producto = await Producto.findOne({ _id: id }).populate('marca', {nombre: 1});
+    producto = await Producto.findOne({
+      $or: [{ _id: id },{codigoSecundario: id}]
+    }).populate('marca', {nombre: 1});
   }
   res.send(producto);
 };
@@ -244,17 +246,64 @@ productoCTRL.eliminarProducto = async (req, res) => {
 };
 
 productoCTRL.traerMarcas = async (req, res) => {
-  const productos = await Producto.find({}, { _id: 0, marca: 1 });
-  let marcas = [];
-  productos.filter((ele) => {
-    if (!marcas.includes(ele.marca)) {
-      marcas.push(ele.marca);
-    }
-  });
-  res.send(marcas);
+  try {
+    const marcas = await Producto.distinct('marca', { marca: {$ne: null}});
+    res.status(200).send(marcas);
+  }catch (error){
+    console.error(error);
+    res.status(500).send([])
+  }
+};
+
+productoCTRL.traerProvedores = async (req, res) => {
+  try{
+    const provedores = await Producto.distinct('provedor', {provedor: {$nin: ['', null]}})
+    res.status(200).send(provedores)   
+  }catch(error){
+    console.error(error)
+    res.status(500).send([])
+  }
 };
 
 productoCTRL.putMarcas = async (req, res) => {
+
+  //Todo
+  // try {
+  //   const { porcentaje, marca } = req.body;
+  //   const pct = parseFloat(porcentaje);
+  //   const productos = await Producto.find({ marca: marca });
+  //   for (const producto of productos) {
+  //     if (producto.costoDolar && producto.costoDolar > 0) {
+  //       producto.costoDolar = parseFloat((producto.costoDolar + (producto.costoDolar * pct) / 100).toFixed(2));
+  //     } else {
+  //       producto.costo = parseFloat((producto.costo + (producto.costo * pct) / 100).toFixed(2));
+  //     }
+  //     const baseCosto = producto.costoDolar > 0 ? producto.costoDolar : producto.costo;
+  //     const utilidad = Number(producto.utilidad || 0);
+  //     const impuesto = Number(producto.impuesto || 0);
+  //     const ganancia = Number(producto.ganancia || 0);
+  //     const costoMasUtilidad = baseCosto + (baseCosto * (utilidad / 100));
+  //     const conImpuesto = costoMasUtilidad + (costoMasUtilidad * (impuesto / 100));
+  //     const conGanancia = conImpuesto + (conImpuesto * (ganancia / 100));
+  //     if (producto.costoDolar > 0) {
+  //       const numero = await Numero.findOne();
+  //       const cotizacion = numero?.Dolar || 1;
+  //       producto.precio = parseFloat((conGanancia * cotizacion).toFixed(2));
+  //     } else {
+  //       producto.precio = parseFloat(conGanancia.toFixed(2));
+  //     }
+  //     await Producto.findByIdAndUpdate(producto._id, {
+  //       costo: producto.costo,
+  //       costoDolar: producto.costoDolar,
+  //       precio: producto.precio,
+  //     });
+  //   }
+  //   res.status(200).json({ estado: true, mensaje: 'Productos de la marca modificados con éxito' });
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ estado: false, mensaje: 'Error al modificar productos por marca' });
+  // }
+
   const { porcentaje, marca } = req.body;
   const productos = await Producto.find({ marca: marca });
   for await (let producto of productos) {
@@ -273,16 +322,30 @@ productoCTRL.putMarcas = async (req, res) => {
 };
 
 productoCTRL.cambioPreciosPorDolar = async (req, res) => {
-  const { dolar } = req.params;
-  const productos = await Producto.find({ costoDolar: { $ne: 0 } });
+  try {
+    const { dolar } = req.params;
+    const cotizacion = parseFloat(dolar);
+    const productos = await Producto.find({ costoDolar: { $gt: 0 } });
 
-  for (let producto of productos) {
-    const costoIva = parseFloat((producto.costoDolar + (producto.costoDolar * producto.impuesto) / 100) * parseFloat(dolar).toFixed(2));
-    producto.precio = ((costoIva * producto.ganancia) / 100 + costoIva).toFixed(2);
-    await Producto.findOneAndUpdate({ _id: producto._id }, producto);
+    for (let producto of productos) {
+      const costoDolar = Number(producto.costoDolar || 0);
+      const utilidad = Number(producto.utilidad || 0);
+      const impuesto = Number(producto.impuesto || 0);
+      const ganancia = Number(producto.ganancia || 0);
+
+      const costoMasUtilidad = costoDolar + (costoDolar * (utilidad / 100));
+      const conImpuesto = costoMasUtilidad + (costoMasUtilidad * (impuesto / 100));
+      const conGanancia = conImpuesto + (conImpuesto * (ganancia / 100));
+      
+      producto.precio = parseFloat((conGanancia * cotizacion).toFixed(2));
+      await Producto.findByIdAndUpdate(producto._id, { precio: producto.precio });
+    }
+    console.log('Precios con costo en dólares actualizados correctamente');
+    res.status(200).json({ ok: true, msg: 'Precios actualizados por cotización de dólar' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, msg: 'Error al cambiar precios por dólar' });
   }
-  console.log('Cambios el precio de los productos con dolares');
-  res.end();
 };
 
 productoCTRL.productosPorMarcas = async (req, res) => {
@@ -296,34 +359,52 @@ productoCTRL.productosPorMarcas = async (req, res) => {
   res.send(arreglo);
 };
 
-productoCTRL.traerProvedores = async (req, res) => {
-  let provedores = [];
-  const productos = await Producto.find({}, { _id: 1, provedor: 1 });
-  productos.forEach((producto) => {
-    if (!provedores.includes(producto.provedor)) {
-      provedores.push(producto);
-    }
-  });
-  res.send(JSON.stringify(provedores));
-};
 
 productoCTRL.putForProvedor = async (req, res) => {
-  const { provedor, porcentaje } = req.body;
-  const productos = await Producto.find({ provedor: provedor });
+  try {
+    const {provedor, porcentaje} = req.body;
+    const pct = parseFloat(porcentaje);
+    const productos = await Producto.find({provedor: provedor});
+    for(const producto of productos){
+      if(producto.costoDolar && producto.costoDolar > 0){
+        producto.costoDolar = parseFloat((producto.costoDolar + (producto.costoDolar * pct) / 100).toFixed(2));
+      }else{
+        producto.costo = parseFloat((producto.costo + (producto.costo * pct) / 100).toFixed(2))
+      }
 
-  productos.forEach(async (producto) => {
-    producto.costo = producto.costo + (producto.costo * porcentaje) / 100;
-    const costoMasIva = parseFloat((producto.costo + (producto.costo * producto.impuesto) / 100).toFixed(2));
-    producto.precio = (costoMasIva + (costoMasIva * producto.ganancia) / 100).toFixed(2);
-    await Producto.findOneAndUpdate({ _id: producto._id }, producto);
-  });
-  console.log(`Productos de provedor ${provedor} Modificados`);
-  res.send('Productos modificados');
+      const baseCosto = producto.costoDolar > 0 ? producto.costoDolar : producto.costo;
+
+      const utilidad = Number(producto.utilidad || 0);
+      const impuesto = Number(producto.impuesto || 0);
+      const ganancia = Number(producto.ganancia || 0);
+
+      const costoMasUtilidad = baseCosto + (baseCosto * (utilidad / 100));
+      const conImpuesto = costoMasUtilidad + (costoMasUtilidad * (impuesto / 100));
+      const conGanancia = conImpuesto + (conImpuesto * (ganancia / 100));
+
+      if(producto.costoDolar > 0 ){
+        const numero = await Numero.findOne();
+        const cotizacion = numero?.Dolar || 1;
+        producto.precio = parseFloat((conGanancia * cotizacion).toFixed(2));
+       }else{
+        producto.precio = parseFloat(conGanancia.toFixed(2))
+       }
+       await Producto.findByIdAndUpdate(producto._id, {
+        costo: producto.costo,
+        costoDolar: producto.costoDolar,
+        precio: producto.precio,
+      });
+    }
+    console.log(`Productos de proveedor ${provedor} modificados`);
+    res.status(200).json({ ok: true, msg: 'Productos modificados correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, msg: 'Error al modificar productos por proveedor' });
+  }
 };
 
 productoCTRL.traerCostoImpuesto = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const producto = await Producto.findOne({ _id: id });
 
   if (producto.costo !== 0) {
