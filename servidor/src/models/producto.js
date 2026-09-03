@@ -21,7 +21,9 @@ const Producto = new mongoose.Schema(
     },
     marca: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Marca"
+      ref: "Marca",
+      default: null,
+      set: (v) => (v === "" ? null : v )
     },
     rubro: {
       type: String,

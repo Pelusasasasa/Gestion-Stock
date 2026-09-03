@@ -175,6 +175,7 @@ productoCTRL.modificarProducto = async (req, res) => {
     mensaje = `Producto ${producto?.descripcion} Modificado`;
     estado = true;
   } catch (error) {
+    console.error(error);
     mensaje = `Producto ${producto?.descripcion} No se modifico`;
     estado = false;
   }

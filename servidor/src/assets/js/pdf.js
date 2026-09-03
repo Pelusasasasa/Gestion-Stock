@@ -37,7 +37,7 @@ funcion.crearPDF = async (venta, productos = []) => {
     html = html.replace('{{clienteIva}}', venta.condicionIva ? venta.condicionIva : 'Consumidor Final');
     html = html.replace('{{condicionVenta}}', venta.tipo_venta === 'CC' ? 'Cuenta Corriente' : 'Contado');
     let tr = '';
-    for await (let {_id, cantidad, precio, impuesto, descripcion, productoOriginal} of productos) {
+    for (let {_id, cantidad, precio, impuesto, descripcion, productoOriginal} of productos) {
       cantidad = parseFloat(cantidad)
       precio = parseFloat(precio)
       impuesto = parseFloat(impuesto)
