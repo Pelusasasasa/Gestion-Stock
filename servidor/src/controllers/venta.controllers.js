@@ -141,9 +141,11 @@ ventaCTRL.realizarVenta = async(req, res) => {
       const afip = await cargarFactura(venta);
       if(afip.ok){
         venta.afip = afip;
-
-        // Generar PDF
-        funcion.crearPDF(venta, productos);
+        try{
+          await funcion.crearPDF(venta, productos);
+        }catch(err){
+          console.error('ADVERTENCIA: La factura se autorizó en AFIP pero falló la creación del PDF:', err);
+        }
       }else{
         return res.status(400).json({
           ok: false,
@@ -180,7 +182,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
           if (!productos[i]._id && !productos[i].codigoAux) continue;
           
           //4. Descontar Stock Si no es presupuesto
-          if(venta.tipo_venta !== 'PP' && descontarStock === 'true'){    
+          if(venta.tipo_venta !== 'PP' && (descontarStock === 'true' || descontarStock === true) && productos[i]._id){    
             const producto = await Producto.findByIdAndUpdate(
               productos[i]._id,
               {
@@ -336,7 +338,7 @@ ventaCTRL.realizarNotaCredito = async(req, res) => {
         venta.afip = afip;
 
         //Generar PDF
-        funcion.crearPDF(venta, productos)
+        await funcion.crearPDF(venta, productos)
       }else{
         return res.status(400).json({
           ok: false,
@@ -375,7 +377,7 @@ ventaCTRL.realizarNotaCredito = async(req, res) => {
       if(!productos[i]._id && !productos[i].codigoAux) continue;
 
       //4. Descontar stock
-      if(venta.tipo_venta !== 'PP' && descontarStock === 'true' && productos[i]._id){
+      if(venta.tipo_venta !== 'PP' && (descontarStock === 'true' || descontarStock === true) && productos[i]._id){
         console.log("se desceunta Stock")
         const producto = await Producto.findByIdAndUpdate(
           productos[i]._id,
@@ -707,9 +709,11 @@ ventaCTRL.recrearPdf = async (req, res) => {
       productos.push(prod);
     } 
     
-    
-
-    await funcion.crearPDF(venta, productos);
+    try{
+      await funcion.crearPDF(venta, productos);
+    }catch(err){
+      console.error('ADVERTENCIA: La factura se autorizó en AFIP pero falló la creación del PDF:', err);
+    }
     
     res.status(200).json({
       ok: true,

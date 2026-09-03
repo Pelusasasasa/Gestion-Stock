@@ -38,7 +38,7 @@ const Tarjeta = new Schema({
     tipoComprobante: {
             type: String,
             required: true,
-            enum: ['Recibo', 'Presupuesto', 'Venta'],
+            enum: ['Recibo', 'Presupuesto', 'Venta', 'Factura A', 'Factura B', 'Credito A', 'Credito B'],
             default: 'Recibo'
     }
 });

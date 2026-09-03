@@ -27,6 +27,9 @@ const generarQR = async(texto) => {
 
 const cargarFactura = async (venta, notaCredito) => {
 
+    const iva21 = Number(venta.iva21 ?? venta.totalIva21 ?? 0);
+    const iva105 = Number(venta.iva105 ?? venta.totalIva105 ?? 0);
+
   try{
     const fecha = venta.fecha;
   const puntoVenta = 2;
@@ -58,7 +61,7 @@ const cargarFactura = async (venta, notaCredito) => {
     ImpTotConc: 0,
     ImpNeto: parseFloat((venta.gravado21 + venta.gravado105).toFixed(2)),
     ImpOpEx: 0,
-    ImpIVA: parseFloat((venta.totalIva21 + venta.totalIva105).toFixed(2)),
+    ImpIVA: parseFloat((iva21 + iva105).toFixed(2)),
     ImpTrib: 0,
     //'CondicionIVAReceptorId': tablaCondicionIVAReceptorId(venta.condicionIva),
     MonId: 'PES',
@@ -76,18 +79,18 @@ const cargarFactura = async (venta, notaCredito) => {
       },
     ]);
 
-    venta.totalIva105 !== 0 &&
+    iva105 !== 0 &&
       data.Iva.push({
         Id: 4,
         BaseImp: venta.gravado105,
-        Importe: venta.totalIva105,
+        Importe: iva105,
       });
 
-    venta.totalIva21 !== 0 &&
+    iva21 !== 0 &&
       data.Iva.push({
         Id: 5,
         BaseImp: venta.gravado21,
-        Importe: venta.totalIva21,
+        Importe: iva21,
       });
 
       console.log(data)
