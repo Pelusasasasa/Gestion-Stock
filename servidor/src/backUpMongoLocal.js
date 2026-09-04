@@ -1,38 +1,32 @@
-const { exec } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-
-//Configuracion
-const DB_NAME = 'gestion';
-const BACKUP_DIR = path.join(__dirname, '../backups');
-
-if(!fs.existsSync(BACKUP_DIR)){
-    fs.mkdirSync(BACKUP_DIR)
-};
+const { exec } = require("child_process");
+const path = require("path");
 
 const backUpMongoLocal = () => {
-    try {
-        const backUpDir = path.join(BACKUP_DIR, `${DB_NAME}`);
 
-        const cmd = `mongodump --db ${DB_NAME} --out ${backUpDir}`;
+const mongodumpPath = `"C:\\Program Files\\MongoDB\\Tools\\100\\bin\\mongodump.exe"`;
 
-        exec(cmd, (error, stdout, stderr) => {
-            if(error){
-                console.error(`Error haciendo el backup: ${error.message}`);
-                return
-            }
+const backupPath = path.join(
+  __dirname,
+  "backups",
+  "gestion"
+);
 
-            if(stderr){
-                console.log(`Error en stderr: ${stderr}`);
-                return
-            }
+const comando = `${mongodumpPath} --db gestion --out "${backupPath}"`;
 
-            console.log(`Backup completado: ${backUpDir}`);
-        })
-    } catch (error) {
-        console.error(error);
-    }
-    
-};
+console.log(comando);
 
+exec(comando, (error, stdout, stderr) => {
+  if (error) {
+    console.error("Error haciendo el backup:", error.message);
+    return;
+  }
+
+  if (stderr) {
+    console.error("MongoDB:", stderr);
+  }
+
+  console.log("Backup realizado correctamente:", stdout);
+});
+
+}
 module.exports = backUpMongoLocal;

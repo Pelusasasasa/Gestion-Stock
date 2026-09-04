@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --ignore backups/ src/index.js"
+    "dev": "nodemon src/index.js"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "src/backups/**"
+    ]
   },
   "keywords": [],
   "author": "",
