@@ -8,27 +8,37 @@ clienteCTRL.getsClientes = async (req, res) => {
   const { nombre } = req.params;
   const { desactivado = 'false' } = req.query;
 
-  
-  let clientes;
-  let texto = "";
-
-  const estaActvo = desactivado === 'false' ? false : true;
-
-
-  texto = nombre.includes("*") ? nombre.substr(1) : nombre;
+  const estaActivo = desactivado === 'false';
 
   try {
-    if (nombre === "NADA") {
-      clientes = await Clientes.find({activo: !estaActvo}).sort({ nombre: 1 }).limit(70);
-    } else {
-      const re = nombre.includes("*")
-        ? new RegExp(`${texto}`)
-        : new RegExp(`^${texto}`);
-      clientes = await Clientes.find({
-        nombre: { $regex: re, $options: "i" },
-        activo: !estaActvo
-      }).sort({ nombre: 1 });
-    }
+    if (!nombre || nombre === "NADA") {
+    const clientes = await Clientes.find({activo: estaActivo}).sort({ nombre: 1 }).limit(70);
+    
+      return res.status(200).json({
+        ok: true,
+        clientes
+      })
+  };
+
+  const textoLimpio = nombre.trim();
+  const textoEscapado = textoLimpio.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+
+  const orConditions = [
+    {nombre: {$regex: textoEscapado, $options: 'i'}},
+    { cuit: {$regex: textoEscapado, $options: 'i'}},
+    { telefono: {$regex: textoEscapado, $options: 'i'}}
+  ]
+
+  if(!isNaN(textoLimpio) && Number(textoLimpio) > 0) {
+    orConditions.push({ _id: Number(textoLimpio  )})
+  }
+
+  const clientes = await Clientes.find({
+    activo: estaActivo,
+    $or: orConditions,
+  })
+  .sort({ nombre: 1 })
+  .limit(100);
 
     res.status(200).json({
       ok: true,
@@ -45,11 +55,8 @@ clienteCTRL.getsClientes = async (req, res) => {
 
 clienteCTRL.id = async (req, res) => {
   try {
-    const ultimoCliente = await Clientes.find({}, { _id: 1 });
-    let arreglo = ultimoCliente.map((e) => {
-      return e._id;
-    });
-    let id = arreglo.length !== 0 ? Math.max(...arreglo) : 0;
+    const ultimoCliente = await Clientes.findOne().sort({_id: -1}).select('_id');
+    const id = ultimoCliente ? ultimoCliente._id  : 0;
     res.status(200).json({
       ok: true,
       id: id + 1,
@@ -96,7 +103,6 @@ clienteCTRL.getClienteId = async (req, res) => {
 
 clienteCTRL.cargarCliente = async (req, res) => {
   try {
-
     const { _id, nombre, cuit, telefono, direccion, localidad, email,condicionFacturacion, condicionIva, tipoCuenta, observaciones} = req.body;
 
     if(!nombre)return res.status(400).json({
@@ -117,15 +123,10 @@ clienteCTRL.cargarCliente = async (req, res) => {
         msg: "No se pudo cargar el cliente",
       });
 
-    const movCreado = await crearMovimientoVendedores(
-      `Alta de Cliente ${cliente.nombre}`,
-      req.body.vendedor,
-    );
-    if (!movCreado)
-      return res.status(500).json({
-        ok: false,
-        msg: "No se pudo crear el movimiento de vendedor, Hable con el administrador",
-      });
+    const movCreado = await crearMovimientoVendedores(`Alta de Cliente ${cliente.nombre}`,req.body.vendedor ?? 'CARLA');
+    if(!req.body.vendedor){
+      console.error('Error al cargar movimiento vendedor al cargar el cliente')
+    }
 
     res.status(201).json({
       ok: true,
@@ -143,6 +144,9 @@ clienteCTRL.cargarCliente = async (req, res) => {
 clienteCTRL.modificarCliente = async (req, res) => {
   const { id } = req.params;
   try {
+    delete req.body.saldo;
+    delete req.body._id;
+
     let cliente = await Clientes.findOneAndUpdate({ _id: id }, req.body, {
       new: true,
     });
@@ -155,13 +159,11 @@ clienteCTRL.modificarCliente = async (req, res) => {
 
     const movCreado = await crearMovimientoVendedores(
       `Modificacion del Cliente ${cliente.nombre}`,
-      req.body.vendedor,
+      req.body.vendedor ?? 'CARLA',
     );
-    if (!movCreado)
-      return res.status(500).json({
-        ok: false,
-        msg: "No se pudo crear el movimiento de vendedor, Hable con el administrador",
-      });
+    if (!movCreado){
+      console.error('Error al cargar movimiento vendedor al modificar el cliente')
+    }
 
     console.log(`Cliente ${cliente.nombre} Modificado`);
     res.status(200).json({
@@ -170,7 +172,7 @@ clienteCTRL.modificarCliente = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       ok: false,
       msg: "No se pudo modificar el cliente, Hable con el administrador",
     });
