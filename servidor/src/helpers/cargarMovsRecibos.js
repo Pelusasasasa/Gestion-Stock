@@ -13,7 +13,7 @@ exports.cargarMovsRecibos = async(lista, numeroRecibo) => {
             movRecibo.numero = elem.nro_venta;
             movRecibo.numeroRecibo = numeroRecibo;
             movRecibo.importe = elem.importe;
-            movRecibo.precio = elem.pagado;
+            movRecibo.precio = elem.pagoActual !== undefined ? Number(elem.pagoActual.toFixed(2)) : Number(elem.pagado.toFixed(2));
             movRecibo.saldo = elem.saldo;
 
             const nuevoMovRecibo = MovRecibos(movRecibo);

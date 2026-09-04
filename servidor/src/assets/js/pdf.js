@@ -110,7 +110,7 @@ funcion.crearPDF = async (venta, productos = []) => {
     };
     const clienteSanitizado = (venta.cliente || 'Consumidor_Final').replace(/[/\\?%*:|"<>]/g, '_');
 
-    pdf.create(html, config).toFile(`pdfs/${clienteSanitizado}--${puntoVenta}-${numero}.pdf`, (err, res) => {
+    pdf.create(html, config).toFile(`pdfs/${clienteSanitizado}-${venta.tipo_comp}-${puntoVenta}-${numero}.pdf`, (err, res) => {
       if (err) {
         reject(err);
       } else {

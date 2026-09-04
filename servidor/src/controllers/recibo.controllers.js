@@ -75,8 +75,8 @@ reciboCTRL.cargarRecibo = async (req, res) => {
 
 reciboCTRL.realizarRecibo = async (req, res) => {
   try {
-    const { fecha, cliente, idCliente, precio, tipo_comp, tipo_venta, valorRecibido = 'EFECTIVO', vendedor  } = req.body;
-    const { retenciones, metodoPagos, compensadas} = req.query;
+    const { recibo, retenciones, metodoPagos, compensadas} = req.body;
+    const { fecha, cliente, idCliente, precio, tipo_comp, tipo_venta, valorRecibido = 'EFECTIVO', vendedor  } = recibo;
 
     // 1. Actualizamos el numero
     const numero = await actualizarNumero(tipo_venta);
@@ -89,20 +89,20 @@ reciboCTRL.realizarRecibo = async (req, res) => {
     req.body.numero = numero.numero;
 
     // 2. Cargamos el Recibo
-    const recibo = new Recibo({
+    const reciboNuevo = new Recibo({
       fecha, cliente, idCliente, precio, tipo_comp, tipo_venta, 
       valorRecibido, numero: req.body.numero, vendedor
     });
 
-    await recibo.save();
+    await reciboNuevo.save();
 
     //3. Cargamos la retencion si existe
     if(retenciones){
       for(let i = 0; i < retenciones.length; i++){
         const retencionAux = retenciones[i];
-        retencionAux.fecha = recibo.fecha;
-        retencionAux.reciboId = recibo._id;
-        retencionAux.nro_comp = recibo.numero;
+        retencionAux.fecha = reciboNuevo.fecha;
+        retencionAux.reciboId = reciboNuevo._id;
+        retencionAux.nro_comp = reciboNuevo.numero;
         const retencion = new Retencion(retencionAux);
         await retencion.save();
       }
@@ -111,37 +111,39 @@ reciboCTRL.realizarRecibo = async (req, res) => {
     // 4. Cargamos los metodos de pago
     
     if(metodoPagos){
-      const metodosPagos = await cargarMetodosPago(recibo, metodoPagos);
+      const metodosPagos = await cargarMetodosPago(reciboNuevo, metodoPagos);
     }
 
     // 5. Modificamos las compensadas
     for(let i = 0; i < compensadas.length; i++){
       const item = compensadas[i];
-      if (item.importe < 0 || item.tipo_comp === 'NC' || typeof item._id === 'string' && item._id.startsWith('saldo_favor_')) {
+      const esNuevoSaldoFavor = typeof item._id === 'string' && item._id.startsWith('saldo_favor_');
+
+      if (esNuevoSaldoFavor) {
         const nuevaCompensadaAkit = new Compensada({
-          fecha: recibo.fecha,
-          idCliente: recibo.idCliente,
-          cliente: recibo.cliente,
+          fecha: reciboNuevo.fecha,
+          idCliente: reciboNuevo.idCliente,
+          cliente: reciboNuevo.cliente,
           tipo_comp: item.tipo_comp || 'NC',
-          nro_venta: recibo.numero,
+          nro_venta: reciboNuevo.numero,
           importe: item.importe,
           pagado: 0,
           saldo: item.saldo,
-          comprobanteId: recibo._id
+          comprobanteId: reciboNuevo._id
         });
         console.log('NUEVA COMPENSADA AGREGADA A LA BASE DE DATOS', nuevaCompensadaAkit)
         await nuevaCompensadaAkit.save();
         compensadas[i] = nuevaCompensadaAkit;
       } else {
         await Compensada.findByIdAndUpdate(item._id, {
-          pagado: item.pagado,
-          saldo: item.saldo,
+          pagado: Number((item.pagado || 0).toFixed(2)),
+          saldo: Number((item.saldo || 0).toFixed(2)),
         });
       }
     }
 
     // 6. Actualizamos el saldo del cliente
-    const saldoModificado = await cambiarSaldoCliente(recibo.idCliente, recibo.precio, true);
+    const saldoModificado = await cambiarSaldoCliente(reciboNuevo.idCliente, reciboNuevo.precio, true);
     if (!saldoModificado.ok) {
       return res.status(400).json({
         ok: false,
@@ -151,15 +153,15 @@ reciboCTRL.realizarRecibo = async (req, res) => {
 
     // 7. Creamos la historica
       const historica = new Historica({
-        fecha: recibo.fecha,
-        cliente: recibo.cliente,
-        idCliente: recibo.idCliente,
-        nro_venta: recibo.numero,
-        tipo_comp: recibo.tipo_comp,
+        fecha: reciboNuevo.fecha,
+        cliente: reciboNuevo.cliente,
+        idCliente: reciboNuevo.idCliente,
+        nro_venta: reciboNuevo.numero,
+        tipo_comp: reciboNuevo.tipo_comp,
         debe: 0,
-        haber: recibo.precio,
+        haber: reciboNuevo.precio,
         saldo: saldoModificado.cliente.saldo,
-        condicion: recibo.valorRecibido,
+        condicion: reciboNuevo.valorRecibido,
         observaciones: '',
       });
       await historica.save();
@@ -173,12 +175,18 @@ reciboCTRL.realizarRecibo = async (req, res) => {
         });
       };
 
+      const clienteActual = saldoModificado.cliente;
       
-
-      
-      const reciboObj = recibo.toObject();
+      const reciboObj = reciboNuevo.toObject();
       reciboObj.movimientos = movsRecibos.movs;
       reciboObj.metodoPago = metodoPagos;
+      reciboObj.datosClientes = {
+        direccion: clienteActual.direccion || '',
+        localidad: clienteActual.localidad || '',
+        telefono: clienteActual.telefono || '',
+        cuit: clienteActual.cuit || '',
+        condicionIva: clienteActual.condicionIva || 'Consumidor Final'
+      }
 
       return res.status(201).json({
         ok: true,
