@@ -42,10 +42,6 @@ const Presupuesto = new Schema({
         ref: 'Vendedor',
         required: true
     },
-    caja:{
-        type:String,
-        default:""
-    },
     F:{
         type:Boolean,
         default:false
@@ -53,6 +49,14 @@ const Presupuesto = new Schema({
     afip:{
         type:Object,
         default:{}
+    },
+    condicion: {
+        type: String,
+        default: 'NORMAL'
+    },
+    observaciones: {
+        type: String,
+        default: ''
     },
 
     //Para la afip
@@ -99,6 +103,20 @@ const Presupuesto = new Schema({
     activo: {
         type: Boolean,
         default: true,
+    },
+
+    //opcional
+    direccion: {
+        type: String,
+        default: '',
+    },
+    telefono: {
+        type: String,
+        default: '',
+    },
+    localidad: {
+        type: String,
+        default: '',
     },
 });
 

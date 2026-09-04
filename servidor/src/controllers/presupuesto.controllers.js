@@ -10,6 +10,7 @@ const {
   crearMovimientoVendedores,
 } = require("../helpers/crearMovimientoVendedores");
 const Cliente = require('../models/Cliente');
+const { cargarFactura } = require('../helpers/afip/facturar');
 
 presupuestoCTRL.post = async (req, res) => {
   try {
@@ -67,10 +68,26 @@ presupuestoCTRL.post = async (req, res) => {
 
 presupuestoCTRL.realizarPresupuesto = async(req, res) => {
   try {
-    const { presupuesto } = req.body;
-    const { productos, facturado } = req.query;
+    const { presupuesto, productos, facturado } = req.body;
 
     // 1. Facturar
+    if(facturado === "true" || facturado === true){
+      const afip = await cargarFactura(presupuesto)
+      if(afip.ok){
+        presupuesto.afip = afip;
+        try{
+          await funcion.crearPDF(presupuesto, productos);
+        }catch(err){
+          console.error('ADVERTENCIA: La factura se autorizo en AFIP pero fallo la creacion del PDF')
+        }
+      }else{
+        return res.status(400).json({
+          ok: false,
+          msg: 'No se pudo autorizar la factura'
+        })
+      }
+    }
+
 
     // 2. Actualizar numero
     const numeroActualizado = await actualizarNumero(presupuesto.tipo_venta);
@@ -111,7 +128,9 @@ presupuestoCTRL.realizarPresupuesto = async(req, res) => {
         iva: productos[i].impuesto,
         precio: productos[i].precio,
         nro_venta: presupuestoCargado.numero,
-        vendedor: presupuestoCargado.vendedor
+        vendedor: presupuestoCargado.vendedor,
+        tipo_comp: presupuestoCargado.tipo_comp,
+        series: productos[i].series
       });
 
       await movimiento.save()
@@ -138,7 +157,7 @@ presupuestoCTRL.realizarPresupuesto = async(req, res) => {
 
     res.status(201).json({
       ok: true,
-      msg: 'Remito cargado correctamente',
+      msg: 'Presupuesto cargado correctamente',
       presupuesto: presupuestoObj
     })
     

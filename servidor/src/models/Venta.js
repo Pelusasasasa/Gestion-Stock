@@ -102,6 +102,20 @@ const Venta = new Schema({
         default: true,
     },
 
+    //opcional
+        direccion: {
+            type: String,
+            default: '',
+        },
+        telefono: {
+            type: String,
+            default: '',
+        },
+        localidad: {
+            type: String,
+            default: '',
+        },
+
 });
 
 module.exports = model('Venta',Venta);

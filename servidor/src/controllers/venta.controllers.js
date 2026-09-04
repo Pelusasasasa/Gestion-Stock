@@ -180,10 +180,12 @@ ventaCTRL.realizarVenta = async(req, res) => {
       let movimientos = [];
     for(let i = 0; i < productos.length; i++){
           if (!productos[i]._id && !productos[i].codigoAux) continue;
+
           
           //4. Descontar Stock Si no es presupuesto
           if(venta.tipo_venta !== 'PP' && (descontarStock === 'true' || descontarStock === true) && productos[i]._id){    
-            const producto = await Producto.findByIdAndUpdate(
+            try{
+              const producto = await Producto.findByIdAndUpdate(
               productos[i]._id,
               {
                 $inc: { stock: -productos[i].cantidad }
@@ -191,11 +193,13 @@ ventaCTRL.realizarVenta = async(req, res) => {
               { runValidators: true }
             );
 
-            if(!producto)
-              return res.status(400).json({
-                ok: false,
-                msg: 'Error al descontar el stock, pero si se facturo y se actualizo el numero',
-              });
+            if(!producto){
+              console.log(`Producto manual o no encontrado en stock: ${productos[i].descripcion || productos[i]._id}`);
+            }
+            }catch(err){
+              console.error('Error al intentar descontar stock:', err)
+            }
+             
           }
         
           //5. Cargar Movimiento de producto
@@ -211,6 +215,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
           iva: productos[i].impuesto,
           precio: productos[i].precio,
           nro_venta: ventaCargada.numero,
+          vendedor: ventaCargada.vendedor,
           tipo_comp: ventaCargada.tipo_comp,
           series: productos[i].series
             

@@ -14,10 +14,25 @@ funcion.crearPDF = async (venta, productos = []) => {
 
     let html = fs.readFileSync(path.join(__dirname, '../html/pdf.html'), 'utf8');
 
+    //Fecha
+    const d = new Date(venta.fecha);
+    // Formato día/mes/año en zona horaria Argentina
+    const [day, month, year] = d.toLocaleDateString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).split('/');
+    html = html.replace('{{day}}', day);
+    html = html.replace('{{month}}', month);
+    html = html.replace('{{year}}', year);
+
+
     const puntoVenta = venta.afip.puntoVenta.toString().padStart(4, '0');
     const numero = venta.afip.numero.toString().padStart(8, '0');
     const letra = verTipoFactura(venta.cod_comp);
-    const fecha = new Date(venta.fecha).toISOString().slice(0, 10).split('-', 3);
+    
+    
 
     //parte arriba
     html = html.replace('{{letra}}', letra);
@@ -25,9 +40,6 @@ funcion.crearPDF = async (venta, productos = []) => {
     html = html.replace('{{puntoVenta}}', puntoVenta);
     html = html.replace('{{factura}}', venta.tipo_comp);
     html = html.replace('{{numero}}', numero);
-    html = html.replace('{{day}}', fecha[2]);
-    html = html.replace('{{month}}', fecha[1]);
-    html = html.replace('{{year}}', fecha[0]);
 
     //cliente
     html = html.replace('{{cliente}}', venta.cliente);
@@ -47,6 +59,7 @@ funcion.crearPDF = async (venta, productos = []) => {
         impuesto = impuesto / dolar;
       }
 
+
       tr =
         tr +
         `
@@ -54,9 +67,9 @@ funcion.crearPDF = async (venta, productos = []) => {
                   <td>${_id ? _id : ''}</td>
                   <td class="text-left">${descripcion}</td>
                   <td class="text-end">${productoOriginal?.unidad === 'horas' ? '' : cantidad.toFixed(2)}</td>
-                  <td class="text-end">${productoOriginal?.unidad === 'horas' ? '' : venta.condicionIva === 'Inscripto' ? (precio / (impuesto / 100 + 1)).toFixed(2) : precio.toFixed(2)}</td>
+                  <td class="text-end">${productoOriginal?.unidad === 'horas' ? '' : venta.condicionIva === 'Responsable Inscripto' ? (precio / (impuesto / 100 + 1)).toFixed(2) : precio.toFixed(2)}</td>
                   <td class="text-end">${impuesto ? impuesto.toFixed(2) : ''}</td>
-                  <td class="text-end">${venta.condicionIva === 'Inscripto' ? ((precio / (impuesto / 100 + 1)) * cantidad).toFixed(2) : (precio * cantidad).toFixed(2)}</td>
+                  <td class="text-end">${venta.condicionIva === 'Responsable Inscripto' ? ((precio / (impuesto / 100 + 1)) * cantidad).toFixed(2) : (precio * cantidad).toFixed(2)}</td>
               </tr>
           `;
     }
