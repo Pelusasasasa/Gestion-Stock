@@ -203,12 +203,7 @@ movimientoCTRL.actualizarPrecios = async(req, res) => {
 
         for(const item of lista){ 
             const producto = await Producto.findById(item._id)
-            if(!producto) return res.status(404).json({
-                ok: false,
-                msg: 'No se encontro el producto',
-            })
-
-            item.precio = producto.precio;
+            if(producto) item.precio = producto.precio;
         }
 
         res.status(200).json({

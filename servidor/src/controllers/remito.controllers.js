@@ -26,16 +26,17 @@ remitoCTRL.getAll = async (req, res) => {
 
 
     if(texto === ''){
-      remitos = await Remito.find({pasado: false, activo: estaActivo}).populate('vendedor', 'nombre').sort({$natural: -1})
+      remitos = await Remito.find({pasado: estaPasado, activo: estaActivo}).populate('vendedor', 'nombre').sort({$natural: -1})
       
     }else{
-
+      const filtros = [{cliente: {$regex: texto, $options: 'i'}}];
+      if(!isNaN(Number(texto)) && Number(texto) > 0){
+        filtros.push({numero: Number(texto)})
+      }
       remitos = await Remito.find({
-        pasado: false,
+        pasado: estaPasado,
         activo: estaActivo,
-        $or: [
-          { cliente: { $regex: texto, $options: 'i' } },
-        ]
+        $or: filtros
       }).populate('vendedor', 'nombre').sort({$natural: -1})
       
     }
