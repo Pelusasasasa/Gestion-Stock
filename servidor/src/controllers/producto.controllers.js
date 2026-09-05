@@ -15,6 +15,19 @@ productoCTRL.descontarStock = async (req, res) => {
   try {
     const producto = await Producto.findByIdAndUpdate(id, { stock }, { new: true });
 
+    const listaSeries = Array.isArray(series) ? series : [];
+
+     // Cálculo seguro de la cantidad del movimiento
+    const cantidadMovimiento = Number(cant) > 0 
+      ? Number(cant) 
+      : (listaSeries.length > 0 ? listaSeries.length : Number(stock));
+
+    // Extraer array de strings de nro_serie para el histórico
+    const seriesStrings = listaSeries
+      .map((s) => (typeof s === 'string' ? s : s.nro_serie))
+      .filter(Boolean);
+
+
     const nuevoMovimiento = {
       fecha: new Date(),
       tipo_venta: tipo,
@@ -24,11 +37,12 @@ productoCTRL.descontarStock = async (req, res) => {
       codProd: producto._id,
       producto: producto.descripcion,
       rubro: producto.rubro,
-      cantidad: cant ? cant : stock,
+      cantidad: cantidadMovimiento,
       iva: producto.impuesto,
       precio: producto.precio,
       nro_venta: 0,
-      tipo_comp: tipo
+      tipo_comp: tipo,
+      series: seriesStrings
     }
 
     const nuevoMovimientoProducto = new movProducto(nuevoMovimiento);
@@ -37,14 +51,12 @@ productoCTRL.descontarStock = async (req, res) => {
 
     const movimientoVendedor = await crearMovimientoVendedores(
       tipo === 'resta' ? `Resto el stock a ${stock} del producto ${descripcion}}` : `Sumo el stock a ${stock} del producto ${descripcion}`,
-      vendedor,
+      vendedor ?? 'CARLA',
     );
 
-    if (!movimientoVendedor)
-      return res.status(404).json({
-        ok: false,
-        msg: 'Error al crear el movimiento del vendedor',
-      });
+    if (!movimientoVendedor) {
+      console.error('Error al crear el movimiento del vendedor');
+    };
 
     const movimientoSeries = await crearNumeroSeries(series);
 
