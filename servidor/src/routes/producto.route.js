@@ -24,6 +24,7 @@ const {
   traerCostoImpuesto,
   activar,
   desactivar,
+  modificarCodigo
 } = require("../controllers/producto.controllers");
 
 router.route("/").post(cargarProducto).put(modificarVarios);
@@ -41,6 +42,7 @@ router.route("/productosPorMarcas/:lista").get(productosPorMarcas);
 router.route("/porMarca/:marca").get(getProductosPorMarca);
 router.route("/provedores").get(traerProvedores).put(putForProvedor);
 router.route("/codProd/:codigo").patch(updateProducto);
+router.route('/modificarCodigo').put(modificarCodigo)
 router
   .route("/:id")
   .get(traerProducto)

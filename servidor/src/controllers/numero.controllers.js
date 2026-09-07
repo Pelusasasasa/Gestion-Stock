@@ -18,6 +18,28 @@ numeroCTRL.modificarNumeros = async(req,res)=>{
     res.send(`Numeros Modificados`);
 };
 
+numeroCTRL.actualizarDolar = async (req, res) => {
+    try {
+        const { Dolar, dolarInstalador } = req.body;
+        const updateData = {};
+        if (Dolar !== undefined) updateData.Dolar = Dolar;
+
+        if (dolarInstalador !== undefined) updateData.dolarInstalador = dolarInstalador;
+
+        await Numero.findOneAndUpdate({}, { $set: updateData });
+        res.status(200).json({
+            ok: true,
+            msg: 'Dolares modificados'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo modificar los dolares'
+        });
+    }
+};
+
 numeroCTRL.traerNumero = async(req,res)=>{
     const {numero} = req.params;
     const numeros = await Numero.findOne();

@@ -1,12 +1,14 @@
-const {Router} = require('express');
+const { Router } = require('express');
 const router = Router();
 
-const {traerNumeros,gargarNumeros,modificarNumeros,modificarNumero, traerNumero} = require('../controllers/numero.controllers');
+const { traerNumeros, gargarNumeros, modificarNumeros, modificarNumero, traerNumero, actualizarDolar } = require('../controllers/numero.controllers');
 
 router.route('/')
-    .post(gargarNumeros )
+    .post(gargarNumeros)
     .get(traerNumeros)
     .put(modificarNumeros)
+router.route('/dolar')
+        .put(actualizarDolar)
 router.route('/:numero')
     .get(traerNumero)
     .put(modificarNumero)

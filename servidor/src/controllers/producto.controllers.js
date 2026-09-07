@@ -1,6 +1,7 @@
 const productoCTRL = {};
 
 const Producto = require('../models/producto');
+const Series = require('../models/NroSerie');
 const Numero = require('../models/Numero');
 const Marca = require('../models/Marca');
 const movProducto = require('../models/movProducto');
@@ -371,7 +372,6 @@ productoCTRL.productosPorMarcas = async (req, res) => {
   res.send(arreglo);
 };
 
-
 productoCTRL.putForProvedor = async (req, res) => {
   try {
     const {provedor, porcentaje} = req.body;
@@ -550,5 +550,64 @@ productoCTRL.desactivar = async (req, res) => {
     });
   }
 };
+
+productoCTRL.modificarCodigo = async (req, res) => {
+  try {
+    const { codigo, codigoNuevo } = req.body;
+
+    const producto = await Producto.findOne({_id: codigo});
+
+    if(!producto) return res.status(404).json({
+      ok: false,
+      msg: 'Producto no encontrado',
+    });
+
+
+    //Validad que no exista ya el codigo
+    const existe = await Producto.findOne({_id: codigoNuevo});
+
+    if(existe) return res.status(400).json({
+      ok: false,
+      msg: 'El codigo ya existe',
+    });
+
+    const productoData = producto.toObject();
+    productoData._id = codigoNuevo;
+
+    const productoNuevo = new Producto(productoData);
+
+    await productoNuevo.save();
+
+    // 4. Actualizar referencias
+    await movProducto.updateMany(
+      { codProd: codigo },
+      { $set: { codProd: codigoNuevo } }
+    );
+
+    await Series.updateMany(
+      {codigo: codigo},
+      {$set: {codigo: codigoNuevo}}
+    );
+
+
+    // 5. Eliminar el producto original
+    await Producto.deleteOne({ _id: codigo });
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Código modificado exitosamente',
+      productoNuevo,
+    });
+    
+
+
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al modificar el codigo',
+    });
+  }
+}
 
 module.exports = productoCTRL;
