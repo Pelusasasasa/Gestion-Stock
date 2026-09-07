@@ -162,20 +162,17 @@ compensadaCTRL.actualizarCompensada = async (req, res) => {
 
     // 6. Traer Productos y actaulizar movimientos
     for(const movimiento of movimientos){
+      if(!movimiento.codProd) continue
       const producto = await Producto.findOne({_id: movimiento.codProd});
-      if(!producto){
-        return res.status(404).json({
-          ok: false,
-          msg: "No se encontro el producto",
-        });
-      }
+      if(producto){
+        movimiento.precio = producto.precio;
+        await movimiento.save()
+      };
 
-      movimiento.precio = producto.precio;
-      await movimiento.save()
     }
 
     // 7. Actualizar Venta
-    venta.precio = movimientos.reduce((acc, mov) => acc + mov.precio, 0);
+    venta.precio = movimientos.reduce((acc, mov) => acc + mov.precio * mov.cantidad, 0);
     await venta.save();
 
     // 8. Actualizar Compensada
@@ -192,7 +189,11 @@ compensadaCTRL.actualizarCompensada = async (req, res) => {
     await historica.save();
 
     // 10. Actualizar Cliente
-    cliente.saldo = venta.precio - compensada.pagado;
+    const compensadasCliente = await CuentaCompensada.find({
+      idCliente: cliente._id.toString()
+    });
+
+    cliente.saldo = compensadasCliente.reduce((acc, item) => acc + (item.saldo || 0), 0);
     await cliente.save();
 
     // 11. Traer historicas con fecha superior a la actual
