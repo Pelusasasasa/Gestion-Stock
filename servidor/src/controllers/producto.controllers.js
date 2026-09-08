@@ -555,7 +555,25 @@ productoCTRL.modificarCodigo = async (req, res) => {
   try {
     const { codigo, codigoNuevo } = req.body;
 
-    const producto = await Producto.findOne({_id: codigo});
+    const codActual = String(codigo || '').trim().toUpperCase();
+    const codNuevo = String(codigoNuevo || '').trim().toUpperCase();
+
+    if(!codActual || !codNuevo){
+      return res.status(400).json({
+        ok: false,
+        msg: 'El codigo actual y el nuevo codigo son obligatorios'
+      })
+    };
+
+    if(codActual === codNuevo){
+      return res.status(400).json({
+        ok: false,
+        msg: 'El codigo actual y el nuevo son iguales'
+      })
+    }
+
+    // 1. Verficar existencia del producto
+    const producto = await Producto.findOne({_id: codActual});
 
     if(!producto) return res.status(404).json({
       ok: false,
@@ -563,43 +581,44 @@ productoCTRL.modificarCodigo = async (req, res) => {
     });
 
 
-    //Validad que no exista ya el codigo
-    const existe = await Producto.findOne({_id: codigoNuevo});
+    //2. Validad que no exista ya el codigo nuevo
+    const existe = await Producto.findOne({_id: codNuevo});
 
     if(existe) return res.status(400).json({
       ok: false,
       msg: 'El codigo ya existe',
     });
 
+    // 3. Crear el nuevo producto con el codigo
     const productoData = producto.toObject();
-    productoData._id = codigoNuevo;
+    productoData._id = codNuevo;
 
     const productoNuevo = new Producto(productoData);
 
     await productoNuevo.save();
 
-    // 4. Actualizar referencias
-    await movProducto.updateMany(
-      { codProd: codigo },
-      { $set: { codProd: codigoNuevo } }
-    );
+    try{
+      // 4. Actualizar referencias
+      await movProducto.updateMany(
+        { codProd: codActual },
+        { $set: { codProd: codNuevo } }
+      );
 
-    await Series.updateMany(
-      {codigo: codigo},
-      {$set: {codigo: codigoNuevo}}
-    );
-
-
-    // 5. Eliminar el producto original
-    await Producto.deleteOne({ _id: codigo });
-
-    res.status(200).json({
-      ok: true,
-      msg: 'Código modificado exitosamente',
-      productoNuevo,
-    });
-    
-
+      await Series.updateMany(
+        {codigo: codActual},
+        {$set: {codigo: codNuevo}}
+      );
+      // 5. Eliminar el producto original
+      await Producto.deleteOne({ _id: codActual });
+      res.status(200).json({
+        ok: true,
+        msg: 'Código modificado exitosamente',
+        productoNuevo,
+      });
+    }catch(error){
+      await Producto.deleteOne({ _id: codNuevo });
+      throw error;
+    }
 
   }catch(error){
     console.error(error);
