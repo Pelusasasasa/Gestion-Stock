@@ -132,8 +132,8 @@ remitoCTRL.postOne = async (req, res) => {
 
 remitoCTRL.realizarRemito = async(req, res) => {
   try{
-    const { remito } = req.body;
-    const {productos, descontarStock = 'true'} = req.query;
+    const { remito, productos, descontarStock = 'true' } = req.body;
+    
 
     // 1. Actualizar numero
     const numero = await actualizarNumero(remito.tipo_venta);
