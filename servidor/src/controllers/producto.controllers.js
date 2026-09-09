@@ -3,6 +3,7 @@ const productoCTRL = {};
 const Producto = require('../models/producto');
 const Series = require('../models/NroSerie');
 const Numero = require('../models/Numero');
+const Provedor = require('../models/Provedor');
 const Marca = require('../models/Marca');
 const movProducto = require('../models/movProducto');
 
@@ -551,6 +552,116 @@ productoCTRL.desactivar = async (req, res) => {
   }
 };
 
+productoCTRL.aumentoPorcentaje = async(req, res) => {
+  try {
+  
+    const {id, tipo, porcentaje} = req.body;
+
+    console.log(id)
+
+  const pct = parseFloat(porcentaje)
+  if(!id || !tipo || isNaN(pct) || pct === 0){
+    return res.status(404).json({
+      ok: false,
+      msg: 'Faltan datos'
+    })
+  };
+
+  // 1. Armar el filtro segun sea Marca o Provedor
+  let filtroProductos = { activo: true};
+  const esMarca = tipo.toLowerCase().startsWith('mar');
+
+  if(esMarca){
+    filtroProductos.marca = id;
+  }else{
+    const prov = await Provedor.findById(id).lean();
+    if(prov){
+      filtroProductos.$or = [
+        {provedor: String(id)},
+        { provedor: prov.nombre}
+      ]
+    } else {
+      filtroProductos.provedor = String(id);
+    };
+  }
+
+  // 2. Traer los productos y la cotizacion del dolar (una sola vez)
+  const [productos, numero] = await Promise.all([
+    Producto.find(filtroProductos),
+    Numero.findOne().lean()
+  ]);
+
+  if (!productos || productos.length === 0){
+    return res.status(200).json({
+      ok: true,
+      msg: 'No se encontraron productos para actualizar',
+      modificados: 0
+    })
+  };
+
+  const cotizacionDolar = Number(numero?.Dolar || 1);
+
+  // 3. Preparar operaciones bulk en memoria
+  const operaciones = productos.map((producto) => {
+    let nuevoCosto = Number(producto.costo || 0);
+    let nuevoCostoDolar = Number(producto.costoDolar || 0);
+
+    if (nuevoCostoDolar > 0){
+      nuevoCostoDolar = Number((nuevoCostoDolar * (1 + pct / 100)).toFixed(2));
+    }else{
+      nuevoCosto = Number((nuevoCosto * (1 + pct / 100)).toFixed(2))
+    };
+
+
+    // Base para el calculo
+    const baseCosto = nuevoCostoDolar > 0 ? nuevoCostoDolar : nuevoCosto;
+    const utilidad = Number(producto.utilidad || 0);
+    const impuesto = Number(producto.impuesto || 0);
+    const ganancia = Number(producto.ganancia || 0);
+
+
+    // Cascada de calculo identica a ModalProducto
+    const costoMasUtilidad = baseCosto + baseCosto * (utilidad / 100);
+    const conImpuesto = costoMasUtilidad + costoMasUtilidad * (impuesto / 100);
+    const conGanancia = conImpuesto + conImpuesto * (ganancia / 100);
+
+    const nuevoPrecio = nuevoCostoDolar > 0 
+    ? Number((conGanancia * cotizacionDolar).toFixed(2))
+    : Number(conGanancia.toFixed(2));
+
+    return {
+      updateOne: {
+        filter: {_id: producto._id},
+        update: {
+          $set: {
+            costo: nuevoCosto,
+            costoDolar: nuevoCostoDolar,
+            precio: nuevoPrecio,
+            ultimaModificacion: new Date().toISOString()
+          }
+        }
+      }
+    }
+  })
+
+  // 4. Ejecucion masiva atomica
+  await Producto.bulkWrite(operaciones);
+
+  res.status(200).json({
+    ok: true,
+    msg: `Se actualizaron ${operaciones.length} productos con un aumento del ${pct}%`,
+    modificados: operaciones.length
+  })
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al modificar el producto',
+    })
+  }
+}
+
 productoCTRL.modificarCodigo = async (req, res) => {
   try {
     const { codigo, codigoNuevo } = req.body;
@@ -627,6 +738,6 @@ productoCTRL.modificarCodigo = async (req, res) => {
       msg: 'Error al modificar el codigo',
     });
   }
-}
+};
 
 module.exports = productoCTRL;
