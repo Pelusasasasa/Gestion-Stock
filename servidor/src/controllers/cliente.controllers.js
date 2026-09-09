@@ -274,4 +274,49 @@ clienteCTRL.traerClienteConSaldo = async (req, res) => {
   res.send(clientes);
 };
 
+clienteCTRL.traerClientesConDeudas = async (req, res) => {
+  try {
+    const { soloActivos = 'false'} = req.query;
+
+    const filtros = {
+      saldo: { $exists: true},
+      $or: [
+        { saldo: { $gt: 0.009}},
+        { saldo: { $lt: -0.009}},
+      ],
+    };
+
+    if( soloActivos === 'true' ){
+      filtros.activo = true;
+    };
+
+
+    const clientes = await Clientes.find(filtros).sort({saldo: -1}).lean();
+
+    // Metricas
+    let totalDeuda = 0;
+    let totalAFavor = 0;
+
+    for (const cliente of clientes){
+      if (cliente.saldo > 0) totalDeuda += cliente.saldo;
+      else totalAFavor += Math.abs(cliente.saldo);
+    };
+
+    return res.status(200).json({
+      ok: true,
+      totalDeuda: Number(totalDeuda.toFixed(2)),
+      totalAFavor: Number(totalAFavor.toFixed(2)),
+      totalNeto: Number((totalDeuda - totalAFavor).toFixed(2)),
+      clientes
+    })
+
+  }catch(error){
+    console.error(error)
+    return res.status(500).json({
+      ok: false,
+      msg: 'No se pudieron obtener los saldos, hable con el administrador'
+    })
+  }
+}
+
 module.exports = clienteCTRL;

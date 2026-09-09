@@ -500,7 +500,6 @@ productoCTRL.modificarVarios = async (req, res) => {
   }
 };
 
-
 productoCTRL.activar = async (req, res) => {
   try{
     const { codigo } = req.query;
