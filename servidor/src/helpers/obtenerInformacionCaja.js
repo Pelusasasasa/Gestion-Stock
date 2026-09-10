@@ -51,6 +51,7 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
       $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
     }).lean();
 
+
     // Asociar movimientos a sus ventas correspondientes
     ventas.forEach((venta) => {
       venta.movimientos = movimientos.filter(
@@ -70,7 +71,7 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
 
     presupuestos.forEach((presupuesto) => {
       presupuesto.movimientos = movPresupuestos.filter(
-        (mov) => mov.numeroPresupuesto == presupuesto.numero
+        (mov) => mov.nro_venta == presupuesto.numero
       );
     });
 
