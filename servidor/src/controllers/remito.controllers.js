@@ -332,7 +332,7 @@ remitoCTRL.cargarRemitoManoObra = async(req, res) => {
         });
       }
 
-      await ManoObra.findByIdAndUpdate(mov.manoObra, { activo: false, estado: 'Remitado' });
+      await ManoObra.findByIdAndUpdate(mov.manoObra, { activo: false, estado: 'Remitado', remito_id: nuevoRemito.numero });
 
       const nuevoMovimiento = new Movimiento({
           fecha: nuevoRemito.fecha,

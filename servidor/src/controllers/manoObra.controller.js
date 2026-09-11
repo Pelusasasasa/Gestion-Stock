@@ -2,14 +2,16 @@ const ManoObra = require('../models/ManoObra')
 
 const manoObraCtrl = {};
 
-manoObraCtrl.getManoDeObras = async(req, res) => {
+manoObraCtrl.getManoDeObras = async (req, res) => {
     try {
         const { activo } = req.query;
-        
-        const manoObras = await ManoObra.find({activo})
-        .populate('cliente_id', 'nombre')
-        .populate('vendedor_id', 'nombre')
-        .populate('operarios', 'nombre codigo')
+
+        const traerActivos = activo === 'true' ? true : false;
+
+        const manoObras = await ManoObra.find({ activo: traerActivos })
+            .populate('cliente_id', 'nombre')
+            .populate('vendedor_id', 'nombre')
+            .populate('operarios', 'nombre codigo')
 
         res.status(200).json({
             ok: true,
@@ -74,7 +76,6 @@ manoObraCtrl.deleteManoObra = async(req, res) => {
             })
         }
 
-        await manoObra.save();
 
         return res.status(200).json({
             ok: true,

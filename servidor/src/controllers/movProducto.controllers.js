@@ -133,7 +133,7 @@ movimientoCTRL.postManoObra = async (req, res) => {
                 msg: 'No se encontro el producto'
             })
 
-            await ManoObra.findByIdAndUpdate(manoObra, {activo: false, estado: 'Remitado'});
+            await ManoObra.findByIdAndUpdate(manoObra, {activo: false, estado: 'Remitado', remito_id: Number(nro_venta)});
 
             const movimiento = movProducto({
                 fecha,
