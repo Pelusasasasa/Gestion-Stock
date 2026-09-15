@@ -11,8 +11,9 @@ const EquipoServicio = new Schema({
         trim: true
     },
     marca: {
-        type: String,
-        default: ''
+        type: Schema.Types.ObjectId,
+        ref: "Marca",
+        default: ""
     },
     serie: {
         type: String,

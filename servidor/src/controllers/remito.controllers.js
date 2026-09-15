@@ -16,8 +16,6 @@ const NroSerie = require('../models/NroSerie')
 
 remitoCTRL.getAll = async (req, res) => {
   const { texto = '', pasado = 'false', activo = 'true' } = req.query;
-
-
   try {
 
     let remitos = [];
@@ -58,6 +56,74 @@ remitoCTRL.getAll = async (req, res) => {
     res.status(200).json({
       ok: true,
       remitos,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'No se pudo obtener los remitos, hable con el administrador',
+    });
+  }
+};
+
+remitoCTRL.getFilter = async (req, res) => {
+  const { pagina = 0, limite = 20, texto = '', pasado = 'false', activo = 'true' } = req.query;
+
+  try {
+    const estaPasado = pasado !== 'false';
+    const estaActivo = activo !== 'false';
+
+    //Parsear parametros de paginacion
+    const limit = Math.max(1, parseInt(limite, 10) || 10);
+    const page = Math.max(1, parseInt(pagina, 10) || 1);
+    const skip = (page - 1) * limit;
+
+    const query = {
+      pasado: estaPasado, activo: estaActivo
+    }
+
+
+    if(texto.trim() !== ''){
+      const filtros = [{cliente: { $regex: texto.trim(), options: 'i'}}];
+      if(!isNaN(Number(texto)) && Number(texto) > 0){
+        filtros.push({numero: Number(texto)})
+      }
+      query.$or = filtros
+      
+    }
+    const [total, remitosDocs] = await Promise.all([
+      Remito.countDocuments(query),
+      Remito.find(query)
+      .populate('vendedor', 'nombre')
+      .sort({ $natural: -1}).skip(skip).limit(limit)
+    ])
+
+    //Obtener Datos del cliente solo para la pagina actual
+    const idClientes = remitosDocs.map((remito) => remito.idCliente).filter(Boolean)
+
+    const datosClientes = await Cliente.find({ _id: { $in: idClientes} });
+
+    const remitos = await Promise.all(
+      remitosDocs.map(async (remito) => {
+        const cliente = datosClientes.find((cliente) => cliente._id.toString() === remito.idCliente?.toString());
+        const movimientos = await Movimiento.find({
+          tipo_venta: 'RT',
+          nro_venta: remito.numero,
+        });
+
+        return { ...remito.toObject(), datosClientes: cliente, movimientos };
+      })
+    );
+
+    res.status(200).json({
+      ok: true,
+      remitos,
+      paginacion: {
+        total,
+        paginaActual: page,
+        totalPaginas: Math.ceil(total/limit),
+        limite: limit
+      }
     });
   } catch (error) {
     console.error(error);
@@ -404,6 +470,26 @@ remitoCTRL.getItemsRemitos = async(req, res) => {
       msg: 'Error en el servidor'
     })
   }
-}
+};
+
+remitoCTRL.desactivarRemitos = async(req, res) => {
+  const { listaRemitos } = req.body;
+
+  try{
+    for(const item of listaRemitos){
+      await Remito.findByIdAndUpdate(item._id, {pasado: true});
+    }
+    return res.status(200).json({
+      ok: true,
+      msg: 'Remitos desactivados correctamente'
+    })
+  }catch(error){
+    console.error(error);
+    return res.status(500).json({
+      ok: true,
+      msg: 'Error al desactivar los remitos'
+    })
+  }
+};
 
 module.exports = remitoCTRL;

@@ -17,6 +17,7 @@ servicioCTRL.eliminarPorID = async (req, res) => {
 
   try {
     const servicio = await Servicio.findByIdAndUpdate(id, { activo: false });
+    
     crearMovimientoVendedores(
       `Elimino el servico numero ${servicio.numero} del cliente ${servicio.datosClientes.nombre}`,
       req.query.vendedor,
@@ -174,7 +175,7 @@ servicioCTRL.traerActivos = async (req, res) => {
       .sort({ fecha: -1 });
 
     for (let servicio of servicios) {
-      const equipo = await EquipoServicio.find({ numero: servicio.numero });
+      const equipo = await EquipoServicio.find({ numero: servicio.numero }).populate('marca', ["nombre"]);
       equipos.push(...equipo);
     }
 
