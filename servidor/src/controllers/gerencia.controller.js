@@ -64,7 +64,9 @@ gerenciaCTRL.realizarGerencia = async(req, res) => {
                         producto: productos[i].descripcion,
                         nro_serie: s,
                         factura: gerenciaCargada.tipo_comp,
-                        vendedor: gerenciaCargada.vendedor
+                        vendedor: gerenciaCargada.vendedor,
+                        comprobanteId: gerenciaCargada._id,
+                        tipoComprobante: gerenciaCargada.tipo_comp
                       });
                       await serie.save();
                     }
@@ -75,7 +77,9 @@ gerenciaCTRL.realizarGerencia = async(req, res) => {
                       producto: productos[i].descripcion,
                       nro_serie: productos[i].series,
                       factura: gerenciaCargada.tipo_comp,
-                      vendedor: gerenciaCargada.vendedor
+                      vendedor: gerenciaCargada.vendedor,
+                      comprobanteId: gerenciaCargada._id,
+                      tipoComprobante: gerenciaCargada.tipo_comp
                     });
                     await serie.save();
                   }

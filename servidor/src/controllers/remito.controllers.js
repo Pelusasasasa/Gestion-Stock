@@ -67,7 +67,8 @@ remitoCTRL.getAll = async (req, res) => {
 };
 
 remitoCTRL.getFilter = async (req, res) => {
-  const { pagina = 0, limite = 20, texto = '', pasado = 'false', activo = 'true' } = req.query;
+  const { pagina = 0, limite = 20, texto = '', pasado = 'false', activo = 'true' } = req.query
+
 
   try {
     const estaPasado = pasado !== 'false';
@@ -84,13 +85,14 @@ remitoCTRL.getFilter = async (req, res) => {
 
 
     if(texto.trim() !== ''){
-      const filtros = [{cliente: { $regex: texto.trim(), options: 'i'}}];
+      const filtros = [{cliente: { $regex: texto.trim(), $options: 'i'}}];
       if(!isNaN(Number(texto)) && Number(texto) > 0){
         filtros.push({numero: Number(texto)})
       }
       query.$or = filtros
       
     }
+   
     const [total, remitosDocs] = await Promise.all([
       Remito.countDocuments(query),
       Remito.find(query)
@@ -279,8 +281,10 @@ remitoCTRL.realizarRemito = async(req, res) => {
                 codigo: productos[i]._id,
                 producto: productos[i].descripcion,
                 nro_serie: s,
-                factura: remito.tipo_comp,
-                vendedor: remito.vendedor
+                factura: remito.numero.toString(),
+                vendedor: remito.vendedor,
+                comprobanteId: remitoCargado._id,
+                tipoComprobante: remitoCargado.tipo_comp
               });
               await serie.save();
             }
@@ -290,8 +294,10 @@ remitoCTRL.realizarRemito = async(req, res) => {
               codigo: productos[i]._id,
               producto: productos[i].descripcion,
               nro_serie: productos[i].series,
-              factura: remito.tipo_comp,
-              vendedor: remito.vendedor
+              factura: remito.numero.toString(),
+              vendedor: remito.vendedor,
+              comprobanteId: remitoCargado._id,
+              tipoComprobante: remitoCargado.tipo_comp
             });
             await serie.save();
           }

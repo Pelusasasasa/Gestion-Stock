@@ -18,7 +18,6 @@ nroSerieCTRL.post = async (req, res) => {
 
 nroSerieCTRL.getForSearch = async (req, res) => {
   const { text } = req.params;
-
   try {
     const re = new RegExp(`^${text}`);
 
@@ -43,6 +42,7 @@ nroSerieCTRL.getForSearch = async (req, res) => {
     }).sort({ $natural: -1 }).populate('vendedor').populate('provedor');
 
     const movs = await buscarMovimientosPorNROSeries(numeros);
+
 
     res.status(200).json({
       ok: true,

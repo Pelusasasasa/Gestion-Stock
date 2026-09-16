@@ -234,7 +234,9 @@ ventaCTRL.realizarVenta = async(req, res) => {
                 producto: productos[i].descripcion,
                 nro_serie: s,
                 factura: ventaCargada.tipo_comp,
-                vendedor: ventaCargada.vendedor
+                vendedor: ventaCargada.vendedor,
+                comprobanteId: ventaCargada._id,
+                tipoComprobante: ventaCargada.tipo_comp
               });
               await serie.save();
             }
@@ -245,7 +247,9 @@ ventaCTRL.realizarVenta = async(req, res) => {
               producto: productos[i].descripcion,
               nro_serie: productos[i].series,
               factura: ventaCargada.tipo_comp,
-              vendedor: ventaCargada.vendedor
+              vendedor: ventaCargada.vendedor,
+              comprobanteId: ventaCargada._id,
+              tipoComprobante: ventaCargada.c
             });
             await serie.save();
           }

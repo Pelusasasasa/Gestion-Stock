@@ -47,6 +47,10 @@ const Producto = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    costoDPP: {
+      type: Number,
+      default: 0
+    },
     utilidad: {
       type: Number,
       required: true,

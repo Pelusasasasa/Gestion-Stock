@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 const NroSerie = new Schema({
 
@@ -26,6 +26,14 @@ const NroSerie = new Schema({
     provedor: {
         type: Schema.Types.ObjectId,
         ref: 'Provedor'
+    },
+    comprobanteId: {
+            type: Types.ObjectId,
+            refPath: 'tipoComprobante'
+        },
+    tipoComprobante: {
+        type: String,
+        default: 'Contado'
     },
     vendedor:{
         type: Schema.Types.ObjectId,
