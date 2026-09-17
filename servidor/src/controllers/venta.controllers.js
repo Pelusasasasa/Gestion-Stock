@@ -135,7 +135,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
 ventaCTRL.realizarVenta = async(req, res) => {
   try {
-    const { venta, metodosPagos, productos, facturado, descontarStock = 'true', remitos } = req.body;
+    const { venta, metodosPagos, productos, facturado, descontarStock = true, remitos } = req.body;
     //1. Facturar si factura = true
     if(facturado === "true" || facturado === true){
       const afip = await cargarFactura(venta);
@@ -183,7 +183,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
 
           
           //4. Descontar Stock Si no es presupuesto
-          if(venta.tipo_venta !== 'PP' && (descontarStock === 'true' || descontarStock === true) && productos[i]._id){    
+          if(venta.tipo_venta !== 'PP' && descontarStock && productos[i]._id){    
             try{
               const producto = await Producto.findByIdAndUpdate(
               productos[i]._id,

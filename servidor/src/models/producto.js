@@ -39,6 +39,8 @@ const Producto = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
+    // Costo
     costo: {
       type: Number,
       required: true,
@@ -63,10 +65,16 @@ const Producto = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    precioCF: {
+      type: Number,
+      default: 0
+    },
     precio: {
       type: Number,
       required: true,
     },
+
+    
     unidad: {
       type: String,
       default: "",

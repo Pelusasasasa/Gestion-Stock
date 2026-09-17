@@ -455,7 +455,6 @@ productoCTRL.traerModificados = async (req, res) => {
 
 productoCTRL.getProductosPorMarca = async (req, res) => {
   const { marca } = req.params;
-
   try {
     const productos = await Producto.find({ marca: marca });
     res.json({

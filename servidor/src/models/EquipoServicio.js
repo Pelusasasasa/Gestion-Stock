@@ -13,7 +13,7 @@ const EquipoServicio = new Schema({
     marca: {
         type: Schema.Types.ObjectId,
         ref: "Marca",
-        default: ""
+        default: null
     },
     serie: {
         type: String,

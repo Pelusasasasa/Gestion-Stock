@@ -19,7 +19,8 @@ nroSerieCTRL.post = async (req, res) => {
 nroSerieCTRL.getForSearch = async (req, res) => {
   const { text } = req.params;
   try {
-    const re = new RegExp(`^${text}`);
+    const cleanText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(cleanText, 'i');
 
     if (text === 'all') {
       const numeros = await NroSerie.find().sort({ $natural: -1 }).limit(50).populate('vendedor').populate('provedor');
@@ -34,10 +35,10 @@ nroSerieCTRL.getForSearch = async (req, res) => {
 
     const numeros = await NroSerie.find({
       $or: [
-        { nro_serie: { $regex: re, $options: 'i' } },
-        { codigo: { $regex: re, $options: 'i' } },
-        { producto: { $regex: re, $options: 'i' } },
-        { factura: { $regex: re, $options: 'i' } },
+        { nro_serie: re },
+        { codigo: re },
+        { producto: re },
+        { factura: re },
       ],
     }).sort({ $natural: -1 }).populate('vendedor').populate('provedor');
 

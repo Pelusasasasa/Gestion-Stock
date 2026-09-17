@@ -200,7 +200,7 @@ remitoCTRL.postOne = async (req, res) => {
 
 remitoCTRL.realizarRemito = async(req, res) => {
   try{
-    const { remito, productos, descontarStock = 'true' } = req.body;
+    const { remito, productos, descontarStock = true } = req.body;
     
 
     // 1. Actualizar numero
@@ -229,7 +229,7 @@ remitoCTRL.realizarRemito = async(req, res) => {
         
         if(!productos[i]._id && !productos[i].codigoAux) continue;
         // 3.Descontar Stock
-        if(descontarStock === 'true'){
+        if(descontarStock){
           const producto = await Producto.findByIdAndUpdate(
             productos[i]._id,
             {

@@ -11,6 +11,11 @@ exports.cargarEquipos = async(equipos = [], numero) => {
     try {
         for(let equipo of equipos){
             equipo.numero = numero;
+
+            if(equipo.marca.trim() === ''){
+                equipo.marca = null
+            }
+
             const equipoCargado = new EquipoServicio(equipo);
             await equipoCargado.save();
 
