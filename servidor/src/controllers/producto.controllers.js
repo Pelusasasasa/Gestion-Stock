@@ -84,23 +84,27 @@ productoCTRL.descontarStock = async (req, res) => {
 productoCTRL.getsProductos = async (req, res) => {
   const { descripcion, condicion } = req.params;
 
-  const { desactivados = 'false' } = req.query;
+  const { desactivados = 'false', exportar = 'false' } = req.query;
 
-  const estaActivo = desactivados === 'false' ? true : false;
-  
+  const estaActivo = desactivados === 'false';
+  const esExportar = exportar === 'true';
+
+  const limite = esExportar ? 0 : 50;
+
   try{
     let productos;
-  if (descripcion === 'textoVacio') {
-    productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(50);
-  } else if (condicion === 'codigo') {
-    const re = new RegExp(`^${descripcion}`);
-    productos = await Producto.find({
-      $or: [{ _id: { $regex: re, $options: 'i' } }, { codigoSecundario: { $regex: re, $options: 'i' } }],
-      activo: estaActivo,
-    }).populate('marca', ['nombre']);
-  } else if(condicion === 'marca'){
-    const marcasCoincidentes = await Marca.find({
-      nombre: {$regex: descripcion, $options: 'i'}
+
+    if (descripcion === 'textoVacio') {
+      productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(limite);
+    } else if (condicion === 'codigo') {
+      const re = new RegExp(`^${descripcion}`);
+      productos = await Producto.find({
+        $or: [{ _id: { $regex: re, $options: 'i' } }, { codigoSecundario: { $regex: re, $options: 'i' } }],
+        activo: estaActivo,
+      }).populate('marca', ['nombre']).limit(limite);
+    } else if(condicion === 'marca'){
+      const marcasCoincidentes = await Marca.find({
+        nombre: {$regex: descripcion, $options: 'i'}
     });
 
     const marcaIds = marcasCoincidentes.map(m => m._id);
@@ -108,7 +112,7 @@ productoCTRL.getsProductos = async (req, res) => {
     productos = await Producto.find({
       marca: { $in: marcaIds},
       activo: estaActivo
-    }).populate('marca', ['nombre']).limit(50);
+    }).populate('marca', ['nombre']).limit(limite);
 
   } else {
     let re;
@@ -121,10 +125,10 @@ productoCTRL.getsProductos = async (req, res) => {
       productos = await Producto.find({
         [condicion]: { $regex: re, $options: 'i' },
         activo: estaActivo,
-      }).populate('marca', ['nombre']).limit(50);
+      }).populate('marca', ['nombre']).limit(limite);
     } catch (error) {
       re = descripcion;
-      productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(50);
+      productos = await Producto.find({activo: estaActivo}).populate('marca', ['nombre']).limit(limite);
     }
   }
 
@@ -469,6 +473,7 @@ productoCTRL.getProductosPorMarca = async (req, res) => {
     });
   }
 };
+
 
 //Modificamos Varios Productos
 productoCTRL.modificarVarios = async (req, res) => {
