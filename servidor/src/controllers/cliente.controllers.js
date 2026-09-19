@@ -319,4 +319,38 @@ clienteCTRL.traerClientesConDeudas = async (req, res) => {
   }
 }
 
+clienteCTRL.modificarSaldo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { saldoNuevo } = req.body;
+
+    const saldoNumerico = Number(saldoNuevo);
+    if (isNaN(saldoNumerico)) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'El nuevo saldo debe ser un número válido',
+      });
+    }
+
+    const cliente = await Clientes.findByIdAndUpdate(id, { saldo: Number(saldoNumerico.toFixed(2)) }, { new: true });
+    if(!cliente){
+      return res.status(404).json({
+        ok: false,
+        msg: 'Cliente no encontrado'
+      })
+    }
+
+    return res.status(200).json({
+      ok: true,
+      msg: 'Saldo modificado correctamente'
+    })
+  }catch(error){
+    console.error(error)
+    return res.status(500).json({
+      ok: false,
+      msg: 'Error al modificar el saldo, hable con el administrador'
+    })
+  }
+}
+
 module.exports = clienteCTRL;

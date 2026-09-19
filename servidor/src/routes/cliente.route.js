@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-const { getsClientes, cargarCliente, id, getClienteId, eliminarCliente, modificarCliente, traerClienteConSaldo, desactivarCliente, activarCliente, traerClientesConDeudas } = require('../controllers/cliente.controllers');
+const { getsClientes, cargarCliente, id, getClienteId, eliminarCliente, modificarCliente, traerClienteConSaldo, desactivarCliente, activarCliente, traerClientesConDeudas, modificarSaldo } = require('../controllers/cliente.controllers');
 
 router.route('/')
     .get(id)
@@ -14,6 +14,9 @@ router.route('/id/:id')
     .get(getClienteId)
     .delete(eliminarCliente)
     .put(modificarCliente)
+
+router.route('/modificarSaldo/:id')
+    .patch(modificarSaldo)
 
 router.route('/clientesConSaldo')
     .get(traerClienteConSaldo)
