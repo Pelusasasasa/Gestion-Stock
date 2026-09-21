@@ -25,7 +25,8 @@ const {
   activar,
   desactivar,
   modificarCodigo,
-  aumentoPorcentaje
+  aumentoPorcentaje,
+  actualizarPrecio
 } = require("../controllers/producto.controllers");
 
 router.route("/").post(cargarProducto).put(modificarVarios);
@@ -45,6 +46,7 @@ router.route("/provedores").get(traerProvedores).put(putForProvedor);
 router.route("/codProd/:codigo").patch(updateProducto);
 router.route('/modificarCodigo').put(modificarCodigo)
 router.route('/aumentoPorcentaje').put(aumentoPorcentaje)
+router.route('/actualizarPrecio').put(actualizarPrecio)
 router
   .route("/:id")
   .get(traerProducto)

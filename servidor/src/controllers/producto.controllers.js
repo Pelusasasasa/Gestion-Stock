@@ -234,6 +234,61 @@ productoCTRL.updateProducto = async (req, res) => {
   }
 };
 
+productoCTRL.actualizarPrecio = async (req, res) => {
+  const productosPrecios = req.body;
+  try {
+
+    if (!Array.isArray(productosPrecios) || productosPrecios.length === 0) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'Productos no encontrados'
+      })
+    };
+
+   // 1. Filtrar solo los porductos que tengan nuevo costo o nuevo costo en dolares
+   const operaciones = productosPrecios.filter((p) => Number(p.costoNuevo) !== 0 || Number(p.costoDolarNuevo) !== 0)
+   .map((p) => {
+      const updateFileds = {
+        costo: Number(p.costoNuevo),
+        costoDolar: Number(p.costoDolarNuevo),
+        precio: Number(p.precioNuevo),
+        costoDPP: Number(p.costoDPPNuevo ?? 0),
+        precioCF: Number(p.precioCFNuevo ?? p.precioCFNuevo ?? 0)
+      }
+
+      return {
+        updateOne: {
+          filter: {_id: p._id},
+          update: {$set: updateFileds}
+        }
+      }
+   });
+
+   if(operaciones.length === 0){
+    return res.status(400).json({
+      ok: false,
+      msg: 'No se encontraron productos para actualizar'
+    })
+   }
+
+   // 3. Ejecutar todas las operaciones en una sola ida y vuelta a MongoDb
+
+   const resultado = await Producto.bulkWrite(operaciones);
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Productos actualizados correctamente',
+      resultado
+    })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al actualizar los productos'
+    })
+  }
+}
+
 productoCTRL.cargarProducto = async (req, res) => {
   let producto;
   
