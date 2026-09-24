@@ -5,6 +5,10 @@ const Movimiento = require("../models/movProducto");
 const MovRecibo = require("../models/MovRecibos");
 const MetodoPago = require('../models/MetodoPago');
 
+
+const Cheque = require('../models/Cheque');
+const Retencion = require('../models/Retencion');
+
 exports.traerInformacionCajaDelDia = async (req, res) => {
   const { desde, hasta } = req.params;
 
@@ -33,9 +37,20 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
       }).populate("vendedor", "nombre").lean();
       
       // Traer MetodoPagos de recibos
-      const metodoPagos = await MetodoPago.find({
-        $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
-      }).lean()
+    const metodoPagos = await MetodoPago.find({
+      $and: [{ fecha: { $gte: fechaBase } }, { fecha: { $lte: fechaFin } }],
+    }).lean()
+
+    // Traer Cheques de esa fecha
+    const cheques = await Cheque.find({
+      $and: [{f_recibido: { $gte: fechaBase}}, {f_recibido: { $lte: fechaFin}}]
+    });
+
+    // Retenciones
+    const retenciones = await Retencion.find({
+      reciboId: { $in: recibos.map((r) => r._id)}
+    }).lean();
+
     
 
     // Buscar movimientos del día una sola vez
@@ -67,6 +82,23 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
       recibo.metodoPago = metodoPagos.filter(
         (metodo) => metodo.nro_comp == recibo.numero
       );
+
+      recibo.retenciones = retenciones.filter(
+        (retencion) => retencion.reciboId?.toString() === recibo._id?.toString()
+      );
+      
+      
+      recibo.metodoPago.forEach((metodo) => {
+        if(metodo.tipo.toLowerCase() === 'cheque'){
+          const chequeAsociado = cheques.find((cheque) => cheque.comprobanteId.toString() == metodo.comprobanteId.toString());
+          if(chequeAsociado){
+            metodo.banco = chequeAsociado.banco;
+            metodo.numero = chequeAsociado.numero;
+            metodo.fecha_pago = chequeAsociado.f_cheque
+            
+          }
+        }
+      })
     });
 
     presupuestos.forEach((presupuesto) => {
@@ -74,6 +106,7 @@ exports.traerInformacionCajaDelDia = async (req, res) => {
         (mov) => mov.nro_venta == presupuesto.numero
       );
     });
+
 
     
     res.status(200).json({

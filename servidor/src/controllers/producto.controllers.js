@@ -112,7 +112,7 @@ productoCTRL.getsProductos = async (req, res) => {
     productos = await Producto.find({
       marca: { $in: marcaIds},
       activo: estaActivo
-    }).populate('marca', ['nombre']).limit(limite);
+    }).populate('marca', ['nombre']);
 
   } else {
     let re;
