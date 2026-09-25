@@ -12,8 +12,8 @@ exports.cargarEquipos = async(equipos = [], numero) => {
         for(let equipo of equipos){
             equipo.numero = numero;
 
-            if(equipo.marca.trim() === ''){
-                equipo.marca = null
+            if (!equipo.marca || (typeof equipo.marca === 'string' && equipo.marca.trim() === '')) {
+                equipo.marca = null;
             }
 
             const equipoCargado = new EquipoServicio(equipo);
