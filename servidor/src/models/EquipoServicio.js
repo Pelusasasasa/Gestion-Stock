@@ -22,6 +22,10 @@ const EquipoServicio = new Schema({
     estado: {
         type: String,
         default: 'Pendiente'
+    },
+    observaciones: {
+        type: String,
+        default: ''
     }
 });
 
