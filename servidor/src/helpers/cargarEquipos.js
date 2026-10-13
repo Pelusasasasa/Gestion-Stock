@@ -39,6 +39,13 @@ exports.modificarEquipos = async(equipos, numero) => {
         for(let equipo of equipos){
             let index = equiposCargados.findIndex(equipoCargado => equipoCargado._id == equipo._id);
 
+            // La marca puede venir vacia o populada ({ _id, nombre })
+            if (!equipo.marca || (typeof equipo.marca === 'string' && equipo.marca.trim() === '')) {
+                equipo.marca = null;
+            } else if (typeof equipo.marca === 'object' && equipo.marca._id) {
+                equipo.marca = equipo.marca._id;
+            }
+
             if(index === -1){
                 equipo.numero = numero;
                 const equipoNuevo = new EquipoServicio(equipo);

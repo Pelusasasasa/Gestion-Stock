@@ -124,17 +124,21 @@ servicioCTRL.traerPorId = async (req, res) => {
 
 servicioCTRL.modificarPorId = async (req, res) => {
   const { id } = req.params;
-  const { servicio, equipos, vendedor } = req.body;
+  // El sistema viejo manda { servicio, equipos, vendedor }; el nuevo manda el servicio plano con sus equipos
+  const { servicio, equipos, vendedor } = req.body.servicio
+    ? req.body
+    : (({ _id, equipos, ...resto }) => ({ servicio: resto, equipos: equipos || [], vendedor: resto.vendedor }))(req.body);
 
-  console.log(req.body);
-  
-  servicio.historial = cargarHstorial(servicio);
+  // El numero de una orden no se modifica: los equipos estan vinculados por ese numero
+  delete servicio.numero;
+
   try {
+    servicio.historial = cargarHstorial(servicio);
     const servicioTraido = await Servicio.findByIdAndUpdate(id, servicio, {
       new: true,
     });
     if (!servicioTraido) {
-      res.status(404).json({
+      return res.status(404).json({
         ok: false,
         msg: "No existe el servicio tecnico",
       });

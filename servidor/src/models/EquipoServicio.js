@@ -26,7 +26,12 @@ const EquipoServicio = new Schema({
     observaciones: {
         type: String,
         default: ''
-    }
+    },
+    historial: [{
+        fecha: { type: Date, default: Date.now },
+        texto: { type: String, default: '' },
+        vendedor: { type: String, default: '' }
+    }]
 });
 
 module.exports = model('EquipoServicio', EquipoServicio);
