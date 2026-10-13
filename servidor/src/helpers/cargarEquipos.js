@@ -45,14 +45,20 @@ exports.modificarEquipos = async(equipos, numero) => {
                 await equipoNuevo.save();
                 equiposModificados.push(equipoNuevo);
 
-                await cargarHistoricaServicio([equipoNuevo], numero);
+                await cargarHistoricaServicio([equipo], numero);
             }else{
+                
                 const equipoActualizado = await EquipoServicio.updateOne(
                     {_id: equipo._id},
                     {$set: equipo}
                 );
 
-                if(equipoActualizado.modifiedCount > 0){
+                const anterior = equiposCargados[index];
+                const cambioEstado = equipo.estado !== anterior.estado;
+                const cambioObservaciones =
+                    (equipo.observaciones ?? '').trim() !== (anterior.observaciones ?? '').trim();
+
+                if(equipoActualizado.modifiedCount > 0 && (cambioEstado || cambioObservaciones)){
                     await cargarHistoricaServicio([equipo], numero);
                 }
 

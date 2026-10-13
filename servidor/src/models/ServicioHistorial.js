@@ -1,7 +1,6 @@
 const { Schema, model } = require("mongoose");
 
 const ServicioHistorial = new Schema({
-
     numero: {
         type: Number,
         required: true
@@ -17,7 +16,20 @@ const ServicioHistorial = new Schema({
     },
     fecha: {
         type: Date,
-        default: Date.now()
+        default: Date.now
+    },
+    estadoAnterior: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    observaciones: {
+        type: String,
+        trim: true
+    },
+    vendedor: {
+        type: Schema.Types.ObjectId,
+        required: true
     }
 });
 

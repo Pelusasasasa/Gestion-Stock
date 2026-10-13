@@ -12,7 +12,10 @@ exports.cargarHistoricaServicio = async(equipos, numero) => {
                 numero,
                 estado: equipo.estado,
                 equipo: equipo.equipo,
-                fecha: new Date()
+                fecha: new Date(),
+                vendedor: equipo.vendedor,
+                estadoAnterior: equipo.estadoAnterior,
+                observaciones: equipo.observaciones
             };
 
             const historicaCargado = new ServicioHistorial(historica);

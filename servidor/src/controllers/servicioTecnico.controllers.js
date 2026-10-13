@@ -39,6 +39,8 @@ servicioCTRL.eliminarPorID = async (req, res) => {
 
 servicioCTRL.crearServicio = async (req, res) => {
   const { equipos } = req.body;
+
+  console.log(req.body);
   try {
     const numero = await actualizarNumero("SR");
     if (!numero)

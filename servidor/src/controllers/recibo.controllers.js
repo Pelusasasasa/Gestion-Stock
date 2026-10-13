@@ -180,6 +180,7 @@ reciboCTRL.realizarRecibo = async (req, res) => {
       const reciboObj = reciboNuevo.toObject();
       reciboObj.movimientos = movsRecibos.movs;
       reciboObj.metodoPago = metodoPagos;
+      reciboObj.retenciones = retenciones;
       reciboObj.datosClientes = {
         direccion: clienteActual.direccion || '',
         localidad: clienteActual.localidad || '',
@@ -193,7 +194,6 @@ reciboCTRL.realizarRecibo = async (req, res) => {
         recibo: reciboObj,
         saldoModificado: saldoModificado.cliente,
         historica,
-        retenciones,
       })
   } catch (error) {
     console.error(error);
