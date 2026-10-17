@@ -27,6 +27,11 @@ const EquipoServicio = new Schema({
         type: String,
         default: ''
     },
+    vendedor: {
+        type: Schema.Types.ObjectId,
+        ref: "Vendedor",
+        default: null
+    },
     historial: [{
         fecha: { type: Date, default: Date.now },
         texto: { type: String, default: '' },
