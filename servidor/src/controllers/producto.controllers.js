@@ -798,4 +798,124 @@ productoCTRL.modificarCodigo = async (req, res) => {
   }
 };
 
+// Fecha desde la que se toman en cuenta los movimientos (antes habia un error en produccion)
+const FECHA_INICIO_CONTROL_STOCK = new Date('2026-09-01T00:00:00-03:00');
+
+// Compras, sumas y notas de credito suman stock; ventas, remitos y restas lo descuentan
+const signoMovimiento = {
+  $switch: {
+    branches: [
+      { case: { $in: [{ $toLower: '$tipo_venta' }, ['compra', 'suma']] }, then: 1 },
+      { case: { $regexMatch: { input: { $ifNull: ['$tipo_comp', ''] }, regex: 'credito', options: 'i' } }, then: 1 },
+    ],
+    default: -1,
+  },
+};
+
+// Movimientos que se tienen en cuenta para el control de stock
+const filtroMovimientosControlStock = {
+  tipo_venta: { $nin: ['GR', 'PP'] },
+  fecha: { $gte: FECHA_INICIO_CONTROL_STOCK },
+};
+
+productoCTRL.stockInconsistente = async (req, res) => {
+  try {
+    // Un solo recorrido de movimientos agrupado por producto (evita un $lookup por cada producto)
+    const [totales, productos] = await Promise.all([
+      movProducto
+        .aggregate([
+          {
+            $match: {
+              ...filtroMovimientosControlStock,
+              codProd: { $nin: ['', null] },
+            },
+          },
+          {
+            $group: {
+              _id: '$codProd',
+              totalMovimientos: { $sum: { $multiply: ['$cantidad', signoMovimiento] } },
+              cantidadMovimientos: { $sum: 1 },
+            },
+          },
+        ])
+        .allowDiskUse(true),
+      Producto.find({}, { descripcion: 1, stock: 1, marca: 1, activo: 1 }).lean(),
+    ]);
+
+    const totalesPorProducto = new Map(totales.map((t) => [t._id, t]));
+
+    const inconsistentes = [];
+    for (const producto of productos) {
+      const total = totalesPorProducto.get(producto._id);
+      // Sin movimientos desde la fecha de control no hay con que comparar
+      if (!total) continue;
+
+      const totalMovimientos = total.totalMovimientos;
+      const diferencia = producto.stock - totalMovimientos;
+
+      // Tolerancia para cantidades con decimales
+      if (Math.abs(diferencia) < 1e-6) continue;
+
+      inconsistentes.push({
+        ...producto,
+        totalMovimientos,
+        cantidadMovimientos: total.cantidadMovimientos,
+        diferencia,
+      });
+    }
+
+    res.status(200).json({
+      ok: true,
+      cantidad: inconsistentes.length,
+      productos: inconsistentes,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al traer los productos con stock inconsistente, hable con el administrador',
+    });
+  }
+};
+
+productoCTRL.arreglarStock = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Se recalcula en el servidor con el mismo criterio que stockInconsistente
+    const [total] = await movProducto.aggregate([
+      { $match: { ...filtroMovimientosControlStock, codProd: id } },
+      { $group: { _id: null, totalMovimientos: { $sum: { $multiply: ['$cantidad', signoMovimiento] } } } },
+    ]);
+
+    // Sin movimientos desde la fecha de control no hay con que comparar
+    if (!total) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'El producto no tiene movimientos desde la fecha de control',
+      });
+    }
+
+    const producto = await Producto.findByIdAndUpdate(id, { stock: total.totalMovimientos }, { new: true });
+
+    if (!producto) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'No existe el producto',
+      });
+    }
+
+    res.status(200).json({
+      ok: true,
+      msg: 'Stock arreglado',
+      producto,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Error al arreglar el stock, hable con el administrador',
+    });
+  }
+};
+
 module.exports = productoCTRL;
