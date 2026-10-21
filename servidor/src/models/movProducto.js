@@ -50,6 +50,11 @@ const movProducto = new mongoose.Schema({
     series:{
         type:Array,
         default:[]
+    },
+    // false cuando el comprobante no toco el stock (ej: venta que viene de remitos ya descontados)
+    descuentaStock:{
+        type:Boolean,
+        default:true
     }
 });
 

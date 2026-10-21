@@ -133,7 +133,8 @@ servicioCTRL.modificarPorId = async (req, res) => {
   delete servicio.numero;
 
   try {
-    servicio.historial = cargarHstorial(servicio);
+    const servicioAnterior = await Servicio.findById(id);
+    servicio.historial = cargarHstorial(servicio, servicioAnterior?.sugerencias);
     const servicioTraido = await Servicio.findByIdAndUpdate(id, servicio, {
       new: true,
     });
@@ -285,21 +286,20 @@ servicioCTRL.getForText = async (req, res) => {
 
 module.exports = servicioCTRL;
 
-const cargarHstorial = (servicio) => {
-  if (servicio.historial) {
-    return [
-      ...servicio.historial,
-      {
-        fecha: new Date(),
-        texto: servicio.sugerencias ?? "",
-      },
-    ];
-  } else {
-    return [
-      {
-        fecha: new Date(),
-        texto: servicio.sugerencias ?? "",
-      },
-    ];
+// Agrega las sugerencias al historial solo si son nuevas o cambiaron respecto a las guardadas
+const cargarHstorial = (servicio, sugerenciasAnteriores = "") => {
+  const historial = servicio.historial || [];
+  const sugerencias = (servicio.sugerencias ?? "").trim();
+
+  if (!sugerencias || sugerencias === (sugerenciasAnteriores ?? "").trim()) {
+    return historial;
   }
+
+  return [
+    ...historial,
+    {
+      fecha: new Date(),
+      texto: sugerencias,
+    },
+  ];
 };

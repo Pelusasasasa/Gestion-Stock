@@ -217,7 +217,8 @@ ventaCTRL.realizarVenta = async(req, res) => {
           nro_venta: ventaCargada.numero,
           vendedor: ventaCargada.vendedor,
           tipo_comp: ventaCargada.tipo_comp,
-          series: productos[i].series
+          series: productos[i].series,
+          descuentaStock: Boolean(descontarStock)
             
         })
 
@@ -417,7 +418,8 @@ ventaCTRL.realizarNotaCredito = async(req, res) => {
           precio: productos[i].precio * -1,
           nro_venta: ventaCargada.numero,
           tipo_comp: ventaCargada.tipo_comp,
-          series: productos[i].series
+          series: productos[i].series,
+          descuentaStock: descontarStock === 'true' || descontarStock === true
         });
 
         await movimiento.save();

@@ -13,16 +13,34 @@ const { crearNumeroSeries } = require('../helpers/crearNumeroSeries');
 
 productoCTRL.descontarStock = async (req, res) => {
   const { id } = req.params;
-  const { stock, tipo, descripcion, vendedor, series, cant } = req.body;
+  const { tipo, descripcion, vendedor, series, cant } = req.body;
   try {
-    const producto = await Producto.findByIdAndUpdate(id, { stock }, { new: true });
-
     const listaSeries = Array.isArray(series) ? series : [];
 
-     // Cálculo seguro de la cantidad del movimiento
-    const cantidadMovimiento = Number(cant) > 0 
-      ? Number(cant) 
-      : (listaSeries.length > 0 ? listaSeries.length : Number(stock));
+    const cantidadMovimiento = Number(cant) > 0 ? Number(cant) : listaSeries.length;
+
+    if (!(cantidadMovimiento > 0)) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'La cantidad debe ser mayor a 0',
+      });
+    }
+
+    // Se incrementa sobre el stock actual de la base: no se usa el stock calculado en el cliente porque puede estar desactualizado
+    const producto = await Producto.findByIdAndUpdate(
+      id,
+      { $inc: { stock: tipo === 'resta' ? -cantidadMovimiento : cantidadMovimiento } },
+      { new: true },
+    );
+
+    if (!producto) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'No existe el producto',
+      });
+    }
+
+    const stock = producto.stock;
 
     // Extraer array de strings de nro_serie para el histórico
     const seriesStrings = listaSeries
@@ -815,6 +833,7 @@ const signoMovimiento = {
 // Movimientos que se tienen en cuenta para el control de stock
 const filtroMovimientosControlStock = {
   tipo_venta: { $nin: ['GR', 'PP'] },
+  descuentaStock: { $ne: false },
   fecha: { $gte: FECHA_INICIO_CONTROL_STOCK },
 };
 

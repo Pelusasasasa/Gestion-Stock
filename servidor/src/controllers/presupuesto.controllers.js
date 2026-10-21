@@ -2,6 +2,7 @@ const presupuestoCTRL = {};
 
 const Movimiento = require('../models/movProducto');
 const Presupuesto = require("../models/Presupuesto");
+const Remito = require('../models/Remito');
 
 const funcion = require("../assets/js/pdf");
 const { actualizarNumero } = require("../helpers/actualizarNumero");
@@ -68,7 +69,7 @@ presupuestoCTRL.post = async (req, res) => {
 
 presupuestoCTRL.realizarPresupuesto = async(req, res) => {
   try {
-    const { presupuesto, productos, facturado } = req.body;
+    const { presupuesto, productos, facturado, remitos } = req.body;
 
     // 1. Facturar
     if(facturado === "true" || facturado === true){
@@ -130,7 +131,9 @@ presupuestoCTRL.realizarPresupuesto = async(req, res) => {
         nro_venta: presupuestoCargado.numero,
         vendedor: presupuestoCargado.vendedor,
         tipo_comp: presupuestoCargado.tipo_comp,
-        series: productos[i].series
+        series: productos[i].series,
+        // El presupuesto nunca descuenta stock
+        descuentaStock: false
       });
 
       await movimiento.save()
@@ -142,6 +145,13 @@ presupuestoCTRL.realizarPresupuesto = async(req, res) => {
           msg: 'Error al cargar el movimiento, pero si se actualizao el numero y se cargo el presupuesto'
         });
     };
+
+    // 5. Si viene de remitos los pasamos como pasados
+    if(Array.isArray(remitos)){
+      for(const idRemito of remitos){
+        await Remito.findByIdAndUpdate(idRemito, { pasado: true });
+      }
+    }
 
     const cliente = await Cliente.findById(presupuesto.idCliente);
 

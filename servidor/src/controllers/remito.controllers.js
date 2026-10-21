@@ -200,7 +200,7 @@ remitoCTRL.postOne = async (req, res) => {
 
 remitoCTRL.realizarRemito = async(req, res) => {
   try{
-    const { remito, productos, descontarStock = true } = req.body;
+    const { remito, productos, descontarStock = true, remitos } = req.body;
     
 
     // 1. Actualizar numero
@@ -228,8 +228,8 @@ remitoCTRL.realizarRemito = async(req, res) => {
       for(let i = 0; i < productos.length; i++){
         
         if(!productos[i]._id && !productos[i].codigoAux) continue;
-        // 3.Descontar Stock
-        if(descontarStock){
+        // 3.Descontar Stock (los productos manuales no tienen stock)
+        if(descontarStock && productos[i]._id){
           const producto = await Producto.findByIdAndUpdate(
             productos[i]._id,
             {
@@ -259,7 +259,8 @@ remitoCTRL.realizarRemito = async(req, res) => {
           precio: productos[i].precio,
           nro_venta: remitoCargado.numero,
           tipo_comp: remitoCargado.tipo_comp,
-          series: productos[i].series
+          series: productos[i].series,
+          descuentaStock: Boolean(descontarStock)
         });
 
         await movimiento.save();
@@ -304,6 +305,13 @@ remitoCTRL.realizarRemito = async(req, res) => {
         }
 
     };  
+
+    // 6. Si viene de remitos los pasamos como pasados
+    if(Array.isArray(remitos)){
+      for(const idRemito of remitos){
+        await Remito.findByIdAndUpdate(idRemito, { pasado: true });
+      }
+    }
 
     const remitoObj = remitoCargado.toObject();
     remitoObj.movimientos = movimientos;      
