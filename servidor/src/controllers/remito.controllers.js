@@ -224,16 +224,24 @@ remitoCTRL.realizarRemito = async(req, res) => {
         msg: 'Error al cargar el remito, pero si se actualizo el numero'
       })
 
+    const aDescontar = new Map();
+    if(Array.isArray(productosDescontar)){
+      productosDescontar.forEach((p) => aDescontar.set(p._id, p.cantidad))
+    }
+
       let movimientos = [];
       for(let i = 0; i < productos.length; i++){
-        
+
         if(!productos[i]._id && !productos[i].codigoAux) continue;
+
+        const cantidadDescontada = Array.isArray(productosDescontar) ? aDescontar.get(productos[i]._id) ?? 0 : descontarStock ? productos[i].cantidad : 0
+
         // 3.Descontar Stock (los productos manuales no tienen stock)
-        if(descontarStock && productos[i]._id){
+        if(cantidadDescontada !== 0 && productos[i]._id){
           const producto = await Producto.findByIdAndUpdate(
             productos[i]._id,
             {
-              $inc: {stock: -productos[i].cantidad}
+              $inc: {stock: -cantidadDescontada}
             },
             {runValidators: true}
         )
@@ -260,7 +268,8 @@ remitoCTRL.realizarRemito = async(req, res) => {
           nro_venta: remitoCargado.numero,
           tipo_comp: remitoCargado.tipo_comp,
           series: productos[i].series,
-          descuentaStock: Boolean(descontarStock)
+          descuentaStock: cantidadDescontada !== 0,
+          cantidadDescontada
         });
 
         await movimiento.save();

@@ -55,6 +55,10 @@ const movProducto = new mongoose.Schema({
     descuentaStock:{
         type:Boolean,
         default:true
+    },
+    cantidadDescontada: {
+        type: Number,
+        default: 0
     }
 });
 

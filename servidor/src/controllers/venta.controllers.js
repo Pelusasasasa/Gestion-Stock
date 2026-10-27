@@ -135,7 +135,7 @@ ventaCTRL.cargarVenta = async (req, res) => {
 
 ventaCTRL.realizarVenta = async(req, res) => {
   try {
-    const { venta, metodosPagos, productos, facturado, descontarStock = true, remitos } = req.body;
+    const { venta, metodosPagos, productos, facturado, descontarStock = true, remitos, productosDescontar } = req.body;
     //1. Facturar si factura = true
     if(facturado === "true" || facturado === true){
       const afip = await cargarFactura(venta);
@@ -175,20 +175,25 @@ ventaCTRL.realizarVenta = async(req, res) => {
         msg: 'Error al cargar la venta, pero si se facturo y se actualizo el numero',
       });
 
+    const aDescontar = new Map();
+    if(Array.isArray(productosDescontar)){
+      productosDescontar.forEach((p) => aDescontar.set(p._id, p.cantidad))
+    }
 
-      
       let movimientos = [];
     for(let i = 0; i < productos.length; i++){
           if (!productos[i]._id && !productos[i].codigoAux) continue;
 
+          const cantidadDescontada = Array.isArray(productosDescontar) ? aDescontar.get(productos[i]._id) ?? 0 : descontarStock ? productos[i].cantidad : 0
+
           
           //4. Descontar Stock Si no es presupuesto
-          if(venta.tipo_venta !== 'PP' && descontarStock && productos[i]._id){    
+          if(venta.tipo_venta !== 'PP' && cantidadDescontada !== 0 && productos[i]._id){    
             try{
               const producto = await Producto.findByIdAndUpdate(
               productos[i]._id,
               {
-                $inc: { stock: -productos[i].cantidad }
+                $inc: { stock: -cantidadDescontada }
               },
               { runValidators: true }
             );
@@ -218,7 +223,8 @@ ventaCTRL.realizarVenta = async(req, res) => {
           vendedor: ventaCargada.vendedor,
           tipo_comp: ventaCargada.tipo_comp,
           series: productos[i].series,
-          descuentaStock: Boolean(descontarStock)
+          descuentaStock: cantidadDescontada !== 0,
+          cantidadDescontada
             
         })
 
@@ -250,7 +256,7 @@ ventaCTRL.realizarVenta = async(req, res) => {
               factura: ventaCargada.tipo_comp,
               vendedor: ventaCargada.vendedor,
               comprobanteId: ventaCargada._id,
-              tipoComprobante: ventaCargada.c
+              tipoComprobante: ventaCargada.tipo_comp
             });
             await serie.save();
           }

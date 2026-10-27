@@ -852,7 +852,7 @@ productoCTRL.stockInconsistente = async (req, res) => {
           {
             $group: {
               _id: '$codProd',
-              totalMovimientos: { $sum: { $multiply: ['$cantidad', signoMovimiento] } },
+              totalMovimientos: { $sum: { $multiply: [{ $ifNull: ['$cantidadDescontada', '$cantidad'] }, signoMovimiento] } },
               cantidadMovimientos: { $sum: 1 },
             },
           },
