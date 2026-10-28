@@ -200,7 +200,7 @@ remitoCTRL.postOne = async (req, res) => {
 
 remitoCTRL.realizarRemito = async(req, res) => {
   try{
-    const { remito, productos, descontarStock = true, remitos } = req.body;
+    const { remito, productos, descontarStock = true, remitos, productosDescontar } = req.body;
     
 
     // 1. Actualizar numero
