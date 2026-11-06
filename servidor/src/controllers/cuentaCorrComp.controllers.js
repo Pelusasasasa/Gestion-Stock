@@ -213,6 +213,7 @@ compensadaCTRL.actualizarCompensada = async (req, res) => {
     res.status(200).json({
       ok: true,
       msg: 'Actualizado correctamente',
+      compensada,
       historicasPosteriores
     });
     
