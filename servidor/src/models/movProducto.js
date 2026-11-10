@@ -59,7 +59,23 @@ const movProducto = new mongoose.Schema({
     cantidadDescontada: {
         type: Number,
         default: 0
+    },
+    stockResultante: {
+        type: Number,
+        default: null
     }
 });
+
+movProducto.pre('save', async function (){
+    if(!this.isNew || this.stockResultante != null) return;
+    if(!this.codProd) return
+
+    const Producto = mongoose.model('Producto');
+    const producto = await Producto.findById(this.codProd, { stock: 1}).lean();
+
+    if(producto){
+        this.stockResultante = producto.stock
+    }
+})
 
 module.exports = mongoose.model('MovProducto',movProducto);
